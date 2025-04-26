@@ -2,6 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
@@ -12,6 +13,91 @@
         <maven.compiler.source>23</maven.compiler.source>
         <maven.compiler.target>23</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <javafx.version>21.0.2</javafx.version>
+        <gluon.version>6.2.3</gluon.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+        <repository>
+            <id>gluon-releases</id>
+            <url>https://nexus.gluonhq.com/nexus/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+
+
+    <dependencies>
+        <!-- JavaFX dependencies -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
+
+        <!-- Gluon Mobile Glisten UI -->
+        <dependency>
+            <groupId>com.gluonhq</groupId>
+            <artifactId>charm-glisten</artifactId>
+            <version>6.2.3</version>
+        </dependency>
+
+        <!-- Optional: Gluon Attach modules -->
+            <!-- Gluon Attach Lifecycle -->
+            <dependency>
+                <groupId>com.gluonhq.attach</groupId>
+                <artifactId>lifecycle</artifactId>
+                <version>4.0.20</version>
+            </dependency>
+
+            <!-- Gluon Attach Storage -->
+            <dependency>
+                <groupId>com.gluonhq.attach</groupId>
+                <artifactId>storage</artifactId>
+                <version>4.0.20</version>
+            </dependency>
+
+
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- JavaFX plugin for local running -->
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>com.belman.belsign.Main</mainClass> <!-- CHANGE THIS -->
+                </configuration>
+            </plugin>
+
+            <!-- Gluon plugin for mobile builds -->
+            <plugin>
+                <groupId>com.gluonhq</groupId>
+                <artifactId>gluonfx-maven-plugin</artifactId>
+                <version>1.0.26</version>
+                <configuration>
+                    <target>host</target> <!-- Later can be android / ios -->
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
 
 </project>
