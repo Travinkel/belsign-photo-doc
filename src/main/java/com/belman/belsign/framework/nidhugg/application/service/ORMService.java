@@ -3,7 +3,7 @@ package com.belman.belsign.framework.nidhugg.application.service;
 
 
 import com.belman.belsign.framework.nidhugg.domain.BaseEntity;
-import com.belman.belsign.framework.nidhugg.domain.Query;
+import com.belman.belsign.framework.nidhugg.infrastructure.Query;
 
 import java.util.ArrayList;
 import java.util.List;

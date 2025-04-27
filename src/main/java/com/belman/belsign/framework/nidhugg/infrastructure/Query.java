@@ -1,5 +1,6 @@
-package com.belman.belsign.framework.nidhugg.domain;
+package com.belman.belsign.framework.nidhugg.infrastructure;
 
+import com.belman.belsign.framework.nidhugg.domain.BaseEntity;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
