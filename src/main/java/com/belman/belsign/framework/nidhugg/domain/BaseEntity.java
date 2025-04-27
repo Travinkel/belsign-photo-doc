@@ -1,4 +1,4 @@
-package com.belman.belsign.framework.nidhugg;
+package com.belman.belsign.framework.nidhugg.domain;
 
 import java.lang.reflect.Field;
 

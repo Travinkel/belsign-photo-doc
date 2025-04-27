@@ -1,6 +1,7 @@
 package com.belman.belsign.framework.nidhugg;
 
-import com.belman.belsign.application.service.ORMService;
+import com.belman.belsign.framework.nidhugg.application.service.ORMService;
+import com.belman.belsign.framework.nidhugg.domain.BaseEntity;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;

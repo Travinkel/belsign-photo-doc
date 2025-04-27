@@ -1,4 +1,4 @@
-package com.belman.belsign.framework.nidhugg;
+package com.belman.belsign.framework.nidhugg.domain;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

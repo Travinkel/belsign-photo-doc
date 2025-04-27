@@ -1,9 +1,9 @@
-package com.belman.belsign.application.service;
+package com.belman.belsign.framework.nidhugg.application.service;
 
 
 
-import com.belman.belsign.framework.nidhugg.BaseEntity;
-import com.belman.belsign.framework.nidhugg.Query;
+import com.belman.belsign.framework.nidhugg.domain.BaseEntity;
+import com.belman.belsign.framework.nidhugg.domain.Query;
 
 import java.util.ArrayList;
 import java.util.List;
