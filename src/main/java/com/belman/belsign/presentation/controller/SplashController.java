@@ -2,10 +2,8 @@ package com.belman.belsign.presentation.controller;
 
 
 import com.belman.belsign.application.viewmodel.SplashViewModel;
-import com.belman.belsign.infrastructure.navigation.Router;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;

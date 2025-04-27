@@ -1,6 +1,6 @@
 package com.belman.belsign.application.viewmodel;
 
-import com.belman.belsign.infrastructure.navigation.ViewLifecycle;
+import com.belman.belsign.framework.athomefx.lifecycle.ViewLifecycle;
 
 public class MainViewModel implements ViewLifecycle {
 }

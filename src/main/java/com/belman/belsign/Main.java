@@ -1,6 +1,6 @@
 package com.belman.belsign;
 
-import com.belman.belsign.infrastructure.navigation.Router;
+import com.belman.belsign.framework.athomefx.navigation.Router;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
