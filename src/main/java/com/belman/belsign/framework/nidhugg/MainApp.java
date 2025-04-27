@@ -1,4 +1,4 @@
-package com.belman.belsign.framework.orm;
+package com.belman.belsign.framework.nidhugg;
 
 import com.belman.belsign.application.service.ORMService;
 import javafx.application.Application;
