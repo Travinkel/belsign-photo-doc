@@ -35,10 +35,10 @@ public class PDFExportService {
             contentStream.showText("Created at: " + report.getCreatedAt().toString());
             contentStream.endText();
 
-            List<PhotoDocument> photos = report.getPhotos();
+            List<PhotoDocument> photoDocuments = report.getPhotos();
             int yPosition = 650;
 
-            for (PhotoDocument photo : photos) {
+            for (PhotoDocument photoDocument : photoDocuments) {
                 if (yPosition < 100) {
                     contentStream.close();
                     page = new PDPage(PDRectangle.A4);
@@ -49,8 +49,8 @@ public class PDFExportService {
                 contentStream.setFont(PDType1Font.HELVETICA, 10);
                 contentStream.beginText();
                 contentStream.newLineAtOffset(50, yPosition);
-                contentStream.showText("Photo ID: " + photo.getId() + " - Angle: " + photo.getAngle() + " - Status: " +
-                                       photo.getStatus());
+                contentStream.showText("Photo ID: " + photoDocument.getPhotoId() + " - Angle: " + photoDocument.getAngle() + " - Status: " +
+                                       photoDocument.getStatus());
                 contentStream.endText();
                 yPosition -= 20;
             }

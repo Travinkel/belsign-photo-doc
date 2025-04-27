@@ -17,7 +17,7 @@ public class QCReport {
         this.order = builder.order;
         this.photos = builder.photos;
         this.createdBy = builder.createdBy;
-        this.createdAt = builder.createdAt;
+        this.createdAt = builder.createdOn;
     }
 
     public Order getOrder() {

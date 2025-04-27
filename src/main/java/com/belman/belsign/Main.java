@@ -1,6 +1,7 @@
 package com.belman.belsign;
 
 import com.belman.belsign.framework.athomefx.navigation.Router;
+import com.belman.belsign.presentation.views.splash.SplashView;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
@@ -11,16 +12,11 @@ import javafx.stage.Stage;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
-        StackPane root = new StackPane();
-        Scene scene = new Scene(root, 400, 600);
 
-        Router.getInstance().initialize(root);
-
-        primaryStage.setScene(scene);
+        Router.setPrimaryStage(primaryStage);
         primaryStage.setTitle("BelSign");
-        primaryStage.show();
+        Router.navigateTo(SplashView.class);
 
-        Router.getInstance().navigate("splash");
     }
     public static void main(String[] args) {
         launch(args);
