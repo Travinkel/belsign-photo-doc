@@ -8,7 +8,7 @@ public class PhotoId {
     private final UUID value;
 
     public PhotoId(UUID value) {
-        this.value = value;
+        this.value = Objects.requireNonNull(value, "value must not be null");
     }
 
     public PhotoId() {

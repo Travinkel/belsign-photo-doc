@@ -1,27 +1,32 @@
 package com.belman.belsign.domain.model.order.photodocument;
 
-import java.nio.file.Path;
+/**
+ * Value object representing the file system path to an image.
+ */
+public final class ImagePath {
+    private final String path;
 
-public record ImagePath(Path path) {
-
-    public ImagePath(Path path) {
-        if (path == null) {
-            throw new NullPointerException("Path must not be null.");
+    public ImagePath(String path) {
+        if (path == null || path.isBlank()) {
+            throw new IllegalArgumentException("Image path cannot be null or blank");
         }
         this.path = path;
     }
 
-    public String filename() {
-        // Check if the path is valid and not a directory ending with "/"
-        Path fileName = path.getFileName();
-        if (fileName == null || fileName.toString().isEmpty()) {
-            return null; // Handle directories or root paths
-        }
-        return fileName.toString();
+    public String getPath() {
+        return path;
     }
 
     @Override
-    public String toString() {
-        return path.toString();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ImagePath imagePath = (ImagePath) o;
+        return path.equals(imagePath.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return path.hashCode();
     }
 }

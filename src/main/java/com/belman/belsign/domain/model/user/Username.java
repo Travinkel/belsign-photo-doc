@@ -1,17 +1,31 @@
 package com.belman.belsign.domain.model.user;
 
-import java.util.Objects;
+/**
+ * Value object for a user's login name.
+ */
+public final class Username {
+    private final String value;
 
-public record Username(String value) {
-    public Username {
-        Objects.requireNonNull(value, "Username cannot be null");
-        if (value.isBlank()) {
+    public Username(String value) {
+        if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("Username cannot be empty");
         }
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
     }
 
     @Override
-    public String toString() {
-        return value;
+    public boolean equals(Object o) {
+        // standard equals implementation
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        // standard hashCode implementation
+        return 0;
     }
 }

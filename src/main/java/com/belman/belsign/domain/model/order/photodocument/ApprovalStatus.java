@@ -1,4 +1,4 @@
-package com.belman.belsign.domain.model.order;
+package com.belman.belsign.domain.model.order.photodocument;
 
 public enum ApprovalStatus {
     PENDING,

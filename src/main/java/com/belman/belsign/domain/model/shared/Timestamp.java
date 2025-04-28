@@ -1,20 +1,38 @@
 package com.belman.belsign.domain.model.shared;
 
 import java.time.Instant;
-import java.util.Objects;
 
-public record Timestamp(Instant value) {
+/**
+ * Value object wrapping a point in time.
+ */
+public final class Timestamp {
+    private final Instant instant;
 
-    public Timestamp {
-        Objects.requireNonNull(value, "Timestamp must not be null");
+    public Timestamp(Instant instant) {
+        this.instant = instant;
     }
 
+    /**
+     * Creates a Timestamp representing the current moment.
+     */
     public static Timestamp now() {
         return new Timestamp(Instant.now());
     }
 
+    public Instant toInstant() {
+        return instant;
+    }
+
     @Override
-    public String toString() {
-        return value.toString();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Timestamp timestamp = (Timestamp) o;
+        return timestamp.instant.equals(this.instant);
+    }
+
+    @Override
+    public int hashCode() {
+        return instant.hashCode();
     }
 }

@@ -1,0 +1,41 @@
+package unit.domain.model.order.photodocument;
+
+import com.belman.belsign.domain.model.order.photodocument.PhotoId;
+import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class PhotoIdTest {
+
+    @Test
+    void constructorShouldAcceptValidUUID() {
+        UUID uuid = UUID.randomUUID();
+        PhotoId photoId = new PhotoId(uuid);
+        assertEquals(uuid, photoId.getValue());
+    }
+
+    @Test
+    void constructorShouldRejectNullUUID() {
+        assertThrows(NullPointerException.class, () -> new PhotoId(null));
+    }
+
+    @Test
+    void equalPhotoIdsShouldBeEqual() {
+        UUID uuid = UUID.randomUUID();
+        PhotoId id1 = new PhotoId(uuid);
+        PhotoId id2 = new PhotoId(uuid);
+
+        assertEquals(id1, id2);
+        assertEquals(id1.hashCode(), id2.hashCode());
+    }
+
+    @Test
+    void differentPhotoIdsShouldNotBeEqual() {
+        PhotoId id1 = new PhotoId(UUID.randomUUID());
+        PhotoId id2 = new PhotoId(UUID.randomUUID());
+
+        assertNotEquals(id1, id2);
+    }
+}
