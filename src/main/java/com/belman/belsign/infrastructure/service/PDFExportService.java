@@ -1,7 +1,7 @@
 package com.belman.belsign.infrastructure.service;
 
 import com.belman.belsign.application.qcreport.QCReport;
-import com.belman.belsign.domain.model.photo.PhotoDocument;
+import com.belman.belsign.domain.model.order.photodocument.PhotoDocument;
 import org.apache.pdfbox.pdmodel.*;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
@@ -49,8 +49,8 @@ public class PDFExportService {
                 contentStream.setFont(PDType1Font.HELVETICA, 10);
                 contentStream.beginText();
                 contentStream.newLineAtOffset(50, yPosition);
-                contentStream.showText("Photo ID: " + photoDocument.getPhotoId() + " - Angle: " + photoDocument.getAngle() + " - Status: " +
-                                       photoDocument.getStatus());
+                contentStream.showText("Photo ID: " + photoDocument.getId() + " - Uploader: " + photoDocument.getUploader() + " - Status: " +
+                                       photoDocument.getApprovalStatus());
                 contentStream.endText();
                 yPosition -= 20;
             }

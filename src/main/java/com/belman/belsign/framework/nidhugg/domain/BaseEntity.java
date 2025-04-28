@@ -1,16 +1,24 @@
 package com.belman.belsign.framework.nidhugg.domain;
 
-import java.lang.reflect.Field;
+import java.util.UUID;
 
 public abstract class BaseEntity {
-    public String getTableName() {
-        return this.getClass().getSimpleName().toLowerCase();
+
+    private UUID id;
+
+    protected BaseEntity() {
+        this.id = UUID.randomUUID();
     }
 
-    public String[] getColumnNames() {
-        Field[] fields = this.getClass().getDeclaredFields();
-        return java.util.Arrays.stream(fields)
-                .map(Field::getName)
-                .toArray(String[]::new);
+    protected BaseEntity(UUID id) {
+        this.id = id == null ? UUID.randomUUID() : id;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 }

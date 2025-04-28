@@ -7,14 +7,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class NidhuggOrmServiceTest {
-    private ORMService ormService;
-    private final Map<UUID, BaseEntity> database = new HashMap<>();
-
+class NidhuggOrmServiceTest {
+    private ORMService<TestEntity> ormService;
 
     static class TestEntity extends BaseEntity {
         private String name;
@@ -26,18 +23,21 @@ public class NidhuggOrmServiceTest {
         public String getName() {
             return name;
         }
+
+        public void setName(String name) {
+            this.name = name;
+        }
     }
 
     @BeforeEach
     void setUp() {
-        ormService = new ORMService();
+        ormService = new ORMService<>();
     }
 
     @Test
     void testSaveEntity() {
         TestEntity entity = new TestEntity("TestName");
         ormService.save(entity);
-
         assertNotNull(entity.getId(), "Entity should have an ID after saving.");
     }
 
@@ -46,7 +46,7 @@ public class NidhuggOrmServiceTest {
         TestEntity entity = new TestEntity("FindMe");
         ormService.save(entity);
 
-        Optional<BaseEntity> found = ormService.findById(entity.getId());
+        Optional<TestEntity> found = ormService.findById(entity.getId());
         assertTrue(found.isPresent(), "Entity should be found by ID.");
         assertEquals(entity.getId(), found.get().getId(), "Found entity ID should match.");
     }
@@ -56,7 +56,7 @@ public class NidhuggOrmServiceTest {
         ormService.save(new TestEntity("A"));
         ormService.save(new TestEntity("B"));
 
-        List<BaseEntity> allEntities = ormService.findAll();
+        List<TestEntity> allEntities = ormService.findAll();
         assertEquals(2, allEntities.size(), "Should retrieve all saved entities.");
     }
 
@@ -65,64 +65,28 @@ public class NidhuggOrmServiceTest {
         ormService.save(new TestEntity("Alpha"));
         ormService.save(new TestEntity("Beta"));
 
-        List<BaseEntity> filtered = ormService.findAll(entity -> ((TestEntity) entity).getName().startsWith("A"));
+        List<TestEntity> filtered = ormService.findAll(entity -> entity.getName().startsWith("A"));
         assertEquals(1, filtered.size(), "Should filter entities correctly.");
-        assertEquals("Alpha", ((TestEntity) filtered.get(0)).getName(), "Filtered entity should match condition.");
+        assertEquals("Alpha", filtered.get(0).getName(), "Filtered entity should match condition.");
     }
 
-
-    public void save(BaseEntity entity) {
-        if (entity.getId() == null) {
-            entity.setId(UUID.randomUUID());
-        }
-        database.put(entity.getId(), entity);
-    }
-
-    public Optional<BaseEntity> findById(UUID id) {
-        return Optional.ofNullable(database.get(id));
-    }
-
-    public List<BaseEntity> findAll() {
-        return new ArrayList<>(database.values());
-    }
-
-    public List<BaseEntity> findAll(Predicate<BaseEntity> filter) {
-        return database.values()
-                .stream()
-                .filter(filter)
-                .collect(Collectors.toList());
-    }
-
-    public void update(BaseEntity entity) {
-        if (entity.getId() == null || !database.containsKey(entity.getId())) {
-            throw new IllegalArgumentException("Entity must exist to be updated.");
-        }
-        database.put(entity.getId(), entity);
-    }
-
-    public void delete(BaseEntity entity) {
-        if (entity.getId() == null || !database.containsKey(entity.getId())) {
-            throw new IllegalArgumentException("Entity must exist to be deleted.");
-        }
-        database.remove(entity.getId());
-    }
     @Test
     void testUpdateEntity() {
         TestEntity entity = new TestEntity("Original");
         ormService.save(entity);
 
-        entity.name = "Updated"; // Direkte adgang for test
+        entity.setName("Updated");
         ormService.update(entity);
 
-        Optional<BaseEntity> found = ormService.findById(entity.getId());
+        Optional<TestEntity> found = ormService.findById(entity.getId());
         assertTrue(found.isPresent());
-        assertEquals("Updated", ((TestEntity) found.get()).getName());
+        assertEquals("Updated", found.get().getName());
     }
 
     @Test
     void testUpdateNonexistentEntityThrowsException() {
         TestEntity entity = new TestEntity("Ghost");
-        entity.setId(UUID.randomUUID()); // Fiktiv ID
+        entity.setId(UUID.randomUUID());
 
         assertThrows(IllegalArgumentException.class, () -> ormService.update(entity));
     }
@@ -134,7 +98,7 @@ public class NidhuggOrmServiceTest {
 
         ormService.delete(entity);
 
-        Optional<BaseEntity> found = ormService.findById(entity.getId());
+        Optional<TestEntity> found = ormService.findById(entity.getId());
         assertFalse(found.isPresent());
     }
 
@@ -145,6 +109,4 @@ public class NidhuggOrmServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> ormService.delete(entity));
     }
-
-
 }

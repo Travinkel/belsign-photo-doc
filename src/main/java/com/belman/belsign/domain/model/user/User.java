@@ -1,5 +1,7 @@
 package com.belman.belsign.domain.model.user;
 
+import java.util.UUID;
+
 public class User {
     private final UUID
             userId;

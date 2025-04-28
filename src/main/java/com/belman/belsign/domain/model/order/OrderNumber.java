@@ -1,38 +1,20 @@
 package com.belman.belsign.domain.model.order;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
-public class OrderNumber {
-    private final String value;
+public record OrderNumber(String value) {
+    private static final Pattern VALID_PATTERN = Pattern.compile("\\d{1,2}/\\d{2}-\\d{6}-\\d{8}");
 
-    public OrderNumber(String value) {
-        if (value == null || value.isEmpty()) {
-            throw new IllegalArgumentException("Order number cannot be null or empty");
+    public OrderNumber {
+        Objects.requireNonNull(value, "OrderNumber must not be null");
+        if (!VALID_PATTERN.matcher(value).matches()) {
+            throw new IllegalArgumentException("OrderNumber must match the pattern 'XX/XX-XXXXXX-XXXXXXXX'");
         }
-        this.value = value.trim();
-    }
-
-    public String getValue() {
-        return value;
     }
 
     @Override
     public String toString() {
         return value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof OrderNumber)) return false;
-
-        OrderNumber that = (OrderNumber) o;
-
-        return Objects.equals(value, that.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
     }
 }
