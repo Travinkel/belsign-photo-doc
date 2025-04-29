@@ -1,0 +1,127 @@
+/* BelSign Application CSS - Compatible with Gluon and JavaFX */
+
+/* Color Definitions - Based on Belsign UI Style Guide */
+* {
+    /* Primary Colors */
+    -belman-light-blue: #7fa8c5;
+    -belman-blue: #004b88;
+    -belman-green: #338d71;
+    -belman-dark-grey: #333535;
+    
+    /* Secondary Colors (Greys) */
+    -belman-grey-80: #575757;
+    -belman-grey-50: #9d9d9d;
+    -belman-grey-30: #c6c6c6;
+    -belman-grey-20: #dadada;
+    -belman-grey-15: #e3e3e3;
+    -belman-grey-07: #f2f2f2;
+}
+
+/* Global Styles */
+.root {
+    -fx-font-family: "Segoe UI", "Roboto", "Arial", sans-serif;
+    -fx-background-color: -belman-grey-07;
+}
+
+/* Typography */
+.title {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+}
+
+.subtitle {
+    -fx-font-size: 20px;
+    -fx-text-fill: -belman-dark-grey;
+}
+
+.body-text {
+    -fx-font-size: 16px;
+    -fx-text-fill: -belman-grey-80;
+}
+
+/* Button Styles */
+.button-primary {
+    -fx-background-color: -belman-blue;
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-padding: 12px 24px;
+    -fx-background-radius: 6px;
+    -fx-min-height: 48px;
+    -fx-cursor: hand;
+}
+
+.button-secondary {
+    -fx-background-color: white;
+    -fx-border-color: -belman-light-blue;
+    -fx-border-width: 2px;
+    -fx-text-fill: -belman-blue;
+    -fx-font-size: 18px;
+    -fx-padding: 12px 24px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-min-height: 48px;
+    -fx-cursor: hand;
+}
+
+/* Progress Bar */
+.progress-bar {
+    -fx-accent: -belman-light-blue;
+}
+
+.progress-bar .track {
+    -fx-background-color: -belman-grey-15;
+}
+
+/* Splash Screen Specific Styles */
+.splash-container {
+    -fx-background-color: -belman-grey-07;
+    -fx-padding: 30px;
+}
+
+.splash-content {
+    -fx-alignment: center;
+    -fx-spacing: 20px;
+}
+
+.splash-logo {
+    -fx-fit-width: 400px;
+    -fx-preserve-ratio: true;
+}
+
+.splash-progress {
+    -fx-pref-width: 300px;
+}
+
+/* Responsive Styles for Different Platforms */
+/* Desktop - Default styles above are for desktop */
+
+/* Tablet */
+.tablet .title {
+    -fx-font-size: 32px;
+}
+
+.tablet .splash-logo {
+    -fx-fit-width: 300px;
+}
+
+/* Smartphone */
+.smartphone .title {
+    -fx-font-size: 28px;
+}
+
+.smartphone .subtitle {
+    -fx-font-size: 18px;
+}
+
+.smartphone .body-text {
+    -fx-font-size: 14px;
+}
+
+.smartphone .splash-logo {
+    -fx-fit-width: 200px;
+}
+
+.smartphone .splash-progress {
+    -fx-pref-width: 200px;
+}

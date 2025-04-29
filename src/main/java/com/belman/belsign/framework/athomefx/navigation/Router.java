@@ -6,6 +6,7 @@ import com.belman.belsign.framework.athomefx.core.BaseViewModel;
 import com.belman.belsign.framework.athomefx.lifecycle.ViewLifecycle;
 import com.belman.belsign.framework.athomefx.logging.Logger;
 import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.util.HashMap;
@@ -25,6 +26,7 @@ public class Router {
     private static final Map<String, Object> routeParameters = new HashMap<>();
     private static final Map<Class<? extends BaseView<?>>, Supplier<Boolean>> routeGuards = new HashMap<>();
     private static final Stack<Class<? extends BaseView<?>>> navigationHistory = new Stack<>();
+    private static StackPane rootPane;
 
     private Router() {
         // Singleton constructor
@@ -40,12 +42,20 @@ public class Router {
     }
 
     /**
-     * Sets the primary stage for the application.
+     * Sets the primary stage for the application and initializes the root pane.
+     * This method should be called once during application startup.
      * 
      * @param stage the primary stage
      */
     public static void setPrimaryStage(Stage stage) {
         primaryStage = stage;
+
+        // Initialize the root pane if it doesn't exist
+        if (rootPane == null) {
+            rootPane = new StackPane();
+            Scene scene = new Scene(rootPane);
+            primaryStage.setScene(scene);
+        }
     }
 
     /**
@@ -93,14 +103,8 @@ public class Router {
                 currentView.onHide();
             }
 
-            // Set the new view as the root of the scene
-            Scene scene = primaryStage.getScene();
-            if (scene == null) {
-                scene = new Scene(view.getRoot());
-                primaryStage.setScene(scene);
-            } else {
-                scene.setRoot(view.getRoot());
-            }
+            // Set the new view as the content of the root pane
+            rootPane.getChildren().setAll(view.getRoot());
             primaryStage.show();
 
             // Show the new view

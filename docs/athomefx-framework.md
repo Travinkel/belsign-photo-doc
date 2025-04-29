@@ -4,6 +4,8 @@
 
 AtHomeFX is a lightweight, Clean Architecture-compliant micro-framework for JavaFX, designed to automate and standardize the View–Controller–ViewModel relationship in modular JavaFX applications. Inspired by Afterburner.fx but rebuilt from scratch, AtHomeFX is modernized for JavaFX 21+ and follows strict layering and Domain-Driven Design principles.
 
+AtHomeFX now implements CERN's proven JavaFX best practices, focusing on a single Scene model with a central root container, explicit lifecycle management, and state-driven UI. For more information, see [AtHomeFX Framework: CERN-Style JavaFX Architecture](athomefx-framework-cern-style.md).
+
 ## Core Features
 
 - **Automatic FXML loading**
@@ -50,7 +52,22 @@ framework/
       Inject.java
     exceptions/
       ServiceInjectionException.java
+    aop/
+      DomainEventPublisherAspect.java
+    examples/
+      ui/
+        Scene.java
+        Stage.java
+        LoginScene.java
+        PhotoScene.java
+        AdminScene.java
+        DesktopStage.java
+        IPadStage.java
+        SmartPhoneStage.java
+        SealedInterfacesExample.java
 ```
+
+Note that the `examples` package contains example implementations that demonstrate various features of the framework but are not part of the core framework itself. The core UI components (View, Controller, ViewModel) are in the `core` package, not in a separate UI package.
 
 ## Getting Started
 
@@ -117,19 +134,19 @@ The `BaseController` class is responsible for binding the UI to the ViewModel. I
 public class LoginController extends BaseController<LoginViewModel> {
     @FXML
     private TextField usernameField;
-    
+
     @FXML
     private PasswordField passwordField;
-    
+
     @FXML
     private Button loginButton;
-    
+
     @Override
     public void initializeBinding() {
         // Bind UI elements to ViewModel properties
         usernameField.textProperty().bindBidirectional(getViewModel().usernameProperty());
         passwordField.textProperty().bindBidirectional(getViewModel().passwordProperty());
-        
+
         // Bind button action to ViewModel command
         loginButton.setOnAction(e -> getViewModel().login());
     }
@@ -144,35 +161,35 @@ The `BaseViewModel` class is responsible for managing application state and busi
 public class LoginViewModel extends BaseViewModel<LoginViewModel> {
     private final StringProperty username = new SimpleStringProperty();
     private final StringProperty password = new SimpleStringProperty();
-    
+
     @Inject
     private AuthService authService;
-    
+
     public LoginViewModel() {
         ServiceLocator.injectServices(this);
     }
-    
+
     public void login() {
         if (authService.login(username.get(), password.get())) {
             // Navigate to the main view
             Router.navigateTo(MainView.class);
         }
     }
-    
+
     public StringProperty usernameProperty() {
         return username;
     }
-    
+
     public StringProperty passwordProperty() {
         return password;
     }
-    
+
     @Override
     public void onShow() {
         super.onShow();
         // Initialize the view model when shown
     }
-    
+
     @Override
     public void onHide() {
         super.onHide();
@@ -201,7 +218,7 @@ ServiceLocator.registerService(AuthService.class, new AuthService());
 public class LoginViewModel extends BaseViewModel<LoginViewModel> {
     @Inject
     private AuthService authService;
-    
+
     public LoginViewModel() {
         ServiceLocator.injectServices(this);
     }
@@ -266,6 +283,10 @@ String viewModelName = NamingConventions.getViewModelName("Login"); // "LoginVie
 ## Cross-Platform Support
 
 AtHomeFX is designed to work on desktop, smartphone, and tablet platforms. It uses JavaFX and Gluon Mobile for cross-platform support.
+
+## CERN-Style JavaFX Architecture
+
+AtHomeFX now implements CERN's proven JavaFX best practices, focusing on a single Scene model with a central root container, explicit lifecycle management, and state-driven UI. For more information, see the [AtHomeFX Framework: CERN-Style JavaFX Architecture](athomefx-framework-cern-style.md) documentation.
 
 ## Conclusion
 

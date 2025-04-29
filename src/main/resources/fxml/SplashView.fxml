@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
-
 <?import javafx.scene.control.Label?>
-<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.belman.belsign.presentation.controller.SplashController">
-    <Label fx:id="messageLabel" />
-    <ImageView fitWidth="300" preserveRatio="true">
-        <Image url="@../images/logo.png"/>
-    </ImageView>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml" 
+           fx:controller="com.belman.belsign.presentation.views.splash.SplashViewController"
+           styleClass="splash-container"
+           stylesheets="@../styles/app.css">
+    <VBox styleClass="splash-content">
+        <padding>
+            <Insets top="30" right="30" bottom="30" left="30" />
+        </padding>
+        <ImageView fx:id="logoImage" styleClass="splash-logo">
+            <Image url="@../images/logo.png"/>
+        </ImageView>
+        <Label fx:id="titleLabel" text="BelSign" styleClass="title" />
+        <Label fx:id="subtitleLabel" text="Photo Documentation System" styleClass="subtitle" />
+        <ProgressBar fx:id="loadingProgress" progress="0.0" styleClass="splash-progress" />
+        <Label fx:id="messageLabel" text="Loading..." styleClass="body-text" />
+    </VBox>
 </StackPane>

@@ -2,6 +2,8 @@ package com.belman.belsign.framework.athomefx.events;
 
 import com.belman.belsign.framework.athomefx.logging.Logger;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -11,7 +13,10 @@ import java.util.function.Supplier;
  */
 public class DomainEvents {
     private static final Logger logger = Logger.getLogger(DomainEvents.class);
-    
+
+    // Map to store handlers by consumer and event type
+    private static final Map<Class<?>, Map<Consumer<?>, DomainEventHandler<?>>> handlerMap = new ConcurrentHashMap<>();
+
     /**
      * Publishes a domain event.
      * 
@@ -22,11 +27,11 @@ public class DomainEvents {
             logger.warn("Null event provided to publish");
             return;
         }
-        
+
         logger.debug("Publishing event: {}", event.getEventType());
         DomainEventPublisher.getInstance().publish(event);
     }
-    
+
     /**
      * Publishes a domain event asynchronously.
      * 
@@ -37,11 +42,11 @@ public class DomainEvents {
             logger.warn("Null event provided to publishAsync");
             return;
         }
-        
+
         logger.debug("Publishing event asynchronously: {}", event.getEventType());
         DomainEventPublisher.getInstance().publishAsync(event);
     }
-    
+
     /**
      * Publishes a domain event if a condition is true.
      * 
@@ -53,7 +58,7 @@ public class DomainEvents {
             logger.warn("Null event provided to publishIf");
             return;
         }
-        
+
         if (condition) {
             logger.debug("Condition is true, publishing event: {}", event.getEventType());
             DomainEventPublisher.getInstance().publish(event);
@@ -61,7 +66,7 @@ public class DomainEvents {
             logger.debug("Condition is false, not publishing event: {}", event.getEventType());
         }
     }
-    
+
     /**
      * Publishes a domain event asynchronously if a condition is true.
      * 
@@ -73,7 +78,7 @@ public class DomainEvents {
             logger.warn("Null event provided to publishAsyncIf");
             return;
         }
-        
+
         if (condition) {
             logger.debug("Condition is true, publishing event asynchronously: {}", event.getEventType());
             DomainEventPublisher.getInstance().publishAsync(event);
@@ -81,7 +86,7 @@ public class DomainEvents {
             logger.debug("Condition is false, not publishing event asynchronously: {}", event.getEventType());
         }
     }
-    
+
     /**
      * Publishes a domain event if it is not null.
      * 
@@ -92,7 +97,7 @@ public class DomainEvents {
             logger.warn("Null event supplier provided to publishIfPresent");
             return;
         }
-        
+
         DomainEvent event = eventSupplier.get();
         if (event != null) {
             logger.debug("Event is present, publishing event: {}", event.getEventType());
@@ -101,7 +106,7 @@ public class DomainEvents {
             logger.debug("Event is not present, not publishing");
         }
     }
-    
+
     /**
      * Publishes a domain event asynchronously if it is not null.
      * 
@@ -112,7 +117,7 @@ public class DomainEvents {
             logger.warn("Null event supplier provided to publishAsyncIfPresent");
             return;
         }
-        
+
         DomainEvent event = eventSupplier.get();
         if (event != null) {
             logger.debug("Event is present, publishing event asynchronously: {}", event.getEventType());
@@ -121,7 +126,7 @@ public class DomainEvents {
             logger.debug("Event is not present, not publishing asynchronously");
         }
     }
-    
+
     /**
      * Registers a handler for a specific event type.
      * 
@@ -129,21 +134,32 @@ public class DomainEvents {
      * @param handler the handler to register
      * @param <T> the type of event
      */
+    @SuppressWarnings("unchecked")
     public static <T extends DomainEvent> void on(Class<T> eventType, Consumer<T> handler) {
         if (eventType == null) {
             logger.warn("Null event type provided to on");
             return;
         }
-        
+
         if (handler == null) {
             logger.warn("Null handler provided to on for event type: {}", eventType.getName());
             return;
         }
-        
+
         logger.debug("Registering handler for event type: {}", eventType.getName());
-        DomainEventPublisher.getInstance().register(eventType, handler::accept);
+
+        // Create a DomainEventHandler from the Consumer
+        DomainEventHandler<T> eventHandler = handler::accept;
+
+        // Store the handler in the map
+        Map<Consumer<?>, DomainEventHandler<?>> eventTypeHandlers = handlerMap.computeIfAbsent(
+            eventType, k -> new ConcurrentHashMap<>());
+        eventTypeHandlers.put((Consumer<?>) handler, (DomainEventHandler<?>) eventHandler);
+
+        // Register the handler with the publisher
+        DomainEventPublisher.getInstance().register(eventType, eventHandler);
     }
-    
+
     /**
      * Unregisters a handler for a specific event type.
      * 
@@ -151,18 +167,32 @@ public class DomainEvents {
      * @param handler the handler to unregister
      * @param <T> the type of event
      */
+    @SuppressWarnings("unchecked")
     public static <T extends DomainEvent> void off(Class<T> eventType, Consumer<T> handler) {
         if (eventType == null) {
             logger.warn("Null event type provided to off");
             return;
         }
-        
+
         if (handler == null) {
             logger.warn("Null handler provided to off for event type: {}", eventType.getName());
             return;
         }
-        
+
         logger.debug("Unregistering handler for event type: {}", eventType.getName());
-        DomainEventPublisher.getInstance().unregister(eventType, handler::accept);
+
+        // Get the handler from the map
+        Map<Consumer<?>, DomainEventHandler<?>> eventTypeHandlers = handlerMap.get(eventType);
+        if (eventTypeHandlers != null) {
+            DomainEventHandler<?> eventHandler = eventTypeHandlers.remove((Consumer<?>) handler);
+            if (eventHandler != null) {
+                // Unregister the handler from the publisher
+                DomainEventPublisher.getInstance().unregister(eventType, (DomainEventHandler<T>) eventHandler);
+            } else {
+                logger.warn("Handler not found for event type: {}", eventType.getName());
+            }
+        } else {
+            logger.warn("No handlers registered for event type: {}", eventType.getName());
+        }
     }
 }
