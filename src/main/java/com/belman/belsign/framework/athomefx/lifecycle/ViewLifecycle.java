@@ -1,9 +1,0 @@
-package com.belman.belsign.framework.athomefx.lifecycle;
-
-/**
- * Interface for Views and ViewModels that want lifecycle hooks.
- */
-public interface ViewLifecycle {
-    default void onShow() {}
-    default void onHide() {}
-}
