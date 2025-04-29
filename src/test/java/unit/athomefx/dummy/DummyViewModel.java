@@ -4,9 +4,8 @@ import com.belman.belsign.framework.athomefx.core.BaseViewModel;
 import com.belman.belsign.framework.athomefx.di.Inject;
 import com.belman.belsign.framework.athomefx.di.ServiceLocator;
 import com.belman.belsign.framework.athomefx.lifecycle.ViewLifecycle;
-import javafx.scene.layout.StackPane;
 
-public class DummyViewModel extends BaseViewModel<DummyViewModel> implements ViewLifecycle {
+public class DummyViewModel extends BaseViewModel<DummyViewModel> {
     @Inject
     private DummyService dummyService;
 
@@ -22,23 +21,15 @@ public class DummyViewModel extends BaseViewModel<DummyViewModel> implements Vie
     }
 
     @Override
-    public DummyViewModel getViewModel() {
-        return this;
-    }
-
-    @Override
-    public StackPane getRoot() {
-        return new StackPane(); // Dummy root for test
-    }
-
-    @Override
     public void onShow() {
         shown = true;
+        super.onShow();
     }
 
     @Override
     public void onHide() {
         hidden = true;
+        super.onHide();
     }
 
     public boolean isShown() {

@@ -6,7 +6,7 @@ public class ServiceInjectionException extends RuntimeException {
     }
 
     public ServiceInjectionException(String message, Throwable cause) {
-        super(message);
+        super(message, cause);
     }
 
 }
