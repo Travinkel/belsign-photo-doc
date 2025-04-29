@@ -33,9 +33,14 @@ class DomainEventsTest {
     void testPublish() {
         // Create a handler for the test event
         AtomicBoolean eventHandled = new AtomicBoolean(false);
-        DomainEvents.on(TestEvent.class, event -> {
+
+        // Store the handler in a variable so we can use the same instance for both on() and off()
+        java.util.function.Consumer<TestEvent> handler = event -> {
             eventHandled.set(true);
-        });
+        };
+
+        // Register the handler
+        DomainEvents.on(TestEvent.class, handler);
 
         // Publish an event
         DomainEvents.publish(new TestEvent());
@@ -44,7 +49,7 @@ class DomainEventsTest {
         assertTrue(eventHandled.get());
 
         // Clean up
-        DomainEvents.off(TestEvent.class, event -> {});
+        DomainEvents.off(TestEvent.class, handler);
     }
 
     @Test
@@ -53,10 +58,14 @@ class DomainEventsTest {
         AtomicBoolean eventHandled = new AtomicBoolean(false);
         CountDownLatch latch = new CountDownLatch(1);
 
-        DomainEvents.on(TestEvent.class, event -> {
+        // Store the handler in a variable so we can use the same instance for both on() and off()
+        java.util.function.Consumer<TestEvent> handler = event -> {
             eventHandled.set(true);
             latch.countDown();
-        });
+        };
+
+        // Register the handler
+        DomainEvents.on(TestEvent.class, handler);
 
         // Publish an event asynchronously
         DomainEvents.publishAsync(new TestEvent());
@@ -68,16 +77,21 @@ class DomainEventsTest {
         assertTrue(eventHandled.get());
 
         // Clean up
-        DomainEvents.off(TestEvent.class, event -> {});
+        DomainEvents.off(TestEvent.class, handler);
     }
 
     @Test
     void testPublishIf() {
         // Create a handler for the test event
         AtomicBoolean eventHandled = new AtomicBoolean(false);
-        DomainEvents.on(TestEvent.class, event -> {
+
+        // Store the handler in a variable so we can use the same instance for both on() and off()
+        java.util.function.Consumer<TestEvent> handler = event -> {
             eventHandled.set(true);
-        });
+        };
+
+        // Register the handler
+        DomainEvents.on(TestEvent.class, handler);
 
         // Publish an event if condition is true
         DomainEvents.publishIf(true, new TestEvent());
@@ -95,7 +109,7 @@ class DomainEventsTest {
         assertFalse(eventHandled.get());
 
         // Clean up
-        DomainEvents.off(TestEvent.class, event -> {});
+        DomainEvents.off(TestEvent.class, handler);
     }
 
     @Test
@@ -104,10 +118,14 @@ class DomainEventsTest {
         AtomicBoolean eventHandled = new AtomicBoolean(false);
         CountDownLatch latch = new CountDownLatch(1);
 
-        DomainEvents.on(TestEvent.class, event -> {
+        // Store the handler in a variable so we can use the same instance for both on() and off()
+        java.util.function.Consumer<TestEvent> handler = event -> {
             eventHandled.set(true);
             latch.countDown();
-        });
+        };
+
+        // Register the handler
+        DomainEvents.on(TestEvent.class, handler);
 
         // Publish an event asynchronously if condition is true
         DomainEvents.publishAsyncIf(true, new TestEvent());
@@ -131,16 +149,21 @@ class DomainEventsTest {
         assertFalse(eventHandled.get());
 
         // Clean up
-        DomainEvents.off(TestEvent.class, event -> {});
+        DomainEvents.off(TestEvent.class, handler);
     }
 
     @Test
     void testPublishIfPresent() {
         // Create a handler for the test event
         AtomicBoolean eventHandled = new AtomicBoolean(false);
-        DomainEvents.on(TestEvent.class, event -> {
+
+        // Store the handler in a variable so we can use the same instance for both on() and off()
+        java.util.function.Consumer<TestEvent> handler = event -> {
             eventHandled.set(true);
-        });
+        };
+
+        // Register the handler
+        DomainEvents.on(TestEvent.class, handler);
 
         // Publish an event if present
         Supplier<DomainEvent> presentSupplier = () -> new TestEvent();
@@ -160,7 +183,7 @@ class DomainEventsTest {
         assertFalse(eventHandled.get());
 
         // Clean up
-        DomainEvents.off(TestEvent.class, event -> {});
+        DomainEvents.off(TestEvent.class, handler);
     }
 
     @Test
@@ -169,10 +192,14 @@ class DomainEventsTest {
         AtomicBoolean eventHandled = new AtomicBoolean(false);
         CountDownLatch latch = new CountDownLatch(1);
 
-        DomainEvents.on(TestEvent.class, event -> {
+        // Store the handler in a variable so we can use the same instance for both on() and off()
+        java.util.function.Consumer<TestEvent> handler = event -> {
             eventHandled.set(true);
             latch.countDown();
-        });
+        };
+
+        // Register the handler
+        DomainEvents.on(TestEvent.class, handler);
 
         // Publish an event asynchronously if present
         Supplier<DomainEvent> presentSupplier = () -> new TestEvent();
@@ -198,7 +225,7 @@ class DomainEventsTest {
         assertFalse(eventHandled.get());
 
         // Clean up
-        DomainEvents.off(TestEvent.class, event -> {});
+        DomainEvents.off(TestEvent.class, handler);
     }
 
     @Test

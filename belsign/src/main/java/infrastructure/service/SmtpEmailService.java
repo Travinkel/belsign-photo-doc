@@ -1,8 +1,10 @@
 package infrastructure.service;
 
-import com.belman.belsign.domain.model.report.Report;
-import com.belman.belsign.domain.model.user.EmailAddress;
-import com.belman.belsign.domain.service.EmailService;
+
+
+import domain.model.report.Report;
+import domain.model.user.EmailAddress;
+import domain.service.EmailService;
 
 import java.io.File;
 import java.util.Collections;

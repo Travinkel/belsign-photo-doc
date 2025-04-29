@@ -6,6 +6,7 @@ import domain.model.order.photodocument.ImagePath;
 import domain.model.order.photodocument.PhotoAngle;
 import domain.model.order.photodocument.PhotoDocument;
 import domain.model.order.photodocument.PhotoId;
+import domain.model.shared.Timestamp;
 import domain.model.user.EmailAddress;
 import domain.model.user.User;
 import domain.model.user.Username;

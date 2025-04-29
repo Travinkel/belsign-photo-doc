@@ -1,6 +1,7 @@
 package presentation.views.main;
 
-import com.belman.belsign.framework.athomefx.core.BaseView;
+
+import core.BaseView;
 
 /**
  * Main view of the application.

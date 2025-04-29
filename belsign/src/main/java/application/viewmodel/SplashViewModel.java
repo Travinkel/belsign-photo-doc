@@ -1,8 +1,8 @@
 package application.viewmodel;
 
-import com.belman.belsign.framework.athomefx.lifecycle.ViewLifecycle;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import lifecycle.ViewLifecycle;
 
 public class SplashViewModel implements ViewLifecycle {
     private final StringProperty message = new SimpleStringProperty("Welcome to BelSign!");

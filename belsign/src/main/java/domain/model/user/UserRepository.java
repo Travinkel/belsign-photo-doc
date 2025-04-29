@@ -1,6 +1,5 @@
 package domain.model.user;
 
-import com.belman.belsign.domain.model.user.User;
 
 
 import java.util.Optional;

@@ -1,8 +1,8 @@
 package domain.model.order.photodocument;
 
-import com.belman.belsign.domain.model.order.OrderId;
+import domain.model.order.OrderId;
 import domain.model.shared.Timestamp;
-import com.belman.belsign.domain.model.user.User;
+import domain.model.user.User;
 
 import java.util.Objects;
 

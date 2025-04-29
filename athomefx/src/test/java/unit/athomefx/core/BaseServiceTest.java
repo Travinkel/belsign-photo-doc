@@ -17,78 +17,83 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BaseServiceTest {
-    
+
     private TestService testService;
     private DependencyService dependencyService;
-    
+
     @BeforeEach
     void setUp() {
         // Clear any existing services
         ServiceLocator.clear();
-        
+
         // Create and register the dependency service
         dependencyService = new DependencyService();
         ServiceLocator.registerService(DependencyService.class, dependencyService);
-        
+
         // Create and register the test service
         testService = new TestService();
         ServiceLocator.registerService(TestService.class, testService);
-        
+
         // Inject dependencies
         ServiceLocator.injectServices(testService);
     }
-    
+
     @AfterEach
     void tearDown() {
         ServiceLocator.clear();
     }
-    
+
     @Test
     void testServiceInjection() {
         // Verify that the dependency was injected
         assertNotNull(testService.getDependencyService());
         assertEquals(dependencyService, testService.getDependencyService());
     }
-    
+
     @Test
     void testPublishEvent() {
         // Create a handler for the test event
         AtomicBoolean eventHandled = new AtomicBoolean(false);
-        DomainEventPublisher.getInstance().register(TestEvent.class, event -> {
+
+        // Store the handler in a variable so we can use the same instance for both register and unregister
+        events.DomainEventHandler<TestEvent> handler = event -> {
             eventHandled.set(true);
-        });
-        
+        };
+
+        // Register the handler
+        DomainEventPublisher.getInstance().register(TestEvent.class, handler);
+
         // Publish an event
         testService.publishTestEvent();
-        
+
         // Verify that the event was published and handled
         assertTrue(eventHandled.get());
-        
+
         // Clean up
-        DomainEventPublisher.getInstance().unregister(TestEvent.class, event -> {});
+        DomainEventPublisher.getInstance().unregister(TestEvent.class, handler);
     }
-    
+
     @Test
     void testLogging() {
         // This test just verifies that the logging methods don't throw exceptions
         testService.testLogging();
     }
-    
+
     /**
      * Test service that extends BaseService.
      */
     static class TestService extends BaseService {
         @Inject
         private DependencyService dependencyService;
-        
+
         public DependencyService getDependencyService() {
             return dependencyService;
         }
-        
+
         public void publishTestEvent() {
             publishEvent(new TestEvent());
         }
-        
+
         public void testLogging() {
             logInfo("Info message");
             logInfo("Info message with parameter: {}", "param");
@@ -101,7 +106,7 @@ class BaseServiceTest {
             logError("Error message with exception", new RuntimeException("Test exception"));
         }
     }
-    
+
     /**
      * Dependency service for testing injection.
      */
@@ -110,24 +115,24 @@ class BaseServiceTest {
             return "dependency value";
         }
     }
-    
+
     /**
      * Test event for testing event publishing.
      */
     static class TestEvent implements DomainEvent {
         private final UUID eventId = UUID.randomUUID();
         private final Instant timestamp = Instant.now();
-        
+
         @Override
         public UUID getEventId() {
             return eventId;
         }
-        
+
         @Override
         public Instant getTimestamp() {
             return timestamp;
         }
-        
+
         @Override
         public String getEventType() {
             return "TestEvent";

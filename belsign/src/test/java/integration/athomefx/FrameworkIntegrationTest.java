@@ -1,8 +1,8 @@
 package integration.athomefx;
 
-import com.belman.belsign.framework.athomefx.di.ServiceLocator;
+import di.ServiceLocator;
+import integration.athomefx.dummy.DummyService;
 import org.junit.jupiter.api.Test;
-import unit.athomefx.dummy.DummyService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

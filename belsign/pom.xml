@@ -54,6 +54,15 @@
             <artifactId>storage</artifactId>
         </dependency>
 
+        <!-- Gluon Attach util artifact -->
+
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>util</artifactId>
+            <version>4.0.20</version>
+        </dependency>
+
+
         <!-- PDFBox for PDF generation -->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>

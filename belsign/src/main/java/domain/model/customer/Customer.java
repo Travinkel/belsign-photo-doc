@@ -1,6 +1,7 @@
 package domain.model.customer;
 
-import com.belman.belsign.domain.model.user.EmailAddress;
+
+import domain.model.user.EmailAddress;
 
 import java.util.Objects;
 

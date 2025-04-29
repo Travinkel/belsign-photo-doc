@@ -1,6 +1,6 @@
 package presentation.views.main;
 
-import com.belman.belsign.framework.athomefx.core.BaseController;
+import core.BaseController;
 import javafx.fxml.FXML;
 
 /**

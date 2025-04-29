@@ -1,9 +1,9 @@
 package domain.service;
 
 
-import com.belman.belsign.domain.model.order.Order;
-import com.belman.belsign.domain.model.report.Report;
-import com.belman.belsign.domain.model.user.User;
+import domain.model.order.Order;
+import domain.model.report.Report;
+import domain.model.user.User;
 
 /**
  * Service for building a QC report based on an order's approved photos.

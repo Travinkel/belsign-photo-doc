@@ -4,7 +4,8 @@ import domain.model.customer.Customer;
 import domain.model.order.photodocument.PhotoDocument;
 import domain.model.order.photodocument.PhotoId;
 import domain.model.shared.Timestamp;
-import com.belman.belsign.domain.model.user.User;
+import domain.model.user.User;
+import domain.model.order.OrderId;
 
 import java.util.Objects;
 import java.util.UUID;

@@ -26,6 +26,38 @@ This document provides essential information for developers working on the ExamP
   - `com.belman.belsign.domain.specification`: Contains specifications for filtering domain objects
   - `com.belman.belsign.infrastructure.service`: Contains infrastructure services
 
+### AtHomeFX Framework
+The project uses the AtHomeFX framework, a lightweight micro-framework for JavaFX that follows Clean Architecture principles.
+
+#### Key Features
+- Automatic FXML loading
+- Automatic linking between View, Controller, and ViewModel
+- Simple, clean View routing (SPA-style)
+- Lifecycle support (`onShow()`, `onHide()`) for Views/ViewModels
+- Runs safely inside the JavaFX Application Thread
+
+#### Framework Structure
+- `athomefx/core`: Core framework classes (BaseView, BaseController, BaseViewModel)
+- `athomefx/navigation`: Navigation components (Router)
+- `athomefx/lifecycle`: Lifecycle management
+- `athomefx/di`: Dependency injection
+- `athomefx/events`: Event handling
+- `athomefx/aop`: Aspect-oriented programming
+- `athomefx/state`: State management
+- `athomefx/util`: Utility classes
+
+#### Using AtHomeFX CLI
+The AtHomeFX CLI is a command-line tool for generating components:
+
+1. Run the CLI: `java -jar athomefx-cli.jar`
+2. Choose what to generate:
+   - Feature (View + Controller + ViewModel + FXML)
+   - Service
+3. Enter the required information:
+   - Base package (e.g., com.example.features.login)
+   - Base name (e.g., Login, Dashboard, UserProfile)
+   - Output directory (e.g., ./src/main/java)
+
 ## Testing Information
 
 ### Test Structure

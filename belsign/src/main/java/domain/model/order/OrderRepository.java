@@ -1,6 +1,5 @@
 package domain.model.order;
 
-import com.belman.belsign.domain.model.order.Order;
 import domain.specification.Specification;
 
 

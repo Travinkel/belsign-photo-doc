@@ -1,12 +1,12 @@
 package presentation.controller;
 
 
-import com.belman.belsign.application.viewmodel.SplashViewModel;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
+import presentation.views.splash.SplashViewModel;
 
 public class SplashController {
     private final SplashViewModel splashViewModel;

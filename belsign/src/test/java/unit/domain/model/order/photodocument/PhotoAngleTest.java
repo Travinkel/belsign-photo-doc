@@ -53,18 +53,18 @@ class PhotoAngleTest {
 
     @Test
     void namedAngleShouldBeCreated() {
-        PhotoAngle angle = new PhotoAngle(NamedAngle.FRONT);
+        PhotoAngle angle = new PhotoAngle(PhotoAngle.NamedAngle.FRONT);
         assertEquals(0.0, angle.getDegrees());
         assertTrue(angle.isNamedAngle());
-        assertEquals(NamedAngle.FRONT, angle.getNamedAngle());
+        assertEquals(PhotoAngle.NamedAngle.FRONT, angle.getNamedAngle());
     }
 
     @Test
     void namedAngleShouldHaveCorrectDegrees() {
-        assertEquals(0.0, new PhotoAngle(NamedAngle.FRONT).getDegrees());
-        assertEquals(90.0, new PhotoAngle(NamedAngle.RIGHT).getDegrees());
-        assertEquals(180.0, new PhotoAngle(NamedAngle.BACK).getDegrees());
-        assertEquals(270.0, new PhotoAngle(NamedAngle.LEFT).getDegrees());
+        assertEquals(0.0, new PhotoAngle(PhotoAngle.NamedAngle.FRONT).getDegrees());
+        assertEquals(90.0, new PhotoAngle(PhotoAngle.NamedAngle.RIGHT).getDegrees());
+        assertEquals(180.0, new PhotoAngle(PhotoAngle.NamedAngle.BACK).getDegrees());
+        assertEquals(270.0, new PhotoAngle(PhotoAngle.NamedAngle.LEFT).getDegrees());
     }
 
     @Test
@@ -74,13 +74,13 @@ class PhotoAngleTest {
 
     @Test
     void displayNameShouldBeCorrect() {
-        assertEquals("FRONT", new PhotoAngle(NamedAngle.FRONT).getDisplayName());
+        assertEquals("FRONT", new PhotoAngle(PhotoAngle.NamedAngle.FRONT).getDisplayName());
         assertEquals("45.5°", new PhotoAngle(45.5).getDisplayName());
     }
 
     @Test
     void namedAngleAndEquivalentDegreesShouldBeEqual() {
-        PhotoAngle namedAngle = new PhotoAngle(NamedAngle.RIGHT);
+        PhotoAngle namedAngle = new PhotoAngle(PhotoAngle.NamedAngle.RIGHT);
         PhotoAngle degreeAngle = new PhotoAngle(90.0);
         assertEquals(namedAngle, degreeAngle);
         assertEquals(namedAngle.hashCode(), degreeAngle.hashCode());

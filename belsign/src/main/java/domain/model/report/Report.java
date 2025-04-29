@@ -1,10 +1,11 @@
 package domain.model.report;
 
 import domain.model.customer.Customer;
-import com.belman.belsign.domain.model.order.OrderId;
-import com.belman.belsign.domain.model.order.photodocument.PhotoDocument;
-import com.belman.belsign.domain.model.user.User;
+
+import domain.model.order.OrderId;
+import domain.model.order.photodocument.PhotoDocument;
 import domain.model.shared.Timestamp;
+import domain.model.user.User;
 
 import java.util.Collections;
 import java.util.List;

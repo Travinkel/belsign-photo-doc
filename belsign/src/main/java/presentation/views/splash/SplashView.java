@@ -1,6 +1,7 @@
 package presentation.views.splash;
 
-import com.belman.belsign.framework.athomefx.core.BaseView;
+
+import core.BaseView;
 
 public class SplashView extends BaseView<SplashViewModel> {
     // This class is intentionally left empty.

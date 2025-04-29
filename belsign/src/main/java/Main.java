@@ -1,5 +1,7 @@
-import com.belman.belsign.framework.athomefx.navigation.Router;
-import com.belman.belsign.presentation.views.splash.SplashView;
+
+import core.BaseView;
+import navigation.Router;
+import presentation.views.splash.SplashView;
 import com.gluonhq.attach.util.Platform;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -15,8 +17,14 @@ public class Main extends Application {
     private static final int DEFAULT_WIDTH = 800;
     private static final int DEFAULT_HEIGHT = 600;
 
+    // Store the primary stage as an instance variable
+    private Stage primaryStage;
+
     @Override
     public void start(Stage primaryStage) {
+        // Store the primary stage
+        this.primaryStage = primaryStage;
+
         // Initialize the Router with the primary stage
         Router.setPrimaryStage(primaryStage);
 
@@ -55,7 +63,7 @@ public class Main extends Application {
      */
     private void applyPlatformStyling() {
         try {
-            Scene scene = Router.getPrimaryStage().getScene();
+            Scene scene = primaryStage.getScene();
             if (scene != null) {
                 if (Platform.isAndroid() || Platform.isIOS()) {
                     if (Platform.isAndroid()) {

@@ -1,8 +1,7 @@
 package domain.specification;
 
 
-import com.belman.belsign.domain.model.order.Order;
-import com.belman.belsign.domain.specification.Specification;
+import domain.model.order.Order;
 
 /**
  * Specification that matches orders having any pending (unapproved) photos.

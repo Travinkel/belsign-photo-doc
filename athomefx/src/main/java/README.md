@@ -107,48 +107,26 @@ is exactly what you need. ❤️
 
 ---
 
-# 📚 Git Next Steps (based on where we are):
+## 🧩 How to Contribute
 
-Since you now added a whole module, **you should:**
+To contribute to the AtHomeFX framework:
 
-```bash
-# 1. Create a new branch
-git checkout -b feature/athomefx-framework
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Write tests for your changes
+5. Submit a pull request
 
-# 2. Add your changes
-git add .
+Please follow the existing code style and naming conventions.
 
-# 3. Commit your changes
-git commit -m "Add AtHomeFX lightweight micro-framework for JavaFX View/ViewModel/Controller"
+## 📄 License
 
-# 4. Push your branch to remote
-git push origin feature/athomefx-framework
-```
-
-Later, when the whole AtHomeFX is done and tested:
-
-```bash
-# Merge it back to main
-git checkout main
-git merge feature/athomefx-framework
-git push origin main
-```
-
-✅ You now prove you understand **branching**, **feature isolation**, and **professional Git practice**.
+AtHomeFX is licensed under the MIT License. See the LICENSE file for details.
 
 ---
 
-# 🔥 If you want, I can now immediately start creating the actual:
+## 🔗 Related Resources
 
-- `BaseView`
-- `BaseViewModel`
-- `BaseController`
-- `Router`
-- `ViewLifecycle`
-- `ViewLoader`
-
-👉 **Just tell me: "Yes, create AtHomeFX core classes!"**  
-and I'll generate them perfectly aligned with the README and our architecture.
-
-
-Let's go 🔥
+- [JavaFX Documentation](https://openjfx.io/javadoc/17/)
+- [Clean Architecture by Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+- [MVVM Pattern](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel)

@@ -1,12 +1,11 @@
 package presentation.views.splash;
 
-import com.belman.belsign.framework.athomefx.core.BaseController;
-import com.belman.belsign.framework.athomefx.navigation.Router;
-import com.gluonhq.attach.util.Platform;
+
+import javafx.application.Platform;
+import core.BaseController;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -55,6 +54,18 @@ public class SplashViewController extends BaseController<SplashViewModel> {
      * Initializes the loading animation with a timeline.
      */
     private void initializeLoadingAnimation() {
+        // Make the logo smaller to signify loading
+        logoImage.setFitWidth(150);
+
+        // Create a flickering animation for the logo
+        Timeline flickerTimeline = new Timeline(
+            new KeyFrame(Duration.ZERO, new KeyValue(logoImage.opacityProperty(), 1.0)),
+            new KeyFrame(Duration.seconds(0.7), new KeyValue(logoImage.opacityProperty(), 0.5)),
+            new KeyFrame(Duration.seconds(1.4), new KeyValue(logoImage.opacityProperty(), 1.0))
+        );
+        flickerTimeline.setCycleCount(Timeline.INDEFINITE);
+        flickerTimeline.play();
+
         // Simulate loading with a timeline animation
         loadingTimeline = new Timeline(
             new KeyFrame(Duration.ZERO, new KeyValue(loadingProgress.progressProperty(), 0)),
@@ -63,6 +74,9 @@ public class SplashViewController extends BaseController<SplashViewModel> {
 
         loadingTimeline.setOnFinished(event -> {
             try {
+                // Stop the flickering animation
+                flickerTimeline.stop();
+
                 // Navigate to the main view after splash screen finishes
                 getViewModel().onLoadingComplete();
             } catch (Exception e) {

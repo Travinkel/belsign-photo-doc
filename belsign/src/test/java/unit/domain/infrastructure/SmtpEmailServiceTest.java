@@ -1,9 +1,10 @@
-package unit.infrastructure.service;
+package unit.domain.infrastructure;
 
 
 import domain.model.order.OrderId;
 import domain.model.order.photodocument.PhotoDocument;
 import domain.model.report.Report;
+import domain.model.shared.Timestamp;
 import domain.model.user.EmailAddress;
 import domain.model.user.User;
 import domain.model.user.Username;
@@ -16,7 +17,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -1,6 +1,6 @@
 package com.belman.athomefx.cli;
 
-import util.ComponentGenerator;
+import com.belman.athomefx.util.ComponentGenerator;
 
 import java.io.IOException;
 import java.util.Scanner;

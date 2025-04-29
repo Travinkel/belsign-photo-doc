@@ -1,9 +1,10 @@
 package presentation.views.splash;
 
-import com.belman.belsign.framework.athomefx.core.BaseViewModel;
-import com.belman.belsign.framework.athomefx.navigation.Router;
+
+import core.BaseViewModel;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import navigation.Router;
 
 public class SplashViewModel extends BaseViewModel<SplashViewModel> {
     private final StringProperty message = new SimpleStringProperty("Loading application...");
@@ -38,7 +39,7 @@ public class SplashViewModel extends BaseViewModel<SplashViewModel> {
      */
     public void onLoadingComplete() {
         // Navigate to the main view
-        Router.navigateTo(com.belman.belsign.presentation.views.main.MainView.class);
+        Router.navigateTo(presentation.views.main.MainView.class);
     }
 
     @Override

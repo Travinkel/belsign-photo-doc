@@ -1,6 +1,7 @@
 package domain.specification;
 
-import com.belman.belsign.domain.model.order.Order;
+
+import domain.model.order.Order;
 
 /**
  * Specification that matches orders with at least a minimum number of photos.

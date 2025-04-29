@@ -1,8 +1,10 @@
 package application.qcreport;
 
-import com.belman.belsign.domain.model.order.Order;
-import com.belman.belsign.domain.model.order.photodocument.PhotoDocument;
-import com.belman.belsign.domain.model.user.User;
+
+
+import domain.model.order.Order;
+import domain.model.order.photodocument.PhotoDocument;
+import domain.model.user.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
