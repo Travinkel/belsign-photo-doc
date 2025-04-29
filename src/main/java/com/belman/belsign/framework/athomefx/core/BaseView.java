@@ -42,6 +42,10 @@ public abstract class BaseView<T extends BaseViewModel<?>> implements ViewLifecy
         if (viewModel != null) {
             viewModel.onShow();
         }
+
+        // Publish a ViewShownEvent
+        com.belman.belsign.framework.athomefx.events.DomainEventPublisher.getInstance()
+            .publish(new com.belman.belsign.framework.athomefx.events.ViewShownEvent(this.getClass().getSimpleName()));
     }
 
     @Override
