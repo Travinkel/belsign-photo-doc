@@ -1,11 +1,17 @@
 package unit.domain.model.report;
 
+import com.belman.belsign.domain.model.customer.Customer;
+import com.belman.belsign.domain.model.customer.CustomerId;
+import com.belman.belsign.domain.model.customer.PersonName;
 import com.belman.belsign.domain.model.order.OrderId;
 import com.belman.belsign.domain.model.order.photodocument.ImagePath;
 import com.belman.belsign.domain.model.order.photodocument.PhotoAngle;
 import com.belman.belsign.domain.model.order.photodocument.PhotoDocument;
 import com.belman.belsign.domain.model.order.photodocument.PhotoId;
 import com.belman.belsign.domain.model.report.Report;
+import com.belman.belsign.domain.model.report.ReportFormat;
+import com.belman.belsign.domain.model.report.ReportId;
+import com.belman.belsign.domain.model.report.ReportStatus;
 import com.belman.belsign.domain.model.shared.Timestamp;
 import com.belman.belsign.domain.model.user.EmailAddress;
 import com.belman.belsign.domain.model.user.User;
@@ -32,7 +38,7 @@ class ReportTest {
         orderId = new OrderId(UUID.randomUUID());
         user = new User(new Username("testuser"), new EmailAddress("test@example.com"));
         timestamp = Timestamp.now();
-        
+
         // Create a list of approved photos
         approvedPhotos = new ArrayList<>();
         PhotoDocument photo1 = new PhotoDocument(
@@ -43,7 +49,7 @@ class ReportTest {
                 timestamp
         );
         photo1.approve(user, timestamp);
-        
+
         PhotoDocument photo2 = new PhotoDocument(
                 new PhotoId(UUID.randomUUID()),
                 new PhotoAngle(PhotoAngle.NamedAngle.BACK),
@@ -52,7 +58,7 @@ class ReportTest {
                 timestamp
         );
         photo2.approve(user, timestamp);
-        
+
         approvedPhotos.add(photo1);
         approvedPhotos.add(photo2);
     }
@@ -61,7 +67,7 @@ class ReportTest {
     void reportShouldBeCreatedWithValidData() {
         // Create a report
         Report report = new Report(orderId, approvedPhotos, user, timestamp);
-        
+
         // Verify the report properties
         assertEquals(orderId, report.getOrderId());
         assertEquals(approvedPhotos, report.getApprovedPhotos());
@@ -70,33 +76,30 @@ class ReportTest {
     }
 
     @Test
-    void reportShouldAllowNullValues() {
-        // This test demonstrates that the Report constructor currently allows null values,
-        // which is a potential issue that should be fixed
-        
-        // Create a report with null values
-        Report report = new Report(null, null, null, null);
-        
-        // Verify that null values are accepted
-        assertNull(report.getOrderId());
-        assertNull(report.getApprovedPhotos());
-        assertNull(report.getGeneratedBy());
-        assertNull(report.getGeneratedAt());
+    void reportShouldRejectNullValues() {
+        // This test verifies that the Report constructor rejects null values,
+        // which is a good practice to prevent NullPointerExceptions
+
+        // Verify that null values are rejected
+        assertThrows(NullPointerException.class, () -> new Report(null, approvedPhotos, user, timestamp));
+        assertThrows(NullPointerException.class, () -> new Report(orderId, null, user, timestamp));
+        assertThrows(NullPointerException.class, () -> new Report(orderId, approvedPhotos, null, timestamp));
+        assertThrows(NullPointerException.class, () -> new Report(orderId, approvedPhotos, user, null));
     }
 
     @Test
-    void approvedPhotosShouldBeModifiable() {
-        // This test demonstrates that the approvedPhotos list is not protected from modification,
-        // which is a potential issue that should be fixed
-        
+    void approvedPhotosShouldBeUnmodifiable() {
+        // This test verifies that the approvedPhotos list is protected from modification,
+        // which is a good practice to maintain encapsulation
+
         // Create a report
         Report report = new Report(orderId, approvedPhotos, user, timestamp);
-        
+
         // Get the approvedPhotos list and try to modify it
         List<PhotoDocument> photos = report.getApprovedPhotos();
-        
-        // Verify that the list can be modified
-        assertDoesNotThrow(() -> {
+
+        // Verify that the list cannot be modified
+        assertThrows(UnsupportedOperationException.class, () -> {
             photos.add(new PhotoDocument(
                     new PhotoId(UUID.randomUUID()),
                     new PhotoAngle(PhotoAngle.NamedAngle.LEFT),
@@ -105,5 +108,43 @@ class ReportTest {
                     timestamp
             ));
         });
+    }
+
+    @Test
+    void builderShouldCreateReportWithAllProperties() {
+        // This test demonstrates the use of the Builder pattern to create a Report
+
+        // Create a report using the Builder pattern
+        ReportId reportId = ReportId.newId();
+        Customer recipient = Customer.individual(
+                CustomerId.newId(),
+                new PersonName("John", "Doe"),
+                new EmailAddress("john.doe@example.com")
+        );
+
+        Report report = Report.builder()
+                .id(reportId)
+                .orderId(orderId)
+                .approvedPhotos(approvedPhotos)
+                .generatedBy(user)
+                .generatedAt(timestamp)
+                .recipient(recipient)
+                .format(ReportFormat.PDF)
+                .status(ReportStatus.DRAFT)
+                .comments("Test comments")
+                .version(1)
+                .build();
+
+        // Verify all properties
+        assertEquals(reportId, report.getId());
+        assertEquals(orderId, report.getOrderId());
+        assertEquals(approvedPhotos, report.getApprovedPhotos());
+        assertEquals(user, report.getGeneratedBy());
+        assertEquals(timestamp, report.getGeneratedAt());
+        assertEquals(recipient, report.getRecipient());
+        assertEquals(ReportFormat.PDF, report.getFormat());
+        assertEquals(ReportStatus.DRAFT, report.getStatus());
+        assertEquals("Test comments", report.getComments());
+        assertEquals(1, report.getVersion());
     }
 }

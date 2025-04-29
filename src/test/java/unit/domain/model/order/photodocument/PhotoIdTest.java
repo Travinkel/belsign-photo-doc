@@ -13,12 +13,22 @@ class PhotoIdTest {
     void constructorShouldAcceptValidUUID() {
         UUID uuid = UUID.randomUUID();
         PhotoId photoId = new PhotoId(uuid);
-        assertEquals(uuid, photoId.getValue());
+        assertEquals(uuid, photoId.value());
     }
 
     @Test
     void constructorShouldRejectNullUUID() {
         assertThrows(NullPointerException.class, () -> new PhotoId(null));
+    }
+
+    @Test
+    void newIdShouldCreateRandomId() {
+        PhotoId id1 = PhotoId.newId();
+        PhotoId id2 = PhotoId.newId();
+
+        assertNotNull(id1);
+        assertNotNull(id2);
+        assertNotEquals(id1, id2);
     }
 
     @Test

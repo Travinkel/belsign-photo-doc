@@ -1,95 +1,151 @@
 package unit.domain.model.customer;
 
-import com.belman.belsign.domain.model.customer.Customer;
-import com.belman.belsign.domain.model.customer.CustomerId;
+import com.belman.belsign.domain.model.customer.*;
 import com.belman.belsign.domain.model.user.EmailAddress;
 import org.junit.jupiter.api.Test;
-
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class CustomerTest {
 
     @Test
-    void customerShouldBeCreatedWithRequiredFields() {
-        // Arrange
-        CustomerId id = new CustomerId(UUID.randomUUID());
-        String name = "John Doe";
+    void individualCustomerShouldBeCreated() {
+        CustomerId id = CustomerId.newId();
+        PersonName name = new PersonName("John", "Doe");
         EmailAddress email = new EmailAddress("john.doe@example.com");
         
-        // Act
-        Customer customer = new Customer(id, name, email);
+        Customer customer = Customer.individual(id, name, email);
         
-        // Assert
         assertEquals(id, customer.getId());
-        assertEquals(name, customer.getName());
+        assertEquals(CustomerType.INDIVIDUAL, customer.getType());
+        assertEquals(name, customer.getPersonName());
         assertEquals(email, customer.getEmail());
-        assertNull(customer.getCompany());
         assertNull(customer.getPhoneNumber());
+        assertTrue(customer.isIndividual());
+        assertFalse(customer.isCompany());
+        assertEquals("John Doe", customer.getName());
     }
     
     @Test
-    void customerShouldBeCreatedWithAllFields() {
-        // Arrange
-        CustomerId id = new CustomerId(UUID.randomUUID());
-        String name = "John Doe";
+    void individualCustomerWithPhoneNumberShouldBeCreated() {
+        CustomerId id = CustomerId.newId();
+        PersonName name = new PersonName("John", "Doe");
         EmailAddress email = new EmailAddress("john.doe@example.com");
-        String company = "Acme Inc.";
-        String phoneNumber = "+1 123-456-7890";
+        PhoneNumber phone = new PhoneNumber("+45 12345678");
         
-        // Act
-        Customer customer = new Customer(id, name, email, company, phoneNumber);
+        Customer customer = Customer.individual(id, name, email, phone);
         
-        // Assert
         assertEquals(id, customer.getId());
-        assertEquals(name, customer.getName());
+        assertEquals(CustomerType.INDIVIDUAL, customer.getType());
+        assertEquals(name, customer.getPersonName());
         assertEquals(email, customer.getEmail());
-        assertEquals(company, customer.getCompany());
-        assertEquals(phoneNumber, customer.getPhoneNumber());
+        assertEquals(phone, customer.getPhoneNumber());
     }
     
     @Test
-    void customerShouldUpdateMutableFields() {
-        // Arrange
-        Customer customer = new Customer(
-            new CustomerId(UUID.randomUUID()),
-            "John Doe",
+    void companyCustomerShouldBeCreated() {
+        CustomerId id = CustomerId.newId();
+        Company company = new Company("Belman A/S", "12345678", "Oddesundvej 18");
+        EmailAddress email = new EmailAddress("info@belman.dk");
+        
+        Customer customer = Customer.company(id, company, email);
+        
+        assertEquals(id, customer.getId());
+        assertEquals(CustomerType.COMPANY, customer.getType());
+        assertEquals(company, customer.getCompany());
+        assertEquals(email, customer.getEmail());
+        assertNull(customer.getPhoneNumber());
+        assertTrue(customer.isCompany());
+        assertFalse(customer.isIndividual());
+        assertEquals("Belman A/S", customer.getName());
+    }
+    
+    @Test
+    void companyCustomerWithPhoneNumberShouldBeCreated() {
+        CustomerId id = CustomerId.newId();
+        Company company = new Company("Belman A/S", "12345678", "Oddesundvej 18");
+        EmailAddress email = new EmailAddress("info@belman.dk");
+        PhoneNumber phone = new PhoneNumber("+45 12345678");
+        
+        Customer customer = Customer.company(id, company, email, phone);
+        
+        assertEquals(id, customer.getId());
+        assertEquals(CustomerType.COMPANY, customer.getType());
+        assertEquals(company, customer.getCompany());
+        assertEquals(email, customer.getEmail());
+        assertEquals(phone, customer.getPhoneNumber());
+    }
+    
+    @Test
+    void getPersonNameShouldThrowExceptionForCompanyCustomer() {
+        Customer customer = Customer.company(
+            CustomerId.newId(),
+            new Company("Belman A/S", "12345678", "Oddesundvej 18"),
+            new EmailAddress("info@belman.dk")
+        );
+        
+        assertThrows(IllegalStateException.class, customer::getPersonName);
+    }
+    
+    @Test
+    void setPersonNameShouldThrowExceptionForCompanyCustomer() {
+        Customer customer = Customer.company(
+            CustomerId.newId(),
+            new Company("Belman A/S", "12345678", "Oddesundvej 18"),
+            new EmailAddress("info@belman.dk")
+        );
+        
+        PersonName name = new PersonName("John", "Doe");
+        assertThrows(IllegalStateException.class, () -> customer.setPersonName(name));
+    }
+    
+    @Test
+    void getCompanyShouldThrowExceptionForIndividualCustomer() {
+        Customer customer = Customer.individual(
+            CustomerId.newId(),
+            new PersonName("John", "Doe"),
             new EmailAddress("john.doe@example.com")
         );
         
-        // Act
-        String newName = "Jane Doe";
-        EmailAddress newEmail = new EmailAddress("jane.doe@example.com");
-        String newCompany = "Beta Corp.";
-        String newPhoneNumber = "+1 987-654-3210";
-        
-        customer.setName(newName);
-        customer.setEmail(newEmail);
-        customer.setCompany(newCompany);
-        customer.setPhoneNumber(newPhoneNumber);
-        
-        // Assert
-        assertEquals(newName, customer.getName());
-        assertEquals(newEmail, customer.getEmail());
-        assertEquals(newCompany, customer.getCompany());
-        assertEquals(newPhoneNumber, customer.getPhoneNumber());
+        assertThrows(IllegalStateException.class, customer::getCompany);
     }
     
     @Test
-    void customerShouldRejectNullRequiredFields() {
-        // Arrange
-        CustomerId id = new CustomerId(UUID.randomUUID());
-        String name = "John Doe";
-        EmailAddress email = new EmailAddress("john.doe@example.com");
+    void setCompanyShouldThrowExceptionForIndividualCustomer() {
+        Customer customer = Customer.individual(
+            CustomerId.newId(),
+            new PersonName("John", "Doe"),
+            new EmailAddress("john.doe@example.com")
+        );
         
-        // Assert
-        assertThrows(NullPointerException.class, () -> new Customer(null, name, email));
-        assertThrows(NullPointerException.class, () -> new Customer(id, null, email));
-        assertThrows(NullPointerException.class, () -> new Customer(id, name, null));
+        Company company = new Company("Belman A/S", "12345678", "Oddesundvej 18");
+        assertThrows(IllegalStateException.class, () -> customer.setCompany(company));
+    }
+    
+    @Test
+    void setEmailShouldUpdateEmail() {
+        Customer customer = Customer.individual(
+            CustomerId.newId(),
+            new PersonName("John", "Doe"),
+            new EmailAddress("john.doe@example.com")
+        );
         
-        Customer customer = new Customer(id, name, email);
-        assertThrows(NullPointerException.class, () -> customer.setName(null));
-        assertThrows(NullPointerException.class, () -> customer.setEmail(null));
+        EmailAddress newEmail = new EmailAddress("new.email@example.com");
+        customer.setEmail(newEmail);
+        
+        assertEquals(newEmail, customer.getEmail());
+    }
+    
+    @Test
+    void setPhoneNumberShouldUpdatePhoneNumber() {
+        Customer customer = Customer.individual(
+            CustomerId.newId(),
+            new PersonName("John", "Doe"),
+            new EmailAddress("john.doe@example.com")
+        );
+        
+        PhoneNumber phone = new PhoneNumber("+45 12345678");
+        customer.setPhoneNumber(phone);
+        
+        assertEquals(phone, customer.getPhoneNumber());
     }
 }

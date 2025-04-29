@@ -6,11 +6,15 @@ import java.util.Objects;
 /**
  * Value object wrapping a unique Customer identifier.
  */
-public final class CustomerId {
-    private final UUID id;
-
-    public CustomerId(UUID id) {
-        this.id = Objects.requireNonNull(id, "id must not be null");
+public record CustomerId(UUID id) {
+    /**
+     * Creates a CustomerId with the specified UUID.
+     * 
+     * @param id the UUID for this customer ID
+     * @throws NullPointerException if id is null
+     */
+    public CustomerId {
+        Objects.requireNonNull(id, "id must not be null");
     }
 
     /**
@@ -20,20 +24,10 @@ public final class CustomerId {
         return new CustomerId(UUID.randomUUID());
     }
 
+    /**
+     * @return the UUID representation of this customer ID
+     */
     public UUID toUUID() {
         return id;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CustomerId customerId = (CustomerId) o;
-        return id.equals(customerId.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
     }
 }

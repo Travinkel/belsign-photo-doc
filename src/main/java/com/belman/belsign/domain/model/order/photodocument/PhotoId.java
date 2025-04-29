@@ -3,32 +3,24 @@ package com.belman.belsign.domain.model.order.photodocument;
 import java.util.Objects;
 import java.util.UUID;
 
-public class PhotoId {
-
-    private final UUID value;
-
-    public PhotoId(UUID value) {
-        this.value = Objects.requireNonNull(value, "value must not be null");
+/**
+ * Value object wrapping a unique Photo identifier.
+ */
+public record PhotoId(UUID value) {
+    /**
+     * Creates a PhotoId with the specified UUID.
+     * 
+     * @param value the UUID for this photo ID
+     * @throws NullPointerException if value is null
+     */
+    public PhotoId {
+        Objects.requireNonNull(value, "value must not be null");
     }
 
-    public PhotoId() {
-        this(UUID.randomUUID());
-    }
-
-    public UUID getValue() {
-        return value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PhotoId)) return false;
-        PhotoId photoId = (PhotoId) o;
-        return value.equals(photoId.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return value.hashCode();
+    /**
+     * Generates a new random PhotoId.
+     */
+    public static PhotoId newId() {
+        return new PhotoId(UUID.randomUUID());
     }
 }
