@@ -15,6 +15,7 @@ import java.util.HashSet;
 public class User {
     private final UserId id;
     private final Username username;
+    private final HashedPassword password;
     private PersonName name;
     private EmailAddress email;
     private PhoneNumber phoneNumber;
@@ -31,7 +32,8 @@ public class User {
      * @deprecated Use User(UserId, Username, EmailAddress) instead
      */
     @Deprecated
-    public User(Username username, EmailAddress email) {
+    public User(Username username, HashedPassword password, EmailAddress email) {
+        this.password = password;
         this.id = UserId.newId();
         this.username = Objects.requireNonNull(username, "username must not be null");
         this.email = Objects.requireNonNull(email, "email must not be null");
@@ -46,9 +48,10 @@ public class User {
      * @param email the user's email address
      * @throws NullPointerException if any parameter is null
      */
-    public User(UserId id, Username username, EmailAddress email) {
+    public User(UserId id, Username username, HashedPassword hashedPassword, EmailAddress email) {
         this.id = Objects.requireNonNull(id, "id must not be null");
         this.username = Objects.requireNonNull(username, "username must not be null");
+        this.password = Objects.requireNonNull(hashedPassword, "hashedPassword must not be null");
         this.email = Objects.requireNonNull(email, "email must not be null");
         this.status = UserStatus.ACTIVE; // Default status
     }
@@ -62,9 +65,10 @@ public class User {
      * @param email the user's email address
      * @throws NullPointerException if any parameter is null
      */
-    public User(UserId id, Username username, PersonName name, EmailAddress email) {
+    public User(UserId id, Username username, HashedPassword hashedPassword, PersonName name, EmailAddress email) {
         this.id = Objects.requireNonNull(id, "id must not be null");
         this.username = Objects.requireNonNull(username, "username must not be null");
+        this.password = Objects.requireNonNull(hashedPassword, "hashedPassword must not be null");
         this.name = Objects.requireNonNull(name, "name must not be null");
         this.email = Objects.requireNonNull(email, "email must not be null");
         this.status = UserStatus.ACTIVE; // Default status
@@ -81,10 +85,11 @@ public class User {
      * @param status the user's status
      * @throws NullPointerException if any required parameter is null
      */
-    public User(UserId id, Username username, PersonName name, EmailAddress email, 
+    public User(UserId id, Username username, HashedPassword hashedPassword, PersonName name, EmailAddress email,
                PhoneNumber phoneNumber, UserStatus status) {
         this.id = Objects.requireNonNull(id, "id must not be null");
         this.username = Objects.requireNonNull(username, "username must not be null");
+        this.password = Objects.requireNonNull(hashedPassword, "hashedPassword must not be null");
         this.name = Objects.requireNonNull(name, "name must not be null");
         this.email = Objects.requireNonNull(email, "email must not be null");
         this.phoneNumber = phoneNumber; // Can be null
