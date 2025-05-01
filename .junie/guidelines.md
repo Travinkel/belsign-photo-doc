@@ -19,7 +19,7 @@ This document provides essential information for developers working on the ExamP
 
 ### Project Structure
 - The project follows a domain-driven design approach
-- Main packages:
+- com.belman.Main packages:
   - `com.belman.belsign.domain.model`: Contains domain model classes
   - `com.belman.belsign.domain.repository`: Contains repository interfaces
   - `com.belman.belsign.domain.service`: Contains domain services

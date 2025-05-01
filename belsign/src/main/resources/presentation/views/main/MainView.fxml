@@ -8,7 +8,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="presentation.views.main.MainViewController"
+            fx:controller="com.belman.presentation.views.main.MainViewController"
             prefHeight="600.0" prefWidth="800.0"
             style="-fx-background-color: #f2f2f2;">
 
@@ -17,7 +17,7 @@
           AnchorPane.leftAnchor="0.0">
         <Label text="BelSign - Photo Documentation System" 
                style="-fx-text-fill: #004b88; -fx-font-weight: bold; -fx-font-size: 24px;"/>
-        <Label text="Main Application View" 
+        <Label text="com.belman.Main Application View"
                style="-fx-text-fill: #333535; -fx-font-size: 18px;"/>
     </VBox>
 </AnchorPane>

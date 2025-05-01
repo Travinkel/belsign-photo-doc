@@ -58,7 +58,7 @@ Belman Blue
 
 (C100, M60, Y0, K30)
 
-Main brand symbol, Icons, Important actions/messages
+com.belman.Main brand symbol, Icons, Important actions/messages
 
 Belman Flexibles India Green
 

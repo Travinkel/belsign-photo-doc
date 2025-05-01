@@ -10,7 +10,7 @@
 <?import javafx.scene.text.Font?>
 
 <StackPane xmlns:fx="http://javafx.com/fxml" 
-           fx:controller="presentation.views.splash.SplashViewController"
+           fx:controller="com.belman.presentation.views.splash.SplashViewController"
            styleClass="splash-container"
            stylesheets="/styles/app.css">
     <VBox styleClass="splash-content">

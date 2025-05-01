@@ -48,7 +48,7 @@ Customer individual = Customer.individual(
 
 Customer company = Customer.company(
     CustomerId.newId(),
-    new Company("Acme Inc.", "12345", "123 Main St"),
+    new Company("Acme Inc.", "12345", "123 com.belman.Main St"),
     new EmailAddress("info@acme.com")
 );
 ```

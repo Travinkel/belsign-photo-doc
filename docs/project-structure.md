@@ -40,7 +40,7 @@ ExamProjectBelman/
 │   │   │   │   └── com/belman/athomefx/cli/
 │   │   ├── test/
 │   └── pom.xml
-├── belsign/                   # Main application module
+├── belsign/                   # com.belman.Main application module
 │   ├── src/
 │   │   ├── main/
 │   │   │   ├── java/
@@ -51,7 +51,7 @@ ExamProjectBelman/
 │   │   │   │       │   └── nidhugg/
 │   │   │   │       ├── infrastructure/
 │   │   │   │       ├── presentation/
-│   │   │   │       └── Main.java
+│   │   │   │       └── com.belman.Main.java
 │   │   │   ├── resources/
 │   │   ├── test/
 │   └── pom.xml
@@ -77,7 +77,7 @@ The dependencies between modules are as follows:
 
 2. **CLI as a Separate Module**: The command-line interface is in its own module, making it easier to distribute and use independently of the application.
 
-3. **Main Application in Its Own Module**: The BelSign application is in its own module, making it easier to focus on application-specific code.
+3. **com.belman.Main Application in Its Own Module**: The BelSign application is in its own module, making it easier to focus on application-specific code.
 
 ### Dependency Management
 

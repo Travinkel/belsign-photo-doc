@@ -11,7 +11,7 @@ The splash screen is the first screen that appears when the application is launc
 - `src/main/java/com/belman/belsign/presentation/views/splash/SplashView.java`: View class
 - `src/main/java/com/belman/belsign/presentation/views/splash/SplashViewController.java`: Controller class
 - `src/main/java/com/belman/belsign/presentation/views/splash/SplashViewModel.java`: ViewModel class
-- `src/main/java/com/belman/belsign/Main.java`: Main application class
+- `src/main/java/com/belman/belsign/com.belman.Main.java`: com.belman.Main application class
 
 ### Design
 The splash screen follows the BelSign UI style guide, using the specified colors, typography, and layout. The design is responsive and adapts to different screen sizes and platforms.
@@ -38,7 +38,7 @@ This is achieved through CSS media queries and platform detection in the control
 
 ### Platform Detection
 The application detects the platform it's running on (desktop, tablet, smartphone) and applies the appropriate styling. This is done in two places:
-1. In the `Main.java` file, which detects the platform and applies the appropriate CSS class to the root element
+1. In the `com.belman.Main.java` file, which detects the platform and applies the appropriate CSS class to the root element
 2. In the `SplashViewController.java` file, which adjusts UI elements based on the platform
 
 ### Error Handling
