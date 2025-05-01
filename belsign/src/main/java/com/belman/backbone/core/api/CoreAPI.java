@@ -1,12 +1,12 @@
 package com.belman.backbone.core.api;
 
 import com.belman.backbone.core.base.BaseViewModel;
-import dev.stefan.athomefx.core.di.ServiceLocator;
+import com.belman.backbone.core.di.ServiceLocator;
 import com.belman.backbone.core.events.DomainEvent;
 import com.belman.backbone.core.events.DomainEventHandler;
 import com.belman.backbone.core.events.DomainEventPublisher;
 import com.belman.backbone.core.state.StateStore;
-import dev.stefan.athomefx.core.util.ViewLoader;
+import com.belman.backbone.core.util.ViewLoader;
 
 import java.util.function.Consumer;
 import java.util.function.Function;

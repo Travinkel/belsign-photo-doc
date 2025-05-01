@@ -1,7 +1,7 @@
 package com.belman.backbone.core.base;
 
 
-import dev.stefan.athomefx.core.di.Inject;
+import com.belman.backbone.core.di.Inject;
 import com.belman.backbone.core.events.DomainEvent;
 import com.belman.backbone.core.events.DomainEventPublisher;
 import com.belman.backbone.core.logging.Logger;
