@@ -58,6 +58,21 @@
     -fx-padding: 8px 16px;
     -fx-background-radius: 6px;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 2, 0, 0, 1);
+    -fx-transition: all 0.2s ease-in-out;
+}
+
+.button:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, 2);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.button:pressed {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 1, 0, 0, 0);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-translate-y: 1px;
 }
 
 .button-primary {
@@ -68,6 +83,14 @@
     -fx-background-radius: 6px;
     -fx-min-height: -touch-target-size;
     -fx-cursor: hand;
+}
+
+.button-primary:hover {
+    -fx-background-color: derive(-belman-blue, 10%);
+}
+
+.button-primary:pressed {
+    -fx-background-color: derive(-belman-blue, -10%);
 }
 
 .button-secondary {
@@ -83,29 +106,92 @@
     -fx-cursor: hand;
 }
 
+.button-secondary:hover {
+    -fx-background-color: derive(white, -5%);
+    -fx-border-color: derive(-belman-light-blue, 10%);
+}
+
+.button-secondary:pressed {
+    -fx-background-color: derive(white, -10%);
+    -fx-border-color: derive(-belman-light-blue, -10%);
+}
+
 /* Form Controls - Enhanced for touch */
 .text-field, .text-area, .combo-box, .choice-box {
     -fx-min-height: -touch-target-size;
     -fx-background-radius: 4px;
     -fx-padding: 8px;
     -fx-font-size: 16px;
+    -fx-border-color: -belman-grey-30;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-transition: border-color 0.2s ease-in-out;
+}
+
+.text-field:focused, .text-area:focused, .combo-box:focused, .choice-box:focused {
+    -fx-border-color: -belman-light-blue;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(127, 168, 197, 0.3), 4, 0, 0, 0);
+}
+
+.text-field:hover, .text-area:hover, .combo-box:hover, .choice-box:hover {
+    -fx-border-color: -belman-grey-50;
 }
 
 .check-box, .radio-button {
     -fx-min-height: -touch-target-size;
     -fx-padding: 8px;
     -fx-font-size: 16px;
+    -fx-transition: scale 0.1s ease-in-out;
+}
+
+.check-box:hover, .radio-button:hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.check-box .box, .radio-button .radio {
+    -fx-min-height: 24px;
+    -fx-min-width: 24px;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-border-color: -belman-grey-50;
+    -fx-border-width: 1px;
+}
+
+.check-box:selected .box, .radio-button:selected .radio {
+    -fx-background-color: -belman-blue;
+    -fx-border-color: -belman-blue;
 }
 
 /* List and Table Views */
 .list-view, .table-view {
     -fx-background-radius: 4px;
     -fx-padding: 4px;
+    -fx-border-color: -belman-grey-30;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
 }
 
 .list-cell, .table-row-cell {
     -fx-min-height: -touch-target-size;
-    -fx-padding: 8px;
+    -fx-padding: 12px;
+    -fx-border-color: transparent transparent -belman-grey-15 transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-transition: background-color 0.1s ease-in-out;
+}
+
+.list-cell:hover, .table-row-cell:hover {
+    -fx-background-color: derive(-belman-grey-07, -2%);
+}
+
+.list-cell:selected, .table-row-cell:selected {
+    -fx-background-color: derive(-belman-light-blue, 80%);
+    -fx-text-fill: -belman-dark-grey;
+}
+
+.list-cell:pressed, .table-row-cell:pressed {
+    -fx-background-color: derive(-belman-light-blue, 70%);
 }
 
 /* Progress Bar */

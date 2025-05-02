@@ -4,10 +4,11 @@ import com.belman.backbone.core.base.BaseController;
 import com.belman.backbone.core.navigation.Router;
 import com.belman.backbone.core.util.PlatformUtils;
 import com.belman.domain.entities.PhotoDocument;
+import com.belman.domain.services.CameraService;
+import com.belman.infrastructure.service.MockCameraService;
+import com.belman.presentation.components.TouchFriendlyDialog;
 import com.belman.presentation.views.main.MainView;
-import com.gluonhq.attach.pictures.PicturesService;
-import com.gluonhq.attach.storage.StorageService;
-import com.gluonhq.attach.util.Services;
+import com.belman.presentation.views.photoupload.TouchFriendlyPhotoListCell;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -82,8 +83,8 @@ public class PhotoUploadViewController extends BaseController<PhotoUploadViewMod
         // Bind list view to photos list
         photoListView.setItems(getViewModel().getPhotos());
 
-        // Set cell factory to display photo information
-        photoListView.setCellFactory(listView -> new PhotoListCell());
+        // Set cell factory to use touch-friendly photo list cells
+        photoListView.setCellFactory(listView -> new TouchFriendlyPhotoListCell());
     }
 
     /**
@@ -100,58 +101,51 @@ public class PhotoUploadViewController extends BaseController<PhotoUploadViewMod
     }
 
     /**
+     * Gets a CameraService instance appropriate for the current platform.
+     * 
+     * @return a CameraService instance
+     */
+    private CameraService getCameraService() {
+        // For now, we'll use the MockCameraService for all platforms
+        // In a real implementation, we would use a platform-specific implementation
+        return new MockCameraService();
+    }
+
+    /**
      * Handles the take photo button action.
-     * Uses Gluon's PicturesService to take a photo with the device camera on mobile devices.
-     * Falls back to file chooser on desktop.
+     * Uses the CameraService to take a photo with the device camera.
      */
     @FXML
     private void handleTakePhoto(ActionEvent event) {
-        // Use PlatformUtils to check if we're on a mobile device
-        if (PlatformUtils.isRunningOnMobile()) {
-            showInfo("Taking photo with camera...");
-            // This is just a placeholder for mobile implementation
-            // In a real mobile app, this would use the device camera
-            useFileChooser();
+        CameraService cameraService = getCameraService();
+
+        if (cameraService.isCameraAvailable()) {
+            cameraService.takePhoto().ifPresent(file -> {
+                selectedPhotoFile = file;
+                getViewModel().setSelectedPhotoFile(file);
+                showInfo("Photo taken successfully");
+            });
         } else {
-            // On desktop, use file chooser
-            useFileChooser();
+            showError("Camera is not available on this device");
         }
     }
 
     /**
      * Handles the select photo button action.
-     * Uses Gluon's PicturesService to select a photo from the gallery on mobile devices.
-     * Falls back to file chooser on desktop.
+     * Uses the CameraService to select a photo from the gallery.
      */
     @FXML
     private void handleSelectPhoto(ActionEvent event) {
-        // Use PlatformUtils to check if we're on a mobile device
-        if (PlatformUtils.isRunningOnMobile()) {
-            showInfo("Selecting photo from gallery...");
-            // This is just a placeholder for mobile implementation
-            // In a real mobile app, this would use the device gallery
-            useFileChooser();
+        CameraService cameraService = getCameraService();
+
+        if (cameraService.isGalleryAvailable()) {
+            cameraService.selectPhoto().ifPresent(file -> {
+                selectedPhotoFile = file;
+                getViewModel().setSelectedPhotoFile(file);
+                showInfo("Photo selected successfully");
+            });
         } else {
-            // On desktop, use file chooser
-            useFileChooser();
-        }
-    }
-
-    /**
-     * Uses JavaFX FileChooser to select an image file.
-     * This is used as a fallback when running on desktop or when Gluon services are not available.
-     */
-    private void useFileChooser() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select Photo");
-        fileChooser.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
-        );
-
-        File file = fileChooser.showOpenDialog(null);
-        if (file != null) {
-            selectedPhotoFile = file;
-            getViewModel().setSelectedPhotoFile(file);
+            showError("Photo gallery is not available on this device");
         }
     }
 
@@ -195,47 +189,17 @@ public class PhotoUploadViewController extends BaseController<PhotoUploadViewMod
     }
 
     /**
-     * Shows an error message.
+     * Shows an error message using a touch-friendly dialog.
      */
     private void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        TouchFriendlyDialog.showError("Error", message);
     }
 
     /**
-     * Shows an information message.
+     * Shows an information message using a touch-friendly dialog.
      */
     private void showInfo(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Information");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        TouchFriendlyDialog.showInformation("Information", message);
     }
 
-    /**
-     * Custom cell for displaying photo information in the list view.
-     */
-    private static class PhotoListCell extends javafx.scene.control.ListCell<PhotoDocument> {
-        @Override
-        protected void updateItem(PhotoDocument item, boolean empty) {
-            super.updateItem(item, empty);
-
-            if (empty || item == null) {
-                setText(null);
-                setGraphic(null);
-            } else {
-                String status = item.getStatus().name();
-                String angle = item.getAngle().degrees() + "°";
-                String uploadedBy = item.getUploadedBy().getUsername().value();
-                String uploadedAt = item.getUploadedAt().toInstant().toString();
-
-                setText(String.format("Photo ID: %s | Angle: %s | Status: %s | Uploaded by: %s | Uploaded at: %s",
-                    item.getPhotoId().value(), angle, status, uploadedBy, uploadedAt));
-            }
-        }
-    }
 }

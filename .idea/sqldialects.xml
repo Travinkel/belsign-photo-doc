@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V1__Create_Users_Tables.sql" dialect="TSQL" />
-    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V2__Create_Customers_Table.sql" dialect="TSQL" />
-    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V3__Create_Orders_Table.sql" dialect="TSQL" />
-    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V4__Create_Photo_Documents_Table.sql" dialect="TSQL" />
-  </component>
-</project>
