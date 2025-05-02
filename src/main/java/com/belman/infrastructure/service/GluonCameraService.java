@@ -55,18 +55,167 @@ public class GluonCameraService extends BaseService implements CameraService {
     public Optional<File> takePhoto() {
         logInfo("Taking photo with Gluon PicturesService");
 
-        // This is a temporary implementation to make the code compile
-        // In a real implementation, we would use the PicturesService API correctly
-        return Optional.empty();
+        try {
+            // Get the PicturesService
+            Optional<PicturesService> picturesServiceOpt = Services.get(PicturesService.class);
+            if (!picturesServiceOpt.isPresent()) {
+                logError("PicturesService not available");
+                return Optional.empty();
+            }
+
+            PicturesService picturesService = picturesServiceOpt.get();
+
+            // Create a temporary file for the image
+            String fileName = "camera_" + UUID.randomUUID().toString() + IMAGE_FILE_EXTENSION;
+            File outputFile = new File(tempDirectory, fileName);
+
+            // Ensure parent directories exist
+            File parentDir = outputFile.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs();
+            }
+
+            // Use reflection to find and invoke the takePhoto method
+            try {
+                // Try to find a method named "takePhoto"
+                java.lang.reflect.Method takePhotoMethod = null;
+
+                for (java.lang.reflect.Method method : picturesService.getClass().getMethods()) {
+                    if (method.getName().equals("takePhoto")) {
+                        takePhotoMethod = method;
+                        break;
+                    }
+                }
+
+                if (takePhotoMethod == null) {
+                    logError("takePhoto method not found in PicturesService");
+                    return Optional.empty();
+                }
+
+                // Determine the number of parameters
+                int paramCount = takePhotoMethod.getParameterCount();
+
+                // Invoke the method with the appropriate number of parameters
+                Object result;
+                if (paramCount == 0) {
+                    result = takePhotoMethod.invoke(picturesService);
+                } else {
+                    // If parameters are required, pass null for each parameter
+                    Object[] params = new Object[paramCount];
+                    result = takePhotoMethod.invoke(picturesService, params);
+                }
+
+                // Check if the result is an Optional<Image>
+                if (result instanceof Optional) {
+                    Optional<?> optResult = (Optional<?>) result;
+                    if (optResult.isPresent() && optResult.get() instanceof Image) {
+                        Image image = (Image) optResult.get();
+
+                        // Resize the image if needed
+                        Image resizedImage = resizeImageIfNeeded(image);
+
+                        // Save to file
+                        saveImageToFile(resizedImage, outputFile);
+
+                        return Optional.of(outputFile);
+                    }
+                }
+
+                logError("takePhoto method did not return an Optional<Image>");
+                return Optional.empty();
+            } catch (Exception e) {
+                logError("Error invoking takePhoto method", e);
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            logError("Error taking photo", e);
+            return Optional.empty();
+        }
     }
 
     @Override
     public Optional<File> selectPhoto() {
         logInfo("Selecting photo with Gluon PicturesService");
 
-        // This is a temporary implementation to make the code compile
-        // In a real implementation, we would use the PicturesService API correctly
-        return Optional.empty();
+        try {
+            // Get the PicturesService
+            Optional<PicturesService> picturesServiceOpt = Services.get(PicturesService.class);
+            if (!picturesServiceOpt.isPresent()) {
+                logError("PicturesService not available");
+                return Optional.empty();
+            }
+
+            PicturesService picturesService = picturesServiceOpt.get();
+
+            // Create a temporary file for the image
+            String fileName = "gallery_" + UUID.randomUUID().toString() + IMAGE_FILE_EXTENSION;
+            File outputFile = new File(tempDirectory, fileName);
+
+            // Ensure parent directories exist
+            File parentDir = outputFile.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs();
+            }
+
+            // Try different method names that might be used for selecting photos
+            String[] methodNames = {"selectPhoto", "pickImage", "getImage", "retrieveImage", "pickMedia", "browsePhotos"};
+
+            for (String methodName : methodNames) {
+                try {
+                    // Try to find a method with the current name
+                    java.lang.reflect.Method method = null;
+
+                    for (java.lang.reflect.Method m : picturesService.getClass().getMethods()) {
+                        if (m.getName().equals(methodName)) {
+                            method = m;
+                            break;
+                        }
+                    }
+
+                    if (method == null) {
+                        continue; // Method not found, try the next name
+                    }
+
+                    // Determine the number of parameters
+                    int paramCount = method.getParameterCount();
+
+                    // Invoke the method with the appropriate number of parameters
+                    Object result;
+                    if (paramCount == 0) {
+                        result = method.invoke(picturesService);
+                    } else {
+                        // If parameters are required, pass null for each parameter
+                        Object[] params = new Object[paramCount];
+                        result = method.invoke(picturesService, params);
+                    }
+
+                    // Check if the result is an Optional<Image>
+                    if (result instanceof Optional) {
+                        Optional<?> optResult = (Optional<?>) result;
+                        if (optResult.isPresent() && optResult.get() instanceof Image) {
+                            Image image = (Image) optResult.get();
+
+                            // Resize the image if needed
+                            Image resizedImage = resizeImageIfNeeded(image);
+
+                            // Save to file
+                            saveImageToFile(resizedImage, outputFile);
+
+                            return Optional.of(outputFile);
+                        }
+                    }
+                } catch (Exception e) {
+                    // Ignore exceptions and try the next method name
+                }
+            }
+
+            // If we get here, none of the methods worked
+            logError("No suitable method found for selecting photos");
+            return Optional.empty();
+        } catch (Exception e) {
+            logError("Error selecting photo", e);
+            return Optional.empty();
+        }
     }
 
     @Override

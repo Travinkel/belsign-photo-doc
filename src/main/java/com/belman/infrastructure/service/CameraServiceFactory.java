@@ -14,19 +14,15 @@ public class CameraServiceFactory {
      * @return a CameraService instance
      */
     public static CameraService getCameraService() {
-        // For now, we'll use the MockCameraService for all platforms
-        // In a future implementation, we would use a platform-specific implementation
-        // such as GluonCameraService for mobile platforms
-        
         if (PlatformUtils.isRunningOnMobile()) {
-            // TODO: Return a mobile-specific implementation when dependencies are sorted out
-            // return new GluonCameraService(getTempDirectory());
-            return new MockCameraService();
+            // Use GluonCameraService for mobile platforms
+            return new GluonCameraService(getTempDirectory());
         } else {
+            // Use MockCameraService for desktop platforms
             return new MockCameraService();
         }
     }
-    
+
     /**
      * Gets the temporary directory for storing camera files.
      * 
