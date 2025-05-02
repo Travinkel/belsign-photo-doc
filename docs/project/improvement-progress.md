@@ -338,12 +338,48 @@ These tools provide several benefits:
 
 The initial analysis has been run successfully, establishing a baseline for future improvements. The team can now address the identified issues incrementally, focusing on the most critical ones first.
 
+## Domain Model Improvements
+
+Strengthened the domain model by enhancing key value objects with better validation, documentation, and functionality:
+
+### EmailAddress Value Object Improvements
+- Enhanced class-level documentation explaining the purpose and usage of email addresses in the system
+- Implemented a more comprehensive RFC 5322 compliant regex pattern for email validation
+- Added better error messages that specify whether the email is null, empty, or invalid
+- Implemented additional utility methods:
+  - `getLocalPart()`: Extracts the local part of the email address (before the @ symbol)
+  - `getDomainPart()`: Extracts the domain part of the email address (after the @ symbol)
+- Improved input validation with trimming of whitespace
+
+### OrderNumber Value Object Improvements
+- Added comprehensive class-level documentation explaining the purpose and format of order numbers
+- Enhanced the regex pattern to capture component groups for easier extraction
+- Implemented a factory method `of()` to create OrderNumber instances from component parts:
+  - Department code (1-2 digits)
+  - Year (2 digits)
+  - Customer code (6 digits)
+  - Sequential number (8 digits)
+- Added getter methods for each component of the order number:
+  - `getDepartmentCode()`
+  - `getYear()`
+  - `getCustomerCode()`
+  - `getSequentialNumber()`
+- Improved validation with specific error messages for each component
+
+These improvements enhance the domain model by:
+- Making value objects more self-documenting and easier to understand
+- Providing richer functionality that encapsulates business concepts
+- Ensuring stricter validation to prevent invalid data
+- Adding utility methods that make working with these objects more convenient
+- Maintaining immutability and encapsulation principles
+
+All tests pass with these improvements, confirming that they integrate well with the existing codebase.
+
 ## Next Steps
 The next priorities should be:
 1. Adding integration tests for component interactions
-2. Strengthening the domain model
-3. Implementing UI tests for comprehensive testing
-4. Implementing other medium-priority tasks
+2. Implementing UI tests for comprehensive testing
+3. Implementing other medium-priority tasks
 
 ## Testing
 All tests pass with the implemented changes, confirming that the improvements work correctly and don't break existing functionality.
