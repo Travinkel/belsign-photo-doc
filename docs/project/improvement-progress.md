@@ -302,11 +302,47 @@ Extracted hardcoded values to constants in several key classes to improve code m
 
 These improvements make the code more maintainable by centralizing configuration values and message strings, making it easier to modify them in the future and ensuring consistency throughout the codebase.
 
+## Static Code Analysis Tools
+
+Integrated static code analysis tools to improve code quality and identify potential issues early in the development process:
+
+### SpotBugs Integration
+- Added SpotBugs Maven plugin (version 4.7.3.6) to the build process
+- Configured SpotBugs with maximum effort and medium threshold for bug detection
+- Created a comprehensive exclude filter file (spotbugs-exclude.xml) to:
+  - Exclude test classes and generated code from analysis
+  - Ignore false positives in JavaFX-specific code patterns
+  - Exclude specific bug patterns that are not relevant for this project
+- Integrated the analysis into the verify phase of the Maven build lifecycle
+- Set failOnError to false to prevent build failures during initial adoption
+
+### PMD Integration
+- Added PMD Maven plugin (version 3.20.0) to the build process
+- Configured PMD with appropriate rulesets:
+  - Best practices
+  - Code style
+  - Design
+  - Error-prone code
+  - Multithreading
+  - Performance
+- Integrated Copy-Paste Detection (CPD) to identify duplicated code
+- Excluded generated code from analysis
+- Configured the plugin to run during the verify phase of the Maven build lifecycle
+
+These tools provide several benefits:
+- Early detection of potential bugs and code quality issues
+- Enforcement of coding standards and best practices
+- Identification of security vulnerabilities
+- Detection of duplicated code
+- Continuous code quality monitoring during the build process
+
+The initial analysis has been run successfully, establishing a baseline for future improvements. The team can now address the identified issues incrementally, focusing on the most critical ones first.
+
 ## Next Steps
 The next priorities should be:
-1. Adding static code analysis tools
-2. Adding integration tests for component interactions
-3. Strengthening the domain model
+1. Adding integration tests for component interactions
+2. Strengthening the domain model
+3. Implementing UI tests for comprehensive testing
 4. Implementing other medium-priority tasks
 
 ## Testing
