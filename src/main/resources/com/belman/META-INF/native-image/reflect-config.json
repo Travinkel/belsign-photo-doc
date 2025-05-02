@@ -1,0 +1,64 @@
+[
+  {
+    "name": "javafx.scene.control.Label",
+    "methods": [
+      { "name": "<init>", "parameterTypes": [] }
+    ],
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javafx.scene.layout.AnchorPane",
+    "methods": [
+      { "name": "<init>", "parameterTypes": [] }
+    ],
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.belman.integration.dummy.DummyController",
+    "methods": [
+      { "name": "<init>", "parameterTypes": [] }
+    ],
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "unit.athomefx.dummy.DummyController",
+    "methods": [
+      { "name": "<init>", "parameterTypes": [] }
+    ],
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.belman.backbone.core.util.ViewLoader",
+    "methods": [
+      { "name": "createViewModel", "parameterTypes": ["java.lang.Class"] },
+      { "name": "setupViewModel", "parameterTypes": ["com.belman.backbone.core.base.BaseController", "com.belman.backbone.core.base.BaseViewModel"] },
+      { "name": "load", "parameterTypes": ["java.lang.Class"] }
+    ],
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.belman.backbone.core.base.BaseController",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.belman.backbone.core.base.BaseViewModel",
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.belman.infrastructure.service.SmtpEmailService",
+    "methods": [
+      { "name": "<init>", "parameterTypes": ["java.lang.String", "int", "java.lang.String", "java.lang.String", "java.lang.String"] },
+      { "name": "sendReport", "parameterTypes": ["com.belman.domain.entities.Report", "com.belman.domain.valueobjects.EmailAddress", "java.lang.String", "java.lang.String", "java.util.List"] },
+      { "name": "sendReport", "parameterTypes": ["com.belman.domain.entities.Report", "java.util.List", "java.lang.String", "java.lang.String", "java.util.List"] }
+    ],
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  }
+]

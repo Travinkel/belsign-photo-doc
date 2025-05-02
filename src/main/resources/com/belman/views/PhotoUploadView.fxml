@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.belman.presentation.views.photoupload.PhotoUploadViewController"
+            prefHeight="600.0" prefWidth="800.0"
+            style="-fx-background-color: #f2f2f2;">
+
+    <!-- 
+    Note: This FXML uses standard JavaFX components for compatibility,
+    but the controller will use Gluon Mobile APIs for camera access and
+    other mobile-specific functionality.
+    -->
+
+    <VBox spacing="20" AnchorPane.topAnchor="0.0" 
+          AnchorPane.rightAnchor="0.0" AnchorPane.bottomAnchor="0.0" 
+          AnchorPane.leftAnchor="0.0">
+
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
+
+        <Label text="Upload Photos" 
+               style="-fx-text-fill: #004b88; -fx-font-weight: bold; -fx-font-size: 24px;"/>
+
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Order Number:" style="-fx-font-weight: bold;"/>
+            <TextField fx:id="orderNumberField" promptText="Enter order number" prefWidth="200"/>
+            <Button fx:id="searchOrderButton" text="Search" onAction="#handleSearchOrder"/>
+        </HBox>
+
+        <Label fx:id="orderInfoLabel" text="No order selected" style="-fx-font-style: italic;"/>
+
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Photo Angle:" style="-fx-font-weight: bold;"/>
+            <TextField fx:id="angleField" promptText="Enter angle (degrees)" prefWidth="150"/>
+        </HBox>
+
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <Button fx:id="takePhotoButton" text="Take Photo" onAction="#handleTakePhoto"/>
+            <Button fx:id="selectPhotoButton" text="Select Photo" onAction="#handleSelectPhoto"/>
+            <Button fx:id="uploadButton" text="Upload" onAction="#handleUpload" disable="true"/>
+        </HBox>
+
+        <Label text="Selected Photos:" style="-fx-font-weight: bold;"/>
+
+        <ListView fx:id="photoListView" VBox.vgrow="ALWAYS"/>
+
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button fx:id="deleteButton" text="Delete Selected" onAction="#handleDeletePhoto" disable="true"/>
+            <Button fx:id="backButton" text="Back to Main" onAction="#handleBack"/>
+        </HBox>
+    </VBox>
+</AnchorPane>

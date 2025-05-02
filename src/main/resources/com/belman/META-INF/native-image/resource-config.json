@@ -1,0 +1,35 @@
+{
+  "resources": [
+    {
+      "pattern": ".*\\.fxml$"
+    },
+    {
+      "pattern": ".*\\.css$"
+    },
+    {
+      "pattern": ".*\\.png$"
+    },
+    {
+      "pattern": ".*\\.jpg$"
+    },
+    {
+      "pattern": "fxml/.*"
+    },
+    {
+      "pattern": "styles/.*"
+    },
+    {
+      "pattern": "images/.*"
+    },
+    {
+      "pattern": "presentation/views/.*/.*\\.fxml"
+    },
+    {
+      "pattern": "dummy/DummyView.fxml"
+    },
+    {
+      "pattern": "integration/athomefx/dummy/DummyView.fxml"
+    }
+  ],
+  "bundles": []
+}
