@@ -12,8 +12,8 @@
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.belman.presentation.views.photoupload.PhotoUploadViewController"
-            prefHeight="600.0" prefWidth="800.0"
-            style="-fx-background-color: #f2f2f2;">
+            styleClass="responsive-container, photo-upload-container"
+            stylesheets="@../styles/app.css">
 
     <!-- 
     Note: This FXML uses standard JavaFX components for compatibility,
@@ -21,43 +21,53 @@
     other mobile-specific functionality.
     -->
 
-    <VBox spacing="20" AnchorPane.topAnchor="0.0" 
-          AnchorPane.rightAnchor="0.0" AnchorPane.bottomAnchor="0.0" 
-          AnchorPane.leftAnchor="0.0">
+    <VBox spacing="20" styleClass="vbox" 
+          AnchorPane.topAnchor="0.0" AnchorPane.rightAnchor="0.0" 
+          AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          maxWidth="Infinity" maxHeight="Infinity">
 
         <padding>
             <Insets top="20" right="20" bottom="20" left="20"/>
         </padding>
 
-        <Label text="Upload Photos" 
-               style="-fx-text-fill: #004b88; -fx-font-weight: bold; -fx-font-size: 24px;"/>
+        <Label text="Upload Photos" styleClass="title"/>
 
-        <HBox spacing="10" alignment="CENTER_LEFT">
-            <Label text="Order Number:" style="-fx-font-weight: bold;"/>
-            <TextField fx:id="orderNumberField" promptText="Enter order number" prefWidth="200"/>
+        <!-- Order Number Section -->
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="form-row">
+            <Label text="Order Number:" styleClass="form-label"/>
+            <TextField fx:id="orderNumberField" promptText="Enter order number" HBox.hgrow="ALWAYS"/>
             <Button fx:id="searchOrderButton" text="Search" onAction="#handleSearchOrder"/>
         </HBox>
 
-        <Label fx:id="orderInfoLabel" text="No order selected" style="-fx-font-style: italic;"/>
+        <Label fx:id="orderInfoLabel" text="No order selected" styleClass="body-text"/>
 
-        <HBox spacing="10" alignment="CENTER_LEFT">
-            <Label text="Photo Angle:" style="-fx-font-weight: bold;"/>
-            <TextField fx:id="angleField" promptText="Enter angle (degrees)" prefWidth="150"/>
+        <!-- Photo Angle Section -->
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="form-row">
+            <Label text="Photo Angle:" styleClass="form-label"/>
+            <TextField fx:id="angleField" promptText="Enter angle (degrees)" HBox.hgrow="ALWAYS"/>
         </HBox>
 
-        <HBox spacing="10" alignment="CENTER_LEFT">
-            <Button fx:id="takePhotoButton" text="Take Photo" onAction="#handleTakePhoto"/>
-            <Button fx:id="selectPhotoButton" text="Select Photo" onAction="#handleSelectPhoto"/>
-            <Button fx:id="uploadButton" text="Upload" onAction="#handleUpload" disable="true"/>
+        <!-- Photo Actions Section -->
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="form-row">
+            <Button fx:id="takePhotoButton" text="Take Photo" onAction="#handleTakePhoto" 
+                    styleClass="button-primary"/>
+            <Button fx:id="selectPhotoButton" text="Select Photo" onAction="#handleSelectPhoto" 
+                    styleClass="button-secondary"/>
+            <Button fx:id="uploadButton" text="Upload" onAction="#handleUpload" 
+                    disable="true" styleClass="button"/>
         </HBox>
 
-        <Label text="Selected Photos:" style="-fx-font-weight: bold;"/>
+        <Label text="Selected Photos:" styleClass="subtitle"/>
 
-        <ListView fx:id="photoListView" VBox.vgrow="ALWAYS"/>
+        <!-- Photo List Section - Grows to fill available space -->
+        <ListView fx:id="photoListView" VBox.vgrow="ALWAYS" styleClass="photo-list"/>
 
-        <HBox spacing="10" alignment="CENTER_RIGHT">
-            <Button fx:id="deleteButton" text="Delete Selected" onAction="#handleDeletePhoto" disable="true"/>
-            <Button fx:id="backButton" text="Back to Main" onAction="#handleBack"/>
+        <!-- Bottom Actions Section -->
+        <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="form-row">
+            <Button fx:id="deleteButton" text="Delete Selected" onAction="#handleDeletePhoto" 
+                    disable="true" styleClass="button"/>
+            <Button fx:id="backButton" text="Back to Main" onAction="#handleBack" 
+                    styleClass="button-secondary"/>
         </HBox>
     </VBox>
 </AnchorPane>

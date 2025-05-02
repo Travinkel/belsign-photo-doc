@@ -7,7 +7,7 @@
     -belman-blue: #004b88;
     -belman-green: #338d71;
     -belman-dark-grey: #333535;
-    
+
     /* Secondary Colors (Greys) */
     -belman-grey-80: #575757;
     -belman-grey-50: #9d9d9d;
@@ -15,6 +15,12 @@
     -belman-grey-20: #dadada;
     -belman-grey-15: #e3e3e3;
     -belman-grey-07: #f2f2f2;
+
+    /* Responsive Sizing Variables */
+    -touch-target-size: 48px;
+    -spacing-small: 8px;
+    -spacing-medium: 16px;
+    -spacing-large: 24px;
 }
 
 /* Global Styles */
@@ -28,26 +34,39 @@
     -fx-font-size: 36px;
     -fx-font-weight: bold;
     -fx-text-fill: -belman-blue;
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
 }
 
 .subtitle {
     -fx-font-size: 20px;
     -fx-text-fill: -belman-dark-grey;
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
 }
 
 .body-text {
     -fx-font-size: 16px;
     -fx-text-fill: -belman-grey-80;
+    -fx-wrap-text: true;
 }
 
-/* Button Styles */
+/* Button Styles - Enhanced for touch */
+.button {
+    -fx-min-height: -touch-target-size;
+    -fx-min-width: 120px;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+}
+
 .button-primary {
     -fx-background-color: -belman-blue;
     -fx-text-fill: white;
     -fx-font-size: 18px;
     -fx-padding: 12px 24px;
     -fx-background-radius: 6px;
-    -fx-min-height: 48px;
+    -fx-min-height: -touch-target-size;
     -fx-cursor: hand;
 }
 
@@ -60,17 +79,53 @@
     -fx-padding: 12px 24px;
     -fx-background-radius: 6px;
     -fx-border-radius: 6px;
-    -fx-min-height: 48px;
+    -fx-min-height: -touch-target-size;
     -fx-cursor: hand;
+}
+
+/* Form Controls - Enhanced for touch */
+.text-field, .text-area, .combo-box, .choice-box {
+    -fx-min-height: -touch-target-size;
+    -fx-background-radius: 4px;
+    -fx-padding: 8px;
+    -fx-font-size: 16px;
+}
+
+.check-box, .radio-button {
+    -fx-min-height: -touch-target-size;
+    -fx-padding: 8px;
+    -fx-font-size: 16px;
+}
+
+/* List and Table Views */
+.list-view, .table-view {
+    -fx-background-radius: 4px;
+    -fx-padding: 4px;
+}
+
+.list-cell, .table-row-cell {
+    -fx-min-height: -touch-target-size;
+    -fx-padding: 8px;
 }
 
 /* Progress Bar */
 .progress-bar {
     -fx-accent: -belman-light-blue;
+    -fx-min-height: 10px;
 }
 
 .progress-bar .track {
     -fx-background-color: -belman-grey-15;
+}
+
+/* Layout Containers */
+.vbox, .hbox {
+    -fx-spacing: -spacing-medium;
+}
+
+.grid-pane {
+    -fx-hgap: -spacing-medium;
+    -fx-vgap: -spacing-medium;
 }
 
 /* Splash Screen Specific Styles */
@@ -82,6 +137,8 @@
 .splash-content {
     -fx-alignment: center;
     -fx-spacing: 20px;
+    -fx-max-width: 800px;
+    -fx-max-height: 600px;
 }
 
 .splash-logo {
@@ -93,29 +150,94 @@
     -fx-pref-width: 300px;
 }
 
+/* Photo Upload View Styles */
+.photo-upload-container {
+    -fx-padding: 20px;
+    -fx-spacing: 16px;
+}
+
+.photo-list {
+    -fx-min-height: 200px;
+}
+
+.form-row {
+    -fx-spacing: 10px;
+    -fx-alignment: center-left;
+}
+
+.form-label {
+    -fx-min-width: 120px;
+    -fx-font-weight: bold;
+}
+
 /* Responsive Styles for Different Platforms */
 /* Desktop - Default styles above are for desktop */
 
 /* Tablet */
+.tablet {
+    -fx-font-size: 14px;
+}
+
 .tablet .title {
     -fx-font-size: 32px;
+}
+
+.tablet .subtitle {
+    -fx-font-size: 18px;
+}
+
+.tablet .body-text {
+    -fx-font-size: 14px;
+}
+
+.tablet .button {
+    -fx-min-width: 100px;
+    -fx-font-size: 16px;
 }
 
 .tablet .splash-logo {
     -fx-fit-width: 300px;
 }
 
+.tablet .splash-progress {
+    -fx-pref-width: 250px;
+}
+
+.tablet .form-row {
+    -fx-spacing: 8px;
+}
+
+.tablet .form-label {
+    -fx-min-width: 100px;
+}
+
 /* Smartphone */
+.smartphone {
+    -fx-font-size: 12px;
+}
+
 .smartphone .title {
-    -fx-font-size: 28px;
+    -fx-font-size: 24px;
 }
 
 .smartphone .subtitle {
-    -fx-font-size: 18px;
+    -fx-font-size: 16px;
 }
 
 .smartphone .body-text {
     -fx-font-size: 14px;
+}
+
+.smartphone .button {
+    -fx-min-width: 80px;
+    -fx-font-size: 14px;
+    -fx-padding: 8px 12px;
+}
+
+.smartphone .text-field, .smartphone .text-area, 
+.smartphone .combo-box, .smartphone .choice-box {
+    -fx-font-size: 14px;
+    -fx-padding: 6px;
 }
 
 .smartphone .splash-logo {
@@ -124,4 +246,23 @@
 
 .smartphone .splash-progress {
     -fx-pref-width: 200px;
+}
+
+.smartphone .form-row {
+    -fx-spacing: 6px;
+}
+
+.smartphone .form-label {
+    -fx-min-width: 80px;
+}
+
+/* Responsive Layout Adjustments */
+.responsive-container {
+    -fx-padding: 10px;
+}
+
+/* Ensure all images scale properly */
+.responsive-image {
+    -fx-preserve-ratio: true;
+    -fx-smooth: true;
 }
