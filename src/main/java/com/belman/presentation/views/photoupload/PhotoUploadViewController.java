@@ -5,7 +5,7 @@ import com.belman.backbone.core.navigation.Router;
 import com.belman.backbone.core.util.PlatformUtils;
 import com.belman.domain.entities.PhotoDocument;
 import com.belman.domain.services.CameraService;
-import com.belman.infrastructure.service.MockCameraService;
+import com.belman.infrastructure.service.CameraServiceFactory;
 import com.belman.presentation.components.TouchFriendlyDialog;
 import com.belman.presentation.views.main.MainView;
 import com.belman.presentation.views.photoupload.TouchFriendlyPhotoListCell;
@@ -16,6 +16,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 
@@ -60,6 +61,9 @@ public class PhotoUploadViewController extends BaseController<PhotoUploadViewMod
 
     @FXML
     private Button backButton;
+
+    @FXML
+    private ProgressIndicator progressIndicator;
 
     private File selectedPhotoFile;
 
@@ -106,9 +110,7 @@ public class PhotoUploadViewController extends BaseController<PhotoUploadViewMod
      * @return a CameraService instance
      */
     private CameraService getCameraService() {
-        // For now, we'll use the MockCameraService for all platforms
-        // In a real implementation, we would use a platform-specific implementation
-        return new MockCameraService();
+        return CameraServiceFactory.getCameraService();
     }
 
     /**
@@ -120,11 +122,51 @@ public class PhotoUploadViewController extends BaseController<PhotoUploadViewMod
         CameraService cameraService = getCameraService();
 
         if (cameraService.isCameraAvailable()) {
-            cameraService.takePhoto().ifPresent(file -> {
-                selectedPhotoFile = file;
-                getViewModel().setSelectedPhotoFile(file);
-                showInfo("Photo taken successfully");
-            });
+            // Show progress indicator
+            progressIndicator.setVisible(true);
+
+            // Disable buttons while taking photo
+            takePhotoButton.setDisable(true);
+            selectPhotoButton.setDisable(true);
+
+            // Take photo in a background thread
+            new Thread(() -> {
+                try {
+                    cameraService.takePhoto().ifPresentOrElse(file -> {
+                        // Update UI on JavaFX thread
+                        javafx.application.Platform.runLater(() -> {
+                            selectedPhotoFile = file;
+                            getViewModel().setSelectedPhotoFile(file);
+                            showInfo("Photo taken successfully");
+
+                            // Hide progress indicator and re-enable buttons
+                            progressIndicator.setVisible(false);
+                            takePhotoButton.setDisable(false);
+                            selectPhotoButton.setDisable(false);
+                        });
+                    }, () -> {
+                        // Handle case where no photo was taken (user cancelled)
+                        javafx.application.Platform.runLater(() -> {
+                            showInfo("Photo capture cancelled");
+
+                            // Hide progress indicator and re-enable buttons
+                            progressIndicator.setVisible(false);
+                            takePhotoButton.setDisable(false);
+                            selectPhotoButton.setDisable(false);
+                        });
+                    });
+                } catch (Exception e) {
+                    // Handle errors
+                    javafx.application.Platform.runLater(() -> {
+                        showError("Error taking photo: " + e.getMessage());
+
+                        // Hide progress indicator and re-enable buttons
+                        progressIndicator.setVisible(false);
+                        takePhotoButton.setDisable(false);
+                        selectPhotoButton.setDisable(false);
+                    });
+                }
+            }).start();
         } else {
             showError("Camera is not available on this device");
         }
@@ -139,11 +181,51 @@ public class PhotoUploadViewController extends BaseController<PhotoUploadViewMod
         CameraService cameraService = getCameraService();
 
         if (cameraService.isGalleryAvailable()) {
-            cameraService.selectPhoto().ifPresent(file -> {
-                selectedPhotoFile = file;
-                getViewModel().setSelectedPhotoFile(file);
-                showInfo("Photo selected successfully");
-            });
+            // Show progress indicator
+            progressIndicator.setVisible(true);
+
+            // Disable buttons while selecting photo
+            takePhotoButton.setDisable(true);
+            selectPhotoButton.setDisable(true);
+
+            // Select photo in a background thread
+            new Thread(() -> {
+                try {
+                    cameraService.selectPhoto().ifPresentOrElse(file -> {
+                        // Update UI on JavaFX thread
+                        javafx.application.Platform.runLater(() -> {
+                            selectedPhotoFile = file;
+                            getViewModel().setSelectedPhotoFile(file);
+                            showInfo("Photo selected successfully");
+
+                            // Hide progress indicator and re-enable buttons
+                            progressIndicator.setVisible(false);
+                            takePhotoButton.setDisable(false);
+                            selectPhotoButton.setDisable(false);
+                        });
+                    }, () -> {
+                        // Handle case where no photo was selected (user cancelled)
+                        javafx.application.Platform.runLater(() -> {
+                            showInfo("Photo selection cancelled");
+
+                            // Hide progress indicator and re-enable buttons
+                            progressIndicator.setVisible(false);
+                            takePhotoButton.setDisable(false);
+                            selectPhotoButton.setDisable(false);
+                        });
+                    });
+                } catch (Exception e) {
+                    // Handle errors
+                    javafx.application.Platform.runLater(() -> {
+                        showError("Error selecting photo: " + e.getMessage());
+
+                        // Hide progress indicator and re-enable buttons
+                        progressIndicator.setVisible(false);
+                        takePhotoButton.setDisable(false);
+                        selectPhotoButton.setDisable(false);
+                    });
+                }
+            }).start();
         } else {
             showError("Photo gallery is not available on this device");
         }
@@ -154,13 +236,33 @@ public class PhotoUploadViewController extends BaseController<PhotoUploadViewMod
      */
     @FXML
     private void handleUpload(ActionEvent event) {
-        boolean uploaded = getViewModel().uploadPhoto();
+        // Show progress indicator
+        progressIndicator.setVisible(true);
 
-        if (uploaded) {
-            showInfo("Photo uploaded successfully");
-        } else {
-            showError(getViewModel().errorMessageProperty().get());
-        }
+        // Disable buttons during upload
+        takePhotoButton.setDisable(true);
+        selectPhotoButton.setDisable(true);
+        uploadButton.setDisable(true);
+
+        // Upload photo in a background thread
+        new Thread(() -> {
+            boolean uploaded = getViewModel().uploadPhoto();
+
+            // Update UI on JavaFX thread
+            javafx.application.Platform.runLater(() -> {
+                if (uploaded) {
+                    showInfo("Photo uploaded successfully");
+                } else {
+                    showError(getViewModel().errorMessageProperty().get());
+                }
+
+                // Hide progress indicator and re-enable buttons
+                progressIndicator.setVisible(false);
+                takePhotoButton.setDisable(false);
+                selectPhotoButton.setDisable(false);
+                // uploadButton will be disabled if no photo is selected (handled by binding)
+            });
+        }).start();
     }
 
     /**
@@ -170,13 +272,33 @@ public class PhotoUploadViewController extends BaseController<PhotoUploadViewMod
     private void handleDeletePhoto(ActionEvent event) {
         PhotoDocument selectedPhoto = photoListView.getSelectionModel().getSelectedItem();
         if (selectedPhoto != null) {
-            boolean deleted = getViewModel().deletePhoto(selectedPhoto);
+            // Show progress indicator
+            progressIndicator.setVisible(true);
 
-            if (deleted) {
-                showInfo("Photo deleted successfully");
-            } else {
-                showError(getViewModel().errorMessageProperty().get());
-            }
+            // Disable buttons during delete
+            takePhotoButton.setDisable(true);
+            selectPhotoButton.setDisable(true);
+            deleteButton.setDisable(true);
+
+            // Delete photo in a background thread
+            new Thread(() -> {
+                boolean deleted = getViewModel().deletePhoto(selectedPhoto);
+
+                // Update UI on JavaFX thread
+                javafx.application.Platform.runLater(() -> {
+                    if (deleted) {
+                        showInfo("Photo deleted successfully");
+                    } else {
+                        showError(getViewModel().errorMessageProperty().get());
+                    }
+
+                    // Hide progress indicator and re-enable buttons
+                    progressIndicator.setVisible(false);
+                    takePhotoButton.setDisable(false);
+                    selectPhotoButton.setDisable(false);
+                    // deleteButton will be disabled if no photo is selected (handled by binding)
+                });
+            }).start();
         }
     }
 
