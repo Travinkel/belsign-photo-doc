@@ -25,6 +25,14 @@ import java.util.UUID;
  */
 public class GluonCameraService extends BaseService implements CameraService {
 
+    // File format constants
+    private static final String IMAGE_FILE_EXTENSION = ".png";
+    private static final String IMAGE_FORMAT = "png";
+
+    // Image size constants
+    private static final int MAX_IMAGE_WIDTH = 1920;
+    private static final int MAX_IMAGE_HEIGHT = 1080;
+
     private final ErrorHandler errorHandler = ErrorHandler.getInstance();
     private final String tempDirectory;
 
@@ -85,7 +93,7 @@ public class GluonCameraService extends BaseService implements CameraService {
     private File saveImageToFile(Image image, String prefix) {
         try {
             // Create a temporary file
-            String fileName = prefix + UUID.randomUUID().toString() + ".png";
+            String fileName = prefix + UUID.randomUUID().toString() + IMAGE_FILE_EXTENSION;
             File file = new File(tempDirectory, fileName);
 
             // Resize the image if it's too large
@@ -108,20 +116,16 @@ public class GluonCameraService extends BaseService implements CameraService {
      * @return the resized image, or the original image if it's not too large
      */
     private Image resizeImageIfNeeded(Image image) {
-        // Maximum dimensions for uploaded images
-        final int MAX_WIDTH = 1920;
-        final int MAX_HEIGHT = 1080;
-
         double width = image.getWidth();
         double height = image.getHeight();
 
         // Check if the image needs to be resized
-        if (width <= MAX_WIDTH && height <= MAX_HEIGHT) {
+        if (width <= MAX_IMAGE_WIDTH && height <= MAX_IMAGE_HEIGHT) {
             return image;
         }
 
         // Calculate the scale factor
-        double scaleFactor = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
+        double scaleFactor = Math.min(MAX_IMAGE_WIDTH / width, MAX_IMAGE_HEIGHT / height);
 
         // Calculate the new dimensions
         int newWidth = (int) (width * scaleFactor);
@@ -178,7 +182,7 @@ public class GluonCameraService extends BaseService implements CameraService {
         // Save the image to the file
         javax.imageio.ImageIO.write(
             javafx.embed.swing.SwingFXUtils.fromFXImage(writableImage, null),
-            "png",
+            IMAGE_FORMAT,
             file
         );
     }

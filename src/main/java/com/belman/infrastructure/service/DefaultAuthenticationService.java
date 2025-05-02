@@ -28,9 +28,21 @@ public class DefaultAuthenticationService extends BaseService implements Authent
     // Constants for brute force protection
     private static final int MAX_FAILED_ATTEMPTS = 5;
     private static final Duration LOCKOUT_DURATION = Duration.ofMinutes(15);
+    private static final int INITIAL_ATTEMPTS = 1;
 
     // Constants for session timeout
     private static final Duration SESSION_TIMEOUT = Duration.ofMinutes(30);
+
+    // Log message constants
+    private static final String LOG_ACCOUNT_LOCKED_OUT = "Authentication failed: Account {} is locked out due to too many failed attempts";
+    private static final String LOG_USER_NOT_ACTIVE = "Authentication failed: User {} is not active";
+    private static final String LOG_USER_LOCKED = "Authentication failed: User {} is locked";
+    private static final String LOG_USER_AUTHENTICATED = "User {} authenticated successfully";
+    private static final String LOG_USER_LOCKED_FAILED_ATTEMPTS = "User {} locked due to too many failed login attempts";
+    private static final String LOG_AUTHENTICATION_FAILED = "Authentication failed for user: {}";
+    private static final String LOG_SESSION_TIMEOUT = "Session timed out for user {}";
+    private static final String LOG_USER_LOGGED_OUT = "User {} logged out";
+    private static final String LOG_AUTHENTICATION_ERROR = "Error during authentication";
 
     // Track failed login attempts by username
     private final Map<String, FailedLoginTracker> failedLoginAttempts = new ConcurrentHashMap<>();
@@ -52,7 +64,7 @@ public class DefaultAuthenticationService extends BaseService implements Authent
         private Instant lockoutTime;
 
         public FailedLoginTracker() {
-            this.attempts = 1;
+            this.attempts = INITIAL_ATTEMPTS;
             this.lockoutTime = null;
         }
 
@@ -90,7 +102,7 @@ public class DefaultAuthenticationService extends BaseService implements Authent
         try {
             // Check if the account is locked out due to too many failed attempts
             if (isAccountLockedOut(username)) {
-                logWarn("Authentication failed: Account {} is locked out due to too many failed attempts", username);
+                logWarn(LOG_ACCOUNT_LOCKED_OUT, username);
                 return Optional.empty();
             }
 
@@ -102,14 +114,14 @@ public class DefaultAuthenticationService extends BaseService implements Authent
 
                 // Check if the user is active
                 if (!user.isActive()) {
-                    logWarn("Authentication failed: User {} is not active", username);
+                    logWarn(LOG_USER_NOT_ACTIVE, username);
                     recordFailedLoginAttempt(username);
                     return Optional.empty();
                 }
 
                 // Check if the user is locked
                 if (user.isLocked()) {
-                    logWarn("Authentication failed: User {} is locked", username);
+                    logWarn(LOG_USER_LOCKED, username);
                     recordFailedLoginAttempt(username);
                     return Optional.empty();
                 }
@@ -128,7 +140,7 @@ public class DefaultAuthenticationService extends BaseService implements Authent
                     // Publish a UserLoggedInEvent
                     publishEvent(new UserLoggedInEvent(user));
 
-                    logInfo("User {} authenticated successfully", username);
+                    logInfo(LOG_USER_AUTHENTICATED, username);
                     return Optional.of(user);
                 } else {
                     // Record failed login attempt
@@ -139,15 +151,15 @@ public class DefaultAuthenticationService extends BaseService implements Authent
                     if (tracker != null && tracker.getAttempts() >= MAX_FAILED_ATTEMPTS) {
                         user.lock();
                         userRepository.save(user);
-                        logWarn("User {} locked due to too many failed login attempts", username);
+                        logWarn(LOG_USER_LOCKED_FAILED_ATTEMPTS, username);
                     }
                 }
             }
 
-            logWarn("Authentication failed for user: {}", username);
+            logWarn(LOG_AUTHENTICATION_FAILED, username);
             return Optional.empty();
         } catch (Exception e) {
-            logError("Error during authentication", e);
+            logError(LOG_AUTHENTICATION_ERROR, e);
             return Optional.empty();
         }
     }
@@ -212,7 +224,7 @@ public class DefaultAuthenticationService extends BaseService implements Authent
     public Optional<User> getCurrentUser() {
         // Check for session timeout
         if (currentUser != null && isSessionTimedOut()) {
-            logInfo("Session timed out for user {}", currentUser.getUsername().value());
+            logInfo(LOG_SESSION_TIMEOUT, currentUser.getUsername().value());
             logout();
             return Optional.empty();
         }
@@ -231,7 +243,7 @@ public class DefaultAuthenticationService extends BaseService implements Authent
             // Publish a UserLoggedOutEvent
             publishEvent(new UserLoggedOutEvent(currentUser));
 
-            logInfo("User {} logged out", currentUser.getUsername().value());
+            logInfo(LOG_USER_LOGGED_OUT, currentUser.getUsername().value());
             currentUser = null;
             lastActivityTime = null;
         }
@@ -241,7 +253,7 @@ public class DefaultAuthenticationService extends BaseService implements Authent
     public boolean isLoggedIn() {
         // Check for session timeout
         if (currentUser != null && isSessionTimedOut()) {
-            logInfo("Session timed out for user {}", currentUser.getUsername().value());
+            logInfo(LOG_SESSION_TIMEOUT, currentUser.getUsername().value());
             logout();
             return false;
         }

@@ -38,6 +38,22 @@ import java.util.stream.Collectors;
  */
 public class DefaultPhotoService implements PhotoService {
 
+    // File operation constants
+    private static final StandardCopyOption FILE_COPY_OPTION = StandardCopyOption.REPLACE_EXISTING;
+    private static final int BUFFER_SIZE = 8192;
+
+    // Error message constants
+    private static final String UPLOAD_ERROR_MESSAGE = "Failed to upload photo: ";
+    private static final String COPY_ERROR_MESSAGE = "Failed to copy file with Gluon Storage: ";
+    private static final String STANDARD_COPY_ERROR_MESSAGE = "Failed to copy file with standard I/O: ";
+    private static final String DELETE_ERROR_MESSAGE = "Failed to delete file with Gluon Storage";
+    private static final String STANDARD_DELETE_ERROR_MESSAGE = "Failed to delete file with standard I/O";
+    private static final String STORAGE_ERROR_MESSAGE = "Private storage not available";
+    private static final String GLUON_STORAGE_ERROR_MESSAGE = "Error in deleteFileWithGluonStorage";
+
+    // File path constants
+    private static final String FILE_EXTENSION_SEPARATOR = ".";
+
     private final OrderRepository orderRepository;
     private final String photoStorageDirectory;
     private final ErrorHandler errorHandler = ErrorHandler.getInstance();
@@ -76,7 +92,7 @@ public class DefaultPhotoService implements PhotoService {
                 // Use standard Java file I/O for desktop
                 Path sourcePath = file.toPath();
                 Path targetPath = Paths.get(photoStorageDirectory, imagePath.path());
-                Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(sourcePath, targetPath, FILE_COPY_OPTION);
             }
 
             // Create a new photo document
@@ -97,7 +113,7 @@ public class DefaultPhotoService implements PhotoService {
 
             return photo;
         } catch (IOException e) {
-            String errorMessage = "Failed to upload photo: " + e.getMessage();
+            String errorMessage = UPLOAD_ERROR_MESSAGE + e.getMessage();
             errorHandler.handleException(e, errorMessage);
             throw new RuntimeException(errorMessage, e);
         }
@@ -116,7 +132,7 @@ public class DefaultPhotoService implements PhotoService {
                 // Get the private storage directory
                 Optional<File> privateStorageDirOpt = storageService.getPrivateStorage();
                 if (privateStorageDirOpt.isEmpty()) {
-                    throw new IOException("Private storage not available");
+                    throw new IOException(STORAGE_ERROR_MESSAGE);
                 }
 
                 File privateStorageDir = privateStorageDirOpt.get();
@@ -134,14 +150,14 @@ public class DefaultPhotoService implements PhotoService {
                 try (InputStream in = new FileInputStream(sourceFile);
                      OutputStream out = new FileOutputStream(targetFile)) {
 
-                    byte[] buffer = new byte[8192];
+                    byte[] buffer = new byte[BUFFER_SIZE];
                     int length;
                     while ((length = in.read(buffer)) > 0) {
                         out.write(buffer, 0, length);
                     }
                 }
             } catch (IOException e) {
-                String errorMessage = "Failed to copy file with Gluon Storage: " + e.getMessage();
+                String errorMessage = COPY_ERROR_MESSAGE + e.getMessage();
                 errorHandler.handleException(e, errorMessage);
                 throw new RuntimeException(errorMessage, e);
             }
@@ -150,9 +166,9 @@ public class DefaultPhotoService implements PhotoService {
             try {
                 Path sourcePath = sourceFile.toPath();
                 Path targetPath = Paths.get(photoStorageDirectory, targetFileName);
-                Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(sourcePath, targetPath, FILE_COPY_OPTION);
             } catch (IOException e) {
-                String errorMessage = "Failed to copy file with standard I/O: " + e.getMessage();
+                String errorMessage = STANDARD_COPY_ERROR_MESSAGE + e.getMessage();
                 errorHandler.handleException(e, errorMessage);
                 throw new RuntimeException(errorMessage, e);
             }
@@ -216,7 +232,7 @@ public class DefaultPhotoService implements PhotoService {
                     // Delete the file
                     return file.delete();
                 } catch (Exception e) {
-                    errorHandler.handleExceptionQuietly(e, "Failed to delete file with Gluon Storage");
+                    errorHandler.handleExceptionQuietly(e, DELETE_ERROR_MESSAGE);
                     return false;
                 }
             }).orElseGet(() -> {
@@ -225,12 +241,12 @@ public class DefaultPhotoService implements PhotoService {
                     File file = new File(photoStorageDirectory, fileName);
                     return file.delete();
                 } catch (Exception e) {
-                    errorHandler.handleExceptionQuietly(e, "Failed to delete file with standard I/O");
+                    errorHandler.handleExceptionQuietly(e, STANDARD_DELETE_ERROR_MESSAGE);
                     return false;
                 }
             });
         } catch (Exception e) {
-            errorHandler.handleExceptionQuietly(e, "Error in deleteFileWithGluonStorage");
+            errorHandler.handleExceptionQuietly(e, GLUON_STORAGE_ERROR_MESSAGE);
             return false;
         }
     }
@@ -259,7 +275,7 @@ public class DefaultPhotoService implements PhotoService {
     public ImagePath generateUniqueFilePath(String originalFileName, OrderId orderId) {
         // Extract the file extension
         String extension = "";
-        int lastDotIndex = originalFileName.lastIndexOf('.');
+        int lastDotIndex = originalFileName.lastIndexOf(FILE_EXTENSION_SEPARATOR);
         if (lastDotIndex > 0) {
             extension = originalFileName.substring(lastDotIndex);
         }

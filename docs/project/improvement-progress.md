@@ -256,11 +256,57 @@ Implemented comprehensive JavaDoc documentation improvements for key domain clas
 
 These documentation improvements make the codebase more maintainable, easier to understand for new developers, and provide clear guidance on how to use the domain model correctly.
 
+## Magic Strings and Numbers Extraction
+
+Extracted hardcoded values to constants in several key classes to improve code maintainability and readability:
+
+### GluonCameraService Improvements
+- Added file format constants:
+  - `IMAGE_FILE_EXTENSION` for ".png"
+  - `IMAGE_FORMAT` for "png"
+- Added image size constants:
+  - `MAX_IMAGE_WIDTH` for 1920
+  - `MAX_IMAGE_HEIGHT` for 1080
+- Replaced all hardcoded values with these constants throughout the class
+
+### DefaultPhotoService Improvements
+- Added file operation constants:
+  - `FILE_COPY_OPTION` for StandardCopyOption.REPLACE_EXISTING
+  - `BUFFER_SIZE` for 8192 (buffer size for file operations)
+- Added error message constants for various error scenarios:
+  - `UPLOAD_ERROR_MESSAGE`
+  - `COPY_ERROR_MESSAGE`
+  - `STANDARD_COPY_ERROR_MESSAGE`
+  - `DELETE_ERROR_MESSAGE`
+  - `STANDARD_DELETE_ERROR_MESSAGE`
+  - `STORAGE_ERROR_MESSAGE`
+  - `GLUON_STORAGE_ERROR_MESSAGE`
+- Added file path constants:
+  - `FILE_EXTENSION_SEPARATOR` for "."
+- Replaced all hardcoded values with these constants throughout the class
+
+### DefaultAuthenticationService Improvements
+- Added constants for brute force protection:
+  - `INITIAL_ATTEMPTS` for the initial number of failed login attempts (1)
+- Added log message constants for various logging scenarios:
+  - `LOG_ACCOUNT_LOCKED_OUT`
+  - `LOG_USER_NOT_ACTIVE`
+  - `LOG_USER_LOCKED`
+  - `LOG_USER_AUTHENTICATED`
+  - `LOG_USER_LOCKED_FAILED_ATTEMPTS`
+  - `LOG_AUTHENTICATION_FAILED`
+  - `LOG_SESSION_TIMEOUT`
+  - `LOG_USER_LOGGED_OUT`
+  - `LOG_AUTHENTICATION_ERROR`
+- Replaced all hardcoded values with these constants throughout the class
+
+These improvements make the code more maintainable by centralizing configuration values and message strings, making it easier to modify them in the future and ensuring consistency throughout the codebase.
+
 ## Next Steps
 The next priorities should be:
-1. Extracting magic strings and numbers to constants
-2. Adding static code analysis tools
-3. Adding integration tests for component interactions
+1. Adding static code analysis tools
+2. Adding integration tests for component interactions
+3. Strengthening the domain model
 4. Implementing other medium-priority tasks
 
 ## Testing
