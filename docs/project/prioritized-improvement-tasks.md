@@ -44,7 +44,7 @@ These tasks should be addressed after high-priority items and will further enhan
 - [x] **Strengthen domain model**: Review domain model for completeness and correctness
 
 ### Testing
-- [ ] **Add integration tests**: Expand integration test suite to cover more component interactions
+- [*] **Add integration tests**: Expand integration test suite to cover more component interactions
 - [ ] **Implement UI tests**: Add more comprehensive UI testing with TestFX
 - [ ] **Implement mobile-specific tests**: Add tests for mobile-specific features
 - [ ] **Create test documentation**: Document testing strategy and approach
