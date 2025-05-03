@@ -1,7 +1,6 @@
 package com.belman.backbone.core.exceptions;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.belman.backbone.core.logging.EmojiLogger;
 
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -20,14 +19,14 @@ import java.util.function.Consumer;
  * logging errors, and displaying error messages to the user.
  */
 public class ErrorHandler {
-    private static final Logger logger = LoggerFactory.getLogger(ErrorHandler.class);
+    private static final EmojiLogger logger = EmojiLogger.getLogger(ErrorHandler.class);
     private static ErrorHandler instance;
 
     /**
      * Private constructor to enforce singleton pattern.
      */
     private ErrorHandler() {
-        // Private constructor to enforce singleton pattern
+        logger.debug("Initializing ErrorHandler");
     }
 
     /**
@@ -51,9 +50,12 @@ public class ErrorHandler {
      */
     public void handleException(Throwable exception, String message, boolean showDialog) {
         logger.error(message, exception);
-        
+
         if (showDialog) {
+            logger.debug("Showing error dialog for: {}", message);
             showErrorDialog(message, exception);
+        } else {
+            logger.debug("Suppressing error dialog for: {}", message);
         }
     }
 
@@ -64,6 +66,7 @@ public class ErrorHandler {
      * @param message the error message to display
      */
     public void handleException(Throwable exception, String message) {
+        logger.failure("Exception occurred: " + message);
         handleException(exception, message, true);
     }
 
@@ -74,6 +77,7 @@ public class ErrorHandler {
      * @param message the error message to log
      */
     public void handleExceptionQuietly(Throwable exception, String message) {
+        logger.failure("Silent exception: " + message);
         handleException(exception, message, false);
     }
 
@@ -83,7 +87,7 @@ public class ErrorHandler {
      * @param message the error message to display
      */
     public void handleError(String message) {
-        logger.error(message);
+        logger.failure(message);
         showErrorDialog(message, null);
     }
 
@@ -93,7 +97,7 @@ public class ErrorHandler {
      * @param message the error message to log
      */
     public void handleErrorQuietly(String message) {
-        logger.error(message);
+        logger.failure("Silent error: " + message);
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.belman.presentation.views.admin;
 
 import com.belman.backbone.core.base.BaseView;
-import com.belman.presentation.viewmodels.admin.AdminViewModel;
 
 /**
  * View for the admin management screen.

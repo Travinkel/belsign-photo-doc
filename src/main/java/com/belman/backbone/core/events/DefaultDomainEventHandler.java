@@ -1,6 +1,6 @@
 package com.belman.backbone.core.events;
 
-import com.belman.backbone.core.logging.Logger;
+import com.belman.backbone.core.logging.EmojiLogger;
 
 /**
  * Default implementation of the DomainEventHandlerImplementation interface.
@@ -10,7 +10,7 @@ import com.belman.backbone.core.logging.Logger;
  * @param <T> the type of event this handler can handle
  */
 public class DefaultDomainEventHandler<T extends DomainEvent> implements DomainEventHandler<T> {
-    private static final Logger logger = Logger.getLogger(DefaultDomainEventHandler.class);
+    private static final EmojiLogger logger = EmojiLogger.getLogger(DefaultDomainEventHandler.class);
 
     private final String handlerName;
 

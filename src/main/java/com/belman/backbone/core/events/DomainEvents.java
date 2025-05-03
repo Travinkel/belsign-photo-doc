@@ -1,6 +1,6 @@
 package com.belman.backbone.core.events;
 
-import com.belman.backbone.core.logging.Logger;
+import com.belman.backbone.core.logging.EmojiLogger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,7 +12,7 @@ import java.util.function.Supplier;
  * Provides a more fluent API for publishing events than using the DomainEventPublisher directly.
  */
 public class DomainEvents {
-    private static final Logger logger = Logger.getLogger(DomainEvents.class);
+    private static final EmojiLogger logger = EmojiLogger.getLogger(DomainEvents.class);
 
     // Map to store handlers by consumer and event type
     private static final Map<Class<?>, Map<Consumer<?>, DomainEventHandler<?>>> handlerMap = new ConcurrentHashMap<>();

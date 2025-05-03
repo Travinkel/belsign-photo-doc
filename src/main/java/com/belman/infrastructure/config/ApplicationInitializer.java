@@ -1,5 +1,6 @@
 package com.belman.infrastructure.config;
 
+import com.belman.backbone.core.logging.EmojiLogger;
 import com.belman.domain.repositories.UserRepository;
 import com.belman.domain.services.AuthenticationService;
 import com.belman.infrastructure.persistence.InMemoryUserRepository;
@@ -8,8 +9,6 @@ import com.belman.infrastructure.service.DefaultAuthenticationService;
 import com.belman.infrastructure.service.SessionManager;
 
 import javax.sql.DataSource;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Initializes the application's services and repositories.
@@ -18,7 +17,7 @@ import java.util.logging.Logger;
  */
 public class ApplicationInitializer {
 
-    private static final Logger LOGGER = Logger.getLogger(ApplicationInitializer.class.getName());
+    private static final EmojiLogger logger = EmojiLogger.getLogger(ApplicationInitializer.class);
     private static boolean initialized = false;
 
     /**
@@ -27,13 +26,17 @@ public class ApplicationInitializer {
      */
     public static synchronized void initialize() {
         if (initialized) {
+            logger.debug("Application already initialized, skipping initialization");
             return;
         }
 
+        logger.startup("Starting application initialization");
+
         try {
             // Initialize database connection pool
+            logger.database("Initializing database connection pool");
             DatabaseConfig.initialize();
-            LOGGER.info("Database connection pool initialized");
+            logger.success("Database connection pool initialized successfully");
 
             // Create repositories
             UserRepository userRepository;
@@ -42,31 +45,39 @@ public class ApplicationInitializer {
             DataSource dataSource = DatabaseConfig.getDataSource();
             if (dataSource != null) {
                 try {
+                    logger.database("Creating SQL-based UserRepository");
                     userRepository = new SqlUserRepository(dataSource);
-                    LOGGER.info("Using SQL-based UserRepository");
+                    logger.success("Using SQL-based UserRepository");
                 } catch (Exception e) {
                     // Fall back to in-memory repository if there's an error with the SQL repository
-                    LOGGER.log(Level.WARNING, "Failed to initialize SQL-based UserRepository, falling back to in-memory repository", e);
+                    logger.warn("Failed to initialize SQL-based UserRepository, falling back to in-memory repository", e);
+                    logger.database("Creating in-memory UserRepository as fallback");
                     userRepository = new InMemoryUserRepository();
-                    LOGGER.info("Using in-memory UserRepository");
+                    logger.info("Using in-memory UserRepository as fallback");
                 }
             } else {
                 // Fall back to in-memory repository if database is not available
-                LOGGER.log(Level.WARNING, "Database is not available, falling back to in-memory repository");
+                logger.warn("Database is not available, falling back to in-memory repository");
+                logger.database("Creating in-memory UserRepository as fallback");
                 userRepository = new InMemoryUserRepository();
-                LOGGER.info("Using in-memory UserRepository");
+                logger.info("Using in-memory UserRepository as fallback");
             }
 
             // Create services
+            logger.debug("Creating authentication service");
             AuthenticationService authenticationService = new DefaultAuthenticationService(userRepository);
+            logger.success("Authentication service created successfully");
 
             // Initialize SessionManager
+            logger.debug("Initializing SessionManager");
             SessionManager.getInstance(authenticationService);
+            logger.success("SessionManager initialized successfully");
 
             initialized = true;
-            LOGGER.info("Application initialized successfully");
+            logger.startup("Application initialized successfully ✨");
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to initialize application", e);
+            logger.failure("Failed to initialize application");
+            logger.error("Initialization error details", e);
             throw new RuntimeException("Failed to initialize application", e);
         }
     }
@@ -77,18 +88,23 @@ public class ApplicationInitializer {
      */
     public static synchronized void shutdown() {
         if (!initialized) {
+            logger.debug("Application not initialized, skipping shutdown");
             return;
         }
 
+        logger.shutdown("Starting application shutdown");
+
         try {
             // Shutdown database connection pool
+            logger.database("Shutting down database connection pool");
             DatabaseConfig.shutdown();
-            LOGGER.info("Database connection pool shut down");
+            logger.success("Database connection pool shut down successfully");
 
             initialized = false;
-            LOGGER.info("Application shut down successfully");
+            logger.shutdown("Application shut down successfully 👋");
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to shut down application", e);
+            logger.failure("Failed to shut down application properly");
+            logger.error("Shutdown error details", e);
         }
     }
 }

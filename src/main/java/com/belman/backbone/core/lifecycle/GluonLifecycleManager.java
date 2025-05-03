@@ -7,7 +7,7 @@ import com.belman.backbone.core.base.BaseViewModel;
 import com.belman.backbone.core.events.DomainEvent;
 import com.belman.backbone.core.events.ViewHiddenEvent;
 import com.belman.backbone.core.events.ViewShownEvent;
-import com.belman.backbone.core.logging.Logger;
+import com.belman.backbone.core.logging.EmojiLogger;
 import com.gluonhq.attach.lifecycle.LifecycleEvent;
 import com.gluonhq.attach.lifecycle.LifecycleService;
 import com.gluonhq.charm.glisten.application.MobileApplication;
@@ -28,7 +28,7 @@ import java.util.function.Consumer;
  * View, ViewModel, and Controller lifecycle methods.
  */
 public class GluonLifecycleManager {
-    private static final Logger logger = Logger.getLogger(GluonLifecycleManager.class);
+    private static final EmojiLogger logger = EmojiLogger.getLogger(GluonLifecycleManager.class);
     private static final Map<LifecycleEvent, DomainEvent> eventMappings = new HashMap<>();
 
     // Use WeakHashMap to avoid memory leaks - views can be garbage collected when no longer needed

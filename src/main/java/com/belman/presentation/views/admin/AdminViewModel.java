@@ -1,11 +1,10 @@
-package com.belman.presentation.viewmodels.admin;
+package com.belman.presentation.views.admin;
 
 import com.belman.application.admin.AdminService;
 import com.belman.backbone.core.base.BaseViewModel;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.aggregates.User.Role;
 import com.belman.domain.rbac.AccessDeniedException;
-import com.belman.domain.valueobjects.UserId;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -16,7 +15,6 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;

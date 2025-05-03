@@ -4,7 +4,7 @@ package com.belman.backbone.core.base;
 import com.belman.backbone.core.di.Inject;
 import com.belman.backbone.core.events.DomainEvent;
 import com.belman.backbone.core.events.DomainEventPublisher;
-import com.belman.backbone.core.logging.Logger;
+import com.belman.backbone.core.logging.EmojiLogger;
 
 /**
  * Base class for all services.
@@ -15,7 +15,7 @@ public abstract class BaseService {
     /**
      * Logger for this service.
      */
-    protected final Logger logger = Logger.getLogger(this.getClass());
+    protected final EmojiLogger logger = EmojiLogger.getLogger(this.getClass());
 
     /**
      * Method for injecting services.

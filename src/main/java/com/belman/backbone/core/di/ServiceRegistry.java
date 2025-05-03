@@ -2,7 +2,7 @@ package com.belman.backbone.core.di;
 
 
 import com.belman.backbone.core.base.BaseService;
-import com.belman.backbone.core.logging.Logger;
+import com.belman.backbone.core.logging.EmojiLogger;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,8 +12,8 @@ import java.util.Collection;
  * Provides methods for registering services with the ServiceLocator.
  */
 public class ServiceRegistry {
-    private static final Logger logger = Logger.getLogger(ServiceRegistry.class);
-    
+    private static final EmojiLogger logger = EmojiLogger.getLogger(ServiceRegistry.class);
+
     /**
      * Registers all the specified services with the ServiceLocator.
      * 
@@ -24,10 +24,10 @@ public class ServiceRegistry {
             logger.warn("No services provided to registerAll");
             return;
         }
-        
+
         registerAll(Arrays.asList(services));
     }
-    
+
     /**
      * Registers all the specified services with the ServiceLocator.
      * 
@@ -38,14 +38,14 @@ public class ServiceRegistry {
             logger.warn("No services provided to registerAll");
             return;
         }
-        
+
         logger.info("Registering {} services", services.size());
-        
+
         for (Object service : services) {
             registerService(service);
         }
     }
-    
+
     /**
      * Registers a service with the ServiceLocator.
      * The service is registered under its class and all interfaces it implements.
@@ -58,10 +58,10 @@ public class ServiceRegistry {
             logger.warn("Null service provided to registerService");
             return;
         }
-        
+
         Class<?> serviceClass = service.getClass();
         logger.debug("Registering service: {}", serviceClass.getName());
-        
+
         // Register the service under its class
         try {
             ServiceLocator.registerService((Class<Object>) serviceClass, service);
@@ -69,7 +69,7 @@ public class ServiceRegistry {
         } catch (Exception e) {
             logger.warn("Failed to register service under class: {}", serviceClass.getName(), e);
         }
-        
+
         // Register the service under all interfaces it implements
         for (Class<?> interfaceClass : serviceClass.getInterfaces()) {
             try {
@@ -79,7 +79,7 @@ public class ServiceRegistry {
                 logger.warn("Failed to register service under interface: {}", interfaceClass.getName(), e);
             }
         }
-        
+
         // If the service is a BaseService, inject services into it
         if (service instanceof BaseService) {
             try {
@@ -90,7 +90,7 @@ public class ServiceRegistry {
             }
         }
     }
-    
+
     /**
      * Unregisters all services from the ServiceLocator.
      */

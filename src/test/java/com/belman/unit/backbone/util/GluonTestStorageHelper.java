@@ -1,6 +1,7 @@
 package com.belman.unit.backbone.util;
 
 import com.belman.backbone.core.persistence.GluonStorageManager;
+import com.belman.infrastructure.service.StorageServiceFactory;
 import com.gluonhq.attach.storage.StorageService;
 
 import java.io.File;
@@ -51,7 +52,7 @@ public class GluonTestStorageHelper {
             GluonStorageManager.saveToFile(fullFileName, contentStr);
 
             // Get the file path from StorageService
-            Optional<StorageService> storageService = StorageService.create();
+            Optional<StorageService> storageService = StorageServiceFactory.getStorageService();
             if (storageService.isPresent()) {
                 Optional<File> privateStorage = storageService.get().getPrivateStorage();
                 if (privateStorage.isPresent()) {

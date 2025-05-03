@@ -1,6 +1,7 @@
 package com.belman.backbone.core.persistence;
 
 import com.gluonhq.attach.storage.StorageService;
+import com.belman.infrastructure.service.StorageServiceFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +24,7 @@ public class GluonStorageManager {
         if (fileName == null || fileName.isBlank()) {
             throw new IllegalArgumentException("File name cannot be null or blank");
         }
-        Optional<StorageService> storageService = StorageService.create();
+        Optional<StorageService> storageService = StorageServiceFactory.getStorageService();
         storageService.ifPresent(service -> {
             Optional<File> privateStorage = service.getPrivateStorage(); // Get the private storage directory
             privateStorage.ifPresent(storageDir -> {
@@ -47,7 +48,7 @@ public class GluonStorageManager {
         if (fileName == null || fileName.isBlank()) {
             throw new IllegalArgumentException("File name cannot be null or blank");
         }
-        Optional<StorageService> storageService = StorageService.create();
+        Optional<StorageService> storageService = StorageServiceFactory.getStorageService();
         return storageService.flatMap(service -> {
             Optional<File> privateStorage = service.getPrivateStorage(); // Get the private storage directory
             return privateStorage.flatMap(storageDir -> {

@@ -1,14 +1,14 @@
 package com.belman.backbone.core.events;
 
 
-import com.belman.backbone.core.logging.Logger;
+import com.belman.backbone.core.logging.EmojiLogger;
 
 /**
  * Implementation of the domain event handler functionality.
  * This class provides methods for handling domain events.
  */
 public class DomainEventHandlerImplementation {
-    private static final Logger logger = Logger.getLogger(DomainEventHandlerImplementation.class);
+    private static final EmojiLogger logger = EmojiLogger.getLogger(DomainEventHandlerImplementation.class);
 
     /**
      * Handles a domain event.

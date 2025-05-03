@@ -141,12 +141,27 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View {
     }
 
     /**
+     * Checks if the app bar should be shown for this view.
+     * By default, returns true. Override in subclasses to hide the app bar.
+     * 
+     * @return true if the app bar should be shown, false otherwise
+     */
+    public boolean shouldShowAppBar() {
+        return true;
+    }
+
+    /**
      * Updates the AppBar with the current properties.
      * This method gracefully handles cases where MobileApplication.getInstance() returns null,
      * which can happen in unit tests or when running outside of a Gluon Mobile environment.
      */
     protected void updateAppBar() {
         try {
+            // If the app bar should not be shown, do nothing
+            if (!shouldShowAppBar()) {
+                return;
+            }
+
             MobileApplication app = MobileApplication.getInstance();
             if (app == null) {
                 // In unit tests or non-Gluon environments, MobileApplication.getInstance() may return null

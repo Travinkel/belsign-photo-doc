@@ -1,6 +1,7 @@
 package com.belman.presentation.views.splash;
 
 
+import com.belman.backbone.core.api.CoreAPI;
 import com.belman.backbone.core.base.BaseViewModel;
 import com.belman.backbone.core.navigation.Router;
 import com.belman.backbone.core.util.PlatformUtils;
@@ -42,12 +43,21 @@ public class SplashViewModel extends BaseViewModel<SplashViewModel> {
      * If running on desktop, uses Router to navigate to LoginView.
      */
     public void onLoadingComplete() {
-        // Navigate to the login view
-        Router.navigateTo(com.belman.presentation.views.login.LoginView.class);
+        try {
+            System.out.println("[DEBUG_LOG] SplashViewModel.onLoadingComplete() called");
+            // Navigate to the login view
+            System.out.println("[DEBUG_LOG] About to navigate to LoginView");
+            Router.navigateTo(com.belman.presentation.views.login.LoginView.class);
+            System.out.println("[DEBUG_LOG] Navigation to LoginView completed");
+        } catch (Exception e) {
+            // Log and handle navigation errors
+            System.err.println("[DEBUG_LOG] Error navigating from SplashView: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void onShow() {
-        // Initialize any resources or data needed for the splash screen
+        // No need to update the app bar title as we want to hide the app bar
     }
 }

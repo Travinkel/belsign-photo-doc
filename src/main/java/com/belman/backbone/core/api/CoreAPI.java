@@ -15,6 +15,8 @@ import com.belman.backbone.core.state.ValidationResult;
 import com.belman.backbone.core.util.ViewLoader;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.services.AuthenticationService;
+import com.gluonhq.charm.glisten.application.MobileApplication;
+import com.gluonhq.charm.glisten.control.AppBar;
 
 import java.util.Map;
 import java.util.Optional;
@@ -578,5 +580,17 @@ public class CoreAPI {
      */
     public static Map<String, ValidationResult> validateAll() {
         return StateStore.getInstance().validateAll();
+    }
+
+    static {
+        // Listen to changes in the appBarTitle state and update the app bar dynamically
+        listenToState("appBarTitle", CoreAPI.class, title -> {
+            if (title != null && MobileApplication.getInstance() != null) {
+                AppBar appBar = MobileApplication.getInstance().getAppBar();
+                if (appBar != null) {
+                    appBar.setTitleText(title.toString());
+                }
+            }
+        });
     }
 }

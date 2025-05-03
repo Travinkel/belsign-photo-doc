@@ -3,7 +3,7 @@ package com.belman.backbone.core.navigation;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
-import com.belman.backbone.core.logging.Logger;
+import com.belman.backbone.core.logging.EmojiLogger;
 import com.belman.backbone.core.api.CoreAPI;
 import com.belman.backbone.core.transition.SlideDirection;
 import com.belman.backbone.core.transition.SlideViewTransition;
@@ -20,7 +20,7 @@ import java.util.function.Supplier;
  * Supports route parameters, nested routes, route guards, and view transitions.
  */
 public class Router {
-    private static final Logger logger = Logger.getLogger(Router.class);
+    private static final EmojiLogger logger = EmojiLogger.getLogger(Router.class);
     private static MobileApplication mobileApplication;
     private static final Router instance = new Router();
     private static View currentView;
@@ -64,6 +64,7 @@ public class Router {
      */
     public static void setMobileApplication(MobileApplication application) {
         mobileApplication = application;
+        logger.startup("Router initialized with MobileApplication");
     }
 
     /**
@@ -111,6 +112,24 @@ public class Router {
     }
 
     /**
+     * Updates the app bar title.
+     *
+     * @param title the new title to set
+     */
+    public static void updateAppBar(String title) {
+        if (mobileApplication != null) {
+            AppBar appBar = mobileApplication.getAppBar();
+            if (appBar != null) {
+                appBar.setTitleText(title);
+            } else {
+                logger.warn("AppBar is null. Unable to update title.");
+            }
+        } else {
+            logger.warn("MobileApplication is null. Unable to update AppBar title.");
+        }
+    }
+
+    /**
      * Navigates to the specified view using the default forward transition.
      *
      * @param viewClass the class of the view to navigate to
@@ -155,16 +174,20 @@ public class Router {
             parameters = new HashMap<>();
         }
 
+        logger.debug("Navigating to: {} with {} parameters", viewClass.getSimpleName(), parameters.size());
+
         // Store route parameters in CoreAPI state
         CoreAPI.setState("routeParameters", parameters);
 
         // Check if there's a route guard for this view
         if (routeGuards.containsKey(viewClass)) {
+            logger.debug("Checking route guard for: {}", viewClass.getSimpleName());
             Supplier<Boolean> guard = routeGuards.get(viewClass);
             if (!guard.get()) {
                 logger.warn("Route guard prevented navigation to: {}", viewClass.getSimpleName());
                 return;
             }
+            logger.debug("Route guard allowed navigation to: {}", viewClass.getSimpleName());
         }
 
         try {
@@ -174,55 +197,100 @@ public class Router {
                 routeParameters.putAll(parameters);
             }
 
-            View newView = viewClass.getDeclaredConstructor().newInstance();
+            // Get the view ID
+            String viewId = viewClass.getSimpleName();
             View oldView = currentView;
 
-            // Register the view with the mobile application
-            String viewId = viewClass.getSimpleName();
-            try {
-                mobileApplication.addViewFactory(viewId, () -> newView);
-            } catch (IllegalArgumentException e) {
-                // View already registered, ignore
-                logger.info("View already registered: {}", viewId);
-            }
+            // Create a new view instance for transition effects
+            // But we'll use the registered view for actual navigation
+            final View newView = viewClass.getDeclaredConstructor().newInstance();
+
+            // We don't need to register the view again, as it should have been registered during app initialization
+            logger.debug("Using view ID for navigation: {}", viewId);
 
             // Add the view to the navigation history
             navigationHistory.push(viewClass);
+            logger.debug("Added {} to navigation history. History size: {}", viewId, navigationHistory.size());
 
             // If no transition is specified, use the default forward transition
             ViewTransition effectiveTransition = transition != null ? transition : defaultForwardTransition;
 
             if (effectiveTransition != null) {
                 // Perform the transition
+                logger.debug("Performing transition to: {}", viewId);
                 effectiveTransition.performTransition(oldView, newView, () -> {
                     // Update the current view reference
                     currentView = newView;
 
-                    // Update the app bar
-                    AppBar appBar = MobileApplication.getInstance().getAppBar();
-                    if (appBar != null) {
-                        appBar.setTitleText(viewId);
+                    // Update the app bar only if the view wants to show it
+                    if (newView instanceof com.belman.backbone.core.base.BaseView) {
+                        com.belman.backbone.core.base.BaseView<?> baseView = (com.belman.backbone.core.base.BaseView<?>) newView;
+                        if (baseView.shouldShowAppBar()) {
+                            AppBar appBar = MobileApplication.getInstance().getAppBar();
+                            if (appBar != null) {
+                                appBar.setVisible(true);
+                                appBar.setTitleText(viewId);
+                                logger.debug("Updated AppBar title to: {}", viewId);
+                            }
+                        } else {
+                            AppBar appBar = MobileApplication.getInstance().getAppBar();
+                            if (appBar != null) {
+                                appBar.setVisible(false);
+                            }
+                            logger.debug("View {} does not want to show AppBar, skipping update", viewId);
+                        }
+                    } else {
+                        // For non-BaseView views, update the app bar as usual
+                        AppBar appBar = MobileApplication.getInstance().getAppBar();
+                        if (appBar != null) {
+                            appBar.setTitleText(viewId);
+                            logger.debug("Updated AppBar title to: {}", viewId);
+                        }
                     }
 
-                    logger.info("Navigated to: {}", viewClass.getSimpleName());
+                    logger.success("Navigated to: " + viewClass.getSimpleName());
                 });
             } else {
                 // No transition, just switch to the view
-                mobileApplication.switchView(viewId);
+                logger.debug("No transition specified, switching directly to: {}", viewId);
+                try {
+                    System.out.println("[DEBUG_LOG] About to call mobileApplication.switchView(" + viewId + ")");
+                    mobileApplication.switchView(viewId);
+                    System.out.println("[DEBUG_LOG] Successfully called mobileApplication.switchView(" + viewId + ")");
+                } catch (Exception e) {
+                    System.err.println("[DEBUG_LOG] Error calling mobileApplication.switchView(" + viewId + "): " + e.getMessage());
+                    e.printStackTrace();
+                }
 
                 // Update the current view reference
                 currentView = newView;
 
-                // Update the app bar
-                AppBar appBar = MobileApplication.getInstance().getAppBar();
-                if (appBar != null) {
-                    appBar.setTitleText(viewId);
+                // Update the app bar only if the view wants to show it
+                if (newView instanceof com.belman.backbone.core.base.BaseView) {
+                    com.belman.backbone.core.base.BaseView<?> baseView = (com.belman.backbone.core.base.BaseView<?>) newView;
+                    if (baseView.shouldShowAppBar()) {
+                        AppBar appBar = MobileApplication.getInstance().getAppBar();
+                        if (appBar != null) {
+                            appBar.setTitleText(viewId);
+                            logger.debug("Updated AppBar title to: {}", viewId);
+                        }
+                    } else {
+                        logger.debug("View {} does not want to show AppBar, skipping update", viewId);
+                    }
+                } else {
+                    // For non-BaseView views, update the app bar as usual
+                    AppBar appBar = MobileApplication.getInstance().getAppBar();
+                    if (appBar != null) {
+                        appBar.setTitleText(viewId);
+                        logger.debug("Updated AppBar title to: {}", viewId);
+                    }
                 }
 
-                logger.info("Navigated to: {}", viewClass.getSimpleName());
+                logger.success("Navigated to: " + viewClass.getSimpleName());
             }
         } catch (Exception e) {
-            logger.error("Failed to navigate to: {}", viewClass.getSimpleName(), e);
+            logger.failure("Failed to navigate to: " + viewClass.getSimpleName());
+            logger.error("Navigation error details", e);
             throw new RuntimeException("Failed to navigate to: " + viewClass.getSimpleName(), e);
         }
     }
@@ -243,31 +311,41 @@ public class Router {
      * @return true if navigation was successful, false if there is no previous view
      */
     public static boolean navigateBack(ViewTransition transition) {
+        logger.debug("Attempting to navigate back. History size: {}", navigationHistory.size());
+
         if (navigationHistory.size() <= 1) {
-            logger.warn("Cannot navigate back: no previous view");
+            logger.warn("Cannot navigate back: no previous view in history");
             return false;
         }
 
         // Remove the current view from the history
-        navigationHistory.pop();
+        Class<? extends View> currentViewClass = navigationHistory.pop();
+        logger.debug("Removed current view from history: {}", currentViewClass.getSimpleName());
+
         Class<? extends View> previousViewClass = navigationHistory.pop();
+        logger.debug("Navigating back to previous view: {}", previousViewClass.getSimpleName());
+
         navigateTo(previousViewClass, transition);
+        logger.success("Successfully navigated back to: " + previousViewClass.getSimpleName());
 
         return true;
     }
 
+    /**
+     * Adds a route guard for the specified view.
+     * 
+     * @param viewClass the view class to add the guard for
+     * @param guard the guard function that determines if navigation is allowed
+     */
     public static void addGuard(Class<? extends View> viewClass, Supplier<Boolean> guard) {
         if (viewClass == null || guard == null) {
+            logger.error("Cannot add guard: view class or guard is null");
             throw new IllegalArgumentException("View class and guard cannot be null");
         }
 
-        if (guard == null) {
-            logger.error("Guard is null");
-            throw new IllegalArgumentException("Guard cannot be null");
-        }
-
+        logger.debug("Adding guard for view: {}", viewClass.getSimpleName());
         routeGuards.put(viewClass, guard);
-        logger.info("Added guard for view: {}", viewClass.getSimpleName());
+        logger.success("Added security guard for view: " + viewClass.getSimpleName());
     }
 
     /**
@@ -277,11 +355,18 @@ public class Router {
      */
     public static void removeGuard(Class<? extends View> viewClass) {
         if (viewClass == null) {
-            logger.error("View class is null");
+            logger.error("Cannot remove guard: view class is null");
             throw new IllegalArgumentException("View class cannot be null");
         }
-        routeGuards.remove(viewClass);
-        logger.info("Removed guard for view: {}", viewClass.getSimpleName());
+
+        logger.debug("Removing guard for view: {}", viewClass.getSimpleName());
+        boolean removed = routeGuards.remove(viewClass) != null;
+
+        if (removed) {
+            logger.success("Removed security guard from view: " + viewClass.getSimpleName());
+        } else {
+            logger.debug("No guard found to remove for view: {}", viewClass.getSimpleName());
+        }
     }
 
     /**

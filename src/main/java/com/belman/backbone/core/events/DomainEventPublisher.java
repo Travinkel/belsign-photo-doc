@@ -1,6 +1,6 @@
 package com.belman.backbone.core.events;
 
-import com.belman.backbone.core.logging.Logger;
+import com.belman.backbone.core.logging.EmojiLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
  */
 public class DomainEventPublisher {
     private static DomainEventPublisher instance = new DomainEventPublisher(); // Remove `final` modifier
-    private static final Logger logger = Logger.getLogger(DomainEventPublisher.class);
+    private static final EmojiLogger logger = EmojiLogger.getLogger(DomainEventPublisher.class);
 
     // Map of event types to handlers
     private final Map<Class<? extends DomainEvent>, List<DomainEventHandler<? extends DomainEvent>>> handlers;
@@ -141,4 +141,3 @@ public class DomainEventPublisher {
         }
     }
 }
-

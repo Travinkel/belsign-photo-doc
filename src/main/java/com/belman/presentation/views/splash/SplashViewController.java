@@ -77,8 +77,8 @@ public class SplashViewController extends BaseController<SplashViewModel> {
                 // Stop the flickering animation
                 flickerTimeline.stop();
 
-                // Navigate to the main view after splash screen finishes
-                getViewModel().onLoadingComplete();
+                // Navigate to the next view after splash screen finishes
+                Platform.runLater(() -> getViewModel().onLoadingComplete());
             } catch (Exception e) {
                 handleNavigationError(e);
             }

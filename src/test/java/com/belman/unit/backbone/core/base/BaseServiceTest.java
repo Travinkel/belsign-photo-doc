@@ -3,7 +3,7 @@ package com.belman.unit.backbone.core.base;
 import com.belman.backbone.core.base.BaseService;
 import com.belman.backbone.core.events.DomainEvent;
 import com.belman.backbone.core.events.DomainEventPublisher;
-import com.belman.backbone.core.logging.Logger;
+import com.belman.backbone.core.logging.EmojiLogger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -97,7 +97,7 @@ public class BaseServiceTest {
     private DomainEventPublisher mockPublisher;
 
     @Mock
-    private Logger mockLogger;
+    private EmojiLogger mockLogger;
 
     private TestService testService;
 

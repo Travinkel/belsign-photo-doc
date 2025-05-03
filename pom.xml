@@ -183,6 +183,12 @@
             <version>2.0.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.11</version>
+        </dependency>
+
         <!-- Logging Dependencies -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -196,6 +202,7 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
+                    <include>**/*</include>
                     <include>**/*.png</include>
                     <include>**/*.fxml</include>
                     <include>**/*.properties</include>
@@ -230,8 +237,22 @@
                 </configuration>
             </plugin>
 
+
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>com.belman.Main</mainClass>
+                    <systemProperties>
+                        <com.gluonhq.license.disable>true</com.gluonhq.license.disable>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+
             <!--- GluonFX plugin for Android -->
-            <!-- 
+            <!--
                 Note: Building for Android on Windows requires WSL2 (Windows Subsystem for Linux).
                 If you encounter the error "We currently can't compile to aarch64-linux-android when running on x86_64-microsoft-windows",
                 please refer to the WSL setup guide at docs/mobile/wsl_setup_guide.md for instructions on how to set up WSL2 for Android builds.
@@ -245,8 +266,13 @@
                     <target>android</target>
                     <graalvmHome>${env.GRAALVM_HOME}</graalvmHome>
                     <androidNDK>${env.ANDROID_NDK}</androidNDK>
+                    <runtimeArgs>
+                        <arg>-Dcom.gluonhq.license.disable=true</arg>
+                    </runtimeArgs>
                 </configuration>
             </plugin>
+
+
 
             <!-- Maven Shade Plugin for executable JAR -->
             <plugin>

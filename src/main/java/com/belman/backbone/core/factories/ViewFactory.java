@@ -1,7 +1,7 @@
 package com.belman.backbone.core.factories;
 
 import com.gluonhq.charm.glisten.mvc.View;
-import com.belman.backbone.core.logging.Logger;
+import com.belman.backbone.core.logging.EmojiLogger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +11,7 @@ import java.util.function.Supplier;
  * Factory for creating and managing Gluon views.
  */
 public class ViewFactory {
-    private static final Logger logger = Logger.getLogger(ViewFactory.class);
+    private static final EmojiLogger logger = EmojiLogger.getLogger(ViewFactory.class);
     private static final Map<String, Supplier<View>> viewSuppliers = new HashMap<>();
 
     /**

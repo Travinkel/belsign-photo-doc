@@ -3,10 +3,8 @@ package com.belman.presentation.views.admin;
 import com.belman.backbone.core.base.BaseController;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.aggregates.User.Role;
-import com.belman.presentation.viewmodels.admin.AdminViewModel;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -18,14 +16,8 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 
-import java.net.URL;
-import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Controller for the admin management view.
