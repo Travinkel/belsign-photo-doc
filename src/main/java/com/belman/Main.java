@@ -1,13 +1,16 @@
 package com.belman;
 
 import com.belman.application.core.GluonLifecycleManager;
+import com.belman.application.core.ServiceLocator;
+import com.belman.domain.services.AuthenticationService;
 import com.belman.infrastructure.PlatformUtils;
 import com.belman.infrastructure.EmojiLogger;
-import com.belman.presentation.navigation.Router;
 import com.belman.infrastructure.config.ApplicationInitializer;
+import com.belman.infrastructure.config.RouteGuardInitializer;
 import com.belman.infrastructure.service.DisplayServiceFactory;
 import com.belman.infrastructure.service.GluonInternalClassesFix;
 import com.belman.infrastructure.service.StorageServiceFactory;
+import com.belman.presentation.navigation.Router;
 import com.belman.presentation.views.splash.SplashView;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import javafx.scene.Scene;
@@ -122,6 +125,12 @@ public class Main extends MobileApplication {
         // Set up the Router
         logger.debug("Setting up Router");
         Router.setMobileApplication(this);
+
+        // Initialize route guards for role-based access control
+        logger.debug("Initializing route guards");
+        AuthenticationService authService = ServiceLocator.getService(AuthenticationService.class);
+        RouteGuardInitializer.initialize(authService);
+        logger.success("Route guards initialized successfully");
 
         // Initialize the GluonLifecycleManager
         logger.debug("Initializing GluonLifecycleManager");

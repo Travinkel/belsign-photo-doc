@@ -12,6 +12,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import java.util.prefs.Preferences;
 
 import java.util.Optional;
 
@@ -24,8 +25,10 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
     private final StringProperty password = new SimpleStringProperty("");
     private final StringProperty errorMessage = new SimpleStringProperty("");
     private final BooleanProperty loginInProgress = new SimpleBooleanProperty(false);
+    private final BooleanProperty rememberMe = new SimpleBooleanProperty(false);
 
     private final SessionManager sessionManager;
+    private final Preferences preferences = Preferences.userNodeForPackage(LoginViewModel.class);
 
     /**
      * Creates a new LoginViewModel.
@@ -35,9 +38,22 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
         sessionManager = SessionManager.getInstance();
     }
 
+    // Constants for preferences
+    private static final String PREF_USERNAME = "username";
+    private static final String PREF_REMEMBER_ME = "rememberMe";
+
     @Override
     public void onShow() {
         // No need to update the app bar title as we want to hide the app bar
+
+        // Load saved username and "Remember Me" preference
+        boolean savedRememberMe = preferences.getBoolean(PREF_REMEMBER_ME, false);
+        rememberMe.set(savedRememberMe);
+
+        if (savedRememberMe) {
+            String savedUsername = preferences.get(PREF_USERNAME, "");
+            username.set(savedUsername);
+        }
     }
 
     /**
@@ -75,6 +91,18 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
                 // Login successful, navigate to role-specific view
                 User user = userOpt.get();
                 logger.success("Login successful for user: " + username.get());
+
+                // Save username and "Remember Me" preference if "Remember Me" is checked
+                if (rememberMe.get()) {
+                    preferences.put(PREF_USERNAME, username.get());
+                    preferences.putBoolean(PREF_REMEMBER_ME, true);
+                    logger.debug("Saved username and 'Remember Me' preference");
+                } else {
+                    // Clear saved username and "Remember Me" preference
+                    preferences.remove(PREF_USERNAME);
+                    preferences.putBoolean(PREF_REMEMBER_ME, false);
+                    logger.debug("Cleared saved username and 'Remember Me' preference");
+                }
 
                 try {
                     // Determine which view to navigate to based on user role
@@ -160,6 +188,15 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
      */
     public BooleanProperty loginInProgressProperty() {
         return loginInProgress;
+    }
+
+    /**
+     * Gets the remember me property.
+     * 
+     * @return the remember me property
+     */
+    public BooleanProperty rememberMeProperty() {
+        return rememberMe;
     }
 
     /**

@@ -1,0 +1,12 @@
+[
+  {
+    "interfaces": [
+      "com.gluonhq.attach.display.DisplayService"
+    ]
+  },
+  {
+    "interfaces": [
+      "java.lang.reflect.InvocationHandler"
+    ]
+  }
+]

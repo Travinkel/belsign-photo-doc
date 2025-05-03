@@ -5,6 +5,8 @@ import com.belman.infrastructure.EmojiLogger;
 import com.belman.domain.repositories.CustomerRepository;
 import com.belman.domain.repositories.OrderRepository;
 import com.belman.domain.repositories.UserRepository;
+import com.belman.domain.rbac.AccessPolicyFactory;
+import com.belman.domain.rbac.RoleBasedAccessControlFactory;
 import com.belman.domain.services.AuthenticationService;
 import com.belman.infrastructure.persistence.InMemoryCustomerRepository;
 import com.belman.infrastructure.persistence.InMemoryOrderRepository;
@@ -149,6 +151,21 @@ public class ApplicationInitializer {
             // Register the SessionManager with the ServiceRegistry
             ServiceRegistry.registerService(sessionManager);
             logger.success("SessionManager initialized successfully");
+
+            // Initialize AccessPolicyFactory
+            logger.debug("Initializing AccessPolicyFactory");
+            AccessPolicyFactory accessPolicyFactory = new AccessPolicyFactory();
+            // Register the AccessPolicyFactory with the ServiceRegistry
+            ServiceRegistry.registerService(accessPolicyFactory);
+            logger.success("AccessPolicyFactory initialized successfully");
+
+            // Initialize RoleBasedAccessControlFactory
+            logger.debug("Initializing RoleBasedAccessControlFactory");
+            RoleBasedAccessControlFactory rbacFactory = new RoleBasedAccessControlFactory(
+                authenticationService, accessPolicyFactory);
+            // Register the RoleBasedAccessControlFactory with the ServiceRegistry
+            ServiceRegistry.registerService(rbacFactory);
+            logger.success("RoleBasedAccessControlFactory initialized successfully");
 
             initialized = true;
             logger.startup("Application initialized successfully ✨");

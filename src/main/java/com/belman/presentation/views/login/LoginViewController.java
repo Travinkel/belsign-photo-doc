@@ -4,6 +4,7 @@ import com.belman.presentation.core.BaseController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -31,6 +32,9 @@ public class LoginViewController extends BaseController<LoginViewModel> {
     @FXML
     private ProgressIndicator loginProgressIndicator;
 
+    @FXML
+    private CheckBox rememberMeCheckBox;
+
     @Override
     public void initializeBinding() {
         // Bind UI components to ViewModel properties
@@ -39,6 +43,7 @@ public class LoginViewController extends BaseController<LoginViewModel> {
         errorMessageLabel.textProperty().bind(getViewModel().errorMessageProperty());
         loginProgressIndicator.visibleProperty().bind(getViewModel().loginInProgressProperty());
         loginButton.disableProperty().bind(getViewModel().loginInProgressProperty());
+        rememberMeCheckBox.selectedProperty().bindBidirectional(getViewModel().rememberMeProperty());
 
         // Set up event handlers
         loginButton.setOnAction(this::handleLoginButtonAction);
