@@ -36,3 +36,30 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# IntelliJ
+.idea/
+*.iml
+
+# Unison conflicts
+*.prf~
+
+# Unison conflicts and metadata
+*.prf
+*.unison
+
+# IDE and build artifacts
+.idea/
+*.iml
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Maven build
+/target/
+/build/
+
+# Logs
+*.log
+hs_err_pid*.log

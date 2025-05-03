@@ -1,173 +1,225 @@
 package com.belman.presentation.views.usermanagement;
 
-
 import com.belman.backbone.core.base.BaseController;
-import com.gluonhq.charm.glisten.control.ProgressBar;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
-import javafx.application.Platform;
+import com.belman.backbone.core.navigation.Router;
+import com.belman.domain.aggregates.User;
+import com.belman.domain.enums.UserStatus;
+import com.belman.presentation.components.TouchFriendlyDialog;
+import com.belman.presentation.views.main.MainView;
+import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
-import javafx.util.Duration;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Controller for the splash screen view.
- * Handles the animation and initialization of the splash screen.
+ * Controller for the user management view.
+ * Handles user interface interactions for managing user accounts.
  */
 public class UserManagementViewController extends BaseController<UserManagementViewModel> {
     @FXML
-    private Label titleLabel;
+    private Button backButton;
 
     @FXML
-    private Label subtitleLabel;
+    private Button createUserButton;
 
     @FXML
-    private Label messageLabel;
+    private TextField searchField;
 
     @FXML
-    private ProgressBar loadingProgress;
+    private ListView<User> userListView;
 
     @FXML
-    private ImageView logoImage;
+    private TextField usernameField;
 
-    private Timeline loadingTimeline;
+    @FXML
+    private TextField firstNameField;
+
+    @FXML
+    private TextField lastNameField;
+
+    @FXML
+    private TextField emailField;
+
+    @FXML
+    private ComboBox<UserStatus> statusComboBox;
+
+    @FXML
+    private CheckBox adminRoleCheckBox;
+
+    @FXML
+    private CheckBox qaRoleCheckBox;
+
+    @FXML
+    private CheckBox productionRoleCheckBox;
+
+    @FXML
+    private PasswordField passwordField;
+
+    @FXML
+    private Button resetPasswordButton;
+
+    @FXML
+    private Button saveButton;
+
+    @FXML
+    private Button cancelButton;
+
+    @FXML
+    private Label errorMessageLabel;
 
     @Override
     public void initializeBinding() {
-        try {
-            // Bind UI components to ViewModel properties
-            messageLabel.textProperty().bind(getViewModel().messageProperty());
+        // Bind UI components to ViewModel properties
+        errorMessageLabel.textProperty().bind(getViewModel().errorMessageProperty());
 
-            // Adjust UI based on platform if needed
-            adjustForPlatform();
+        // Set up the status combo box
+        statusComboBox.setItems(FXCollections.observableArrayList(UserStatus.values()));
 
-            // Initialize loading animation
-            initializeLoadingAnimation();
-        } catch (Exception e) {
-            handleInitializationError(e);
-        }
-    }
+        // Set up the user list view
+        userListView.setItems(getViewModel().getUsersProperty());
+        userListView.setCellFactory(listView -> new UserListCell());
 
-    /**
-     * Initializes the loading animation with a timeline.
-     */
-    private void initializeLoadingAnimation() {
-        // Make the logo smaller to signify loading
-        logoImage.setFitWidth(150);
+        // Bind the search field to the filter property
+        searchField.textProperty().bindBidirectional(getViewModel().searchFilterProperty());
 
-        // Create a flickering animation for the logo
-        Timeline flickerTimeline = new Timeline(
-            new KeyFrame(Duration.ZERO, new KeyValue(logoImage.opacityProperty(), 1.0)),
-            new KeyFrame(Duration.seconds(0.7), new KeyValue(logoImage.opacityProperty(), 0.5)),
-            new KeyFrame(Duration.seconds(1.4), new KeyValue(logoImage.opacityProperty(), 1.0))
-        );
-        flickerTimeline.setCycleCount(Timeline.INDEFINITE);
-        flickerTimeline.play();
+        // Bind the form fields to the selected user properties
+        usernameField.textProperty().bindBidirectional(getViewModel().usernameProperty());
+        firstNameField.textProperty().bindBidirectional(getViewModel().firstNameProperty());
+        lastNameField.textProperty().bindBidirectional(getViewModel().lastNameProperty());
+        emailField.textProperty().bindBidirectional(getViewModel().emailProperty());
 
-        // Simulate loading with a timeline animation
-        loadingTimeline = new Timeline(
-            new KeyFrame(Duration.ZERO, new KeyValue(loadingProgress.progressProperty(), 0)),
-            new KeyFrame(Duration.seconds(2.5), new KeyValue(loadingProgress.progressProperty(), 1))
-        );
+        // Bind the status combo box to the selected user status property
+        statusComboBox.valueProperty().bindBidirectional(getViewModel().statusProperty());
 
-        loadingTimeline.setOnFinished(event -> {
-            try {
-                // Stop the flickering animation
-                flickerTimeline.stop();
+        // Bind the role checkboxes to the selected user roles properties
+        adminRoleCheckBox.selectedProperty().bindBidirectional(getViewModel().adminRoleProperty());
+        qaRoleCheckBox.selectedProperty().bindBidirectional(getViewModel().qaRoleProperty());
+        productionRoleCheckBox.selectedProperty().bindBidirectional(getViewModel().productionRoleProperty());
 
-                // Navigate to the main view after splash screen finishes
-                getViewModel().onLoadingComplete();
-            } catch (Exception e) {
-                handleNavigationError(e);
+        // Bind the password field to the password property
+        passwordField.textProperty().bindBidirectional(getViewModel().passwordProperty());
+
+        // Disable the form fields when no user is selected
+        usernameField.disableProperty().bind(getViewModel().userSelectedProperty().not());
+        firstNameField.disableProperty().bind(getViewModel().userSelectedProperty().not());
+        lastNameField.disableProperty().bind(getViewModel().userSelectedProperty().not());
+        emailField.disableProperty().bind(getViewModel().userSelectedProperty().not());
+        statusComboBox.disableProperty().bind(getViewModel().userSelectedProperty().not());
+        adminRoleCheckBox.disableProperty().bind(getViewModel().userSelectedProperty().not());
+        qaRoleCheckBox.disableProperty().bind(getViewModel().userSelectedProperty().not());
+        productionRoleCheckBox.disableProperty().bind(getViewModel().userSelectedProperty().not());
+        passwordField.disableProperty().bind(getViewModel().userSelectedProperty().not());
+        resetPasswordButton.disableProperty().bind(getViewModel().userSelectedProperty().not());
+        saveButton.disableProperty().bind(getViewModel().userSelectedProperty().not());
+
+        // Set up event handlers
+        backButton.setOnAction(this::handleBackButtonAction);
+        createUserButton.setOnAction(this::handleCreateUserButtonAction);
+        resetPasswordButton.setOnAction(this::handleResetPasswordButtonAction);
+        saveButton.setOnAction(this::handleSaveButtonAction);
+        cancelButton.setOnAction(this::handleCancelButtonAction);
+
+        // Set up selection listener for the user list view
+        userListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                getViewModel().selectUser(newVal);
             }
         });
 
-        // Start the animation
-        loadingTimeline.play();
-    }
-
-    /**
-     * Adjusts UI elements based on the platform (desktop, tablet, smartphone).
-     */
-    private void adjustForPlatform() {
-        try {
-            // Check if running on mobile
-            if (isRunningOnMobile()) {
-                // Adjust UI for mobile if needed
-                if (isRunningOnSmartphone()) {
-                    // Smartphone-specific adjustments
-                    logoImage.setFitWidth(200);
-                } else {
-                    // Tablet-specific adjustments
-                    logoImage.setFitWidth(300);
-                }
-            }
-        } catch (Exception e) {
-            // If platform detection fails, use default desktop styling
-            System.err.println("Platform detection failed: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Detects if the application is running on a mobile device.
-     * @return true if running on Android or iOS, false otherwise
-     */
-    private boolean isRunningOnMobile() {
-        try {
-            return com.gluonhq.attach.util.Platform.isAndroid() || 
-                   com.gluonhq.attach.util.Platform.isIOS();
-        } catch (Exception e) {
-            // If Gluon Attach is not available, assume desktop
-            return false;
-        }
-    }
-
-    /**
-     * Detects if the application is running on a smartphone (as opposed to a tablet).
-     * @return true if running on a smartphone, false otherwise
-     */
-    private boolean isRunningOnSmartphone() {
-        try {
-            return com.gluonhq.attach.util.Platform.isAndroid();
-        } catch (Exception e) {
-            // If detection fails, assume not a smartphone
-            return false;
-        }
-    }
-
-    /**
-     * Handles errors that occur during initialization.
-     * @param e the exception that occurred
-     */
-    private void handleInitializationError(Exception e) {
-        System.err.println("Error initializing splash screen: " + e.getMessage());
-        e.printStackTrace();
-
-        // Update UI to show error
-        Platform.runLater(() -> {
-            if (messageLabel != null) {
-                messageLabel.textProperty().unbind();
-                messageLabel.setText("Error initializing application");
-            }
+        // Set up search field listener
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+            getViewModel().filterUsers();
         });
+
+        // Load users when the view is shown
+        getViewModel().loadUsers();
     }
 
     /**
-     * Handles errors that occur during navigation.
-     * @param e the exception that occurred
+     * Handles the back button action.
+     * 
+     * @param event the action event
      */
-    private void handleNavigationError(Exception e) {
-        System.err.println("Error navigating from splash screen: " + e.getMessage());
-        e.printStackTrace();
+    private void handleBackButtonAction(ActionEvent event) {
+        Router.navigateTo(MainView.class);
+    }
 
-        // Update UI to show error
-        Platform.runLater(() -> {
-            if (messageLabel != null) {
-                messageLabel.textProperty().unbind();
-                messageLabel.setText("Error loading application");
+    /**
+     * Handles the create user button action.
+     * 
+     * @param event the action event
+     */
+    private void handleCreateUserButtonAction(ActionEvent event) {
+        getViewModel().createNewUser();
+    }
+
+    /**
+     * Handles the reset password button action.
+     * 
+     * @param event the action event
+     */
+    private void handleResetPasswordButtonAction(ActionEvent event) {
+        getViewModel().resetPassword();
+    }
+
+    /**
+     * Handles the save button action.
+     * 
+     * @param event the action event
+     */
+    private void handleSaveButtonAction(ActionEvent event) {
+        boolean success = getViewModel().saveUser();
+        if (success) {
+            showInfo("User saved successfully");
+        }
+    }
+
+    /**
+     * Handles the cancel button action.
+     * 
+     * @param event the action event
+     */
+    private void handleCancelButtonAction(ActionEvent event) {
+        getViewModel().cancelEdit();
+    }
+
+    /**
+     * Shows an error message using a touch-friendly dialog.
+     * 
+     * @param message the error message
+     */
+    private void showError(String message) {
+        TouchFriendlyDialog.showError("Error", message);
+    }
+
+    /**
+     * Shows an information message using a touch-friendly dialog.
+     * 
+     * @param message the information message
+     */
+    private void showInfo(String message) {
+        TouchFriendlyDialog.showInformation("Information", message);
+    }
+
+    /**
+     * Custom cell for displaying users in the list view.
+     */
+    private static class UserListCell extends ListCell<User> {
+        @Override
+        protected void updateItem(User user, boolean empty) {
+            super.updateItem(user, empty);
+
+            if (empty || user == null) {
+                setText(null);
+                setGraphic(null);
+            } else {
+                setText(user.getUsername().value() + " (" + user.getStatus() + ")");
             }
-        });
+        }
     }
 }

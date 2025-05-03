@@ -5,20 +5,20 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ProgressBar?>
+<?import com.gluonhq.charm.glisten.control.ProgressBar?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Font?>
 
 <StackPane xmlns:fx="http://javafx.com/fxml" 
            fx:controller="com.belman.presentation.views.splash.SplashViewController"
            styleClass="splash-container"
-           stylesheets="/styles/app.css">
+           stylesheets="/com/belman/styles/app.css">
     <VBox styleClass="splash-content">
         <padding>
             <Insets top="30" right="30" bottom="30" left="30" />
         </padding>
         <ImageView fx:id="logoImage" styleClass="splash-logo">
-            <Image url="/images/logo.png"/>
+            <Image url="/com/belman/images/logo.png"/>
         </ImageView>
         <Label fx:id="titleLabel" text="BelSign" styleClass="title" />
         <Label fx:id="subtitleLabel" text="Photo Documentation System" styleClass="subtitle" />

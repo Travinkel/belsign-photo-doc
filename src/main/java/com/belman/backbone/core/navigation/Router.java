@@ -5,6 +5,10 @@ import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.belman.backbone.core.logging.Logger;
 import com.belman.backbone.core.api.CoreAPI;
+import com.belman.backbone.core.transition.SlideDirection;
+import com.belman.backbone.core.transition.SlideViewTransition;
+import com.belman.backbone.core.transition.ViewTransition;
+import com.belman.backbone.core.util.PlatformUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +17,7 @@ import java.util.function.Supplier;
 
 /**
  * Router for navigating between views in a Gluon Mobile application.
- * Supports route parameters, nested routes, and route guards.
+ * Supports route parameters, nested routes, route guards, and view transitions.
  */
 public class Router {
     private static final Logger logger = Logger.getLogger(Router.class);
@@ -24,8 +28,23 @@ public class Router {
     private static final Map<Class<? extends View>, Supplier<Boolean>> routeGuards = new HashMap<>();
     private static final Stack<Class<? extends View>> navigationHistory = new Stack<>();
 
+    // Default transitions
+    private static ViewTransition defaultForwardTransition;
+    private static ViewTransition defaultBackwardTransition;
+
     private Router() {
         // Singleton constructor
+
+        // Initialize default transitions based on platform
+        if (PlatformUtils.isRunningOnMobile()) {
+            // Mobile platforms typically use slide transitions
+            defaultForwardTransition = new SlideViewTransition(SlideDirection.RIGHT_TO_LEFT);
+            defaultBackwardTransition = new SlideViewTransition(SlideDirection.LEFT_TO_RIGHT);
+        } else {
+            // Desktop platforms typically use fade transitions
+            defaultForwardTransition = new com.belman.backbone.core.transition.FadeViewTransition();
+            defaultBackwardTransition = new com.belman.backbone.core.transition.FadeViewTransition();
+        }
     }
 
     /**
@@ -47,11 +66,87 @@ public class Router {
         mobileApplication = application;
     }
 
-    public static void navigateTo(Class<? extends View> viewClass) {
-        navigateTo(viewClass, new HashMap<>());
+    /**
+     * Sets the default forward transition.
+     * This transition is used when navigating to a new view.
+     * 
+     * @param transition the transition to use
+     */
+    public static void setDefaultForwardTransition(ViewTransition transition) {
+        if (transition == null) {
+            throw new IllegalArgumentException("Transition cannot be null");
+        }
+        defaultForwardTransition = transition;
     }
 
+    /**
+     * Gets the default forward transition.
+     * 
+     * @return the default forward transition
+     */
+    public static ViewTransition getDefaultForwardTransition() {
+        return defaultForwardTransition;
+    }
+
+    /**
+     * Sets the default backward transition.
+     * This transition is used when navigating back to a previous view.
+     * 
+     * @param transition the transition to use
+     */
+    public static void setDefaultBackwardTransition(ViewTransition transition) {
+        if (transition == null) {
+            throw new IllegalArgumentException("Transition cannot be null");
+        }
+        defaultBackwardTransition = transition;
+    }
+
+    /**
+     * Gets the default backward transition.
+     * 
+     * @return the default backward transition
+     */
+    public static ViewTransition getDefaultBackwardTransition() {
+        return defaultBackwardTransition;
+    }
+
+    /**
+     * Navigates to the specified view using the default forward transition.
+     *
+     * @param viewClass the class of the view to navigate to
+     */
+    public static void navigateTo(Class<? extends View> viewClass) {
+        navigateTo(viewClass, new HashMap<>(), defaultForwardTransition);
+    }
+
+    /**
+     * Navigates to the specified view with the specified parameters using the default forward transition.
+     *
+     * @param viewClass  the class of the view to navigate to
+     * @param parameters the parameters to pass to the view
+     */
     public static void navigateTo(Class<? extends View> viewClass, Map<String, Object> parameters) {
+        navigateTo(viewClass, parameters, defaultForwardTransition);
+    }
+
+    /**
+     * Navigates to the specified view with the specified transition.
+     *
+     * @param viewClass  the class of the view to navigate to
+     * @param transition the transition to use
+     */
+    public static void navigateTo(Class<? extends View> viewClass, ViewTransition transition) {
+        navigateTo(viewClass, new HashMap<>(), transition);
+    }
+
+    /**
+     * Navigates to the specified view with the specified parameters and transition.
+     *
+     * @param viewClass  the class of the view to navigate to
+     * @param parameters the parameters to pass to the view
+     * @param transition the transition to use
+     */
+    public static void navigateTo(Class<? extends View> viewClass, Map<String, Object> parameters, ViewTransition transition) {
         if (viewClass == null) {
             logger.error("View class is null");
             throw new IllegalArgumentException("View class cannot be null");
@@ -79,34 +174,53 @@ public class Router {
                 routeParameters.putAll(parameters);
             }
 
-            View view = viewClass.getDeclaredConstructor().newInstance();
-
-            // Update the current view reference
-            currentView = view;
-
-            // Show the new view
-            String viewId = viewClass.getSimpleName();
+            View newView = viewClass.getDeclaredConstructor().newInstance();
+            View oldView = currentView;
 
             // Register the view with the mobile application
+            String viewId = viewClass.getSimpleName();
             try {
-                mobileApplication.addViewFactory(viewId, () -> view);
+                mobileApplication.addViewFactory(viewId, () -> newView);
             } catch (IllegalArgumentException e) {
                 // View already registered, ignore
                 logger.info("View already registered: {}", viewId);
             }
 
-            // Switch to the view
-            mobileApplication.switchView(viewId);
-
-            AppBar appBar = MobileApplication.getInstance().getAppBar();
-            if (appBar != null) {
-                appBar.setTitleText(viewId);
-            }
-
             // Add the view to the navigation history
             navigationHistory.push(viewClass);
 
-            logger.info("Navigated to: {}", viewClass.getSimpleName());
+            // If no transition is specified, use the default forward transition
+            ViewTransition effectiveTransition = transition != null ? transition : defaultForwardTransition;
+
+            if (effectiveTransition != null) {
+                // Perform the transition
+                effectiveTransition.performTransition(oldView, newView, () -> {
+                    // Update the current view reference
+                    currentView = newView;
+
+                    // Update the app bar
+                    AppBar appBar = MobileApplication.getInstance().getAppBar();
+                    if (appBar != null) {
+                        appBar.setTitleText(viewId);
+                    }
+
+                    logger.info("Navigated to: {}", viewClass.getSimpleName());
+                });
+            } else {
+                // No transition, just switch to the view
+                mobileApplication.switchView(viewId);
+
+                // Update the current view reference
+                currentView = newView;
+
+                // Update the app bar
+                AppBar appBar = MobileApplication.getInstance().getAppBar();
+                if (appBar != null) {
+                    appBar.setTitleText(viewId);
+                }
+
+                logger.info("Navigated to: {}", viewClass.getSimpleName());
+            }
         } catch (Exception e) {
             logger.error("Failed to navigate to: {}", viewClass.getSimpleName(), e);
             throw new RuntimeException("Failed to navigate to: " + viewClass.getSimpleName(), e);
@@ -114,11 +228,21 @@ public class Router {
     }
 
     /**
-     * Navigates back to the previous view.
+     * Navigates back to the previous view using the default backward transition.
      * 
      * @return true if navigation was successful, false if there is no previous view
      */
     public static boolean navigateBack() {
+        return navigateBack(defaultBackwardTransition);
+    }
+
+    /**
+     * Navigates back to the previous view using the specified transition.
+     * 
+     * @param transition the transition to use
+     * @return true if navigation was successful, false if there is no previous view
+     */
+    public static boolean navigateBack(ViewTransition transition) {
         if (navigationHistory.size() <= 1) {
             logger.warn("Cannot navigate back: no previous view");
             return false;
@@ -127,7 +251,7 @@ public class Router {
         // Remove the current view from the history
         navigationHistory.pop();
         Class<? extends View> previousViewClass = navigationHistory.pop();
-        navigateTo(previousViewClass);
+        navigateTo(previousViewClass, transition);
 
         return true;
     }

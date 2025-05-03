@@ -230,13 +230,21 @@
                 </configuration>
             </plugin>
 
-            <!-- GluonFX plugin -->
+            <!--- GluonFX plugin for Android -->
+            <!-- 
+                Note: Building for Android on Windows requires WSL2 (Windows Subsystem for Linux).
+                If you encounter the error "We currently can't compile to aarch64-linux-android when running on x86_64-microsoft-windows",
+                please refer to the WSL setup guide at docs/mobile/wsl_setup_guide.md for instructions on how to set up WSL2 for Android builds.
+            -->
             <plugin>
                 <groupId>com.gluonhq</groupId>
                 <artifactId>gluonfx-maven-plugin</artifactId>
                 <version>1.0.26</version>
                 <configuration>
-                    <target>host</target> <!-- Can be android / ios -->
+                    <mainClass>com.belman.Main</mainClass>
+                    <target>android</target>
+                    <graalvmHome>${env.GRAALVM_HOME}</graalvmHome>
+                    <androidNDK>${env.ANDROID_NDK}</androidNDK>
                 </configuration>
             </plugin>
 
@@ -324,7 +332,6 @@
                 <version>3.20.0</version>
                 <configuration>
                     <linkXRef>false</linkXRef>
-                    <sourceEncoding>UTF-8</sourceEncoding>
                     <minimumTokens>100</minimumTokens>
                     <targetJdk>${maven.compiler.target}</targetJdk>
                     <excludes>
@@ -355,4 +362,12 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>android</id>
+            <properties>
+                <gluonfx.target>android</gluonfx.target>
+            </properties>
+        </profile>
+    </profiles>
 </project>

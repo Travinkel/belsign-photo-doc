@@ -16,6 +16,8 @@ import java.util.Optional;
 public class MockCameraService extends BaseService implements CameraService {
 
     private final Stage stage;
+    // Make fileChooser a field so it can be mocked in tests
+    private FileChooser fileChooser;
 
     /**
      * Creates a new MockCameraService with the specified stage.
@@ -24,6 +26,10 @@ public class MockCameraService extends BaseService implements CameraService {
      */
     public MockCameraService(Stage stage) {
         this.stage = stage;
+        this.fileChooser = new FileChooser();
+        this.fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+        );
     }
 
     /**
@@ -65,11 +71,7 @@ public class MockCameraService extends BaseService implements CameraService {
      * @return an Optional containing the selected file, or empty if no file was selected
      */
     private Optional<File> selectPhotoWithFileChooser(String title) {
-        FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(title);
-        fileChooser.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
-        );
 
         File file = fileChooser.showOpenDialog(stage);
         return Optional.ofNullable(file);

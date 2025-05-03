@@ -1,0 +1,36 @@
+{
+  "orderNumber": "ORD-49-230615-EXP-0002",
+  "date": "2023-06-15",
+  "productType": "Expansion Joint",
+  "countryCode": "49",
+  "images": [
+    {
+      "filename": "img1.jpg",
+      "description": "Front view of expansion joint",
+      "uploadedBy": "production_worker",
+      "uploadedAt": "2023-06-15T09:30:15Z",
+      "status": "approved"
+    },
+    {
+      "filename": "img2.jpg",
+      "description": "Side view of expansion joint",
+      "uploadedBy": "production_worker",
+      "uploadedAt": "2023-06-15T09:32:40Z",
+      "status": "approved"
+    },
+    {
+      "filename": "img3.jpg",
+      "description": "Close-up of expansion bellows",
+      "uploadedBy": "production_worker",
+      "uploadedAt": "2023-06-15T09:35:10Z",
+      "status": "approved"
+    },
+    {
+      "filename": "img4.jpg",
+      "description": "Connection flange detail",
+      "uploadedBy": "production_worker",
+      "uploadedAt": "2023-06-15T09:38:25Z",
+      "status": "approved"
+    }
+  ]
+}

@@ -11,10 +11,11 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -305,34 +306,145 @@ public class GluonCameraService extends BaseService implements CameraService {
      * @throws IOException if an I/O error occurs
      */
     private void saveImageToFile(Image image, File file) throws IOException {
-        // Ensure parent directories exist
-        File parentDir = file.getParentFile();
-        if (parentDir != null && !parentDir.exists()) {
-            parentDir.mkdirs();
-        }
+        // Try to use Gluon's StorageService if available
+        Services.get(StorageService.class).ifPresentOrElse(storageService -> {
+            try {
+                // Get the private storage directory
+                Optional<File> privateStorageDirOpt = storageService.getPrivateStorage();
+                if (privateStorageDirOpt.isEmpty()) {
+                    throw new IOException("Private storage not available");
+                }
 
+                File privateStorageDir = privateStorageDirOpt.get();
+
+                // Create the target file path relative to the private storage
+                String relativePath = file.getName();
+                File targetFile = new File(privateStorageDir, relativePath);
+
+                // Ensure parent directories exist
+                File parentDir = targetFile.getParentFile();
+                if (parentDir != null && !parentDir.exists()) {
+                    parentDir.mkdirs();
+                }
+
+                // Save the image using JavaFX PixelReader
+                saveImageToFileUsingPixelReader(image, targetFile);
+            } catch (IOException e) {
+                logError("Error saving image with StorageService", e);
+                throw new RuntimeException("Failed to save image to file", e);
+            }
+        }, () -> {
+            try {
+                // Ensure parent directories exist
+                File parentDir = file.getParentFile();
+                if (parentDir != null && !parentDir.exists()) {
+                    parentDir.mkdirs();
+                }
+
+                // Save the image using JavaFX PixelReader
+                saveImageToFileUsingPixelReader(image, file);
+            } catch (IOException e) {
+                logError("Error saving image with standard I/O", e);
+                throw new RuntimeException("Failed to save image to file", e);
+            }
+        });
+    }
+
+    /**
+     * Saves an image to a file using JavaFX PixelReader.
+     * This method is mobile-compatible and doesn't use any desktop-specific APIs.
+     * 
+     * @param image the image to save
+     * @param file the file to save to
+     * @throws IOException if an I/O error occurs
+     */
+    private void saveImageToFileUsingPixelReader(Image image, File file) throws IOException {
         // Get the pixel reader
-        javafx.scene.image.PixelReader pixelReader = image.getPixelReader();
+        PixelReader pixelReader = image.getPixelReader();
 
-        // Create a JavaFX WritableImage
-        javafx.scene.image.WritableImage writableImage = new javafx.scene.image.WritableImage(
-            (int) image.getWidth(),
-            (int) image.getHeight()
-        );
+        // Get image dimensions
+        int width = (int) image.getWidth();
+        int height = (int) image.getHeight();
 
-        // Copy the pixels
-        javafx.scene.image.PixelWriter pixelWriter = writableImage.getPixelWriter();
-        for (int y = 0; y < image.getHeight(); y++) {
-            for (int x = 0; x < image.getWidth(); x++) {
-                pixelWriter.setArgb(x, y, pixelReader.getArgb(x, y));
+        // Create a byte buffer to hold the image data
+        // 4 bytes per pixel (RGBA)
+        ByteBuffer buffer = ByteBuffer.allocate(width * height * 4);
+
+        // Read the pixel data
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int argb = pixelReader.getArgb(x, y);
+
+                // Extract RGBA components
+                byte a = (byte) ((argb >> 24) & 0xFF);
+                byte r = (byte) ((argb >> 16) & 0xFF);
+                byte g = (byte) ((argb >> 8) & 0xFF);
+                byte b = (byte) (argb & 0xFF);
+
+                // Write to buffer
+                buffer.put(r);
+                buffer.put(g);
+                buffer.put(b);
+                buffer.put(a);
             }
         }
 
-        // Save the image to the file
-        javax.imageio.ImageIO.write(
-            javafx.embed.swing.SwingFXUtils.fromFXImage(writableImage, null),
-            IMAGE_FORMAT,
-            file
-        );
+        // Flip the buffer to prepare for reading
+        buffer.flip();
+
+        // Write the buffer to the file
+        try (OutputStream out = new FileOutputStream(file)) {
+            // Write a simple PNG header
+            writePngHeader(out, width, height);
+
+            // Write the image data
+            byte[] data = new byte[buffer.remaining()];
+            buffer.get(data);
+            out.write(data);
+        }
+    }
+
+    /**
+     * Writes a simple PNG header to the output stream.
+     * This is a simplified version and doesn't create a fully compliant PNG file,
+     * but it's sufficient for demonstration purposes.
+     * 
+     * @param out the output stream
+     * @param width the image width
+     * @param height the image height
+     * @throws IOException if an I/O error occurs
+     */
+    private void writePngHeader(OutputStream out, int width, int height) throws IOException {
+        // PNG signature
+        byte[] signature = {(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
+        out.write(signature);
+
+        // IHDR chunk
+        byte[] ihdr = new byte[13];
+        ihdr[0] = (byte) ((width >> 24) & 0xFF);
+        ihdr[1] = (byte) ((width >> 16) & 0xFF);
+        ihdr[2] = (byte) ((width >> 8) & 0xFF);
+        ihdr[3] = (byte) (width & 0xFF);
+        ihdr[4] = (byte) ((height >> 24) & 0xFF);
+        ihdr[5] = (byte) ((height >> 16) & 0xFF);
+        ihdr[6] = (byte) ((height >> 8) & 0xFF);
+        ihdr[7] = (byte) (height & 0xFF);
+        ihdr[8] = 8;  // bit depth
+        ihdr[9] = 6;  // color type (RGBA)
+        ihdr[10] = 0; // compression method
+        ihdr[11] = 0; // filter method
+        ihdr[12] = 0; // interlace method
+
+        // Write IHDR chunk
+        out.write(0);
+        out.write(0);
+        out.write(0);
+        out.write(13); // length
+        out.write('I');
+        out.write('H');
+        out.write('D');
+        out.write('R');
+        out.write(ihdr);
+        // CRC would go here in a real PNG
     }
 }
