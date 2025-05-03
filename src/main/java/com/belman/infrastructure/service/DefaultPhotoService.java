@@ -1,7 +1,7 @@
 package com.belman.infrastructure.service;
 
-import com.belman.backbone.core.exceptions.ErrorHandler;
-import com.belman.backbone.core.util.PlatformUtils;
+import com.belman.infrastructure.ErrorHandler;
+import com.belman.infrastructure.PlatformUtils;
 import com.belman.domain.aggregates.Order;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.entities.PhotoDocument;
@@ -25,13 +25,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * Default implementation of the PhotoService interface.

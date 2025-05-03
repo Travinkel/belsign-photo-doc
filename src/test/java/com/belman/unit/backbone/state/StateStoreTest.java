@@ -1,7 +1,7 @@
 package com.belman.unit.backbone.state;
 
-import com.belman.backbone.core.state.Property;
-import com.belman.backbone.core.state.StateStore;
+import com.belman.domain.shared.Property;
+import com.belman.domain.shared.StateStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 

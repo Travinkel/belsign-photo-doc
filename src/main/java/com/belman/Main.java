@@ -1,8 +1,9 @@
 package com.belman;
 
-import com.belman.backbone.core.util.PlatformUtils;
-import com.belman.backbone.core.logging.EmojiLogger;
-import com.belman.backbone.core.navigation.Router;
+import com.belman.application.core.GluonLifecycleManager;
+import com.belman.infrastructure.PlatformUtils;
+import com.belman.infrastructure.EmojiLogger;
+import com.belman.presentation.navigation.Router;
 import com.belman.infrastructure.config.ApplicationInitializer;
 import com.belman.infrastructure.service.DisplayServiceFactory;
 import com.belman.infrastructure.service.GluonInternalClassesFix;
@@ -10,6 +11,7 @@ import com.belman.infrastructure.service.StorageServiceFactory;
 import com.belman.presentation.views.splash.SplashView;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import javafx.scene.Scene;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.net.URL;
 
@@ -41,6 +43,7 @@ public class Main extends MobileApplication {
 
     public static void main(String[] args) {
         System.setProperty("com.gluonhq.license.disable", "true");
+        BCryptGenerator();
         launch(args);
     }
 
@@ -75,13 +78,46 @@ public class Main extends MobileApplication {
 
         // Register the login view
         logger.debug("Registering login view");
-        addViewFactory(com.belman.presentation.views.login.LoginView.class.getSimpleName(), 
-                       com.belman.presentation.views.login.LoginView::new);
+        addViewFactory(com.belman.presentation.views.login.LoginView.class.getSimpleName(),
+                com.belman.presentation.views.login.LoginView::new);
 
-        // Register the main view
-        logger.debug("Registering main view");
-        addViewFactory(com.belman.presentation.views.main.MainView.class.getSimpleName(), 
-                       com.belman.presentation.views.main.MainView::new);
+        // Main view has been removed as it doesn't offer value
+        // Users are redirected to role-specific views after login
+
+        // Register the admin view
+        logger.debug("Registering admin view");
+        addViewFactory(com.belman.presentation.views.admin.AdminView.class.getSimpleName(),
+                com.belman.presentation.views.admin.AdminView::new);
+
+        // Register the order gallery view
+        logger.debug("Registering order gallery view");
+        addViewFactory(com.belman.presentation.views.ordergallery.OrderGalleryView.class.getSimpleName(),
+                com.belman.presentation.views.ordergallery.OrderGalleryView::new);
+
+        // Register the photo review view
+        logger.debug("Registering photo review view");
+        addViewFactory(com.belman.presentation.views.photoreview.PhotoReviewView.class.getSimpleName(),
+                com.belman.presentation.views.photoreview.PhotoReviewView::new);
+
+        // Register the photo upload view
+        logger.debug("Registering photo upload view");
+        addViewFactory(com.belman.presentation.views.photoupload.PhotoUploadView.class.getSimpleName(),
+                com.belman.presentation.views.photoupload.PhotoUploadView::new);
+
+        // Register the QA dashboard view
+        logger.debug("Registering QA dashboard view");
+        addViewFactory(com.belman.presentation.views.qadashboard.QADashboardView.class.getSimpleName(),
+                com.belman.presentation.views.qadashboard.QADashboardView::new);
+
+        // Register the report preview view
+        logger.debug("Registering report preview view");
+        addViewFactory(com.belman.presentation.views.reportpreview.ReportPreviewView.class.getSimpleName(),
+                com.belman.presentation.views.reportpreview.ReportPreviewView::new);
+
+        // Register the user management view
+        logger.debug("Registering user management view");
+        addViewFactory(com.belman.presentation.views.usermanagement.UserManagementView.class.getSimpleName(),
+                com.belman.presentation.views.usermanagement.UserManagementView::new);
 
         // Set up the Router
         logger.debug("Setting up Router");
@@ -89,7 +125,7 @@ public class Main extends MobileApplication {
 
         // Initialize the GluonLifecycleManager
         logger.debug("Initializing GluonLifecycleManager");
-        com.belman.backbone.core.lifecycle.GluonLifecycleManager.init(this);
+        GluonLifecycleManager.init(this);
     }
 
     @Override
@@ -119,21 +155,12 @@ public class Main extends MobileApplication {
     private void applyPlatformStyling(Scene scene) {
         try {
             if (scene != null) {
-                if (PlatformUtils.isRunningOnMobile()) {
-                    if (PlatformUtils.isAndroid()) {
-                        logger.debug("Applying smartphone styling");
-                        scene.getRoot().getStyleClass().add("smartphone");
-                    } else {
-                        logger.debug("Applying tablet styling");
-                        scene.getRoot().getStyleClass().add("tablet");
-                    }
-                } else {
-                    logger.debug("Applying desktop styling");
-                    scene.getRoot().getStyleClass().add("desktop");
-                }
+                // App is now mobile-only and Android-focused, so always apply smartphone styling
+                logger.debug("Applying smartphone styling (mobile-only mode)");
+                scene.getRoot().getStyleClass().add("smartphone");
             }
         } catch (Exception e) {
-            logger.error("Platform detection failed: {}", e.getMessage(), e);
+            logger.error("Platform styling failed: {}", e.getMessage(), e);
         }
     }
 
@@ -144,5 +171,10 @@ public class Main extends MobileApplication {
         ApplicationInitializer.shutdown();
 
         super.stop();
+    }
+
+    protected static void BCryptGenerator() {
+        String hashed = BCrypt.hashpw("password123", BCrypt.gensalt());
+        System.out.println(hashed);
     }
 }

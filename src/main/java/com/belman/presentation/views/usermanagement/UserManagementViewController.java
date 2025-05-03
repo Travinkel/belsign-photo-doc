@@ -1,28 +1,20 @@
 package com.belman.presentation.views.usermanagement;
 
-import com.belman.backbone.core.base.BaseController;
-import com.belman.backbone.core.navigation.Router;
+import com.belman.presentation.core.BaseController;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.enums.UserStatus;
 import com.belman.presentation.components.TouchFriendlyDialog;
-import com.belman.presentation.views.main.MainView;
-import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Controller for the user management view.
  * Handles user interface interactions for managing user accounts.
  */
 public class UserManagementViewController extends BaseController<UserManagementViewModel> {
-    @FXML
-    private Button backButton;
+    // Back button removed - now using AppBar back button
 
     @FXML
     private Button createUserButton;
@@ -118,7 +110,7 @@ public class UserManagementViewController extends BaseController<UserManagementV
         saveButton.disableProperty().bind(getViewModel().userSelectedProperty().not());
 
         // Set up event handlers
-        backButton.setOnAction(this::handleBackButtonAction);
+        // Back button handler removed - now using AppBar back button
         createUserButton.setOnAction(this::handleCreateUserButtonAction);
         resetPasswordButton.setOnAction(this::handleResetPasswordButtonAction);
         saveButton.setOnAction(this::handleSaveButtonAction);
@@ -140,14 +132,7 @@ public class UserManagementViewController extends BaseController<UserManagementV
         getViewModel().loadUsers();
     }
 
-    /**
-     * Handles the back button action.
-     * 
-     * @param event the action event
-     */
-    private void handleBackButtonAction(ActionEvent event) {
-        Router.navigateTo(MainView.class);
-    }
+    // Back button handler removed - now using AppBar back button
 
     /**
      * Handles the create user button action.

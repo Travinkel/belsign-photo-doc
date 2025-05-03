@@ -1,5 +1,5 @@
 package com.belman.presentation.views.splash;
-import com.belman.backbone.core.base.BaseView;
+import com.belman.presentation.core.BaseView;
 import com.gluonhq.charm.glisten.control.AppBar;
 
 

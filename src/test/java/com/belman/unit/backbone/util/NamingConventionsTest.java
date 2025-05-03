@@ -1,6 +1,6 @@
 package com.belman.unit.backbone.util;
 
-import com.belman.backbone.core.util.NamingConventions;
+import com.belman.infrastructure.NamingConventions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

@@ -1,7 +1,7 @@
 package com.belman.unit.backbone.api;
 
-import com.belman.backbone.core.api.CoreAPI;
-import com.belman.backbone.core.session.SessionManager;
+import com.belman.application.api.CoreAPI;
+import com.belman.application.core.SessionManager;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.services.AuthenticationService;
 import org.junit.jupiter.api.AfterEach;

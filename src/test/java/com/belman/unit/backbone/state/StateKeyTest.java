@@ -1,6 +1,6 @@
 package com.belman.unit.backbone.state;
 
-import com.belman.backbone.core.state.StateKey;
+import com.belman.domain.shared.StateKey;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

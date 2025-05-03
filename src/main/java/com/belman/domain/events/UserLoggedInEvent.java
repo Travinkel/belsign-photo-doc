@@ -1,7 +1,7 @@
 package com.belman.domain.events;
 
-import com.belman.backbone.core.events.AbstractDomainEvent;
 import com.belman.domain.aggregates.User;
+import com.belman.domain.shared.AbstractDomainEvent;
 import com.belman.domain.valueobjects.Username;
 
 /**

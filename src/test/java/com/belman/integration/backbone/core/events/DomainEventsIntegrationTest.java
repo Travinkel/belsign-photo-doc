@@ -1,9 +1,7 @@
 package com.belman.integration.backbone.core.events;
 
-import com.belman.backbone.core.events.AbstractDomainEvent;
-import com.belman.backbone.core.events.DomainEvent;
-import com.belman.backbone.core.events.DomainEventPublisher;
-import com.belman.backbone.core.events.DomainEvents;
+import com.belman.domain.shared.AbstractDomainEvent;
+import com.belman.domain.events.DomainEvents;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

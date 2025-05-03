@@ -1,7 +1,9 @@
 package com.belman.unit.backbone.core.base;
 
-import com.belman.backbone.core.base.BaseViewModel;
-import com.belman.backbone.core.di.ServiceLocator;
+import com.belman.application.core.Inject;
+import com.belman.application.core.ViewModelLifecycle;
+import com.belman.presentation.core.BaseViewModel;
+import com.belman.application.core.ServiceLocator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -103,7 +105,7 @@ public class BaseViewModelTest {
     @Test
     void baseViewModel_shouldImplementViewModelLifecycle() {
         // Assert
-        assertTrue(viewModel instanceof com.belman.backbone.core.lifecycle.ViewModelLifecycle,
+        assertTrue(viewModel instanceof ViewModelLifecycle,
                 "BaseViewModel should implement ViewModelLifecycle");
     }
 
@@ -113,7 +115,7 @@ public class BaseViewModelTest {
         Method injectServicesMethod = BaseViewModel.class.getDeclaredMethod("injectServices");
         
         // Assert
-        assertTrue(injectServicesMethod.isAnnotationPresent(com.belman.backbone.core.di.Inject.class),
+        assertTrue(injectServicesMethod.isAnnotationPresent(Inject.class),
                 "injectServices method should be annotated with @Inject");
     }
 

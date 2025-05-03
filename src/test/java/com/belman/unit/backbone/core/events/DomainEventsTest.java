@@ -1,9 +1,9 @@
 package com.belman.unit.backbone.core.events;
 
-import com.belman.backbone.core.events.AbstractDomainEvent;
-import com.belman.backbone.core.events.DomainEvent;
-import com.belman.backbone.core.events.DomainEventPublisher;
-import com.belman.backbone.core.events.DomainEvents;
+import com.belman.domain.shared.AbstractDomainEvent;
+import com.belman.domain.shared.DomainEvent;
+import com.belman.domain.events.DomainEventPublisher;
+import com.belman.domain.events.DomainEvents;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -11,8 +11,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.lang.reflect.Field;
-import java.time.Instant;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;

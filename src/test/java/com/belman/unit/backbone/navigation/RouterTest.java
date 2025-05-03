@@ -1,6 +1,6 @@
 package com.belman.unit.backbone.navigation;
 
-import com.belman.backbone.core.navigation.Router;
+import com.belman.presentation.navigation.Router;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

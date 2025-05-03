@@ -1,15 +1,12 @@
 package com.belman.infrastructure.service;
 
-import com.belman.backbone.core.base.BaseService;
-import com.belman.backbone.core.events.DomainEvents;
+import com.belman.presentation.core.BaseService;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.events.UserLoggedInEvent;
 import com.belman.domain.events.UserLoggedOutEvent;
 import com.belman.domain.repositories.UserRepository;
 import com.belman.domain.services.AuthenticationService;
 import com.belman.domain.valueobjects.Username;
-import com.belman.domain.valueobjects.HashedPassword;
-import com.belman.domain.enums.UserStatus;
 
 import java.util.Optional;
 import java.util.Map;

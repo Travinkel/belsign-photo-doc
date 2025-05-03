@@ -1,10 +1,10 @@
 package com.belman.integration.backbone.core.lifecycle;
 
-import com.belman.backbone.core.events.DomainEvents;
-import com.belman.backbone.core.events.ViewHiddenEvent;
-import com.belman.backbone.core.events.ViewShownEvent;
-import com.belman.backbone.core.lifecycle.ControllerLifecycle;
-import com.belman.backbone.core.lifecycle.ViewModelLifecycle;
+import com.belman.domain.events.DomainEvents;
+import com.belman.domain.shared.ViewHiddenEvent;
+import com.belman.domain.shared.ViewShownEvent;
+import com.belman.application.core.ControllerLifecycle;
+import com.belman.application.core.ViewModelLifecycle;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

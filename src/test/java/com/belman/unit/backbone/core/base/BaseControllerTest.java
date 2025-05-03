@@ -1,7 +1,8 @@
 package com.belman.unit.backbone.core.base;
 
-import com.belman.backbone.core.base.BaseController;
-import com.belman.backbone.core.base.BaseViewModel;
+import com.belman.application.core.ControllerLifecycle;
+import com.belman.presentation.core.BaseController;
+import com.belman.presentation.core.BaseViewModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -11,7 +12,6 @@ import org.mockito.MockitoAnnotations;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for the BaseController class.
@@ -119,7 +119,7 @@ public class BaseControllerTest {
     @Test
     void baseController_shouldImplementControllerLifecycle() {
         // Assert
-        assertTrue(controller instanceof com.belman.backbone.core.lifecycle.ControllerLifecycle,
+        assertTrue(controller instanceof ControllerLifecycle,
                 "BaseController should implement ControllerLifecycle");
     }
 

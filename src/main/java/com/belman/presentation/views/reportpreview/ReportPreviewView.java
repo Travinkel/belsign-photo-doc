@@ -1,5 +1,5 @@
 package com.belman.presentation.views.reportpreview;
-import com.belman.backbone.core.base.BaseView;
+import com.belman.presentation.core.BaseView;
 
 
 public class ReportPreviewView extends BaseView<ReportPreviewViewModel> {

@@ -1,6 +1,6 @@
 package com.belman.application.admin;
 
-import com.belman.backbone.core.base.BaseService;
+import com.belman.presentation.core.BaseService;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.aggregates.User.Role;
 import com.belman.domain.rbac.AccessDeniedException;
@@ -16,7 +16,6 @@ import com.belman.domain.valueobjects.Username;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**

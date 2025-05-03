@@ -1,7 +1,7 @@
 package com.belman.infrastructure.service;
 
-import com.belman.backbone.core.base.BaseService;
-import com.belman.backbone.core.events.DomainEvents;
+import com.belman.presentation.core.BaseService;
+import com.belman.domain.events.DomainEvents;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.events.UserLoggedInEvent;
 import com.belman.domain.events.UserLoggedOutEvent;

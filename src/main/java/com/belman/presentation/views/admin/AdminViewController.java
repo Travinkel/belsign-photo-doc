@@ -1,6 +1,6 @@
 package com.belman.presentation.views.admin;
 
-import com.belman.backbone.core.base.BaseController;
+import com.belman.presentation.core.BaseController;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.aggregates.User.Role;
 

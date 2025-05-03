@@ -1,7 +1,7 @@
 package com.belman.presentation.views.admin;
 
 import com.belman.application.admin.AdminService;
-import com.belman.backbone.core.base.BaseViewModel;
+import com.belman.presentation.core.BaseViewModel;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.aggregates.User.Role;
 import com.belman.domain.rbac.AccessDeniedException;

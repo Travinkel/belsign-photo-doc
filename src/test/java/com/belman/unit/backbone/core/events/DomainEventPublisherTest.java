@@ -1,21 +1,18 @@
 package com.belman.unit.backbone.core.events;
 
-import com.belman.backbone.core.events.DomainEvent;
-import com.belman.backbone.core.events.DomainEventHandler;
-import com.belman.backbone.core.events.DomainEventPublisher;
+import com.belman.domain.shared.DomainEvent;
+import com.belman.domain.shared.DomainEventHandler;
+import com.belman.domain.events.DomainEventPublisher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;

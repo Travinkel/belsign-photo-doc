@@ -1,6 +1,9 @@
 package com.belman.presentation.views.ordergallery;
 
-import com.belman.backbone.core.base.BaseView;
+import com.belman.presentation.core.BaseView;
+import com.belman.presentation.navigation.Router;
+import com.gluonhq.charm.glisten.control.AppBar;
+import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 
 /**
  * View for selecting and managing orders.
@@ -8,6 +11,11 @@ import com.belman.backbone.core.base.BaseView;
  * select an order from the list, view order details, and create new orders.
  */
 public class OrderGalleryView extends BaseView<OrderGalleryViewModel> {
-    // This class is intentionally left as a placeholder.
-    // The actual implementation is in the FXML file and controller.
+
+    @Override
+    public void updateAppBar(AppBar appBar) {
+        appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> Router.navigateBack()));
+        appBar.setTitleText("Order Gallery");
+        appBar.getActionItems().add(MaterialDesignIcon.POWER_SETTINGS_NEW.button(e -> getViewModel().logout()));
+    }
 }

@@ -1,10 +1,10 @@
 package com.belman.presentation.views.main;
 
 
-import com.belman.backbone.core.api.CoreAPI;
-import com.belman.backbone.core.base.BaseViewModel;
-import com.belman.backbone.core.logging.EmojiLogger;
-import com.belman.backbone.core.navigation.Router;
+import com.belman.application.api.CoreAPI;
+import com.belman.presentation.core.BaseViewModel;
+import com.belman.infrastructure.EmojiLogger;
+import com.belman.presentation.navigation.Router;
 import com.belman.domain.aggregates.User;
 import com.belman.infrastructure.service.SessionManager;
 import com.belman.presentation.views.login.LoginView;

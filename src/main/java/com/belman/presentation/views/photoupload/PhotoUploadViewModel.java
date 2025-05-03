@@ -1,17 +1,17 @@
 package com.belman.presentation.views.photoupload;
 
-import com.belman.backbone.core.base.BaseViewModel;
-import com.belman.backbone.core.di.Inject;
+import com.belman.presentation.core.BaseViewModel;
+import com.belman.application.core.Inject;
+import com.belman.presentation.navigation.Router;
 import com.belman.domain.aggregates.Order;
 import com.belman.domain.entities.PhotoDocument;
 import com.belman.domain.repositories.OrderRepository;
 import com.belman.domain.services.PhotoService;
-import com.belman.domain.valueobjects.ImagePath;
 import com.belman.domain.valueobjects.OrderId;
 import com.belman.domain.valueobjects.OrderNumber;
 import com.belman.domain.valueobjects.PhotoAngle;
-import com.belman.domain.valueobjects.PhotoId;
 import com.belman.infrastructure.service.SessionManager;
+import com.belman.presentation.views.login.LoginView;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -25,40 +25,39 @@ import javafx.collections.ObservableList;
 
 import java.io.File;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * View model for the photo upload view.
  */
 public class PhotoUploadViewModel extends BaseViewModel<PhotoUploadViewModel> {
-    
+
     @Inject
     private PhotoService photoService;
-    
+
     @Inject
     private OrderRepository orderRepository;
-    
+
     private final SessionManager sessionManager = SessionManager.getInstance();
-    
+
     private final StringProperty orderNumber = new SimpleStringProperty("");
     private final StringProperty orderInfo = new SimpleStringProperty("No order selected");
     private final StringProperty photoAngle = new SimpleStringProperty("");
     private final StringProperty errorMessage = new SimpleStringProperty("");
-    
+
     private final BooleanProperty orderSelected = new SimpleBooleanProperty(false);
     private final BooleanProperty photoSelected = new SimpleBooleanProperty(false);
-    
+
     private final ObjectProperty<Order> selectedOrder = new SimpleObjectProperty<>();
     private final ObjectProperty<File> selectedPhotoFile = new SimpleObjectProperty<>();
-    
+
     private final ListProperty<PhotoDocument> photos = new SimpleListProperty<>(FXCollections.observableArrayList());
-    
+
     @Override
     public void onShow() {
         // Clear any previous data
         clearForm();
     }
-    
+
     /**
      * Searches for an order by its number.
      * 
@@ -70,10 +69,10 @@ public class PhotoUploadViewModel extends BaseViewModel<PhotoUploadViewModel> {
             errorMessage.set("Please enter an order number");
             return false;
         }
-        
+
         try {
             OrderNumber orderNum = new OrderNumber(orderNumberStr);
-            
+
             // In a real application, you would search by OrderNumber
             // For simplicity, we'll just get all orders and find the one with the matching number
             List<Order> orders = orderRepository.findAll();
@@ -83,14 +82,14 @@ public class PhotoUploadViewModel extends BaseViewModel<PhotoUploadViewModel> {
                     orderSelected.set(true);
                     orderInfo.set("Order: " + orderNumberStr + " - Customer: " + 
                                  (order.getCustomer() != null ? order.getCustomer().getName() : "N/A"));
-                    
+
                     // Load photos for this order
                     loadPhotosForOrder(order.getId());
-                    
+
                     return true;
                 }
             }
-            
+
             errorMessage.set("Order not found: " + orderNumberStr);
             return false;
         } catch (IllegalArgumentException e) {
@@ -98,7 +97,7 @@ public class PhotoUploadViewModel extends BaseViewModel<PhotoUploadViewModel> {
             return false;
         }
     }
-    
+
     /**
      * Loads photos for the specified order.
      * 
@@ -108,7 +107,7 @@ public class PhotoUploadViewModel extends BaseViewModel<PhotoUploadViewModel> {
         List<PhotoDocument> orderPhotos = photoService.getPhotosForOrder(orderId);
         photos.setAll(orderPhotos);
     }
-    
+
     /**
      * Sets the selected photo file.
      * 
@@ -120,7 +119,7 @@ public class PhotoUploadViewModel extends BaseViewModel<PhotoUploadViewModel> {
             photoSelected.set(true);
         }
     }
-    
+
     /**
      * Uploads the selected photo.
      * 
@@ -131,36 +130,36 @@ public class PhotoUploadViewModel extends BaseViewModel<PhotoUploadViewModel> {
             errorMessage.set("Please select an order first");
             return false;
         }
-        
+
         if (!photoSelected.get()) {
             errorMessage.set("Please select a photo first");
             return false;
         }
-        
+
         if (photoAngle.get() == null || photoAngle.get().isBlank()) {
             errorMessage.set("Please enter a photo angle");
             return false;
         }
-        
+
         try {
             double angle = Double.parseDouble(photoAngle.get());
             PhotoAngle photoAngleObj = new PhotoAngle(angle);
-            
+
             PhotoDocument photo = photoService.uploadPhoto(
                 selectedPhotoFile.get(),
                 selectedOrder.get().getId(),
                 photoAngleObj,
                 sessionManager.getCurrentUser().orElseThrow(() -> new IllegalStateException("User not logged in"))
             );
-            
+
             // Refresh the photos list
             loadPhotosForOrder(selectedOrder.get().getId());
-            
+
             // Clear the photo selection
             selectedPhotoFile.set(null);
             photoSelected.set(false);
             photoAngle.set("");
-            
+
             return true;
         } catch (NumberFormatException e) {
             errorMessage.set("Invalid angle format. Please enter a number.");
@@ -173,7 +172,7 @@ public class PhotoUploadViewModel extends BaseViewModel<PhotoUploadViewModel> {
             return false;
         }
     }
-    
+
     /**
      * Deletes the specified photo.
      * 
@@ -185,7 +184,7 @@ public class PhotoUploadViewModel extends BaseViewModel<PhotoUploadViewModel> {
             errorMessage.set("No photo selected");
             return false;
         }
-        
+
         try {
             boolean deleted = photoService.deletePhoto(photo.getPhotoId());
             if (deleted) {
@@ -201,7 +200,7 @@ public class PhotoUploadViewModel extends BaseViewModel<PhotoUploadViewModel> {
             return false;
         }
     }
-    
+
     /**
      * Clears the form.
      */
@@ -216,38 +215,55 @@ public class PhotoUploadViewModel extends BaseViewModel<PhotoUploadViewModel> {
         selectedPhotoFile.set(null);
         photos.clear();
     }
-    
+
     // Getters for properties
-    
+
     public StringProperty orderNumberProperty() {
         return orderNumber;
     }
-    
+
     public StringProperty orderInfoProperty() {
         return orderInfo;
     }
-    
+
     public StringProperty photoAngleProperty() {
         return photoAngle;
     }
-    
+
     public StringProperty errorMessageProperty() {
         return errorMessage;
     }
-    
+
     public BooleanProperty orderSelectedProperty() {
         return orderSelected;
     }
-    
+
     public BooleanProperty photoSelectedProperty() {
         return photoSelected;
     }
-    
+
     public ListProperty<PhotoDocument> photosProperty() {
         return photos;
     }
-    
+
     public ObservableList<PhotoDocument> getPhotos() {
         return photos.get();
+    }
+
+    /**
+     * Logs out the current user and navigates to the login view.
+     */
+    public void logout() {
+        try {
+            // Log out the user
+            if (sessionManager != null) {
+                sessionManager.logout();
+            }
+
+            // Navigate to the login view
+            Router.navigateTo(LoginView.class);
+        } catch (Exception e) {
+            errorMessage.set("Error logging out: " + e.getMessage());
+        }
     }
 }

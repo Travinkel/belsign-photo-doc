@@ -1,6 +1,6 @@
 package com.belman.unit.backbone.state;
 
-import com.belman.backbone.core.state.NestedProperty;
+import com.belman.domain.shared.NestedProperty;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

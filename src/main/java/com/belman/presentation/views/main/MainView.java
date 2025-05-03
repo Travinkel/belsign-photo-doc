@@ -1,7 +1,7 @@
 package com.belman.presentation.views.main;
 
 
-import com.belman.backbone.core.base.BaseView;
+import com.belman.presentation.core.BaseView;
 
 /**
  * com.belman.Main view of the application.

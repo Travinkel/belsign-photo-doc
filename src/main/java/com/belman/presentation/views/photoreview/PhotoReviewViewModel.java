@@ -1,17 +1,18 @@
 package com.belman.presentation.views.photoreview;
 
-import com.belman.backbone.core.base.BaseViewModel;
-import com.belman.backbone.core.di.Inject;
+import com.belman.presentation.core.BaseViewModel;
+import com.belman.application.core.Inject;
+import com.belman.presentation.navigation.Router;
 import com.belman.domain.aggregates.Order;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.entities.PhotoDocument;
-import com.belman.domain.entities.PhotoDocument.ApprovalStatus;
 import com.belman.domain.repositories.OrderRepository;
 import com.belman.domain.services.PhotoService;
 import com.belman.domain.valueobjects.OrderId;
 import com.belman.domain.valueobjects.OrderNumber;
 import com.belman.domain.valueobjects.Timestamp;
 import com.belman.infrastructure.service.SessionManager;
+import com.belman.presentation.views.login.LoginView;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -262,5 +263,22 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
 
     public ObservableList<PhotoDocument> getPhotos() {
         return photos.get();
+    }
+
+    /**
+     * Logs out the current user and navigates to the login view.
+     */
+    public void logout() {
+        try {
+            // Log out the user
+            if (sessionManager != null) {
+                sessionManager.logout();
+            }
+
+            // Navigate to the login view
+            Router.navigateTo(LoginView.class);
+        } catch (Exception e) {
+            errorMessage.set("Error logging out: " + e.getMessage());
+        }
     }
 }

@@ -1,11 +1,8 @@
 package com.belman.presentation.views.splash;
 
 
-import com.belman.backbone.core.api.CoreAPI;
-import com.belman.backbone.core.base.BaseViewModel;
-import com.belman.backbone.core.navigation.Router;
-import com.belman.backbone.core.util.PlatformUtils;
-import com.belman.presentation.views.main.MainView;
+import com.belman.presentation.core.BaseViewModel;
+import com.belman.presentation.navigation.Router;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 

@@ -1,6 +1,6 @@
 package com.belman.presentation.views.login;
 
-import com.belman.backbone.core.base.BaseView;
+import com.belman.presentation.core.BaseView;
 import com.gluonhq.charm.glisten.control.AppBar;
 
 /**

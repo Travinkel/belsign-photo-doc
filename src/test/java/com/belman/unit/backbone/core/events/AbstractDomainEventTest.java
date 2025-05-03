@@ -1,7 +1,7 @@
 package com.belman.unit.backbone.core.events;
 
-import com.belman.backbone.core.events.AbstractDomainEvent;
-import com.belman.backbone.core.events.DomainEvent;
+import com.belman.domain.shared.AbstractDomainEvent;
+import com.belman.domain.shared.DomainEvent;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 

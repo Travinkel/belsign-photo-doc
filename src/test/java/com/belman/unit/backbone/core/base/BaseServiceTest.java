@@ -1,9 +1,9 @@
 package com.belman.unit.backbone.core.base;
 
-import com.belman.backbone.core.base.BaseService;
-import com.belman.backbone.core.events.DomainEvent;
-import com.belman.backbone.core.events.DomainEventPublisher;
-import com.belman.backbone.core.logging.EmojiLogger;
+import com.belman.presentation.core.BaseService;
+import com.belman.domain.shared.DomainEvent;
+import com.belman.domain.events.DomainEventPublisher;
+import com.belman.infrastructure.EmojiLogger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;

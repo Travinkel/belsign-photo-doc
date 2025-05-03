@@ -1,13 +1,10 @@
 package com.belman.unit.backbone.core.events;
 
-import com.belman.backbone.core.events.AbstractDomainEvent;
-import com.belman.backbone.core.events.DomainEvent;
-import com.belman.backbone.core.events.DomainEventHandlerImplementation;
+import com.belman.domain.shared.AbstractDomainEvent;
+import com.belman.domain.events.DomainEventHandlerImplementation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import java.time.Instant;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 

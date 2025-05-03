@@ -1,14 +1,13 @@
 package com.belman.presentation.views.login;
 
-import com.belman.backbone.core.api.CoreAPI;
-import com.belman.backbone.core.base.BaseViewModel;
-import com.belman.backbone.core.logging.EmojiLogger;
-import com.belman.backbone.core.navigation.Router;
+import com.belman.presentation.core.BaseViewModel;
+import com.belman.infrastructure.EmojiLogger;
+import com.belman.presentation.navigation.Router;
 import com.belman.domain.aggregates.User;
-import com.belman.domain.services.AuthenticationService;
-import com.belman.infrastructure.service.DefaultAuthenticationService;
 import com.belman.infrastructure.service.SessionManager;
-import com.belman.presentation.views.main.MainView;
+import com.belman.presentation.views.photoupload.PhotoUploadView;
+import com.belman.presentation.views.qadashboard.QADashboardView;
+import com.belman.presentation.views.usermanagement.UserManagementView;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -73,20 +72,48 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
             Optional<User> userOpt = sessionManager.login(username.get(), password.get());
 
             if (userOpt.isPresent()) {
-                // Login successful, navigate to main view
+                // Login successful, navigate to role-specific view
+                User user = userOpt.get();
                 logger.success("Login successful for user: " + username.get());
-                logger.debug("Navigating to MainView");
+
                 try {
-                    Router.navigateTo(MainView.class);
-                    logger.debug("Navigation to MainView completed");
+                    // Determine which view to navigate to based on user role
+                    if (user.getRoles().contains(User.Role.ADMIN)) {
+                        logger.debug("Navigating to UserManagementView for ADMIN user");
+                        Router.navigateTo(UserManagementView.class);
+                        logger.debug("Navigation to UserManagementView completed");
+                    } else if (user.getRoles().contains(User.Role.QA)) {
+                        logger.debug("Navigating to QADashboardView for QA user");
+                        Router.navigateTo(QADashboardView.class);
+                        logger.debug("Navigation to QADashboardView completed");
+                    } else if (user.getRoles().contains(User.Role.PRODUCTION)) {
+                        logger.debug("Navigating to PhotoUploadView for PRODUCTION user");
+                        Router.navigateTo(PhotoUploadView.class);
+                        logger.debug("Navigation to PhotoUploadView completed");
+                    } else {
+                        // Fallback if no specific role is found
+                        logger.warn("No specific role found for user, using default view");
+                        Router.navigateTo(PhotoUploadView.class);
+                        logger.debug("Navigation to default view completed");
+                    }
                 } catch (Exception e) {
-                    logger.error("Failed to navigate to MainView", e);
+                    logger.error("Failed to navigate to role-specific view", e);
                     errorMessage.set("Navigation error: " + e.getMessage());
                 }
             } else {
-                // Login failed
-                logger.warn("Login failed: Invalid credentials for user: {}", username.get());
-                errorMessage.set("Invalid username or password");
+                // Provide more specific error messages based on the username
+                String usernameStr = username.get();
+
+                // Check if the username looks valid (simple heuristic)
+                if (usernameStr.length() < 3 || !usernameStr.matches("[a-zA-Z0-9_]+")) {
+                    // Username is likely invalid
+                    logger.warn("Login failed: User not found: {}", usernameStr);
+                    errorMessage.set("User not found");
+                } else {
+                    // Username looks valid, so password is likely incorrect
+                    logger.warn("Login failed: Invalid password for user: {}", usernameStr);
+                    errorMessage.set("Invalid password");
+                }
             }
         } catch (Exception e) {
             // Handle any exceptions
@@ -205,5 +232,21 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
      */
     public void setLoginInProgress(boolean loginInProgress) {
         this.loginInProgress.set(loginInProgress);
+    }
+
+    /**
+     * Cancels the login process and clears the form.
+     * This is especially important for the admin role.
+     */
+    public void cancel() {
+        logger.debug("Login cancelled");
+
+        // Clear the form
+        username.set("");
+        password.set("");
+        errorMessage.set("");
+
+        // Ensure login is not in progress
+        loginInProgress.set(false);
     }
 }

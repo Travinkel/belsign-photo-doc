@@ -1,6 +1,6 @@
 package com.belman.unit.backbone.state;
 
-import com.belman.backbone.core.state.Property;
+import com.belman.domain.shared.Property;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;

@@ -1,6 +1,6 @@
 package com.belman.infrastructure.config;
 
-import com.belman.backbone.core.base.BaseService;
+import com.belman.presentation.core.BaseService;
 import com.belman.infrastructure.security.SecureConfigStorage;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

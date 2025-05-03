@@ -1,6 +1,6 @@
 package com.belman.domain.rbac;
 
-import com.belman.backbone.core.base.BaseService;
+import com.belman.presentation.core.BaseService;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.services.AuthenticationService;
 

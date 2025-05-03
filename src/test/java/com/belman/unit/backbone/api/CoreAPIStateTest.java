@@ -1,9 +1,8 @@
 package com.belman.unit.backbone.api;
 
-import com.belman.backbone.core.api.CoreAPI;
-import com.belman.backbone.core.state.Property;
-import com.belman.backbone.core.state.StateKey;
-import com.belman.backbone.core.state.StateStore;
+import com.belman.application.api.CoreAPI;
+import com.belman.domain.shared.Property;
+import com.belman.domain.shared.StateKey;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,7 +1,7 @@
 package com.belman.unit.backbone.state;
 
-import com.belman.backbone.core.state.StateSchema;
-import com.belman.backbone.core.state.ValidationResult;
+import com.belman.domain.shared.StateSchema;
+import com.belman.domain.shared.ValidationResult;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;

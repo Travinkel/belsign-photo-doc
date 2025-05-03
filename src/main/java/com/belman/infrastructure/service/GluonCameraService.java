@@ -1,15 +1,13 @@
 package com.belman.infrastructure.service;
 
-import com.belman.backbone.core.base.BaseService;
-import com.belman.backbone.core.exceptions.ErrorHandler;
+import com.belman.presentation.core.BaseService;
+import com.belman.infrastructure.ErrorHandler;
 import com.belman.domain.services.CameraService;
 import com.gluonhq.attach.pictures.PicturesService;
 import com.gluonhq.attach.storage.StorageService;
 import com.gluonhq.attach.util.Services;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
 
 import java.io.File;
 import java.io.FileOutputStream;

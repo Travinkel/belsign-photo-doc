@@ -1,7 +1,7 @@
 package com.belman.presentation.views.reportpreview;
 
 
-import com.belman.backbone.core.base.BaseController;
+import com.belman.presentation.core.BaseController;
 import com.gluonhq.charm.glisten.control.ProgressBar;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;

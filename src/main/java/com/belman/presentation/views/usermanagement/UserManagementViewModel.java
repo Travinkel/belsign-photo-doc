@@ -1,7 +1,8 @@
 package com.belman.presentation.views.usermanagement;
 
-import com.belman.backbone.core.base.BaseViewModel;
-import com.belman.backbone.core.di.Inject;
+import com.belman.presentation.core.BaseViewModel;
+import com.belman.application.core.Inject;
+import com.belman.presentation.navigation.Router;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.aggregates.User.Role;
 import com.belman.domain.enums.UserStatus;
@@ -11,6 +12,8 @@ import com.belman.domain.valueobjects.HashedPassword;
 import com.belman.domain.valueobjects.PersonName;
 import com.belman.domain.valueobjects.UserId;
 import com.belman.domain.valueobjects.Username;
+import com.belman.infrastructure.service.SessionManager;
+import com.belman.presentation.views.login.LoginView;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -376,5 +379,25 @@ public class UserManagementViewModel extends BaseViewModel<UserManagementViewMod
 
     public StringProperty errorMessageProperty() {
         return errorMessage;
+    }
+
+    /**
+     * Logs out the current user and navigates to the login view.
+     */
+    public void logout() {
+        try {
+            // Get the SessionManager instance
+            SessionManager sessionManager = SessionManager.getInstance();
+
+            // Log out the user
+            if (sessionManager != null) {
+                sessionManager.logout();
+            }
+
+            // Navigate to the login view
+            Router.navigateTo(LoginView.class);
+        } catch (Exception e) {
+            errorMessage.set("Error logging out: " + e.getMessage());
+        }
     }
 }

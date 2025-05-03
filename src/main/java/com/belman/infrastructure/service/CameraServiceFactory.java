@@ -1,6 +1,6 @@
 package com.belman.infrastructure.service;
 
-import com.belman.backbone.core.util.PlatformUtils;
+import com.belman.infrastructure.PlatformUtils;
 import com.belman.domain.services.CameraService;
 
 /**

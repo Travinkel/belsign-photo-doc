@@ -1,8 +1,7 @@
 package com.belman.domain.rbac;
 
-import com.belman.backbone.core.base.BaseService;
-import com.belman.backbone.core.di.Inject;
-import com.belman.domain.aggregates.User;
+import com.belman.presentation.core.BaseService;
+import com.belman.application.core.Inject;
 import com.belman.domain.services.AuthenticationService;
 
 /**

@@ -1,34 +1,25 @@
 package com.belman.presentation.views.photoupload;
 
-import com.belman.backbone.core.base.BaseController;
-import com.belman.backbone.core.navigation.Router;
-import com.belman.backbone.core.util.PlatformUtils;
+import com.belman.presentation.core.BaseController;
+import com.belman.presentation.navigation.Router;
+import com.belman.domain.aggregates.User;
 import com.belman.domain.entities.PhotoDocument;
 import com.belman.domain.services.CameraService;
 import com.belman.infrastructure.service.CameraServiceFactory;
+import com.belman.infrastructure.service.SessionManager;
 import com.belman.presentation.components.TouchFriendlyDialog;
-import com.belman.presentation.views.main.MainView;
-import com.belman.presentation.views.photoupload.TouchFriendlyPhotoListCell;
+import com.belman.presentation.views.qadashboard.QADashboardView;
+import com.belman.presentation.views.usermanagement.UserManagementView;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
-import javafx.stage.FileChooser;
 
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Controller for the photo upload view.
@@ -304,10 +295,32 @@ public class PhotoUploadViewController extends BaseController<PhotoUploadViewMod
 
     /**
      * Handles the back button action.
+     * Navigates to the appropriate view based on the user's role.
      */
     @FXML
     private void handleBack(ActionEvent event) {
-        Router.navigateTo(MainView.class);
+        // Get the current user and check their role
+        SessionManager sessionManager = SessionManager.getInstance();
+        if (sessionManager != null && sessionManager.isLoggedIn()) {
+            User user = sessionManager.getCurrentUser().orElse(null);
+            if (user != null) {
+                // Navigate to the appropriate view based on the user's role
+                if (user.getRoles().contains(User.Role.ADMIN)) {
+                    Router.navigateTo(UserManagementView.class);
+                } else if (user.getRoles().contains(User.Role.QA)) {
+                    Router.navigateTo(QADashboardView.class);
+                } else if (user.getRoles().contains(User.Role.PRODUCTION)) {
+                    Router.navigateTo(PhotoUploadView.class);
+                } else {
+                    // Fallback to PhotoUploadView if no specific role is found
+                    Router.navigateTo(PhotoUploadView.class);
+                }
+                return;
+            }
+        }
+
+        // Fallback to PhotoUploadView if no user is logged in or if an error occurs
+        Router.navigateTo(PhotoUploadView.class);
     }
 
     /**

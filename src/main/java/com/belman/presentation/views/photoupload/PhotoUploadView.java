@@ -1,6 +1,9 @@
 package com.belman.presentation.views.photoupload;
 
-import com.belman.backbone.core.base.BaseView;
+import com.belman.presentation.core.BaseView;
+import com.belman.presentation.navigation.Router;
+import com.gluonhq.charm.glisten.control.AppBar;
+import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 
 /**
  * View for uploading photos to orders.
@@ -8,6 +11,11 @@ import com.belman.backbone.core.base.BaseView;
  * and upload multiple pictures at once.
  */
 public class PhotoUploadView extends BaseView<PhotoUploadViewModel> {
-    // This class is intentionally left as a placeholder.
-    // The actual implementation is in the FXML file and controller.
+
+    @Override
+    public void updateAppBar(AppBar appBar) {
+        appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> Router.navigateBack()));
+        appBar.setTitleText("Photo Upload");
+        appBar.getActionItems().add(MaterialDesignIcon.POWER_SETTINGS_NEW.button(e -> getViewModel().logout()));
+    }
 }

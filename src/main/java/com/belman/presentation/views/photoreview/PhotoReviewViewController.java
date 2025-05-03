@@ -1,10 +1,14 @@
 package com.belman.presentation.views.photoreview;
 
-import com.belman.backbone.core.base.BaseController;
-import com.belman.backbone.core.navigation.Router;
+import com.belman.presentation.core.BaseController;
+import com.belman.presentation.navigation.Router;
+import com.belman.domain.aggregates.User;
 import com.belman.domain.entities.PhotoDocument;
+import com.belman.infrastructure.service.SessionManager;
 import com.belman.presentation.components.TouchFriendlyDialog;
-import com.belman.presentation.views.main.MainView;
+import com.belman.presentation.views.photoupload.PhotoUploadView;
+import com.belman.presentation.views.qadashboard.QADashboardView;
+import com.belman.presentation.views.usermanagement.UserManagementView;
 import com.belman.presentation.views.photoupload.TouchFriendlyPhotoListCell;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
@@ -156,10 +160,32 @@ public class PhotoReviewViewController extends BaseController<PhotoReviewViewMod
 
     /**
      * Handles the back button action.
+     * Navigates to the appropriate view based on the user's role.
      */
     @FXML
     private void handleBack(ActionEvent event) {
-        Router.navigateTo(MainView.class);
+        // Get the current user and check their role
+        SessionManager sessionManager = SessionManager.getInstance();
+        if (sessionManager != null && sessionManager.isLoggedIn()) {
+            User user = sessionManager.getCurrentUser().orElse(null);
+            if (user != null) {
+                // Navigate to the appropriate view based on the user's role
+                if (user.getRoles().contains(User.Role.ADMIN)) {
+                    Router.navigateTo(UserManagementView.class);
+                } else if (user.getRoles().contains(User.Role.QA)) {
+                    Router.navigateTo(QADashboardView.class);
+                } else if (user.getRoles().contains(User.Role.PRODUCTION)) {
+                    Router.navigateTo(PhotoUploadView.class);
+                } else {
+                    // Fallback to QADashboardView if no specific role is found
+                    Router.navigateTo(QADashboardView.class);
+                }
+                return;
+            }
+        }
+
+        // Fallback to QADashboardView if no user is logged in or if an error occurs
+        Router.navigateTo(QADashboardView.class);
     }
 
     /**

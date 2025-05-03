@@ -1,9 +1,9 @@
 package com.belman.unit.backbone.di;
 
-import com.belman.backbone.core.base.BaseService;
-import com.belman.backbone.core.di.Inject;
-import com.belman.backbone.core.di.ServiceLocator;
-import com.belman.backbone.core.di.ServiceRegistry;
+import com.belman.presentation.core.BaseService;
+import com.belman.application.core.Inject;
+import com.belman.application.core.ServiceLocator;
+import com.belman.application.core.ServiceRegistry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
