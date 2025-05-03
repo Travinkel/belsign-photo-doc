@@ -7,6 +7,7 @@ import com.belman.presentation.core.BaseViewModel;
 import com.belman.domain.shared.DomainEvent;
 import com.belman.domain.shared.ViewHiddenEvent;
 import com.belman.domain.shared.ViewShownEvent;
+import com.belman.domain.shared.ApplicationStateEvent.ApplicationState;
 import com.belman.infrastructure.EmojiLogger;
 import com.gluonhq.attach.lifecycle.LifecycleEvent;
 import com.gluonhq.attach.lifecycle.LifecycleService;
@@ -277,13 +278,39 @@ public class GluonLifecycleManager {
     public static void initialize() {
         logger.info("Initializing GluonLifecycleManager");
 
-        // Register default lifecycle handlers
+        // Initialize the ApplicationStateManager
+        ApplicationStateManager.initialize();
+
+        // Register lifecycle handlers for all relevant lifecycle events
         registerLifecycleHandler(LifecycleEvent.PAUSE, () -> {
             logger.info("Application paused");
+            ApplicationStateManager.transitionTo(ApplicationState.PAUSED);
         });
 
         registerLifecycleHandler(LifecycleEvent.RESUME, () -> {
             logger.info("Application resumed");
+            ApplicationStateManager.transitionTo(ApplicationState.ACTIVE);
+        });
+
+        // Note: Gluon Attach LifecycleService only supports PAUSE and RESUME events
+        // For more comprehensive lifecycle management, we use these events to infer other states
+        // When the app is paused, we also register a background task to run after a delay
+        ApplicationStateManager.registerBackgroundTask(() -> {
+            logger.debug("Performing background cleanup");
+            // Release non-essential resources when going to background
+            System.gc(); // Suggest garbage collection
+        });
+
+        // Register default foreground tasks for resource reinitialization
+        ApplicationStateManager.registerForegroundTask(() -> {
+            logger.debug("Performing foreground initialization");
+            // Reinitialize resources when coming to foreground
+        });
+
+        // Register default shutdown tasks for final cleanup
+        ApplicationStateManager.registerShutdownTask(() -> {
+            logger.debug("Performing shutdown cleanup");
+            // Release all resources when shutting down
         });
     }
 
@@ -303,6 +330,15 @@ public class GluonLifecycleManager {
 
         // Initialize basic lifecycle handlers
         initialize();
+
+        // Transition the application to the ACTIVE state
+        ApplicationStateManager.transitionTo(ApplicationState.ACTIVE);
+
+        // Register a shutdown hook to handle application termination
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            logger.info("Application shutdown hook triggered");
+            ApplicationStateManager.transitionTo(ApplicationState.STOPPING);
+        }));
 
         // Note: Views will register themselves with GluonLifecycleManager during construction
         logger.info("GluonLifecycleManager initialized. Views will register themselves when created.");
