@@ -136,17 +136,17 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
                 if (usernameStr.length() < 3 || !usernameStr.matches("[a-zA-Z0-9_]+")) {
                     // Username is likely invalid
                     logger.warn("Login failed: User not found: {}", usernameStr);
-                    errorMessage.set("User not found");
+                    errorMessage.set("User not found. Please check your username.");
                 } else {
-                    // Username looks valid, so password is likely incorrect
-                    logger.warn("Login failed: Invalid password for user: {}", usernameStr);
-                    errorMessage.set("Invalid password");
+                    // Username looks valid, so password is likely incorrect or account is locked
+                    logger.warn("Login failed: Invalid password or account locked for user: {}", usernameStr);
+                    errorMessage.set("Login failed. This could be due to an incorrect password or your account may be locked due to too many failed attempts. Please try again later or contact an administrator.");
                 }
             }
         } catch (Exception e) {
             // Handle any exceptions
             logger.error("Exception during login for user: {}", username.get(), e);
-            errorMessage.set("An error occurred: " + e.getMessage());
+            errorMessage.set("An error occurred during login. Please try again later.");
         } finally {
             // Clear login in progress
             loginInProgress.set(false);

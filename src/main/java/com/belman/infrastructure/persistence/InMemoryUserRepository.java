@@ -34,7 +34,7 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     private void createDefaultUsers() {
-        // Create admin user
+        // Create admin user with both old and new credentials
         User adminUser = new User(
             UserId.newId(),
             new Username("admin"),
@@ -43,6 +43,16 @@ public class InMemoryUserRepository implements UserRepository {
             new EmailAddress("admin@belman.com")
         );
         adminUser.addRole(User.Role.ADMIN);
+
+        // Create admin user with password123 (for Android compatibility)
+        User adminUser2 = new User(
+            UserId.newId(),
+            new Username("admin"),
+            HashedPassword.fromPlainText("password123"),
+            new PersonName("Admin", "User"),
+            new EmailAddress("admin@belman.com")
+        );
+        adminUser2.addRole(User.Role.ADMIN);
 
         // Create production user
         User productionUser = new User(
@@ -54,7 +64,7 @@ public class InMemoryUserRepository implements UserRepository {
         );
         productionUser.addRole(User.Role.PRODUCTION);
 
-        // Create QA user
+        // Create QA user with both usernames
         User qaUser = new User(
             UserId.newId(),
             new Username("qa"),
@@ -64,10 +74,22 @@ public class InMemoryUserRepository implements UserRepository {
         );
         qaUser.addRole(User.Role.QA);
 
+        // Create QA user with qa_user username (for Android compatibility)
+        User qaUser2 = new User(
+            UserId.newId(),
+            new Username("qa_user"),
+            HashedPassword.fromPlainText("qa"),
+            new PersonName("QA", "User"),
+            new EmailAddress("qa_user@belman.com")
+        );
+        qaUser2.addRole(User.Role.QA);
+
         // Save users
         save(adminUser);
+        save(adminUser2);
         save(productionUser);
         save(qaUser);
+        save(qaUser2);
     }
 
     @Override

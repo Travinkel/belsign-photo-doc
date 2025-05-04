@@ -11,6 +11,8 @@ import com.belman.domain.services.AuthenticationService;
 import com.belman.infrastructure.persistence.InMemoryCustomerRepository;
 import com.belman.infrastructure.persistence.InMemoryOrderRepository;
 import com.belman.infrastructure.persistence.InMemoryUserRepository;
+import com.belman.infrastructure.persistence.SqlCustomerRepository;
+import com.belman.infrastructure.persistence.SqlOrderRepository;
 import com.belman.infrastructure.persistence.SqlUserRepository;
 import com.belman.infrastructure.service.DefaultAuthenticationService;
 import com.belman.infrastructure.service.DefaultPhotoService;
@@ -18,6 +20,7 @@ import com.belman.infrastructure.service.SessionManager;
 import com.belman.domain.services.PhotoService;
 
 import javax.sql.DataSource;
+import java.lang.reflect.Constructor;
 
 /**
  * Initializes the application's services and repositories.
@@ -56,48 +59,45 @@ public class ApplicationInitializer {
             CustomerRepository customerRepository;
             logger.debug("Creating repositories");
 
-            // Try to use SQL-based repository if database is available
+            // Try to use SQL-based repositories if database is available
             DataSource dataSource = DatabaseConfig.getDataSource();
             if (dataSource != null) {
                 try {
-                    logger.database("Creating SQL-based UserRepository");
-                    userRepository = new SqlUserRepository(dataSource);
-                    // Register the UserRepository with the ServiceRegistry
+                    // Initialize UserRepository - try SQL implementation first
+                    userRepository = createRepository(UserRepository.class, "SqlUserRepository", dataSource, InMemoryUserRepository.class);
                     ServiceRegistry.registerService(userRepository);
-                    logger.success("Using SQL-based UserRepository");
 
-                    logger.database("Creating in-memory OrderRepository as no SQL implementation exists yet");
-                    orderRepository = new InMemoryOrderRepository();
+                    // Initialize OrderRepository - try SQL implementation first
+                    orderRepository = createRepository(OrderRepository.class, "SqlOrderRepository", dataSource, InMemoryOrderRepository.class);
                     ServiceRegistry.registerService(orderRepository);
-                    logger.success("Using in-memory OrderRepository");
 
-                    // Initialize CustomerRepository
-                    logger.database("Creating in-memory CustomerRepository as no SQL implementation exists yet");
-                    customerRepository = new InMemoryCustomerRepository();
+                    // Initialize CustomerRepository - try SQL implementation first
+                    customerRepository = createRepository(CustomerRepository.class, "SqlCustomerRepository", dataSource, InMemoryCustomerRepository.class);
                     ServiceRegistry.registerService(customerRepository);
-                    logger.success("Using in-memory CustomerRepository");
 
                     // Initialize PhotoService
                     logger.database("Creating DefaultPhotoService");
                     PhotoService photoService = new DefaultPhotoService(orderRepository, PHOTO_STORAGE_DIRECTORY);
                     ServiceRegistry.registerService(photoService);
                     logger.success("Using DefaultPhotoService");
-
                 } catch (Exception e) {
-                    // Fall back to in-memory repository if there's an error with the SQL repository
-                    logger.warn("Failed to initialize SQL-based UserRepository, falling back to in-memory repository", e);
+                    // Fall back to in-memory repositories if there's an error
+                    logger.warn("Failed to initialize repositories, falling back to in-memory repositories", e);
+
+                    // Initialize UserRepository as fallback
                     logger.database("Creating in-memory UserRepository as fallback");
                     userRepository = new InMemoryUserRepository();
-                    // Register the UserRepository with the ServiceRegistry
                     ServiceRegistry.registerService(userRepository);
                     logger.info("Using in-memory UserRepository as fallback");
 
                     // Initialize OrderRepository as fallback
+                    logger.database("Creating in-memory OrderRepository as fallback");
                     orderRepository = new InMemoryOrderRepository();
                     ServiceRegistry.registerService(orderRepository);
                     logger.info("Using in-memory OrderRepository as fallback");
 
                     // Initialize CustomerRepository as fallback
+                    logger.database("Creating in-memory CustomerRepository as fallback");
                     customerRepository = new InMemoryCustomerRepository();
                     ServiceRegistry.registerService(customerRepository);
                     logger.info("Using in-memory CustomerRepository as fallback");
@@ -107,7 +107,6 @@ public class ApplicationInitializer {
                     PhotoService photoService = new DefaultPhotoService(orderRepository, PHOTO_STORAGE_DIRECTORY);
                     ServiceRegistry.registerService(photoService);
                     logger.info("Using DefaultPhotoService as fallback");
-
                 }
             } else {
                 // Fall back to in-memory repositories if database is not available
@@ -200,5 +199,58 @@ public class ApplicationInitializer {
             logger.failure("Failed to shut down application properly");
             logger.error("Shutdown error details", e);
         }
+    }
+
+    /**
+     * Creates a repository instance, trying to use a SQL implementation first if available,
+     * and falling back to an in-memory implementation if the SQL implementation is not available.
+     *
+     * @param <T> the repository interface type
+     * @param repositoryInterface the repository interface class
+     * @param sqlImplName the name of the SQL implementation class
+     * @param dataSource the DataSource to pass to the SQL implementation constructor
+     * @param inMemoryImplClass the in-memory implementation class to use as fallback
+     * @return a repository instance
+     * @throws Exception if an error occurs while creating the repository
+     */
+    @SuppressWarnings("unchecked")
+    private static <T> T createRepository(Class<T> repositoryInterface, String sqlImplName, DataSource dataSource, 
+                                         Class<? extends T> inMemoryImplClass) throws Exception {
+        // Try to create SQL implementation first
+        try {
+            // Construct the full class name for the SQL implementation
+            String sqlImplClassName = "com.belman.infrastructure.persistence." + sqlImplName;
+
+            // Try to load the SQL implementation class
+            Class<?> sqlImplClass = Class.forName(sqlImplClassName);
+
+            // Check if the class implements the repository interface
+            if (repositoryInterface.isAssignableFrom(sqlImplClass)) {
+                logger.database("Creating SQL-based " + repositoryInterface.getSimpleName());
+
+                // Find constructor that takes a DataSource
+                Constructor<?> constructor = sqlImplClass.getConstructor(DataSource.class);
+
+                // Create instance
+                T repository = (T) constructor.newInstance(dataSource);
+
+                logger.success("Using SQL-based " + repositoryInterface.getSimpleName());
+                return repository;
+            } else {
+                logger.warn("Class " + sqlImplClassName + " does not implement " + repositoryInterface.getSimpleName());
+            }
+        } catch (ClassNotFoundException e) {
+            // SQL implementation not found, this is expected for repositories that don't have SQL implementations yet
+            logger.info("SQL implementation " + sqlImplName + " not found, using in-memory implementation");
+        } catch (Exception e) {
+            // Other error occurred while trying to create SQL implementation
+            logger.warn("Failed to create SQL-based " + repositoryInterface.getSimpleName() + ", falling back to in-memory implementation", e);
+        }
+
+        // Fall back to in-memory implementation
+        logger.database("Creating in-memory " + repositoryInterface.getSimpleName());
+        T repository = inMemoryImplClass.getDeclaredConstructor().newInstance();
+        logger.info("Using in-memory " + repositoryInterface.getSimpleName());
+        return repository;
     }
 }

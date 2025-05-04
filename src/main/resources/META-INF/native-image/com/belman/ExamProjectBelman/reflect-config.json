@@ -1,5 +1,12 @@
 [
   {
+    "name": "java.lang.Object",
+    "allPublicClasses": true,
+    "allDeclaredConstructors": true,
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
     "name": "javafx.scene.control.Label",
     "methods": [
       { "name": "<init>", "parameterTypes": [] }
@@ -232,8 +239,9 @@
   {
     "name": "com.belman.presentation.views.login.LoginViewController",
     "allDeclaredConstructors": true,
-    "allDeclaredFields": true,
-    "allDeclaredMethods": true
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
   },
   {
     "name": "com.belman.presentation.views.admin.AdminViewController",
