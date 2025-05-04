@@ -230,6 +230,60 @@
     "allDeclaredMethods": true
   },
   {
+    "name": "com.belman.presentation.views.login.LoginViewController",
+    "allDeclaredConstructors": true,
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.belman.presentation.views.admin.AdminViewController",
+    "allDeclaredConstructors": true,
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.belman.presentation.views.main.MainViewController",
+    "allDeclaredConstructors": true,
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.belman.presentation.views.ordergallery.OrderGalleryViewController",
+    "allDeclaredConstructors": true,
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.belman.presentation.views.photoreview.PhotoReviewViewController",
+    "allDeclaredConstructors": true,
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.belman.presentation.views.photoupload.PhotoUploadViewController",
+    "allDeclaredConstructors": true,
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.belman.presentation.views.qadashboard.QADashboardViewController",
+    "allDeclaredConstructors": true,
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.belman.presentation.views.reportpreview.ReportPreviewViewController",
+    "allDeclaredConstructors": true,
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.belman.presentation.views.usermanagement.UserManagementViewController",
+    "allDeclaredConstructors": true,
+    "allDeclaredFields": true,
+    "allDeclaredMethods": true
+  },
+  {
     "name": "com.belman.infrastructure.service.SmtpEmailService",
     "methods": [
       { "name": "<init>", "parameterTypes": ["java.lang.String", "int", "java.lang.String", "java.lang.String", "java.lang.String"] },
