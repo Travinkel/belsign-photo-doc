@@ -207,6 +207,7 @@
                     <include>**/*.png</include>
                     <include>**/*.fxml</include>
                     <include>**/*.properties</include>
+                    <include>META-INF/native-image/**</include>
                 </includes>
             </resource>
 
