@@ -63,3 +63,53 @@ Thumbs.db
 # Logs
 *.log
 hs_err_pid*.log
+
+# Build outputs
+/target/
+/build/
+/*.apk
+
+# Maven wrapper JAR (keep)
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE configs
+.idea/
+*.iml
+*.iws
+*.ipr
+.junie/
+.qodo/
+
+# VSCode
+.vscode/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+hs_err_pid*.log
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Unison sync junk
+*.prf
+*.prf~
+*.unison
+
+# GraalVM + Gluon native image
+**/gluonfx/**/gvm/
+**/gluonfx/**/tmp/
+**/gluonfx/**/substrate/
+src/main/resources/META-INF/native-image/
