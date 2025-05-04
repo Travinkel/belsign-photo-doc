@@ -109,17 +109,26 @@ The following changes have been implemented:
 4. Renamed `Inject` to `DependencyInject`.
 5. Moved `QCReportViewModel` from application.qcreport to presentation.views.qcreport.
 6. Created a new `RoleBasedAccessManager` class in the domain.rbac package.
+7. Updated `AdminService` to use the new `BaseService` from the application layer.
+8. Created a `LoggerFactory` interface in the domain.services package.
+9. Created a `DomainService` base class in the domain layer.
+10. Created an `EmojiLoggerFactory` implementation in the infrastructure.logging package.
+11. Updated `RoleBasedAccessManager` to use `DomainService` instead of `BaseService`.
+12. Created an `InfrastructureService` base class in the infrastructure layer.
+13. Updated `SecureDatabaseConfig` to be a utility class that doesn't extend any base class.
+14. Updated `SecureConfigStorage` to use `InfrastructureService` instead of `BaseService`.
+15. Updated `CommandManager` to use the `BaseService` from the application.core package.
+16. Updated `SessionManager` to use the `BaseService` from the application.core package.
 
 ## Next Steps
 
 To fully address the architectural issues, the following steps are needed:
 
-1. Update all classes that extend `BaseService` from the presentation layer to use the new `BaseService` in the application layer.
-2. Update all domain classes to use the `Logger` interface instead of directly using `EmojiLogger`.
-3. Create a `DomainService` base class in the domain layer and update domain classes to use it.
-4. Update all application classes to avoid dependencies on the presentation layer.
-5. Update all infrastructure classes to avoid dependencies on the presentation layer.
-6. Run the ArchUnit tests again to verify that the architectural violations have been fixed.
+1. Update all remaining classes that extend `BaseService` from the presentation layer to use the new `BaseService` in the application layer.
+2. Update all domain classes to use the `DomainService` base class instead of `BaseService`.
+3. Update all infrastructure classes to use the `InfrastructureService` base class instead of `BaseService`.
+4. Initialize the `LoggerFactory` in the `DomainService` class during application startup.
+5. Run the ArchUnit tests again to verify that the architectural violations have been fixed.
 
 ## Conclusion
 

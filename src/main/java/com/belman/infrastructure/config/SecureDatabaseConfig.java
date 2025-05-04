@@ -1,21 +1,21 @@
 package com.belman.infrastructure.config;
 
-import com.belman.presentation.core.BaseService;
+import com.belman.domain.services.Logger;
+import com.belman.infrastructure.logging.EmojiLoggerFactory;
 import com.belman.infrastructure.security.SecureConfigStorage;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Secure configuration class for database connectivity.
  * Uses SecureConfigStorage to store and retrieve database credentials securely.
  * Sets up a connection pool using HikariCP and provides a DataSource.
+ * This is a utility class with static methods and should not be instantiated.
  */
-public class SecureDatabaseConfig extends BaseService {
-    private static final Logger LOGGER = Logger.getLogger(SecureDatabaseConfig.class.getName());
+public class SecureDatabaseConfig {
+    private static final Logger LOGGER = EmojiLoggerFactory.getInstance().getLogger(SecureDatabaseConfig.class);
     private static final String DB_PROPERTIES_FILE = "database.properties";
     private static HikariDataSource dataSource;
 
@@ -30,6 +30,13 @@ public class SecureDatabaseConfig extends BaseService {
     private static final String DB_POOL_CONNECTION_TIMEOUT_KEY = "db.pool.connectionTimeout";
 
     /**
+     * Private constructor to prevent instantiation.
+     */
+    private SecureDatabaseConfig() {
+        // Utility class should not be instantiated
+    }
+
+    /**
      * Initializes the database connection pool.
      * This method should be called during application startup.
      */
@@ -38,45 +45,45 @@ public class SecureDatabaseConfig extends BaseService {
             try {
                 // Get the secure config storage instance
                 SecureConfigStorage secureStorage = SecureConfigStorage.getInstance();
-                
+
                 // Check if secure storage has been initialized with database properties
                 if (secureStorage.getValue(DB_URL_KEY) == null) {
                     // Import database properties from the properties file
                     boolean imported = secureStorage.importFromProperties(DB_PROPERTIES_FILE);
                     if (!imported) {
-                        LOGGER.severe("Failed to import database properties from " + DB_PROPERTIES_FILE);
+                        LOGGER.error("Failed to import database properties from " + DB_PROPERTIES_FILE);
                         return;
                     }
                     LOGGER.info("Database properties imported to secure storage");
                 }
-                
+
                 // Configure HikariCP with secure properties
                 HikariConfig config = new HikariConfig();
-                
+
                 config.setJdbcUrl(secureStorage.getValue(DB_URL_KEY));
                 config.setUsername(secureStorage.getValue(DB_USERNAME_KEY));
                 config.setPassword(secureStorage.getValue(DB_PASSWORD_KEY));
                 config.setDriverClassName(secureStorage.getValue(DB_DRIVER_KEY));
-                
+
                 // Connection pool settings
                 config.setMaximumPoolSize(Integer.parseInt(secureStorage.getValue(DB_POOL_MAX_SIZE_KEY, "10")));
                 config.setMinimumIdle(Integer.parseInt(secureStorage.getValue(DB_POOL_MIN_IDLE_KEY, "5")));
                 config.setIdleTimeout(Long.parseLong(secureStorage.getValue(DB_POOL_IDLE_TIMEOUT_KEY, "30000")));
                 config.setConnectionTimeout(Long.parseLong(secureStorage.getValue(DB_POOL_CONNECTION_TIMEOUT_KEY, "30000")));
-                
+
                 // Set pool name for easier debugging
                 config.setPoolName("BelSignSecureHikariPool");
-                
+
                 dataSource = new HikariDataSource(config);
                 LOGGER.info("Secure database connection pool initialized successfully");
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Failed to initialize secure database connection pool", e);
+                LOGGER.error("Failed to initialize secure database connection pool", e);
                 // Don't throw an exception, just log it and return
                 // The application will fall back to using in-memory repositories
             }
         }
     }
-    
+
     /**
      * Gets the DataSource for database connections.
      * 
@@ -85,7 +92,7 @@ public class SecureDatabaseConfig extends BaseService {
     public static DataSource getDataSource() {
         return dataSource;
     }
-    
+
     /**
      * Closes the database connection pool.
      * This method should be called during application shutdown.
@@ -98,11 +105,11 @@ public class SecureDatabaseConfig extends BaseService {
                     LOGGER.info("Secure database connection pool closed");
                 }
             } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "Error closing secure database connection pool", e);
+                LOGGER.warn("Error closing secure database connection pool", e);
             }
         }
     }
-    
+
     /**
      * Updates a database configuration value in secure storage.
      * 
@@ -114,20 +121,20 @@ public class SecureDatabaseConfig extends BaseService {
         try {
             SecureConfigStorage secureStorage = SecureConfigStorage.getInstance();
             boolean stored = secureStorage.storeValue(key, value);
-            
+
             if (stored) {
                 LOGGER.info("Database configuration value updated: " + key);
                 return true;
             } else {
-                LOGGER.warning("Failed to update database configuration value: " + key);
+                LOGGER.warn("Failed to update database configuration value: " + key);
                 return false;
             }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error updating database configuration value: " + key, e);
+            LOGGER.error("Error updating database configuration value: " + key, e);
             return false;
         }
     }
-    
+
     /**
      * Reinitializes the database connection pool with updated configuration.
      * This method should be called after updating configuration values.
@@ -138,16 +145,16 @@ public class SecureDatabaseConfig extends BaseService {
         try {
             // Close existing connection pool if it exists
             shutdown();
-            
+
             // Reset dataSource to null to force reinitialization
             dataSource = null;
-            
+
             // Initialize with updated configuration
             initialize();
-            
+
             return dataSource != null;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to reinitialize secure database connection pool", e);
+            LOGGER.error("Failed to reinitialize secure database connection pool", e);
             return false;
         }
     }

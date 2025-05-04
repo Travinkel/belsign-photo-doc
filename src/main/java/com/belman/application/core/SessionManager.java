@@ -1,6 +1,7 @@
 package com.belman.application.core;
 
-import com.belman.presentation.core.BaseService;
+// Using the BaseService from the application.core package
+// This class is already in the application.core package, so no import needed
 import com.belman.domain.events.DomainEventPublisher;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.events.UserLoggedInEvent;

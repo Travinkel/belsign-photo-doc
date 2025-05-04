@@ -1,6 +1,6 @@
 package com.belman.infrastructure.security;
 
-import com.belman.presentation.core.BaseService;
+import com.belman.infrastructure.core.InfrastructureService;
 import com.belman.infrastructure.ErrorHandler;
 
 import javax.crypto.Cipher;
@@ -27,7 +27,7 @@ import java.util.Properties;
  * Provides secure storage for sensitive configuration data such as database credentials.
  * Uses AES-GCM encryption to protect data at rest.
  */
-public class SecureConfigStorage extends BaseService {
+public class SecureConfigStorage extends InfrastructureService {
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final int GCM_TAG_LENGTH = 128;
     private static final int GCM_IV_LENGTH = 12;
