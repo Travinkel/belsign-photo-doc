@@ -5,7 +5,7 @@ import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.belman.infrastructure.logging.EmojiLogger;
-import com.belman.application.api.CoreAPI;
+import com.belman.application.core.StateManager;
 import com.belman.presentation.core.SlideDirection;
 import com.belman.presentation.core.SlideViewTransition;
 import com.belman.presentation.core.ViewTransition;
@@ -177,8 +177,8 @@ public class Router {
 
         logger.debug("Navigating to: {} with {} parameters", viewClass.getSimpleName(), parameters.size());
 
-        // Store route parameters in CoreAPI state
-        CoreAPI.setState("routeParameters", parameters);
+        // Store route parameters in state
+        StateManager.getInstance().setState("routeParameters", parameters);
 
         // Check if there's a route guard for this view
         if (routeGuards.containsKey(viewClass)) {
@@ -314,7 +314,7 @@ public class Router {
      */
     @SuppressWarnings("unchecked")
     public static <T> T getParameter(String key) {
-        Map<String, Object> parameters = CoreAPI.getState("routeParameters");
+        Map<String, Object> parameters = StateManager.getInstance().getState("routeParameters");
         if (parameters != null) {
             return (T) parameters.get(key);
         }

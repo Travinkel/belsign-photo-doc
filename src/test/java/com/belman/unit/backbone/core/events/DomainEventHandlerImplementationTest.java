@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests for the DomainEventHandlerImplementation class.
@@ -21,6 +22,17 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DomainEventHandlerImplementationTest {
+
+    @Mock
+    private Logger mockLogger;
+
+    private DomainEventHandlerImplementation handlerImplementation;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        handlerImplementation = new DomainEventHandlerImplementation(mockLogger);
+    }
 
     /**
      * Test event class for testing the handler implementation.
@@ -46,7 +58,7 @@ public class DomainEventHandlerImplementationTest {
 
         // Act - this should not throw
         assertDoesNotThrow(() -> {
-            DomainEventHandlerImplementation.handleEvent(testEvent, handlerName);
+            handlerImplementation.handleEvent(testEvent, handlerName);
         });
 
         // We can't easily verify the logging, but we can verify that the method doesn't throw
@@ -59,7 +71,7 @@ public class DomainEventHandlerImplementationTest {
 
         // Act - this should not throw
         assertDoesNotThrow(() -> {
-            DomainEventHandlerImplementation.handleEvent(null, handlerName);
+            handlerImplementation.handleEvent(null, handlerName);
         });
 
         // We can't easily verify the logging, but we can verify that the method doesn't throw
@@ -82,7 +94,7 @@ public class DomainEventHandlerImplementationTest {
 
         // Act
         java.util.function.Consumer<Object> handler = 
-            DomainEventHandlerImplementation.createHandler("TestHandler", handlerFunction);
+            handlerImplementation.createHandler("TestHandler", handlerFunction);
 
         // Call the handler with an event
         handler.accept(testEvent);
@@ -104,7 +116,7 @@ public class DomainEventHandlerImplementationTest {
 
         // Act
         java.util.function.Consumer<Object> handler = 
-            DomainEventHandlerImplementation.createHandler("TestHandler", handlerFunction);
+            handlerImplementation.createHandler("TestHandler", handlerFunction);
 
         // Call the handler with a null event
         handler.accept(null);
@@ -120,7 +132,7 @@ public class DomainEventHandlerImplementationTest {
 
         // Act
         java.util.function.Consumer<Object> handler = 
-            DomainEventHandlerImplementation.createHandler("TestHandler", null);
+            handlerImplementation.createHandler("TestHandler", null);
 
         // Call the handler with an event - should not throw
         assertDoesNotThrow(() -> {

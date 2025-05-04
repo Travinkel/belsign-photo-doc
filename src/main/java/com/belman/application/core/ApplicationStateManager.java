@@ -1,6 +1,6 @@
 package com.belman.application.core;
 
-import com.belman.application.api.CoreAPI;
+import com.belman.application.core.EventManager;
 import com.belman.domain.shared.ApplicationBackgroundedEvent;
 import com.belman.domain.shared.ApplicationPausedEvent;
 import com.belman.domain.shared.ApplicationResumedEvent;
@@ -57,7 +57,7 @@ public class ApplicationStateManager {
         executeStateSpecificTasks(newState);
 
         // Publish the event
-        CoreAPI.publishEvent(event);
+        EventManager.getInstance().publishEvent(event);
 
         // Notify listeners
         notifyStateChangeListeners(event);

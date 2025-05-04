@@ -1,6 +1,6 @@
 package com.belman.application.core;
 
-import com.belman.application.api.CoreAPI;
+import com.belman.application.core.EventManager;
 import com.belman.presentation.core.BaseController;
 import com.belman.presentation.core.BaseView;
 import com.belman.presentation.core.BaseViewModel;
@@ -60,7 +60,7 @@ public class GluonLifecycleManager {
         registerLifecycleHandler(lifecycleEvent, () -> {
             logger.debug("Lifecycle event triggered: {}, publishing domain event: {}", 
                 lifecycleEvent, domainEvent.getEventType());
-            CoreAPI.publishEvent(domainEvent); // Use CoreAPI for publishing events
+            EventManager.getInstance().publishEvent(domainEvent); // Publish event using EventManager
         });
     }
 
@@ -73,7 +73,7 @@ public class GluonLifecycleManager {
      */
     public static <T extends DomainEvent> void registerDomainEventHandler(Class<T> eventType, Consumer<T> handler) {
         logger.debug("Registering domain event handler for event type: {}", eventType.getSimpleName());
-        CoreAPI.registerEventHandler(eventType, handler::accept); // Use CoreAPI for event handling
+        EventManager.getInstance().registerEventHandler(eventType, handler::accept); // Register event handler using EventManager
     }
 
     /**
@@ -201,7 +201,7 @@ public class GluonLifecycleManager {
         // Publish a ViewShownEvent
         try {
             ViewShownEvent event = new ViewShownEvent(viewName);
-            CoreAPI.publishEvent(event);
+            EventManager.getInstance().publishEvent(event);
             logger.debug("Published ViewShownEvent for view: {}", viewName);
         } catch (Exception e) {
             logger.error("Error publishing ViewShownEvent: {}", e.getMessage(), e);
@@ -264,7 +264,7 @@ public class GluonLifecycleManager {
         // Publish a ViewHiddenEvent
         try {
             ViewHiddenEvent event = new ViewHiddenEvent(viewName);
-            CoreAPI.publishEvent(event);
+            EventManager.getInstance().publishEvent(event);
             logger.debug("Published ViewHiddenEvent for view: {}", viewName);
         } catch (Exception e) {
             logger.error("Error publishing ViewHiddenEvent: {}", e.getMessage(), e);

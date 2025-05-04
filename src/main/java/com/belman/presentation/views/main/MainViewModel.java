@@ -1,7 +1,7 @@
 package com.belman.presentation.views.main;
 
 
-import com.belman.application.api.CoreAPI;
+import com.belman.application.core.StateManager;
 import com.belman.presentation.core.BaseViewModel;
 import com.belman.infrastructure.logging.EmojiLogger;
 import com.belman.presentation.navigation.Router;
@@ -34,9 +34,9 @@ public class MainViewModel extends BaseViewModel<MainViewModel> {
     public void onShow() {
         logger.debug("MainViewModel.onShow() called");
         try {
-            // Update the app bar title using CoreAPI
+            // Update the app bar title using StateManager
             logger.debug("Setting app bar title to 'Main View'");
-            CoreAPI.setState("appBarTitle", "Main View");
+            StateManager.getInstance().setState("appBarTitle", "Main View");
 
             logger.debug("Calling updateWelcomeMessage()");
             updateWelcomeMessage();
