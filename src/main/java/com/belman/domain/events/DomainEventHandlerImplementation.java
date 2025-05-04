@@ -1,14 +1,22 @@
 package com.belman.domain.events;
 
-
-import com.belman.infrastructure.logging.EmojiLogger;
+import com.belman.domain.services.Logger;
 
 /**
  * Implementation of the domain event handler functionality.
  * This class provides methods for handling domain events.
  */
 public class DomainEventHandlerImplementation {
-    private static final EmojiLogger logger = EmojiLogger.getLogger(DomainEventHandlerImplementation.class);
+    private final Logger logger;
+
+    /**
+     * Creates a new DomainEventHandlerImplementation with the specified logger.
+     * 
+     * @param logger the logger to use
+     */
+    public DomainEventHandlerImplementation(Logger logger) {
+        this.logger = logger;
+    }
 
     /**
      * Handles a domain event.
@@ -16,7 +24,7 @@ public class DomainEventHandlerImplementation {
      * @param event the event to handle
      * @param handlerName the name of the handler
      */
-    public static void handleEvent(Object event, String handlerName) {
+    public void handleEvent(Object event, String handlerName) {
         if (event == null) {
             logger.warn("{}: Received null event", handlerName);
             return;
@@ -35,7 +43,7 @@ public class DomainEventHandlerImplementation {
      * @param handlerFunction the function to apply to the event
      * @return a function that logs and handles the event
      */
-    public static java.util.function.Consumer<Object> createHandler(
+    public java.util.function.Consumer<Object> createHandler(
             String handlerName, java.util.function.Consumer<Object> handlerFunction) {
 
         return event -> {

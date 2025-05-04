@@ -1,27 +1,14 @@
 package com.belman.domain.rbac;
 
-import com.belman.application.core.BaseService;
-import com.belman.application.core.Inject;
 import com.belman.domain.services.AuthenticationService;
 
 /**
  * Factory for creating role-based access control components.
- * This class is Gluon-aware and uses the backbone framework.
  */
-public class RoleBasedAccessControlFactory extends BaseService {
+public class RoleBasedAccessControlFactory {
 
-    @Inject
-    private AuthenticationService authenticationService;
-
-    @Inject
-    private AccessPolicyFactory accessPolicyFactory;
-
-    /**
-     * Creates a new RoleBasedAccessControlFactory.
-     */
-    public RoleBasedAccessControlFactory() {
-        // Default constructor for dependency injection
-    }
+    private final AuthenticationService authenticationService;
+    private final AccessPolicyFactory accessPolicyFactory;
 
     /**
      * Creates a new RoleBasedAccessControlFactory with the specified services.

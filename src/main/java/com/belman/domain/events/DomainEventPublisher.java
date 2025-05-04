@@ -1,6 +1,6 @@
 package com.belman.domain.events;
 
-import com.belman.infrastructure.logging.EmojiLogger;
+import com.belman.domain.services.Logger;
 import com.belman.domain.shared.DomainEvent;
 import com.belman.domain.shared.DomainEventHandler;
 
@@ -17,8 +17,8 @@ import java.util.concurrent.Executors;
  * It follows the publisher-subscriber pattern.
  */
 public class DomainEventPublisher {
-    private static DomainEventPublisher instance = new DomainEventPublisher(); // Remove `final` modifier
-    private static final EmojiLogger logger = EmojiLogger.getLogger(DomainEventPublisher.class);
+    private static DomainEventPublisher instance = new DomainEventPublisher();
+    private Logger logger;
 
     // Map of event types to handlers
     private final Map<Class<? extends DomainEvent>, List<DomainEventHandler<? extends DomainEvent>>> handlers;
@@ -30,6 +30,69 @@ public class DomainEventPublisher {
     private DomainEventPublisher() {
         this.handlers = new ConcurrentHashMap<>();
         this.executor = Executors.newCachedThreadPool();
+        this.logger = null; // Will be set by setLogger method
+    }
+
+    /**
+     * Sets the logger for this publisher.
+     * This method should be called before using the publisher.
+     * 
+     * @param logger the logger to use
+     */
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
+    /**
+     * Safely logs a message at the debug level.
+     * If the logger is not set, this method does nothing.
+     * 
+     * @param message the message to log
+     * @param args the arguments to the message
+     */
+    private void logDebug(String message, Object... args) {
+        if (logger != null) {
+            logger.debug(message, args);
+        }
+    }
+
+    /**
+     * Safely logs a message at the info level.
+     * If the logger is not set, this method does nothing.
+     * 
+     * @param message the message to log
+     * @param args the arguments to the message
+     */
+    private void logInfo(String message, Object... args) {
+        if (logger != null) {
+            logger.info(message, args);
+        }
+    }
+
+    /**
+     * Safely logs a message at the warn level.
+     * If the logger is not set, this method does nothing.
+     * 
+     * @param message the message to log
+     * @param args the arguments to the message
+     */
+    private void logWarn(String message, Object... args) {
+        if (logger != null) {
+            logger.warn(message, args);
+        }
+    }
+
+    /**
+     * Safely logs a message at the trace level.
+     * If the logger is not set, this method does nothing.
+     * 
+     * @param message the message to log
+     * @param args the arguments to the message
+     */
+    private void logTrace(String message, Object... args) {
+        if (logger != null) {
+            logger.trace(message, args);
+        }
     }
 
     /**
@@ -63,7 +126,7 @@ public class DomainEventPublisher {
      */
     @SuppressWarnings("unchecked")
     public <T extends DomainEvent> void register(Class<T> eventType, DomainEventHandler<T> handler) {
-        logger.debug("Registering handler {} for event type: {}", handler.getClass().getName(), eventType.getName());
+        logDebug("Registering handler {} for event type: {}", handler.getClass().getName(), eventType.getName());
         handlers.computeIfAbsent(eventType, k -> new ArrayList<>())
                 .add((DomainEventHandler<? extends DomainEvent>) handler);
     }
@@ -76,21 +139,21 @@ public class DomainEventPublisher {
      * @param handler the handler to unregister
      */
     public <T extends DomainEvent> void unregister(Class<T> eventType, DomainEventHandler<T> handler) {
-        logger.debug("Unregistering handler {} for event type: {}", handler.getClass().getName(), eventType.getName());
+        logDebug("Unregistering handler {} for event type: {}", handler.getClass().getName(), eventType.getName());
         if (handlers.containsKey(eventType)) {
             boolean removed = handlers.get(eventType).remove(handler);
             if (removed) {
-                logger.debug("Handler removed successfully");
+                logDebug("Handler removed successfully");
             } else {
-                logger.debug("Handler was not registered for this event type");
+                logDebug("Handler was not registered for this event type");
             }
 
             if (handlers.get(eventType).isEmpty()) {
-                logger.debug("No more handlers for event type: {}, removing event type", eventType.getName());
+                logDebug("No more handlers for event type: {}, removing event type", eventType.getName());
                 handlers.remove(eventType);
             }
         } else {
-            logger.debug("No handlers registered for event type: {}", eventType.getName());
+            logDebug("No handlers registered for event type: {}", eventType.getName());
         }
     }
 
@@ -102,20 +165,20 @@ public class DomainEventPublisher {
      */
     @SuppressWarnings("unchecked")
     public <T extends DomainEvent> void publish(T event) {
-        logger.debug("Publishing event: {} (ID: {})", event.getEventType(), event.getEventId());
+        logDebug("Publishing event: {} (ID: {})", event.getEventType(), event.getEventId());
 
         if (handlers.containsKey(event.getClass())) {
             List<DomainEventHandler<? extends DomainEvent>> eventHandlers = handlers.get(event.getClass());
-            logger.debug("Found {} handlers for event type: {}", eventHandlers.size(), event.getEventType());
+            logDebug("Found {} handlers for event type: {}", eventHandlers.size(), event.getEventType());
 
             for (DomainEventHandler<? extends DomainEvent> handler : eventHandlers) {
                 // Cast is safe because we only register handlers for the correct event type
                 DomainEventHandler<T> typedHandler = (DomainEventHandler<T>) handler;
-                logger.trace("Handling event with: {}", typedHandler.getClass().getName());
+                logTrace("Handling event with: {}", typedHandler.getClass().getName());
                 typedHandler.handle(event);
             }
         } else {
-            logger.debug("No handlers found for event type: {}", event.getEventType());
+            logDebug("No handlers found for event type: {}", event.getEventType());
         }
     }
 
@@ -126,7 +189,7 @@ public class DomainEventPublisher {
      * @param event the event to publish
      */
     public <T extends DomainEvent> void publishAsync(T event) {
-        logger.debug("Publishing event asynchronously: {} (ID: {})", event.getEventType(), event.getEventId());
+        logDebug("Publishing event asynchronously: {} (ID: {})", event.getEventType(), event.getEventId());
         executor.submit(() -> publish(event));
     }
 
@@ -135,11 +198,11 @@ public class DomainEventPublisher {
      * This should be called when the application is shutting down.
      */
     public void shutdown() {
-        logger.info("Shutting down DomainEventPublisher executor service");
+        logInfo("Shutting down DomainEventPublisher executor service");
         if (!executor.isShutdown()) {
             executor.shutdown();
         } else {
-            logger.warn("Executor service is already shut down");
+            logWarn("Executor service is already shut down");
         }
     }
 }

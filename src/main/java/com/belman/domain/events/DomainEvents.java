@@ -1,6 +1,6 @@
 package com.belman.domain.events;
 
-import com.belman.infrastructure.logging.EmojiLogger;
+import com.belman.domain.services.Logger;
 import com.belman.domain.shared.DomainEvent;
 import com.belman.domain.shared.DomainEventHandler;
 
@@ -14,7 +14,43 @@ import java.util.function.Supplier;
  * Provides a more fluent API for publishing events than using the DomainEventPublisher directly.
  */
 public class DomainEvents {
-    private static final EmojiLogger logger = EmojiLogger.getLogger(DomainEvents.class);
+    private static Logger logger;
+
+    /**
+     * Sets the logger for this class.
+     * This method should be called before using any methods in this class.
+     * 
+     * @param loggerInstance the logger to use
+     */
+    public static void setLogger(Logger loggerInstance) {
+        logger = loggerInstance;
+    }
+
+    /**
+     * Safely logs a message at the debug level.
+     * If the logger is not set, this method does nothing.
+     * 
+     * @param message the message to log
+     * @param args the arguments to the message
+     */
+    private static void logDebug(String message, Object... args) {
+        if (logger != null) {
+            logger.debug(message, args);
+        }
+    }
+
+    /**
+     * Safely logs a message at the warn level.
+     * If the logger is not set, this method does nothing.
+     * 
+     * @param message the message to log
+     * @param args the arguments to the message
+     */
+    private static void logWarn(String message, Object... args) {
+        if (logger != null) {
+            logger.warn(message, args);
+        }
+    }
 
     // Map to store handlers by consumer and event type
     private static final Map<Class<?>, Map<Consumer<?>, DomainEventHandler<?>>> handlerMap = new ConcurrentHashMap<>();
@@ -26,11 +62,11 @@ public class DomainEvents {
      */
     public static void publish(DomainEvent event) {
         if (event == null) {
-            logger.warn("Null event provided to publish");
+            logWarn("Null event provided to publish");
             return;
         }
 
-        logger.debug("Publishing event: {}", event.getEventType());
+        logDebug("Publishing event: {}", event.getEventType());
         DomainEventPublisher.getInstance().publish(event);
     }
 
@@ -41,11 +77,11 @@ public class DomainEvents {
      */
     public static void publishAsync(DomainEvent event) {
         if (event == null) {
-            logger.warn("Null event provided to publishAsync");
+            logWarn("Null event provided to publishAsync");
             return;
         }
 
-        logger.debug("Publishing event asynchronously: {}", event.getEventType());
+        logDebug("Publishing event asynchronously: {}", event.getEventType());
         DomainEventPublisher.getInstance().publishAsync(event);
     }
 
@@ -57,15 +93,15 @@ public class DomainEvents {
      */
     public static void publishIf(boolean condition, DomainEvent event) {
         if (event == null) {
-            logger.warn("Null event provided to publishIf");
+            logWarn("Null event provided to publishIf");
             return;
         }
 
         if (condition) {
-            logger.debug("Condition is true, publishing event: {}", event.getEventType());
+            logDebug("Condition is true, publishing event: {}", event.getEventType());
             DomainEventPublisher.getInstance().publish(event);
         } else {
-            logger.debug("Condition is false, not publishing event: {}", event.getEventType());
+            logDebug("Condition is false, not publishing event: {}", event.getEventType());
         }
     }
 
@@ -77,15 +113,15 @@ public class DomainEvents {
      */
     public static void publishAsyncIf(boolean condition, DomainEvent event) {
         if (event == null) {
-            logger.warn("Null event provided to publishAsyncIf");
+            logWarn("Null event provided to publishAsyncIf");
             return;
         }
 
         if (condition) {
-            logger.debug("Condition is true, publishing event asynchronously: {}", event.getEventType());
+            logDebug("Condition is true, publishing event asynchronously: {}", event.getEventType());
             DomainEventPublisher.getInstance().publishAsync(event);
         } else {
-            logger.debug("Condition is false, not publishing event asynchronously: {}", event.getEventType());
+            logDebug("Condition is false, not publishing event asynchronously: {}", event.getEventType());
         }
     }
 
@@ -96,16 +132,16 @@ public class DomainEvents {
      */
     public static void publishIfPresent(Supplier<DomainEvent> eventSupplier) {
         if (eventSupplier == null) {
-            logger.warn("Null event supplier provided to publishIfPresent");
+            logWarn("Null event supplier provided to publishIfPresent");
             return;
         }
 
         DomainEvent event = eventSupplier.get();
         if (event != null) {
-            logger.debug("Event is present, publishing event: {}", event.getEventType());
+            logDebug("Event is present, publishing event: {}", event.getEventType());
             DomainEventPublisher.getInstance().publish(event);
         } else {
-            logger.debug("Event is not present, not publishing");
+            logDebug("Event is not present, not publishing");
         }
     }
 
@@ -116,16 +152,16 @@ public class DomainEvents {
      */
     public static void publishAsyncIfPresent(Supplier<DomainEvent> eventSupplier) {
         if (eventSupplier == null) {
-            logger.warn("Null event supplier provided to publishAsyncIfPresent");
+            logWarn("Null event supplier provided to publishAsyncIfPresent");
             return;
         }
 
         DomainEvent event = eventSupplier.get();
         if (event != null) {
-            logger.debug("Event is present, publishing event asynchronously: {}", event.getEventType());
+            logDebug("Event is present, publishing event asynchronously: {}", event.getEventType());
             DomainEventPublisher.getInstance().publishAsync(event);
         } else {
-            logger.debug("Event is not present, not publishing asynchronously");
+            logDebug("Event is not present, not publishing asynchronously");
         }
     }
 
@@ -142,7 +178,7 @@ public class DomainEvents {
             throw new IllegalArgumentException("Event type and handler cannot be null");
         }
 
-        logger.debug("Registering handler for event type: {}", eventType.getName());
+        logDebug("Registering handler for event type: {}", eventType.getName());
 
         // Create a DomainEventHandler from the Consumer
         DomainEventHandler<T> eventHandler = handler::accept;
@@ -167,7 +203,7 @@ public class DomainEvents {
             throw new IllegalArgumentException("Event type and handler cannot be null");
         }
 
-        logger.debug("Unregistering handler for event type: {}", eventType.getName());
+        logDebug("Unregistering handler for event type: {}", eventType.getName());
 
         // Get the handler from the map
         Map<Consumer<?>, DomainEventHandler<?>> eventTypeHandlers = handlerMap.get(eventType);
@@ -177,10 +213,10 @@ public class DomainEvents {
                 // Unregister the handler from the publisher
                 DomainEventPublisher.getInstance().unregister(eventType, (DomainEventHandler<T>) eventHandler);
             } else {
-                logger.warn("Handler not found for event type: {}", eventType.getName());
+                logWarn("Handler not found for event type: {}", eventType.getName());
             }
         } else {
-            logger.warn("No handlers registered for event type: {}", eventType.getName());
+            logWarn("No handlers registered for event type: {}", eventType.getName());
         }
     }
 }

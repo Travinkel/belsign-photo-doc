@@ -1,6 +1,6 @@
 package com.belman.domain.events;
 
-import com.belman.infrastructure.logging.EmojiLogger;
+import com.belman.domain.services.Logger;
 import com.belman.domain.shared.DomainEvent;
 import com.belman.domain.shared.DomainEventHandler;
 
@@ -12,23 +12,27 @@ import com.belman.domain.shared.DomainEventHandler;
  * @param <T> the type of event this handler can handle
  */
 public class DefaultDomainEventHandler<T extends DomainEvent> implements DomainEventHandler<T> {
-    private static final EmojiLogger logger = EmojiLogger.getLogger(DefaultDomainEventHandler.class);
-
+    private final Logger logger;
     private final String handlerName;
 
     /**
-     * Creates a new DefaultDomainEventHandler with a default name.
+     * Creates a new DefaultDomainEventHandler with a default name and the specified logger.
+     * 
+     * @param logger the logger to use
      */
-    public DefaultDomainEventHandler() {
+    public DefaultDomainEventHandler(Logger logger) {
+        this.logger = logger;
         this.handlerName = this.getClass().getSimpleName();
     }
 
     /**
-     * Creates a new DefaultDomainEventHandler with the specified name.
+     * Creates a new DefaultDomainEventHandler with the specified name and logger.
      * 
+     * @param logger the logger to use
      * @param handlerName the name of this handler
      */
-    public DefaultDomainEventHandler(String handlerName) {
+    public DefaultDomainEventHandler(Logger logger, String handlerName) {
+        this.logger = logger;
         this.handlerName = handlerName;
     }
 
@@ -66,17 +70,18 @@ public class DefaultDomainEventHandler<T extends DomainEvent> implements DomainE
      * Creates a new DefaultDomainEventHandler with the specified handler function.
      * 
      * @param <E> the type of event
+     * @param logger the logger to use
      * @param handlerName the name of the handler
      * @param handlerFunction the function to handle events
      * @return a new DefaultDomainEventHandler
      */
     public static <E extends DomainEvent> DefaultDomainEventHandler<E> create(
-            String handlerName, java.util.function.Consumer<E> handlerFunction) {
-        if (handlerName == null || handlerFunction == null) {
-            throw new IllegalArgumentException("Handler name and function cannot be null");
+            Logger logger, String handlerName, java.util.function.Consumer<E> handlerFunction) {
+        if (logger == null || handlerName == null || handlerFunction == null) {
+            throw new IllegalArgumentException("Logger, handler name, and function cannot be null");
         }
 
-        return new DefaultDomainEventHandler<E>(handlerName) {
+        return new DefaultDomainEventHandler<E>(logger, handlerName) {
             @Override
             public void handle(E event) {
                 super.handle(event);

@@ -1,9 +1,13 @@
 package com.belman.unit.backbone.core.events;
 
+import com.belman.domain.services.Logger;
 import com.belman.domain.shared.AbstractDomainEvent;
 import com.belman.domain.events.DomainEventHandlerImplementation;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -79,7 +83,7 @@ public class DomainEventHandlerImplementationTest {
         // Act
         java.util.function.Consumer<Object> handler = 
             DomainEventHandlerImplementation.createHandler("TestHandler", handlerFunction);
-        
+
         // Call the handler with an event
         handler.accept(testEvent);
 
@@ -101,7 +105,7 @@ public class DomainEventHandlerImplementationTest {
         // Act
         java.util.function.Consumer<Object> handler = 
             DomainEventHandlerImplementation.createHandler("TestHandler", handlerFunction);
-        
+
         // Call the handler with a null event
         handler.accept(null);
 
@@ -117,7 +121,7 @@ public class DomainEventHandlerImplementationTest {
         // Act
         java.util.function.Consumer<Object> handler = 
             DomainEventHandlerImplementation.createHandler("TestHandler", null);
-        
+
         // Call the handler with an event - should not throw
         assertDoesNotThrow(() -> {
             handler.accept(testEvent);

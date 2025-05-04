@@ -1,6 +1,5 @@
 package com.belman.domain.rbac;
 
-import com.belman.application.core.BaseService;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.services.AuthenticationService;
 
@@ -8,9 +7,8 @@ import java.util.Optional;
 
 /**
  * Controller for role-based access control.
- * This class is Gluon-aware and uses the backbone framework.
  */
-public class RoleBasedAccessController extends BaseService {
+public class RoleBasedAccessController {
 
     private final AuthenticationService authenticationService;
     private final AccessPolicy accessPolicy;

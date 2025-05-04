@@ -1,13 +1,11 @@
 package com.belman.domain.rbac;
 
-import com.belman.application.core.BaseService;
 import com.belman.domain.aggregates.User.Role;
 
 /**
  * Factory for creating common access policies.
- * This class is Gluon-aware and uses the backbone framework.
  */
-public class AccessPolicyFactory extends BaseService {
+public class AccessPolicyFactory {
 
     /**
      * Creates an access policy that allows only administrators.
