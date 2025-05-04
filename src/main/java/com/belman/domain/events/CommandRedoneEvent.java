@@ -1,16 +1,14 @@
-package com.belman.domain.shared;
+package com.belman.domain.events;
+
+import com.belman.domain.shared.Command;
 
 /**
  * Event published when a command is successfully redone.
  * <p>
  * This event is published by the CommandManager after a command has been
  * successfully redone and moved from the redo stack back to the undo stack.
- * 
- * @deprecated This class is deprecated and will be removed in a future release.
- * Use {@link com.belman.domain.events.CommandRedoneEvent} instead.
  */
-@Deprecated
-public class CommandRedoneEvent extends com.belman.domain.events.CommandRedoneEvent {
+public class CommandRedoneEvent extends CommandEvent {
 
     /**
      * Creates a new CommandRedoneEvent with the specified command.
@@ -19,5 +17,10 @@ public class CommandRedoneEvent extends com.belman.domain.events.CommandRedoneEv
      */
     public CommandRedoneEvent(Command<?> command) {
         super(command);
+    }
+
+    @Override
+    public String toString() {
+        return "CommandRedoneEvent{command=" + getCommandDescription() + "}";
     }
 }

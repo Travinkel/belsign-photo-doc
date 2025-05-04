@@ -1,16 +1,14 @@
-package com.belman.domain.shared;
+package com.belman.domain.events;
+
+import com.belman.domain.shared.Command;
 
 /**
  * Event published when a command is successfully executed.
  * <p>
  * This event is published by the CommandManager after a command has been
  * successfully executed and added to the undo stack.
- * 
- * @deprecated This class is deprecated and will be removed in a future release.
- * Use {@link com.belman.domain.events.CommandExecutedEvent} instead.
  */
-@Deprecated
-public class CommandExecutedEvent extends com.belman.domain.events.CommandExecutedEvent {
+public class CommandExecutedEvent extends CommandEvent {
 
     /**
      * Creates a new CommandExecutedEvent with the specified command.
@@ -19,5 +17,10 @@ public class CommandExecutedEvent extends com.belman.domain.events.CommandExecut
      */
     public CommandExecutedEvent(Command<?> command) {
         super(command);
+    }
+
+    @Override
+    public String toString() {
+        return "CommandExecutedEvent{command=" + getCommandDescription() + "}";
     }
 }

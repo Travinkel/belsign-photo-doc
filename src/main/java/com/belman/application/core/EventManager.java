@@ -1,7 +1,7 @@
 package com.belman.application.core;
 
-import com.belman.domain.shared.DomainEvent;
-import com.belman.domain.shared.DomainEventHandler;
+import com.belman.domain.events.DomainEvent;
+import com.belman.domain.events.DomainEventHandler;
 import com.belman.domain.events.DomainEventPublisher;
 
 /**

@@ -5,9 +5,12 @@ package com.belman.domain.shared;
  * <p>
  * This class provides common functionality for all command events,
  * such as storing the command that triggered the event.
+ * 
+ * @deprecated This class is deprecated and will be removed in a future release.
+ * Use {@link com.belman.domain.events.CommandEvent} instead.
  */
-public abstract class CommandEvent extends AbstractDomainEvent {
-    private final Command<?> command;
+@Deprecated
+public abstract class CommandEvent extends com.belman.domain.events.CommandEvent {
 
     /**
      * Creates a new CommandEvent with the specified command.
@@ -15,24 +18,6 @@ public abstract class CommandEvent extends AbstractDomainEvent {
      * @param command the command that triggered this event
      */
     protected CommandEvent(Command<?> command) {
-        this.command = command;
-    }
-
-    /**
-     * Gets the command that triggered this event.
-     *
-     * @return the command
-     */
-    public Command<?> getCommand() {
-        return command;
-    }
-
-    /**
-     * Gets the description of the command that triggered this event.
-     *
-     * @return the command description
-     */
-    public String getCommandDescription() {
-        return command.getDescription();
+        super(command);
     }
 }

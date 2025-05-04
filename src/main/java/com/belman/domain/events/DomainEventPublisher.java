@@ -1,8 +1,8 @@
 package com.belman.domain.events;
 
 import com.belman.domain.services.Logger;
-import com.belman.domain.shared.DomainEvent;
-import com.belman.domain.shared.DomainEventHandler;
+// Import the interfaces from the same package
+// No need to import DomainEvent and DomainEventHandler as they are in the same package
 
 import java.util.ArrayList;
 import java.util.List;

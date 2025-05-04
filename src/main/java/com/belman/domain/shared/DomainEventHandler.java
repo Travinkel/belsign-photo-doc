@@ -5,14 +5,10 @@ package com.belman.domain.shared;
  * Implementations of this interface can handle events of a specific type.
  * 
  * @param <T> the type of event this handler can handle
+ * @deprecated This interface is deprecated and will be removed in a future release.
+ * Use {@link com.belman.domain.events.DomainEventHandler} instead.
  */
+@Deprecated
 @FunctionalInterface
-public interface DomainEventHandler<T extends DomainEvent> {
-    
-    /**
-     * Handles the specified event.
-     * 
-     * @param event the event to handle
-     */
-    void handle(T event);
+public interface DomainEventHandler<T extends DomainEvent> extends com.belman.domain.events.DomainEventHandler<T> {
 }

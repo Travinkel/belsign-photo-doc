@@ -1,13 +1,13 @@
 package com.belman.application.core;
 
 import com.belman.application.core.EventManager;
-import com.belman.domain.shared.ApplicationBackgroundedEvent;
-import com.belman.domain.shared.ApplicationPausedEvent;
-import com.belman.domain.shared.ApplicationResumedEvent;
-import com.belman.domain.shared.ApplicationStartedEvent;
-import com.belman.domain.shared.ApplicationStateEvent;
-import com.belman.domain.shared.ApplicationStateEvent.ApplicationState;
-import com.belman.domain.shared.ApplicationStoppedEvent;
+import com.belman.domain.events.ApplicationBackgroundedEvent;
+import com.belman.domain.events.ApplicationPausedEvent;
+import com.belman.domain.events.ApplicationResumedEvent;
+import com.belman.domain.events.ApplicationStartedEvent;
+import com.belman.domain.events.ApplicationStateEvent;
+import com.belman.domain.events.ApplicationStateEvent.ApplicationState;
+import com.belman.domain.events.ApplicationStoppedEvent;
 import com.belman.infrastructure.logging.EmojiLogger;
 
 import java.util.ArrayList;

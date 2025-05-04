@@ -6,27 +6,10 @@ import java.util.UUID;
 /**
  * Base interface for all domain events in the application.
  * Domain events represent something that happened in the domain that domain experts care about.
+ * 
+ * @deprecated This interface is deprecated and will be removed in a future release.
+ * Use {@link com.belman.domain.events.DomainEvent} instead.
  */
-public interface DomainEvent {
-
-    /**
-     * Gets the unique identifier for this event.
-     * 
-     * @return the event ID
-     */
-    UUID getEventId();
-
-    /**
-     * Gets the timestamp when this event occurred.
-     * 
-     * @return the event timestamp
-     */
-    Instant getTimestamp();
-
-    /**
-     * Gets the type of this event.
-     * 
-     * @return the event type
-     */
-    String getEventType();
+@Deprecated
+public interface DomainEvent extends com.belman.domain.events.DomainEvent {
 }
