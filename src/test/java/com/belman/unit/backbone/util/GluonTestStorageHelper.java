@@ -1,6 +1,6 @@
 package com.belman.unit.backbone.util;
 
-import com.belman.infrastructure.GluonStorageManager;
+import com.belman.infrastructure.storage.GluonStorageManager;
 import com.belman.infrastructure.service.StorageServiceFactory;
 import com.gluonhq.attach.storage.StorageService;
 

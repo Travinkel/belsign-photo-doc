@@ -1,7 +1,7 @@
 package com.belman.infrastructure.service;
 
-import com.belman.infrastructure.ErrorHandler;
-import com.belman.infrastructure.PlatformUtils;
+import com.belman.infrastructure.platform.ErrorHandler;
+import com.belman.infrastructure.platform.PlatformUtils;
 import com.belman.domain.aggregates.Order;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.entities.PhotoDocument;

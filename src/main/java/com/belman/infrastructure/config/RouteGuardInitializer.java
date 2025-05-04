@@ -3,16 +3,14 @@ package com.belman.infrastructure.config;
 import com.belman.domain.rbac.AccessPolicyFactory;
 import com.belman.domain.rbac.RoleBasedAccessControlFactory;
 import com.belman.domain.services.AuthenticationService;
-import com.belman.infrastructure.EmojiLogger;
+import com.belman.infrastructure.logging.EmojiLogger;
 import com.belman.presentation.navigation.Router;
 import com.belman.presentation.views.admin.AdminView;
-import com.belman.presentation.views.login.LoginView;
 import com.belman.presentation.views.ordergallery.OrderGalleryView;
 import com.belman.presentation.views.photoreview.PhotoReviewView;
 import com.belman.presentation.views.photoupload.PhotoUploadView;
 import com.belman.presentation.views.qadashboard.QADashboardView;
 import com.belman.presentation.views.reportpreview.ReportPreviewView;
-import com.belman.presentation.views.splash.SplashView;
 import com.belman.presentation.views.usermanagement.UserManagementView;
 
 /**

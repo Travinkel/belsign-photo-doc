@@ -1,8 +1,8 @@
 package com.belman.application.core;
 
 
-import com.belman.presentation.core.BaseService;
-import com.belman.infrastructure.EmojiLogger;
+import com.belman.application.core.BaseService;
+import com.belman.infrastructure.logging.EmojiLogger;
 
 import java.util.Arrays;
 import java.util.Collection;

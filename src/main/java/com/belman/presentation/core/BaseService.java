@@ -4,17 +4,23 @@ package com.belman.presentation.core;
 import com.belman.application.core.Inject;
 import com.belman.domain.shared.DomainEvent;
 import com.belman.domain.events.DomainEventPublisher;
-import com.belman.infrastructure.EmojiLogger;
+import com.belman.infrastructure.logging.EmojiLogger;
 
 /**
  * Base class for all services.
  * Provides common functionality and standardizes service implementation.
+ * 
+ * @deprecated This class is deprecated and will be removed in a future release.
+ * Use {@link com.belman.application.core.BaseService} instead.
  */
-public abstract class BaseService {
+@Deprecated
+public abstract class BaseService extends com.belman.application.core.BaseService {
 
     /**
      * Logger for this service.
+     * @deprecated Use the logger from the parent class instead.
      */
+    @Deprecated
     protected final EmojiLogger logger = EmojiLogger.getLogger(this.getClass());
 
     /**
@@ -22,8 +28,10 @@ public abstract class BaseService {
      * This method will be overridden by the ServiceLocator to inject services.
      */
     @Inject
+    @Override
     protected void injectServices() {
         // This method will be overridden by the ServiceLocator to inject services.
+        super.injectServices();
     }
 
     /**

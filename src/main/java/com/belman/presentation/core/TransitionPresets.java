@@ -1,6 +1,6 @@
 package com.belman.presentation.core;
 
-import com.belman.infrastructure.PlatformUtils;
+import com.belman.infrastructure.platform.PlatformUtils;
 import javafx.util.Duration;
 
 /**

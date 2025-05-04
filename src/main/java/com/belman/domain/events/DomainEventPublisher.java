@@ -1,6 +1,6 @@
 package com.belman.domain.events;
 
-import com.belman.infrastructure.EmojiLogger;
+import com.belman.infrastructure.logging.EmojiLogger;
 import com.belman.domain.shared.DomainEvent;
 import com.belman.domain.shared.DomainEventHandler;
 

@@ -1,7 +1,7 @@
 package com.belman.presentation.core;
 
 import com.belman.application.core.ServiceLocator;
-import com.belman.infrastructure.NamingConventions;
+import com.belman.infrastructure.platform.NamingConventions;
 import javafx.fxml.FXMLLoader;
 
 import java.io.FileNotFoundException;

@@ -1,6 +1,6 @@
 package com.belman.infrastructure.service;
 
-import com.belman.infrastructure.PlatformUtils;
+import com.belman.infrastructure.platform.PlatformUtils;
 import com.gluonhq.attach.display.DisplayService;
 import java.util.Optional;
 import java.util.logging.Level;

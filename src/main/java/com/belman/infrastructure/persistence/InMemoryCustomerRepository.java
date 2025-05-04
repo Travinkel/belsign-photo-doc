@@ -1,6 +1,6 @@
 package com.belman.infrastructure.persistence;
 
-import com.belman.presentation.core.BaseService;
+import com.belman.application.core.BaseService;
 import com.belman.domain.entities.Customer;
 import com.belman.domain.repositories.CustomerRepository;
 import com.belman.domain.specification.Specification;

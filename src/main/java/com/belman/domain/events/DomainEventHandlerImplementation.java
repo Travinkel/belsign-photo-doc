@@ -1,7 +1,7 @@
 package com.belman.domain.events;
 
 
-import com.belman.infrastructure.EmojiLogger;
+import com.belman.infrastructure.logging.EmojiLogger;
 
 /**
  * Implementation of the domain event handler functionality.

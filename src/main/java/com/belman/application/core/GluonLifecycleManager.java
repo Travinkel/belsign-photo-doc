@@ -8,7 +8,7 @@ import com.belman.domain.shared.DomainEvent;
 import com.belman.domain.shared.ViewHiddenEvent;
 import com.belman.domain.shared.ViewShownEvent;
 import com.belman.domain.shared.ApplicationStateEvent.ApplicationState;
-import com.belman.infrastructure.EmojiLogger;
+import com.belman.infrastructure.logging.EmojiLogger;
 import com.gluonhq.attach.lifecycle.LifecycleEvent;
 import com.gluonhq.attach.lifecycle.LifecycleService;
 import com.gluonhq.charm.glisten.application.MobileApplication;

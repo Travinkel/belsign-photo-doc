@@ -2,7 +2,7 @@ package com.belman.unit.backbone.di;
 
 import com.belman.application.core.Inject;
 import com.belman.application.core.ServiceLocator;
-import com.belman.infrastructure.ServiceInjectionException;
+import com.belman.infrastructure.platform.ServiceInjectionException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

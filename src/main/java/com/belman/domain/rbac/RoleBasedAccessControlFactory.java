@@ -1,6 +1,6 @@
 package com.belman.domain.rbac;
 
-import com.belman.presentation.core.BaseService;
+import com.belman.application.core.BaseService;
 import com.belman.application.core.Inject;
 import com.belman.domain.services.AuthenticationService;
 
@@ -9,20 +9,20 @@ import com.belman.domain.services.AuthenticationService;
  * This class is Gluon-aware and uses the backbone framework.
  */
 public class RoleBasedAccessControlFactory extends BaseService {
-    
+
     @Inject
     private AuthenticationService authenticationService;
-    
+
     @Inject
     private AccessPolicyFactory accessPolicyFactory;
-    
+
     /**
      * Creates a new RoleBasedAccessControlFactory.
      */
     public RoleBasedAccessControlFactory() {
         // Default constructor for dependency injection
     }
-    
+
     /**
      * Creates a new RoleBasedAccessControlFactory with the specified services.
      * 
@@ -33,7 +33,7 @@ public class RoleBasedAccessControlFactory extends BaseService {
         this.authenticationService = authenticationService;
         this.accessPolicyFactory = accessPolicyFactory;
     }
-    
+
     /**
      * Creates a role-based access controller for admin-only operations.
      * 
@@ -45,7 +45,7 @@ public class RoleBasedAccessControlFactory extends BaseService {
             accessPolicyFactory.createAdminOnlyPolicy()
         );
     }
-    
+
     /**
      * Creates a role-based access controller for QA-only operations.
      * 
@@ -57,7 +57,7 @@ public class RoleBasedAccessControlFactory extends BaseService {
             accessPolicyFactory.createQAOnlyPolicy()
         );
     }
-    
+
     /**
      * Creates a role-based access controller for production-only operations.
      * 
@@ -69,7 +69,7 @@ public class RoleBasedAccessControlFactory extends BaseService {
             accessPolicyFactory.createProductionOnlyPolicy()
         );
     }
-    
+
     /**
      * Creates a role-based access controller for QA and admin operations.
      * 
@@ -81,7 +81,7 @@ public class RoleBasedAccessControlFactory extends BaseService {
             accessPolicyFactory.createQAAndAdminPolicy()
         );
     }
-    
+
     /**
      * Creates a role-based access controller for production and QA operations.
      * 
@@ -93,7 +93,7 @@ public class RoleBasedAccessControlFactory extends BaseService {
             accessPolicyFactory.createProductionAndQAPolicy()
         );
     }
-    
+
     /**
      * Creates a role-based access controller for operations accessible to all roles.
      * 
@@ -105,7 +105,7 @@ public class RoleBasedAccessControlFactory extends BaseService {
             accessPolicyFactory.createAllRolesPolicy()
         );
     }
-    
+
     /**
      * Creates a role-based access controller with a custom access policy.
      * 

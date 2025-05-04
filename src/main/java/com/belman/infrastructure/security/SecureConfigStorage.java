@@ -1,7 +1,7 @@
 package com.belman.infrastructure.security;
 
 import com.belman.infrastructure.core.InfrastructureService;
-import com.belman.infrastructure.ErrorHandler;
+import com.belman.infrastructure.platform.ErrorHandler;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;

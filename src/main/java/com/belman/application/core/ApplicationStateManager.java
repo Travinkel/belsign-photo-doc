@@ -8,7 +8,7 @@ import com.belman.domain.shared.ApplicationStartedEvent;
 import com.belman.domain.shared.ApplicationStateEvent;
 import com.belman.domain.shared.ApplicationStateEvent.ApplicationState;
 import com.belman.domain.shared.ApplicationStoppedEvent;
-import com.belman.infrastructure.EmojiLogger;
+import com.belman.infrastructure.logging.EmojiLogger;
 
 import java.util.ArrayList;
 import java.util.List;

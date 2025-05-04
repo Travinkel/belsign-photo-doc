@@ -5,7 +5,7 @@ import com.belman.presentation.navigation.Router;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.entities.PhotoDocument;
 import com.belman.domain.services.CameraService;
-import com.belman.infrastructure.service.CameraServiceFactory;
+import com.belman.infrastructure.camera.CameraServiceFactory;
 import com.belman.infrastructure.service.SessionManager;
 import com.belman.presentation.components.TouchFriendlyDialog;
 import com.belman.presentation.views.qadashboard.QADashboardView;

@@ -1,6 +1,6 @@
 package com.belman.infrastructure.service;
 
-import com.belman.presentation.core.BaseService;
+import com.belman.application.core.BaseService;
 import com.belman.domain.events.DomainEvents;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.events.UserLoggedInEvent;

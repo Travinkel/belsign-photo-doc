@@ -1,6 +1,6 @@
 package com.belman.infrastructure.service;
 
-import com.belman.presentation.core.BaseService;
+import com.belman.application.core.BaseService;
 import com.belman.domain.services.CameraService;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;

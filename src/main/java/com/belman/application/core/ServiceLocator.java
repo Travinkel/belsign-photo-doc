@@ -1,7 +1,7 @@
 package com.belman.application.core;
 
 
-import com.belman.infrastructure.ServiceInjectionException;
+import com.belman.infrastructure.platform.ServiceInjectionException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

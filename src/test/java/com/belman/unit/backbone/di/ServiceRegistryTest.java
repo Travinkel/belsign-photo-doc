@@ -1,6 +1,6 @@
 package com.belman.unit.backbone.di;
 
-import com.belman.presentation.core.BaseService;
+import com.belman.application.core.BaseService;
 import com.belman.application.core.Inject;
 import com.belman.application.core.ServiceLocator;
 import com.belman.application.core.ServiceRegistry;
@@ -102,7 +102,7 @@ public class ServiceRegistryTest {
         // Assert
         TestService retrievedTestService = ServiceLocator.getService(TestService.class);
         AnotherTestService retrievedAnotherService = ServiceLocator.getService(AnotherTestService.class);
-        
+
         assertSame(service, retrievedTestService);
         assertSame(service, retrievedAnotherService);
     }
@@ -143,7 +143,7 @@ public class ServiceRegistryTest {
         // Assert
         TestServiceImpl retrievedService1 = ServiceLocator.getService(TestServiceImpl.class);
         MultiInterfaceServiceImpl retrievedService2 = ServiceLocator.getService(MultiInterfaceServiceImpl.class);
-        
+
         assertSame(service1, retrievedService1);
         assertSame(service2, retrievedService2);
     }
@@ -160,7 +160,7 @@ public class ServiceRegistryTest {
         // Assert
         TestServiceImpl retrievedService1 = ServiceLocator.getService(TestServiceImpl.class);
         MultiInterfaceServiceImpl retrievedService2 = ServiceLocator.getService(MultiInterfaceServiceImpl.class);
-        
+
         assertSame(service1, retrievedService1);
         assertSame(service2, retrievedService2);
     }
@@ -202,13 +202,13 @@ public class ServiceRegistryTest {
         // Arrange
         TestServiceImpl service = new TestServiceImpl();
         ServiceRegistry.registerService(service);
-        
+
         // Verify service is registered
         assertSame(service, ServiceLocator.getService(TestServiceImpl.class));
-        
+
         // Act
         ServiceRegistry.unregisterAll();
-        
+
         // Assert
         assertThrows(Exception.class, () -> {
             ServiceLocator.getService(TestServiceImpl.class);

@@ -8,7 +8,7 @@ import com.belman.domain.valueobjects.EmailAddress;
 import com.belman.domain.valueobjects.HashedPassword;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.valueobjects.Username;
-import com.belman.infrastructure.service.SmtpEmailService;
+import com.belman.infrastructure.email.SmtpEmailService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

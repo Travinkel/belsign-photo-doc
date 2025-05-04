@@ -2,7 +2,6 @@ package com.belman.infrastructure.logging;
 
 import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
-import com.belman.infrastructure.EmojiLogger;
 
 /**
  * Implementation of LoggerFactory that creates EmojiLoggerAdapter instances.

@@ -1,7 +1,7 @@
 package com.belman.infrastructure.config;
 
 import com.belman.application.core.ServiceRegistry;
-import com.belman.infrastructure.EmojiLogger;
+import com.belman.infrastructure.logging.EmojiLogger;
 import com.belman.domain.repositories.CustomerRepository;
 import com.belman.domain.repositories.OrderRepository;
 import com.belman.domain.repositories.UserRepository;
@@ -11,9 +11,6 @@ import com.belman.domain.services.AuthenticationService;
 import com.belman.infrastructure.persistence.InMemoryCustomerRepository;
 import com.belman.infrastructure.persistence.InMemoryOrderRepository;
 import com.belman.infrastructure.persistence.InMemoryUserRepository;
-import com.belman.infrastructure.persistence.SqlCustomerRepository;
-import com.belman.infrastructure.persistence.SqlOrderRepository;
-import com.belman.infrastructure.persistence.SqlUserRepository;
 import com.belman.infrastructure.service.DefaultAuthenticationService;
 import com.belman.infrastructure.service.DefaultPhotoService;
 import com.belman.infrastructure.service.SessionManager;

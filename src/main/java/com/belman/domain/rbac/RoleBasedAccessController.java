@@ -1,6 +1,6 @@
 package com.belman.domain.rbac;
 
-import com.belman.presentation.core.BaseService;
+import com.belman.application.core.BaseService;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.services.AuthenticationService;
 
@@ -11,10 +11,10 @@ import java.util.Optional;
  * This class is Gluon-aware and uses the backbone framework.
  */
 public class RoleBasedAccessController extends BaseService {
-    
+
     private final AuthenticationService authenticationService;
     private final AccessPolicy accessPolicy;
-    
+
     /**
      * Creates a new RoleBasedAccessController with the specified authentication service and access policy.
      * 
@@ -25,7 +25,7 @@ public class RoleBasedAccessController extends BaseService {
         this.authenticationService = authenticationService;
         this.accessPolicy = accessPolicy;
     }
-    
+
     /**
      * Checks if the current user has access based on the access policy.
      * 
@@ -35,7 +35,7 @@ public class RoleBasedAccessController extends BaseService {
         Optional<User> currentUser = authenticationService.getCurrentUser();
         return currentUser.isPresent() && accessPolicy.hasAccess(currentUser.get());
     }
-    
+
     /**
      * Checks if the specified user has access based on the access policy.
      * 
@@ -45,7 +45,7 @@ public class RoleBasedAccessController extends BaseService {
     public boolean hasAccess(User user) {
         return user != null && accessPolicy.hasAccess(user);
     }
-    
+
     /**
      * Gets the access policy used by this controller.
      * 
@@ -54,7 +54,7 @@ public class RoleBasedAccessController extends BaseService {
     public AccessPolicy getAccessPolicy() {
         return accessPolicy;
     }
-    
+
     /**
      * Throws an exception if the current user does not have access.
      * 
@@ -65,7 +65,7 @@ public class RoleBasedAccessController extends BaseService {
             throw new AccessDeniedException("Access denied. User does not have the required role.");
         }
     }
-    
+
     /**
      * Throws an exception if the specified user does not have access.
      * 

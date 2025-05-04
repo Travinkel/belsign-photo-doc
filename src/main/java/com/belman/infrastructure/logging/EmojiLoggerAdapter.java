@@ -1,7 +1,6 @@
 package com.belman.infrastructure.logging;
 
 import com.belman.domain.services.Logger;
-import com.belman.infrastructure.EmojiLogger;
 
 /**
  * Adapter that implements the domain Logger interface using EmojiLogger.
