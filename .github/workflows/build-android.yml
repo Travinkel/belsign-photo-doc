@@ -1,10 +1,14 @@
-# .github/workflows/build-android.yml
 name: Build Android APK
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  id-token: write
 
 jobs:
   build:
@@ -22,10 +26,15 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
 
+      - name: Install Gluon Plugin (Optional Stub)
+        run: |
+          mkdir -p ~/.gluon/substrate
+          echo "{}" > ~/.gluon/substrate/plugins.json
+
       - name: Build APK
         run: mvn gluonfx:build gluonfx:package -Pandroid
 
-      - name: Upload APK
+      - name: Upload APK to Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: belsign-apk
