@@ -1,13 +1,12 @@
 package com.belman.unit.application.core;
 
 import com.belman.application.core.ApplicationStateManager;
-import com.belman.domain.shared.ApplicationBackgroundedEvent;
-import com.belman.domain.shared.ApplicationPausedEvent;
-import com.belman.domain.shared.ApplicationResumedEvent;
-import com.belman.domain.shared.ApplicationStartedEvent;
-import com.belman.domain.shared.ApplicationStateEvent;
-import com.belman.domain.shared.ApplicationStateEvent.ApplicationState;
-import com.belman.domain.shared.ApplicationStoppedEvent;
+import com.belman.domain.events.ApplicationBackgroundedEvent;
+import com.belman.domain.events.ApplicationPausedEvent;
+import com.belman.domain.events.ApplicationResumedEvent;
+import com.belman.domain.events.ApplicationStateEvent;
+import com.belman.domain.events.ApplicationStateEvent.ApplicationState;
+import com.belman.domain.events.ApplicationStoppedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +48,7 @@ public class ApplicationStateManagerTest {
     @Test
     void initialize_shouldSetStateToStarting() {
         // When initialized in setUp()
-        
+
         // Then
         assertEquals(ApplicationState.STARTING, ApplicationStateManager.getCurrentState());
     }
@@ -58,7 +57,7 @@ public class ApplicationStateManagerTest {
     void transitionTo_shouldChangeState() {
         // When
         ApplicationStateManager.transitionTo(ApplicationState.ACTIVE);
-        
+
         // Then
         assertEquals(ApplicationState.ACTIVE, ApplicationStateManager.getCurrentState());
     }
@@ -67,7 +66,7 @@ public class ApplicationStateManagerTest {
     void transitionTo_shouldPublishEvent() {
         // When
         ApplicationStateManager.transitionTo(ApplicationState.ACTIVE);
-        
+
         // Then
         assertEquals(1, receivedEvents.size());
         assertTrue(receivedEvents.get(0) instanceof ApplicationResumedEvent);
@@ -78,10 +77,10 @@ public class ApplicationStateManagerTest {
         // Given
         ApplicationStateManager.transitionTo(ApplicationState.ACTIVE);
         receivedEvents.clear();
-        
+
         // When
         ApplicationStateManager.transitionTo(ApplicationState.ACTIVE);
-        
+
         // Then
         assertEquals(0, receivedEvents.size());
     }
@@ -90,7 +89,7 @@ public class ApplicationStateManagerTest {
     void transitionToBackground_shouldExecuteBackgroundTasks() {
         // When
         ApplicationStateManager.transitionTo(ApplicationState.BACKGROUND);
-        
+
         // Then
         assertTrue(backgroundTaskExecuted.get());
     }
@@ -99,7 +98,7 @@ public class ApplicationStateManagerTest {
     void transitionToActive_shouldExecuteForegroundTasks() {
         // When
         ApplicationStateManager.transitionTo(ApplicationState.ACTIVE);
-        
+
         // Then
         assertTrue(foregroundTaskExecuted.get());
     }
@@ -108,7 +107,7 @@ public class ApplicationStateManagerTest {
     void transitionToStopping_shouldExecuteShutdownTasks() {
         // When
         ApplicationStateManager.transitionTo(ApplicationState.STOPPING);
-        
+
         // Then
         assertTrue(shutdownTaskExecuted.get());
     }
@@ -121,7 +120,7 @@ public class ApplicationStateManagerTest {
         ApplicationStateManager.transitionTo(ApplicationState.BACKGROUND);
         ApplicationStateManager.transitionTo(ApplicationState.ACTIVE);
         ApplicationStateManager.transitionTo(ApplicationState.STOPPING);
-        
+
         // Then
         assertEquals(5, receivedEvents.size());
         assertTrue(receivedEvents.get(0) instanceof ApplicationResumedEvent);

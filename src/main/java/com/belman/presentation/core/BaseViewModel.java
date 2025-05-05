@@ -13,6 +13,25 @@ public abstract class BaseViewModel<T> implements ViewModelLifecycle {
     }
 
     /**
+     * Gets the class name of the view model.
+     * 
+     * @return the simple class name of the view model
+     */
+    @Override
+    public String getViewModelName() {
+        return this.getClass().getSimpleName();
+    }
+
+    /**
+     * Initializes the view model.
+     * This method is called once when the view model is created.
+     */
+    @Override
+    public void initialize() {
+        // Default implementation does nothing
+    }
+
+    /**
      * Called when the ViewModel is about to be shown.
      * Override if needed.
      */

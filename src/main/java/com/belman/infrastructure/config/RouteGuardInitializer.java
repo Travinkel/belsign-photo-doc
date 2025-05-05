@@ -4,14 +4,7 @@ import com.belman.domain.rbac.AccessPolicyFactory;
 import com.belman.domain.rbac.RoleBasedAccessControlFactory;
 import com.belman.domain.services.AuthenticationService;
 import com.belman.domain.services.Logger;
-import com.belman.presentation.navigation.Router;
-import com.belman.presentation.views.admin.AdminView;
-import com.belman.presentation.views.ordergallery.OrderGalleryView;
-import com.belman.presentation.views.photoreview.PhotoReviewView;
-import com.belman.presentation.views.photoupload.PhotoUploadView;
-import com.belman.presentation.views.qadashboard.QADashboardView;
-import com.belman.presentation.views.reportpreview.ReportPreviewView;
-import com.belman.presentation.views.usermanagement.UserManagementView;
+import com.belman.application.routing.RouteGuard;
 
 /**
  * Initializes route guards for role-based access control.
@@ -76,8 +69,9 @@ public class RouteGuardInitializer {
      * This method should be called once during application startup, after the Router is set up.
      * 
      * @param authenticationService the authentication service
+     * @param routeGuard the route guard to register guards with
      */
-    public static synchronized void initialize(AuthenticationService authenticationService) {
+    public static synchronized void initialize(AuthenticationService authenticationService, RouteGuard routeGuard) {
         if (initialized) {
             logDebug("Route guards already initialized, skipping initialization");
             return;
@@ -100,29 +94,29 @@ public class RouteGuardInitializer {
 
             // AdminView and UserManagementView are accessible only to ADMIN users
             logDebug("Adding ADMIN guard for AdminView");
-            Router.addGuard(AdminView.class, rbacFactory.createAdminAccessController()::hasAccess);
+            routeGuard.registerGuard("admin", () -> rbacFactory.createAdminAccessController().hasAccess());
 
             logDebug("Adding ADMIN guard for UserManagementView");
-            Router.addGuard(UserManagementView.class, rbacFactory.createAdminAccessController()::hasAccess);
+            routeGuard.registerGuard("userManagement", () -> rbacFactory.createAdminAccessController().hasAccess());
 
             // PhotoReviewView and QADashboardView are accessible to QA users
             logDebug("Adding QA guard for PhotoReviewView");
-            Router.addGuard(PhotoReviewView.class, rbacFactory.createQAAccessController()::hasAccess);
+            routeGuard.registerGuard("photoReview", () -> rbacFactory.createQAAccessController().hasAccess());
 
             logDebug("Adding QA guard for QADashboardView");
-            Router.addGuard(QADashboardView.class, rbacFactory.createQAAccessController()::hasAccess);
+            routeGuard.registerGuard("qaDashboard", () -> rbacFactory.createQAAccessController().hasAccess());
 
             // PhotoUploadView is accessible to PRODUCTION users
             logDebug("Adding PRODUCTION guard for PhotoUploadView");
-            Router.addGuard(PhotoUploadView.class, rbacFactory.createProductionAccessController()::hasAccess);
+            routeGuard.registerGuard("photoUpload", () -> rbacFactory.createProductionAccessController().hasAccess());
 
             // OrderGalleryView is accessible to all authenticated users
             logDebug("Adding ALL ROLES guard for OrderGalleryView");
-            Router.addGuard(OrderGalleryView.class, rbacFactory.createAllRolesAccessController()::hasAccess);
+            routeGuard.registerGuard("orderGallery", () -> rbacFactory.createAllRolesAccessController().hasAccess());
 
             // ReportPreviewView is accessible to QA and ADMIN users
             logDebug("Adding QA and ADMIN guard for ReportPreviewView");
-            Router.addGuard(ReportPreviewView.class, rbacFactory.createQAAndAdminAccessController()::hasAccess);
+            routeGuard.registerGuard("reportPreview", () -> rbacFactory.createQAAndAdminAccessController().hasAccess());
 
             initialized = true;
             logInfo("Route guards initialized successfully ✨");

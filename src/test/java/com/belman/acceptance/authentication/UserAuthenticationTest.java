@@ -3,12 +3,14 @@ package com.belman.acceptance.authentication;
 import com.belman.acceptance.BaseAcceptanceTest;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.services.AuthenticationService;
+import com.belman.domain.services.PasswordHasher;
 import com.belman.domain.valueobjects.EmailAddress;
 import com.belman.domain.valueobjects.HashedPassword;
 import com.belman.domain.valueobjects.PersonName;
 import com.belman.domain.valueobjects.UserId;
 import com.belman.domain.valueobjects.Username;
 import com.belman.infrastructure.persistence.InMemoryUserRepository;
+import com.belman.infrastructure.security.BCryptPasswordHasher;
 import com.belman.infrastructure.service.DefaultAuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +28,7 @@ public class UserAuthenticationTest extends BaseAcceptanceTest {
 
     private AuthenticationService authService;
     private User testUser;
+    private PasswordHasher passwordHasher;
     private static final String TEST_USERNAME = "testuser";
     private static final String TEST_PASSWORD = "password123";
     private static final String TEST_EMAIL = "test@example.com";
@@ -37,11 +40,12 @@ public class UserAuthenticationTest extends BaseAcceptanceTest {
         // Create a repository and add a test user
         InMemoryUserRepository userRepository = new InMemoryUserRepository();
         authService = new DefaultAuthenticationService(userRepository);
+        passwordHasher = new BCryptPasswordHasher();
 
         // Create a test user for authentication tests
         UserId userId = UserId.newId();
         Username username = new Username(TEST_USERNAME);
-        HashedPassword password = HashedPassword.fromPlainText(TEST_PASSWORD);
+        HashedPassword password = HashedPassword.fromPlainText(TEST_PASSWORD, passwordHasher);
         EmailAddress email = new EmailAddress(TEST_EMAIL);
 
         testUser = new User(userId, username, password, email);

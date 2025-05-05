@@ -6,13 +6,14 @@ import com.tngtech.archunit.lang.ArchRule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
 /**
  * Tests to verify that the project follows clean architecture principles.
  * These tests ensure that dependencies between layers flow in the correct direction:
- * Presentation -> Application -> Domain
+ * Presentation -> Usecase -> Domain
  * Infrastructure -> Domain
  */
 public class LayerDependencyTest {
@@ -22,6 +23,24 @@ public class LayerDependencyTest {
     @BeforeAll
     public static void setup() {
         importedClasses = new ClassFileImporter().importPackages("com.belman");
+    }
+
+    @Test
+    public void servicesShouldNotAccessControllers() {
+        ArchRule rule = noClasses()
+                .that().resideInAPackage("com.belman.application..")
+                .should().dependOnClassesThat().resideInAPackage("com.belman.presentation..");
+
+        rule.check(importedClasses);
+    }
+
+    @Test
+    public void repositoriesShouldNotDependOnServices() {
+        ArchRule rule = noClasses()
+                .that().resideInAPackage("com.belman.infrastructure.persistence..")
+                .should().dependOnClassesThat().resideInAPackage("com.belman.application..");
+
+        rule.check(importedClasses);
     }
 
     @Test
@@ -43,10 +62,10 @@ public class LayerDependencyTest {
     @Test
     public void applicationShouldNotDependOnPresentationOrInfrastructure() {
         ArchRule rule = classes()
-                .that().resideInAPackage("com.belman.application..")
+                .that().resideInAPackage("com.belman.usecase..")
                 .should().onlyDependOnClassesThat()
                 .resideInAnyPackage(
-                        "com.belman.application..",
+                        "com.belman.usecase..",
                         "com.belman.domain..",
                         "java..",
                         "javafx..",
@@ -65,7 +84,7 @@ public class LayerDependencyTest {
                 .resideInAnyPackage(
                         "com.belman.infrastructure..",
                         "com.belman.domain..",
-                        "com.belman.application..",
+                        "com.belman.usecase..",
                         "java..",
                         "javafx..",
                         "javax..",
@@ -83,7 +102,7 @@ public class LayerDependencyTest {
         ArchRule rule = layeredArchitecture()
                 .consideringAllDependencies()
                 .layer("Domain").definedBy("com.belman.domain..")
-                .layer("Application").definedBy("com.belman.application..")
+                .layer("Application").definedBy("com.belman.usecase..")
                 .layer("Infrastructure").definedBy("com.belman.infrastructure..")
                 .layer("Presentation").definedBy("com.belman.presentation..")
 

@@ -13,6 +13,7 @@ import com.belman.unit.backbone.util.GluonTestStorageHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,6 +75,7 @@ class GluonCompatibleSmtpEmailServiceTest {
     }
 
     @Test
+    @DisplayName("Send report to a single recipient should succeed")
     void sendReportToSingleRecipientShouldReturnTrue() {
         boolean result = emailService.sendReport(
             report,
@@ -87,6 +89,7 @@ class GluonCompatibleSmtpEmailServiceTest {
     }
 
     @Test
+    @DisplayName("Send report to multiple recipients should succeed")
     void sendReportToMultipleRecipientsShouldReturnTrue() {
         List<EmailAddress> recipients = new ArrayList<>();
         recipients.add(recipient);
@@ -104,6 +107,7 @@ class GluonCompatibleSmtpEmailServiceTest {
     }
 
     @Test
+    @DisplayName("Send report with file attachments should succeed")
     void sendReportWithAttachmentsShouldReturnTrue() {
         boolean result = emailService.sendReport(
             report,

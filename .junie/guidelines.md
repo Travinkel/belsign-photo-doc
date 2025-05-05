@@ -51,7 +51,7 @@ Before submitting changes, Junie should:
 
 2. **Run the application**: If UI changes are made, consider running the application to verify the changes work as expected.
    - The application can be run using: `mvn javafx:run`
-   - The main class is: `com.belman.Main`
+   - The main class is: `com.belman.infrastructure.bootstrap.Main`
 
 ## Code Style Guidelines
 When making changes, Junie should follow these code style guidelines:
@@ -1370,7 +1370,7 @@ mvn javafx:run
 Or using the full class path:
 
 ```bash
-mvn exec:java -Dexec.mainClass="com.belman.Main"
+mvn exec:java -Dexec.mainClass="com.belman.infrastructure.bootstrap.Main"
 ```
 
 ### Development Mode

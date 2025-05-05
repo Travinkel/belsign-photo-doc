@@ -3,50 +3,44 @@ name: Android Build
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
 
 jobs:
-  build:
+  build-android:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
-    
-    - name: Set up GraalVM
-      uses: graalvm/setup-graalvm@v1
-      with:
-        version: '22.3.1'
-        java-version: '17'
-        components: 'native-image'
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v2
-    
-    - name: Install Android NDK
-      run: |
-        sdkmanager --install "ndk;25.2.9519653"
-        echo "ANDROID_NDK=$ANDROID_HOME/ndk/25.2.9519653" >> $GITHUB_ENV
-    
-    - name: Build with Maven
-      run: mvn -B clean package
-    
-    - name: Build Android Debug APK
-      run: |
-        export GRAALVM_HOME=$GRAALVM_HOME
-        mvn -B -Pandroid-debug gluonfx:build
-    
-    - name: Upload APK
-      uses: actions/upload-artifact@v3
-      with:
-        name: app-debug
-        path: target/gluonfx/aarch64-android/gvm/BelSign.apk
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
+
+      - name: Install Android & Gluon SDKs
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip zip wget
+          wget https://download2.gluonhq.com/substrate/graalvm/graalvm-svm-linux-22.1.0.1-gluon.tar.gz
+          tar -xzf graalvm-svm-linux-22.1.0.1-gluon.tar.gz
+          export GRAALVM_HOME=$PWD/graalvm-svm-linux-22.1.0.1-gluon
+          export PATH=$GRAALVM_HOME/bin:$PATH
+          echo "GRAALVM_HOME=$GRAALVM_HOME" >> $GITHUB_ENV
+          echo "$GRAALVM_HOME/bin" >> $GITHUB_PATH
+
+      - name: Native Android build
+        run: ./mvnw gluonfx:build gluonfx:package -Pandroid
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: belsign-android-apk
+          path: target/gluonfx/host/*.apk

@@ -38,6 +38,14 @@ public class LoginViewController extends BaseController<LoginViewModel> {
     @Override
     public void initializeBinding() {
         // Bind UI components to ViewModel properties
+        if (getViewModel() == null) {
+            System.err.println("Error in LoginViewController.initializeBinding(): ViewModel is null");
+            // Create a temporary view model if it's null - this is just a safety measure
+            LoginViewModel tempViewModel = new LoginViewModel();
+            setViewModel(tempViewModel);
+            System.out.println("Created temporary LoginViewModel to avoid NullPointerException");
+        }
+
         usernameField.textProperty().bindBidirectional(getViewModel().usernameProperty());
         passwordField.textProperty().bindBidirectional(getViewModel().passwordProperty());
         errorMessageLabel.textProperty().bind(getViewModel().errorMessageProperty());

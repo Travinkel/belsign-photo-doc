@@ -8,21 +8,67 @@
 <?import com.gluonhq.charm.glisten.control.ProgressBar?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.paint.Color?>
 
 <StackPane xmlns:fx="http://javafx.com/fxml" 
            fx:controller="com.belman.presentation.views.splash.SplashViewController"
-           styleClass="splash-container"
-           stylesheets="/com/belman/styles/app.css">
-    <VBox styleClass="splash-content">
+           styleClass="splash-container, responsive-container"
+           stylesheets="@../../../styles/app.css">
+
+    <!-- Simple white background for better visibility -->
+    <Region styleClass="splash-background"/>
+
+    <VBox styleClass="splash-content" alignment="CENTER" spacing="20">
         <padding>
             <Insets top="30" right="30" bottom="30" left="30" />
         </padding>
-        <ImageView fx:id="logoImage" styleClass="splash-logo">
-            <Image url="/com/belman/images/logo.png"/>
+
+        <!-- Logo with subtle shadow effect -->
+        <ImageView fx:id="logoImage" styleClass="splash-logo, responsive-image"
+                   fitWidth="180" fitHeight="120" preserveRatio="true">
+            <Image url="@../../../images/logo.png"/>
+            <effect>
+                <DropShadow radius="5" spread="0.1">
+                    <color>
+                        <Color opacity="0.2"/>
+                    </color>
+                </DropShadow>
+            </effect>
         </ImageView>
-        <Label fx:id="titleLabel" text="BelSign" styleClass="title" />
-        <Label fx:id="subtitleLabel" text="Photo Documentation System" styleClass="subtitle" />
-        <ProgressBar fx:id="loadingProgress" progress="0.0" styleClass="splash-progress" />
-        <Label fx:id="messageLabel" text="Loading..." styleClass="body-text" />
+
+        <Label fx:id="titleLabel" text="BelSign" styleClass="splash-title">
+            <font>
+                <Font name="System Bold" size="28.0"/>
+            </font>
+        </Label>
+
+        <Label fx:id="subtitleLabel" text="Photo Documentation System" styleClass="subtitle">
+            <font>
+                <Font size="16.0"/>
+            </font>
+            <textFill>
+                <Color red="0.2" green="0.2" blue="0.2" opacity="0.8"/>
+            </textFill>
+        </Label>
+
+        <Region VBox.vgrow="ALWAYS" minHeight="25" maxHeight="25"/>
+
+        <ProgressBar fx:id="loadingProgress" progress="0.0" styleClass="splash-progress" prefWidth="240"
+                     maxWidth="280"/>
+
+        <Label fx:id="messageLabel" text="Loading..." styleClass="body-text">
+            <textFill>
+                <Color red="0.0" green="0.29" blue="0.53" opacity="0.8"/>
+            </textFill>
+        </Label>
+
+        <!-- Version display -->
+        <Label text="v1.0" styleClass="version-text">
+            <VBox.margin>
+                <Insets top="15.0"/>
+            </VBox.margin>
+        </Label>
     </VBox>
 </StackPane>

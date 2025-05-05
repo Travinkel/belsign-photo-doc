@@ -17,8 +17,10 @@
         <padding>
             <Insets top="30" right="30" bottom="30" left="30" />
         </padding>
-        <ImageView fx:id="logoImage" styleClass="splash-logo, responsive-image" 
-                   image="@/com/belman/images/logo.png" />
+        <ImageView fx:id="logoImage" styleClass="splash-logo, responsive-image"
+                   fitWidth="200" fitHeight="200" preserveRatio="true">
+            <Image url="@../images/logo.png"/>
+        </ImageView>
 
         <Label fx:id="titleLabel" text="BelSign" styleClass="title" />
         <Label fx:id="subtitleLabel" text="Photo Documentation System" styleClass="subtitle" />

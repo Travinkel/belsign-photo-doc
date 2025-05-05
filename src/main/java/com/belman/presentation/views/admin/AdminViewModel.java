@@ -1,6 +1,6 @@
 package com.belman.presentation.views.admin;
 
-import com.belman.application.admin.service.AdminService;
+import com.belman.application.usecases.admin.service.AdminService;
 import com.belman.presentation.core.BaseViewModel;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.aggregates.User.Role;
@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 public class AdminViewModel extends BaseViewModel<AdminViewModel> {
     private static final Logger LOGGER = Logger.getLogger(AdminViewModel.class.getName());
 
-    private final com.belman.application.admin.service.AdminService adminService;
+    private final AdminService adminService;
 
     // Properties for creating a user
     private final StringProperty username = new SimpleStringProperty();

@@ -83,7 +83,7 @@ mvn javafx:run
 Or using the full class path:
 
 ```bash
-mvn exec:java -Dexec.mainClass="com.belman.Main"
+mvn exec:java -Dexec.mainClass="com.belman.infrastructure.bootstrap.Main"
 ```
 
 ### Development Mode

@@ -4,7 +4,7 @@ package com.belman.presentation.views.main;
 import com.belman.presentation.core.BaseView;
 
 /**
- * com.belman.Main view of the application.
+ * com.belman.infrastructure.bootstrap.Main view of the application.
  * This is where the user lands after the splash screen.
  */
 public class MainView extends BaseView<MainViewModel> {

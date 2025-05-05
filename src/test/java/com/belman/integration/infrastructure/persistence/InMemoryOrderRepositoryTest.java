@@ -4,10 +4,12 @@ import com.belman.domain.aggregates.Order;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.enums.OrderStatus;
 import com.belman.domain.repositories.OrderRepository;
+import com.belman.domain.services.PasswordHasher;
 import com.belman.domain.specification.MinPhotosSpecification;
 import com.belman.domain.specification.Specification;
 import com.belman.domain.valueobjects.*;
 import com.belman.infrastructure.persistence.InMemoryOrderRepository;
+import com.belman.infrastructure.security.BCryptPasswordHasher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -30,6 +32,7 @@ public class InMemoryOrderRepositoryTest {
     private User testUser;
     private OrderId orderId;
     private OrderNumber orderNumber;
+    private PasswordHasher passwordHasher;
 
     @BeforeEach
     void setUp() {
@@ -39,10 +42,14 @@ public class InMemoryOrderRepositoryTest {
         orderRepository = new InMemoryOrderRepository();
         System.out.println("[DEBUG_LOG] Created InMemoryOrderRepository");
 
+        // Create a password hasher
+        passwordHasher = new BCryptPasswordHasher();
+        System.out.println("[DEBUG_LOG] Created BCryptPasswordHasher");
+
         // Create a test user
         UserId userId = new UserId(UUID.randomUUID());
         Username username = new Username("testuser");
-        HashedPassword password = HashedPassword.fromPlainText("password");
+        HashedPassword password = HashedPassword.fromPlainText("password", passwordHasher);
         EmailAddress email = new EmailAddress("testuser@example.com");
         testUser = new User(userId, username, password, email);
         System.out.println("[DEBUG_LOG] Created test user: " + username.value());

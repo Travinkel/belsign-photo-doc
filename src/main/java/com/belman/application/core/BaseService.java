@@ -1,9 +1,9 @@
 package com.belman.application.core;
 
 import com.belman.domain.services.Logger;
+import com.belman.domain.services.LoggerFactory;
 import com.belman.domain.shared.DomainEvent;
 import com.belman.domain.events.DomainEventPublisher;
-import com.belman.infrastructure.logging.EmojiLoggerAdapter;
 
 /**
  * Base class for all services.
@@ -18,9 +18,26 @@ public abstract class BaseService {
 
     /**
      * Creates a new BaseService with a logger for the concrete service class.
+     * 
+     * @param loggerFactory the factory to create loggers
      */
+    protected BaseService(LoggerFactory loggerFactory) {
+        if (loggerFactory == null) {
+            throw new IllegalArgumentException("LoggerFactory cannot be null");
+        }
+        this.logger = loggerFactory.getLogger(this.getClass());
+    }
+
+    /**
+     * Creates a new BaseService with a logger for the concrete service class.
+     * This constructor is deprecated and will be removed in a future version.
+     * Use the constructor with LoggerFactory parameter instead.
+     */
+    @Deprecated
     protected BaseService() {
-        this.logger = EmojiLoggerAdapter.getLogger(this.getClass());
+        // Try to get the LoggerFactory from ServiceLocator
+        LoggerFactory loggerFactory = ServiceLocator.getService(LoggerFactory.class);
+        this.logger = loggerFactory.getLogger(this.getClass());
     }
 
     /**

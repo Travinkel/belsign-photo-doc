@@ -4,12 +4,14 @@ import com.belman.domain.aggregates.User;
 import com.belman.domain.enums.UserStatus;
 import com.belman.domain.repositories.UserRepository;
 import com.belman.domain.services.AuthenticationService;
+import com.belman.domain.services.PasswordHasher;
 import com.belman.domain.valueobjects.EmailAddress;
 import com.belman.domain.valueobjects.HashedPassword;
 import com.belman.domain.valueobjects.PersonName;
 import com.belman.domain.valueobjects.UserId;
 import com.belman.domain.valueobjects.Username;
 import com.belman.infrastructure.persistence.InMemoryUserRepository;
+import com.belman.infrastructure.security.BCryptPasswordHasher;
 import com.belman.infrastructure.service.DefaultAuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,7 @@ public class AuthenticationServiceTest {
     private UserRepository userRepository;
     private AuthenticationService authenticationService;
     private User testUser;
+    private PasswordHasher passwordHasher;
 
     @BeforeEach
     void setUp() {
@@ -41,11 +44,14 @@ public class AuthenticationServiceTest {
         // Create the authentication service with the repository
         authenticationService = new DefaultAuthenticationService(userRepository);
 
+        // Create a password hasher
+        passwordHasher = new BCryptPasswordHasher();
+
         // Create a test user
         testUser = new User(
             UserId.newId(),
             new Username("testuser"),
-            HashedPassword.fromPlainText("testpassword"),
+            HashedPassword.fromPlainText("testpassword", passwordHasher),
             new PersonName("Test", "User"),
             new EmailAddress("test@example.com")
         );
@@ -162,7 +168,7 @@ public class AuthenticationServiceTest {
         User lockableUser = new User(
             UserId.newId(),
             new Username("lockableuser"),
-            HashedPassword.fromPlainText("password123"),
+            HashedPassword.fromPlainText("password123", passwordHasher),
             new PersonName("Lockable", "User"),
             new EmailAddress("lockable@example.com")
         );

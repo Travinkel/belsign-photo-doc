@@ -37,6 +37,9 @@ public class SessionManager extends BaseService {
      */
     public static synchronized SessionManager getInstance(AuthenticationService authenticationService) {
         if (instance == null) {
+            if (authenticationService == null) {
+                throw new IllegalArgumentException("AuthenticationService cannot be null");
+            }
             instance = new SessionManager(authenticationService);
         }
         return instance;
@@ -48,6 +51,9 @@ public class SessionManager extends BaseService {
      * @return the SessionManager instance, or null if it hasn't been initialized yet
      */
     public static SessionManager getInstance() {
+        if (instance == null) {
+            System.err.println("WARNING: SessionManager.getInstance() called before initialization");
+        }
         return instance;
     }
 
@@ -113,6 +119,25 @@ public class SessionManager extends BaseService {
      * @return an Optional containing the authenticated User if successful, or empty if authentication failed
      */
     public Optional<User> login(String username, String password) {
-        return authenticationService.authenticate(username, password);
+        if (authenticationService == null) {
+            logError("AuthenticationService is null. Cannot perform login.");
+            return Optional.empty();
+        }
+
+        try {
+            logInfo("Attempting to authenticate user: {}", username);
+            Optional<User> user = authenticationService.authenticate(username, password);
+
+            if (user.isPresent()) {
+                logInfo("Authentication successful for user: {}", username);
+            } else {
+                logWarn("Authentication failed for user: {}", username);
+            }
+
+            return user;
+        } catch (Exception e) {
+            logError("Error during authentication: {}", e.getMessage(), e);
+            return Optional.empty();
+        }
     }
 }

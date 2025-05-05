@@ -1,6 +1,7 @@
 package com.belman.domain.valueobjects;
 
-import org.mindrot.jbcrypt.BCrypt;
+import com.belman.domain.services.PasswordHasher;
+
 /**
  * Represents a securely hashed password.
  * Cannot be null or empty.
@@ -18,11 +19,22 @@ public record HashedPassword(String value) {
         }
     }
 
-    public static HashedPassword fromPlainText(String plainTextPassword) {
+    /**
+     * Creates a new HashedPassword from a plain text password.
+     *
+     * @param plainTextPassword the plain text password to hash
+     * @param passwordHasher the password hasher to use
+     * @return a new HashedPassword instance
+     * @throws IllegalArgumentException if the plain text password is null or blank
+     */
+    public static HashedPassword fromPlainText(String plainTextPassword, PasswordHasher passwordHasher) {
         if (plainTextPassword == null || plainTextPassword.isBlank()) {
             throw new IllegalArgumentException("Plain text password must not be null or blank");
         }
-        String hashed = BCrypt.hashpw(plainTextPassword, BCrypt.gensalt());
+        if (passwordHasher == null) {
+            throw new IllegalArgumentException("Password hasher must not be null");
+        }
+        String hashed = passwordHasher.hash(plainTextPassword);
         return new HashedPassword(hashed);
     }
 
@@ -30,13 +42,14 @@ public record HashedPassword(String value) {
      * Checks if this hashed password matches a plain text password.
      *
      * @param plainTextPassword the plain text password to check
+     * @param passwordHasher the password hasher to use
      * @return true if the password matches, false otherwise
      */
-    public boolean matches(String plainTextPassword) {
-        if (plainTextPassword == null || plainTextPassword.isBlank()) {
+    public boolean matches(String plainTextPassword, PasswordHasher passwordHasher) {
+        if (plainTextPassword == null || plainTextPassword.isBlank() || passwordHasher == null) {
             return false;
         }
-        return BCrypt.checkpw(plainTextPassword, value);
+        return passwordHasher.verify(plainTextPassword, value);
     }
 
     /**

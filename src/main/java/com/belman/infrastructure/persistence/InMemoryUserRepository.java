@@ -2,11 +2,13 @@ package com.belman.infrastructure.persistence;
 
 import com.belman.domain.aggregates.User;
 import com.belman.domain.repositories.UserRepository;
+import com.belman.domain.services.PasswordHasher;
 import com.belman.domain.valueobjects.EmailAddress;
 import com.belman.domain.valueobjects.HashedPassword;
 import com.belman.domain.valueobjects.PersonName;
 import com.belman.domain.valueobjects.Username;
 import com.belman.domain.valueobjects.UserId;
+import com.belman.infrastructure.security.BCryptPasswordHasher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,11 +36,14 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     private void createDefaultUsers() {
+        // Create password hasher
+        PasswordHasher passwordHasher = new BCryptPasswordHasher();
+
         // Create admin user with both old and new credentials
         User adminUser = new User(
             UserId.newId(),
             new Username("admin"),
-            HashedPassword.fromPlainText("admin"),
+            HashedPassword.fromPlainText("admin", passwordHasher),
             new PersonName("Admin", "User"),
             new EmailAddress("admin@belman.com")
         );
@@ -48,7 +53,7 @@ public class InMemoryUserRepository implements UserRepository {
         User adminUser2 = new User(
             UserId.newId(),
             new Username("admin"),
-            HashedPassword.fromPlainText("password123"),
+            HashedPassword.fromPlainText("password123", passwordHasher),
             new PersonName("Admin", "User"),
             new EmailAddress("admin@belman.com")
         );
@@ -58,7 +63,7 @@ public class InMemoryUserRepository implements UserRepository {
         User productionUser = new User(
             UserId.newId(),
             new Username("production"),
-            HashedPassword.fromPlainText("production"),
+            HashedPassword.fromPlainText("production", passwordHasher),
             new PersonName("Production", "User"),
             new EmailAddress("production@belman.com")
         );
@@ -68,7 +73,7 @@ public class InMemoryUserRepository implements UserRepository {
         User qaUser = new User(
             UserId.newId(),
             new Username("qa"),
-            HashedPassword.fromPlainText("qa"),
+            HashedPassword.fromPlainText("qa", passwordHasher),
             new PersonName("QA", "User"),
             new EmailAddress("qa@belman.com")
         );
@@ -78,7 +83,7 @@ public class InMemoryUserRepository implements UserRepository {
         User qaUser2 = new User(
             UserId.newId(),
             new Username("qa_user"),
-            HashedPassword.fromPlainText("qa"),
+            HashedPassword.fromPlainText("qa", passwordHasher),
             new PersonName("QA", "User"),
             new EmailAddress("qa_user@belman.com")
         );

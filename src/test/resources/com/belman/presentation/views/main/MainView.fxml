@@ -16,7 +16,7 @@
           AnchorPane.leftAnchor="0.0">
         <Label text="BelSign - Photo Documentation System" 
                style="-fx-text-fill: #004b88; -fx-font-weight: bold; -fx-font-size: 24px;"/>
-        <Label text="com.belman.Main Application View"
+        <Label text="com.belman.infrastructure.bootstrap.Main Application View"
                style="-fx-text-fill: #333535; -fx-font-size: 18px;"/>
     </VBox>
 </AnchorPane>

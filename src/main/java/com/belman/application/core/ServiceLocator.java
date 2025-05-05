@@ -35,6 +35,24 @@ public class ServiceLocator {
     }
 
     /**
+     * Registers a service instance only if it doesn't already exist.
+     *
+     * @param serviceClass    the service class
+     * @param serviceInstance the service instance
+     * @return true if the service was registered, false if it already existed
+     */
+    public static <T> boolean registerServiceIfAbsent(Class<T> serviceClass, T serviceInstance) {
+        if (serviceInstance == null) {
+            throw new IllegalArgumentException("Service instance cannot be null for: " + serviceClass.getSimpleName());
+        }
+        if (services.containsKey(serviceClass)) {
+            return false;
+        }
+        services.put(serviceClass, serviceInstance);
+        return true;
+    }
+
+    /**
      * Injects services into the target object.
      *
      * @param target the object to inject services into

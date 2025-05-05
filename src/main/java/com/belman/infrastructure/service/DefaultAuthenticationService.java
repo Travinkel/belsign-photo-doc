@@ -6,7 +6,9 @@ import com.belman.domain.events.UserLoggedInEvent;
 import com.belman.domain.events.UserLoggedOutEvent;
 import com.belman.domain.repositories.UserRepository;
 import com.belman.domain.services.AuthenticationService;
+import com.belman.domain.services.PasswordHasher;
 import com.belman.domain.valueobjects.Username;
+import com.belman.infrastructure.security.BCryptPasswordHasher;
 
 import java.util.Optional;
 import java.util.Map;
@@ -19,6 +21,7 @@ import java.time.Duration;
  */
 public class DefaultAuthenticationService extends BaseService implements AuthenticationService {
     private final UserRepository userRepository;
+    private final PasswordHasher passwordHasher;
     private User currentUser;
     private Instant lastActivityTime;
 
@@ -51,6 +54,7 @@ public class DefaultAuthenticationService extends BaseService implements Authent
      */
     public DefaultAuthenticationService(UserRepository userRepository) {
         this.userRepository = userRepository;
+        this.passwordHasher = new BCryptPasswordHasher();
     }
 
     /**
@@ -124,7 +128,7 @@ public class DefaultAuthenticationService extends BaseService implements Authent
                 }
 
                 // Check if the password matches the user's password
-                boolean isValid = user.getPassword().matches(password);
+                boolean isValid = user.getPassword().matches(password, passwordHasher);
 
                 if (isValid) {
                     // Reset failed login attempts

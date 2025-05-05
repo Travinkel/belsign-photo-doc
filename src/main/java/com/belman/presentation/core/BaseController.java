@@ -1,6 +1,7 @@
 package com.belman.presentation.core;
 
 import com.belman.application.core.ControllerLifecycle;
+import javafx.application.Platform;
 
 /**
  * Base class for all controllers in the application.
@@ -28,6 +29,26 @@ public abstract class BaseController<T extends BaseViewModel<?>> implements Cont
      */
     public T getViewModel() {
         return viewModel;
+    }
+
+    /**
+     * Gets the class name of the controller.
+     * 
+     * @return the simple class name of the controller
+     */
+    @Override
+    public String getControllerName() {
+        return this.getClass().getSimpleName();
+    }
+
+    /**
+     * Initializes the controller.
+     * This method is called once when the controller is created.
+     */
+    @Override
+    public void initialize() {
+        // Default implementation initializes bindings
+        Platform.runLater(this::initializeBinding);
     }
 
     /**

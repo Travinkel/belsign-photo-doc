@@ -1,6 +1,7 @@
 package com.belman.presentation.core;
 
-import com.belman.application.core.GluonLifecycleManager;
+import com.belman.application.core.LifecycleManager;
+import com.belman.application.core.ServiceLocator;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.control.ProgressIndicator;
@@ -10,7 +11,11 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+
+import java.io.IOException;
+import java.net.URL;
 
 /**
  * Base class for all views in the application.
@@ -19,7 +24,7 @@ import javafx.scene.Node;
  * 
  * @param <T> The type of ViewModel associated with this view
  */
-public abstract class BaseView<T extends BaseViewModel<?>> extends View {
+public abstract class BaseView<T extends BaseViewModel<?>> extends View implements com.belman.application.core.ViewLifecycle<T, BaseController<?>> {
 
     private final BaseController<?> controller;
     protected final T viewModel;
@@ -41,17 +46,13 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View {
     public BaseView() {
         try {
             var components = ViewLoader.load(this.getClass());
-
             if (components == null) {
-                throw new RuntimeException("ViewLoader failed to load components for: " + this.getClass().getSimpleName());
+                throw new RuntimeException("ViewLoader failed to load components for: " + getClass().getSimpleName());
             }
 
-            // Set the loaded parent as the center of the view
-            Node parentNode = (Node) components.parent();
-            this.setCenter(parentNode);
-
-            this.controller = components.controller();
             this.viewModel = (T) components.viewModel();
+            this.controller = components.controller();
+            this.setCenter((Node) components.parent());
 
             // Initialize the loading indicator
             loadingIndicator = new ProgressIndicator();
@@ -66,14 +67,53 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View {
         }
     }
 
-    private void initializeLifecycleListeners() {
-        // Register this view with the GluonLifecycleManager for lifecycle management
+    /**
+     * Creates the ViewModel for this View.
+     * Default implementation uses NamingConventions to find the ViewModel class.
+     *
+     * @return the ViewModel instance
+     */
+    @SuppressWarnings("unchecked")
+    protected T createViewModel() {
         try {
-            GluonLifecycleManager.registerView(this);
+            String viewModelClassName = getClass().getName().replace("View", "ViewModel");
+            Class<?> viewModelClass = Class.forName(viewModelClassName);
+            return (T) viewModelClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create ViewModel for " + getClass().getSimpleName(), e);
+        }
+    }
+
+    /**
+     * Loads the FXML file for this View.
+     * Default implementation uses the View class name to find the FXML file.
+     *
+     * @return the FXMLLoader instance
+     */
+    protected FXMLLoader loadFXML() throws IOException {
+        String viewName = getClass().getSimpleName();
+        String fxmlPath = "/" + getClass().getPackageName().replace('.', '/') + "/" + viewName + ".fxml";
+
+        URL fxmlUrl = getClass().getResource(viewName + ".fxml");
+        if (fxmlUrl == null) {
+            fxmlUrl = getClass().getResource(fxmlPath);
+        }
+
+        if (fxmlUrl == null) {
+            throw new IOException("FXML file not found for " + viewName);
+        }
+
+        return new FXMLLoader(fxmlUrl);
+    }
+
+    private void initializeLifecycleListeners() {
+        // Register this view with the LifecycleManager for lifecycle management
+        try {
+            LifecycleManager.registerView(this);
         } catch (Exception e) {
             // Gracefully handle any exceptions during registration
             // This ensures that unit tests and other scenarios without the full framework still work
-            System.err.println("Warning: Could not register view with GluonLifecycleManager: " + e.getMessage());
+            System.err.println("Warning: Could not register view with LifecycleManager: " + e.getMessage());
         }
 
         // Keep the original listener for backward compatibility
@@ -89,8 +129,10 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View {
     /**
      * Called when the view is shown.
      * Delegates to the ViewModel's onShow method.
+     * Implementation of the ViewLifecycle interface.
      */
-    protected void onViewShown() {
+    @Override
+    public void onViewShown() {
         if (viewModel != null) {
             viewModel.onShow();
         }
@@ -105,8 +147,10 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View {
     /**
      * Called when the view is hidden.
      * Delegates to the ViewModel's onHide method.
+     * Implementation of the ViewLifecycle interface.
      */
-    protected void onViewHidden() {
+    @Override
+    public void onViewHidden() {
         if (viewModel != null) {
             viewModel.onHide();
         }
@@ -138,6 +182,28 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View {
      */
     protected void setUpAppBar() {
         // To be overridden by subclasses
+    }
+
+    /**
+     * Gets the class name of the view.
+     * Implementation of the ViewLifecycle interface.
+     * 
+     * @return the simple class name of the view
+     */
+    @Override
+    public String getViewName() {
+        return this.getClass().getSimpleName();
+    }
+
+    /**
+     * Gets the underlying View object.
+     * Implementation of the ViewLifecycle interface.
+     * 
+     * @return this view
+     */
+    @Override
+    public View getView() {
+        return this;
     }
 
     /**

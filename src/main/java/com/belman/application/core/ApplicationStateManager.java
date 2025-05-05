@@ -1,6 +1,5 @@
 package com.belman.application.core;
 
-import com.belman.application.core.EventManager;
 import com.belman.domain.events.ApplicationBackgroundedEvent;
 import com.belman.domain.events.ApplicationPausedEvent;
 import com.belman.domain.events.ApplicationResumedEvent;
@@ -8,7 +7,8 @@ import com.belman.domain.events.ApplicationStartedEvent;
 import com.belman.domain.events.ApplicationStateEvent;
 import com.belman.domain.events.ApplicationStateEvent.ApplicationState;
 import com.belman.domain.events.ApplicationStoppedEvent;
-import com.belman.infrastructure.logging.EmojiLogger;
+import com.belman.domain.services.Logger;
+import com.belman.domain.services.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.function.Consumer;
  * handling state transitions, and notifying listeners of state changes.
  */
 public class ApplicationStateManager {
-    private static final EmojiLogger logger = EmojiLogger.getLogger(ApplicationStateManager.class);
+    private static Logger logger;
     private static ApplicationState currentState = ApplicationState.STARTING;
     private static final List<Consumer<ApplicationStateEvent>> stateChangeListeners = new CopyOnWriteArrayList<>();
     private static final List<Runnable> backgroundTasks = new ArrayList<>();
@@ -45,11 +45,15 @@ public class ApplicationStateManager {
      */
     public static void transitionTo(ApplicationState newState) {
         if (newState == currentState) {
-            logger.debug("Application is already in state: {}", newState);
+            if (logger != null) {
+                logger.debug("Application is already in state: {}", newState);
+            }
             return;
         }
 
-        logger.info("Application transitioning from {} to {}", currentState, newState);
+        if (logger != null) {
+            logger.info("Application transitioning from {} to {}", currentState, newState);
+        }
         ApplicationStateEvent event = createEventForState(newState);
         currentState = newState;
 
@@ -112,12 +116,16 @@ public class ApplicationStateManager {
      * Executes tasks that should run when the application goes to the background.
      */
     private static void executeBackgroundTasks() {
-        logger.debug("Executing background tasks");
+        if (logger != null) {
+            logger.debug("Executing background tasks");
+        }
         for (Runnable task : backgroundTasks) {
             try {
                 task.run();
             } catch (Exception e) {
-                logger.error("Error executing background task: {}", e.getMessage(), e);
+                if (logger != null) {
+                    logger.error("Error executing background task: {}", e.getMessage(), e);
+                }
             }
         }
     }
@@ -126,12 +134,16 @@ public class ApplicationStateManager {
      * Executes tasks that should run when the application comes to the foreground.
      */
     private static void executeForegroundTasks() {
-        logger.debug("Executing foreground tasks");
+        if (logger != null) {
+            logger.debug("Executing foreground tasks");
+        }
         for (Runnable task : foregroundTasks) {
             try {
                 task.run();
             } catch (Exception e) {
-                logger.error("Error executing foreground task: {}", e.getMessage(), e);
+                if (logger != null) {
+                    logger.error("Error executing foreground task: {}", e.getMessage(), e);
+                }
             }
         }
     }
@@ -140,12 +152,16 @@ public class ApplicationStateManager {
      * Executes tasks that should run when the application is shutting down.
      */
     private static void executeShutdownTasks() {
-        logger.debug("Executing shutdown tasks");
+        if (logger != null) {
+            logger.debug("Executing shutdown tasks");
+        }
         for (Runnable task : shutdownTasks) {
             try {
                 task.run();
             } catch (Exception e) {
-                logger.error("Error executing shutdown task: {}", e.getMessage(), e);
+                if (logger != null) {
+                    logger.error("Error executing shutdown task: {}", e.getMessage(), e);
+                }
             }
         }
     }
@@ -178,7 +194,9 @@ public class ApplicationStateManager {
             try {
                 listener.accept(event);
             } catch (Exception e) {
-                logger.error("Error notifying state change listener: {}", e.getMessage(), e);
+                if (logger != null) {
+                    logger.error("Error notifying state change listener: {}", e.getMessage(), e);
+                }
             }
         }
     }
@@ -215,7 +233,22 @@ public class ApplicationStateManager {
      * This method should be called once during application startup.
      */
     public static void initialize() {
-        logger.info("Initializing ApplicationStateManager");
+        if (logger != null) {
+            logger.info("Initializing ApplicationStateManager");
+        }
         transitionTo(ApplicationState.STARTING);
+    }
+
+    /**
+     * Sets the logger for this class.
+     * This method should be called before using any methods in this class.
+     * 
+     * @param loggerFactory the factory to create loggers
+     */
+    public static void setLogger(LoggerFactory loggerFactory) {
+        if (loggerFactory == null) {
+            throw new IllegalArgumentException("LoggerFactory cannot be null");
+        }
+        logger = loggerFactory.getLogger(ApplicationStateManager.class);
     }
 }

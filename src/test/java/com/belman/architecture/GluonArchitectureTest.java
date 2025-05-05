@@ -23,10 +23,10 @@ public class GluonArchitectureTest {
 
     @Test
     public void glistenShouldOnlyBeUsedInPresentationLayer() {
-        ArchRule rule = classes()
+        ArchRule rule = noClasses()
                 .that().resideOutsideOfPackage("..presentation..")
-                .should().onlyDependOnClassesThat().resideOutsideOfPackage("com.gluonhq.charm.glisten..")
-                .because("Glisten UI components should only be used in the presentation layer");
+                .should().dependOnClassesThat().resideInAnyPackage("com.gluonhq.charm.glisten..")
+                .because("Glisten UI components must only be used in the presentation layer to maintain separation of concerns");
 
         rule.check(importedClasses);
     }
@@ -36,7 +36,7 @@ public class GluonArchitectureTest {
         ArchRule rule = noClasses()
                 .that().resideInAPackage("..domain..")
                 .should().dependOnClassesThat().resideInAnyPackage("com.gluonhq.attach..")
-                .because("Attach services should not be accessed from the domain layer");
+                .because("Domain layer must remain independent of platform-specific services");
 
         rule.check(importedClasses);
     }
@@ -46,18 +46,18 @@ public class GluonArchitectureTest {
         ArchRule rule = noClasses()
                 .that().resideInAPackage("..domain..")
                 .should().dependOnClassesThat().resideInAnyPackage("javafx..")
-                .because("Domain should be independent of UI frameworks");
+                .because("Domain layer must not depend on UI frameworks like JavaFX");
 
         rule.check(importedClasses);
     }
 
     @Test
-    public void lifecycleAnnotationsShouldOnlyBeInOuterLayers() {
+    public void lifecycleAnnotationsShouldOnlyBeInInfrastructureOrPresentationLayers() {
         ArchRule rule = classes()
                 .that().areAnnotatedWith("javax.annotation.PostConstruct")
                 .or().areAnnotatedWith("javax.annotation.PreDestroy")
                 .should().resideInAnyPackage("..infrastructure..", "..presentation..")
-                .because("Lifecycle methods should only exist in outer layers");
+                .because("Lifecycle annotations should only exist in outer layers to manage application lifecycle");
 
         rule.check(importedClasses);
     }

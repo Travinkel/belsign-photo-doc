@@ -3,6 +3,7 @@ package com.belman.integration.infrastructure.persistence;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.enums.UserStatus;
 import com.belman.domain.repositories.UserRepository;
+import com.belman.domain.services.PasswordHasher;
 import com.belman.domain.valueobjects.EmailAddress;
 import com.belman.domain.valueobjects.HashedPassword;
 import com.belman.domain.valueobjects.PersonName;
@@ -10,6 +11,7 @@ import com.belman.domain.valueobjects.UserId;
 import com.belman.domain.valueobjects.Username;
 import com.belman.infrastructure.config.DatabaseConfig;
 import com.belman.infrastructure.persistence.SqlUserRepository;
+import com.belman.infrastructure.security.BCryptPasswordHasher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,6 +31,7 @@ public class SqlUserRepositoryTest {
 
     private UserRepository userRepository;
     private User testUser;
+    private PasswordHasher passwordHasher;
 
     @BeforeEach
     void setUp() {
@@ -50,11 +53,15 @@ public class SqlUserRepositoryTest {
         userRepository = new SqlUserRepository(dataSource);
         System.out.println("[DEBUG_LOG] Created SqlUserRepository");
 
+        // Create a password hasher
+        passwordHasher = new BCryptPasswordHasher();
+        System.out.println("[DEBUG_LOG] Created BCryptPasswordHasher");
+
         // Create a test user with a unique ID, username, and email
         String uniqueId = UUID.randomUUID().toString().substring(0, 8);
         UserId userId = new UserId(UUID.randomUUID());
         Username username = new Username("testuser_" + uniqueId);
-        HashedPassword password = HashedPassword.fromPlainText("password");
+        HashedPassword password = HashedPassword.fromPlainText("password", passwordHasher);
         PersonName name = new PersonName("Test", "User");
         EmailAddress email = new EmailAddress("testuser_" + uniqueId + "@example.com");
 
