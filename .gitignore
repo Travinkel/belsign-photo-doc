@@ -1,38 +1,60 @@
-target/
-!.mvn/wrapper/maven-wrapper.jar
+
+# Build outputs
+/target/
+/build/
 !**/src/main/**/target/
 !**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
-### IntelliJ IDEA ###
+# Maven wrapper JAR (keep)
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE configurations
+.idea/
+*.iml
+*.iws
+*.ipr
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
-*.iws
-*.iml
-*.ipr
+.vscode/
 
-### Eclipse ###
-.apt_generated
+# Eclipse
 .classpath
-.factorypath
 .project
-.settings
+.settings/
+.apt_generated
+.factorypath
 .springBeans
 .sts4-cache
 
-### NetBeans ###
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+# Logs
+*.log
+hs_err_pid*.log
 
-### Mac OS ###
+# OS-specific files
 .DS_Store
+Thumbs.db
+
+# Unison sync junk
+*.prf
+*.prf~
+*.unison
+
+# GraalVM + Gluon native image
+**/gluonfx/**/gvm/
+**/gluonfx/**/tmp/
+**/gluonfx/**/substrate/
+src/main/resources/META-INF/native-image/
+
+# Android build outputs
+/*.apk

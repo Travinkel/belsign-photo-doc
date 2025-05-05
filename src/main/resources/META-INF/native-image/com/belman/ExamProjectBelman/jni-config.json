@@ -1,0 +1,42 @@
+[
+  {
+    "name": "com.gluonhq.attach.storage.StorageService",
+    "methods": [
+      { "name": "getPrivateStorage", "parameterTypes": [] },
+      { "name": "getPublicStorage", "parameterTypes": [] },
+      { "name": "isExternalStorageWritable", "parameterTypes": [] },
+      { "name": "isExternalStorageReadable", "parameterTypes": [] }
+    ]
+  },
+  {
+    "name": "com.gluonhq.attach.display.DisplayService",
+    "methods": [
+      { "name": "isTablet", "parameterTypes": [] },
+      { "name": "getScreenResolution", "parameterTypes": [] },
+      { "name": "getScreenSize", "parameterTypes": [] }
+    ]
+  },
+  {
+    "name": "com.gluonhq.attach.lifecycle.LifecycleService",
+    "methods": [
+      { "name": "create", "parameterTypes": [] },
+      { "name": "addListener", "parameterTypes": ["com.gluonhq.attach.lifecycle.LifecycleEvent", "java.lang.Runnable"] }
+    ]
+  },
+  {
+    "name": "com.gluonhq.attach.pictures.PicturesService",
+    "methods": [
+      { "name": "create", "parameterTypes": [] },
+      { "name": "takePhoto", "parameterTypes": [] },
+      { "name": "retrieveImageFromGallery", "parameterTypes": [] }
+    ]
+  },
+  {
+    "name": "com.gluonhq.attach.connectivity.ConnectivityService",
+    "methods": [
+      { "name": "create", "parameterTypes": [] },
+      { "name": "isConnected", "parameterTypes": [] },
+      { "name": "getConnectionType", "parameterTypes": [] }
+    ]
+  }
+]
