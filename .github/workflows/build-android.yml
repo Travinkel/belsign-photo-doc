@@ -1,4 +1,4 @@
-# .GitHub/workflows/build-android.yml
+# .github/workflows/build-android.yml
 name: Build Android APK
 
 on:
