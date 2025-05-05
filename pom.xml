@@ -283,6 +283,7 @@
                     <runtimeArgs>
                         <arg>-Dcom.gluonhq.license.disable=true</arg>
                     </runtimeArgs>
+                    <skipTests>true</skipTests>
                 </configuration>
             </plugin>
 

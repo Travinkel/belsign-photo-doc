@@ -37,6 +37,14 @@ jobs:
           sdkmanager --install "ndk;25.2.9519653"
           echo "ANDROID_NDK=$ANDROID_HOME/ndk/25.2.9519653" >> $GITHUB_ENV
 
+      - name: Install required Android SDK packages
+        run: |
+          sdkmanager --install "platforms;android-34" \
+                              "build-tools;34.0.0" \
+                              "platform-tools" \
+                              "extras;android;m2repository" \
+                              "extras;google;m2repository"
+
       - name: Build Android APK
         run: |
           mvn -B -Pandroid gluonfx:build gluonfx:package
