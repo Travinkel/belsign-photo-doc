@@ -44,7 +44,7 @@ jobs:
         with:
           api-level: 34
           build-tools: 34.0.0
-          ndk: 23.1.7779620 # Updated NDK version
+          ndk: 21.4.7075529 # Gluon Substrate requires this NDK version
           cmake: 3.22.1
 
       - name: Accept Android SDK Licenses
@@ -59,15 +59,15 @@ jobs:
                               "extras;google;m2repository"
 
       - name: Set ANDROID_NDK environment variable
-        run: echo "ANDROID_NDK=$ANDROID_HOME/ndk/23.1.7779620" >> $GITHUB_ENV
+        run: echo "ANDROID_NDK=$ANDROID_HOME/ndk/21.4.7075529" >> $GITHUB_ENV
 
       - name: Verify Android SDK Installation
         run: |
           sdkmanager --list || { echo "Android SDK setup failed"; exit 1; }
 
-      - name: Build Android APK
+      - name: Build Android APK with Gluon Substrate
         run: |
-          mvn -B -Pandroid gluonfx:build gluonfx:package
+          mvn -B gluonfx:build gluonfx:package -Pandroid
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
