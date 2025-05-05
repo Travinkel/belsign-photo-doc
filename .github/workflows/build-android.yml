@@ -17,24 +17,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Java
+      - name: Set up Java (used for Maven)
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Set up Android SDK
+      - name: Install Android SDK
         uses: android-actions/setup-android@v2
 
-      - name: Install Gluon Plugin (Optional Stub)
+      - name: Download Gluon GraalVM CE
         run: |
-          mkdir -p ~/.gluon/substrate
-          echo "{}" > ~/.gluon/substrate/plugins.json
+          wget https://download2.gluonhq.com/substrate/graalvm/graalvm-svm-linux-gluon-22.1.0.1-Final.zip -O graalvm.zip
+          unzip -q graalvm.zip -d $HOME
+          echo "GRAALVM_HOME=$HOME/graalvm-svm-22.1.0.1-Final" >> $GITHUB_ENV
 
       - name: Build APK
-        run: mvn gluonfx:build gluonfx:package -Pandroid
+        run: mvn -Pandroid gluonfx:build gluonfx:package
 
-      - name: Upload APK to Artifacts
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: belsign-apk
