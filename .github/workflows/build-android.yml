@@ -1,0 +1,36 @@
+# .GitHub/workflows/build-android.yml
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Set up Gluon client plugin
+        run: |
+          mkdir -p ~/.gluon/substrate
+          echo "{}" > ~/.gluon/substrate/plugins.json
+
+      - name: Build APK
+        run: mvn gluonfx:build gluonfx:package -Pandroid
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: belsign-apk
+          path: target/gluonfx/aarch64-android/*.apk
