@@ -29,16 +29,26 @@ jobs:
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Cache Android SDK and Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.android
+            ~/.gradle
+          key: ${{ runner.os }}-android-gradle-${{ hashFiles('**/*.gradle*', '**/build.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-android-gradle-
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
         with:
           api-level: 34
           build-tools: 34.0.0
-          ndk: 25.2.9519653
+          ndk: 23.1.7779620 # Updated NDK version
           cmake: 3.22.1
 
       - name: Accept Android SDK Licenses
-        run: yes | sdkmanager --licenses
+        run: yes | sdkmanager --licenses || true
 
       - name: Install Required Android SDK Packages
         run: |
@@ -49,7 +59,11 @@ jobs:
                               "extras;google;m2repository"
 
       - name: Set ANDROID_NDK environment variable
-        run: echo "ANDROID_NDK=$ANDROID_HOME/ndk/25.2.9519653" >> $GITHUB_ENV
+        run: echo "ANDROID_NDK=$ANDROID_HOME/ndk/23.1.7779620" >> $GITHUB_ENV
+
+      - name: Verify Android SDK Installation
+        run: |
+          sdkmanager --list || { echo "Android SDK setup failed"; exit 1; }
 
       - name: Build Android APK
         run: |
