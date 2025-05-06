@@ -4,28 +4,31 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Base interface for all domain events in the application.
- * Domain events represent something that happened in the domain that domain experts care about.
+ * Base interface for all domain events in the system.
+ * <p>
+ * Domain events represent significant occurrences within the domain model that other
+ * parts of the application might be interested in. They are immutable records of
+ * something that happened in the domain.
  */
 public interface DomainEvent {
 
     /**
-     * Gets the unique identifier for this event.
-     * 
+     * Returns the unique identifier for this event.
+     *
      * @return the event ID
      */
     UUID getEventId();
 
     /**
-     * Gets the timestamp when this event occurred.
-     * 
+     * Returns the timestamp when this event occurred.
+     *
      * @return the event timestamp
      */
-    Instant getTimestamp();
+    Instant getOccurredOn();
 
     /**
-     * Gets the type of this event.
-     * 
+     * Returns the type of this event.
+     *
      * @return the event type
      */
     String getEventType();

@@ -10,39 +10,33 @@ import com.belman.domain.shared.DomainEvent;
  * Provides common functionality and standardizes service implementation.
  * This class is designed to be used in the domain layer and does not depend on outer layers.
  */
-public abstract class DomainService {
+public abstract class DomainService implements IDomainService {
 
     /**
-     * Logger for this service.
+     * The logger for this service.
      */
     protected final Logger logger;
 
     /**
-     * The logger factory used to create loggers.
+     * Gets the logger factory to use for creating loggers.
+     * <p>
+     * This method must be implemented by subclasses to provide a LoggerFactory.
+     * The factory is typically injected by the infrastructure layer.
+     *
+     * @return the LoggerFactory to use for creating loggers
      */
-    private static LoggerFactory loggerFactory;
+    protected abstract LoggerFactory getLoggerFactory();
 
     /**
-     * Sets the logger factory to be used by all domain services.
-     * This method should be called during application initialization.
-     * 
-     * @param factory the logger factory to use
+     * Gets a string representation of the service's state for logging purposes.
+     * <p>
+     * By default, this method returns an empty string.
+     * Subclasses may override this method to provide a different representation.
+     *
+     * @return a string representation of the service's state
      */
-    public static void setLoggerFactory(LoggerFactory factory) {
-        loggerFactory = factory;
-    }
-
-    /**
-     * Gets the logger factory.
-     * 
-     * @return the logger factory
-     * @throws IllegalStateException if the logger factory has not been set
-     */
-    protected static LoggerFactory getLoggerFactory() {
-        if (loggerFactory == null) {
-            throw new IllegalStateException("LoggerFactory has not been set. Call DomainService.setLoggerFactory() during application initialization.");
-        }
-        return loggerFactory;
+    protected String getStateForLogging() {
+        return "";
     }
 
     /**

@@ -1,8 +1,6 @@
 package com.belman.domain.events;
 
 import com.belman.domain.services.Logger;
-// Import the interfaces from the same package
-// No need to import DomainEvent and DomainEventHandler as they are in the same package
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +14,7 @@ import java.util.concurrent.Executors;
  * This class is responsible for publishing domain events and notifying registered handlers.
  * It follows the publisher-subscriber pattern.
  */
-public class DomainEventPublisher {
+public class DomainEventPublisher implements IDomainEventPublisher {
     private static DomainEventPublisher instance = new DomainEventPublisher();
     private Logger logger;
 
@@ -157,14 +155,8 @@ public class DomainEventPublisher {
         }
     }
 
-    /**
-     * Publishes an event to all registered handlers.
-     * 
-     * @param <T> the type of event
-     * @param event the event to publish
-     */
-    @SuppressWarnings("unchecked")
-    public <T extends DomainEvent> void publish(T event) {
+    @Override
+    public void publish(DomainEvent event) {
         logDebug("Publishing event: {} (ID: {})", event.getEventType(), event.getEventId());
 
         if (handlers.containsKey(event.getClass())) {
@@ -173,7 +165,8 @@ public class DomainEventPublisher {
 
             for (DomainEventHandler<? extends DomainEvent> handler : eventHandlers) {
                 // Cast is safe because we only register handlers for the correct event type
-                DomainEventHandler<T> typedHandler = (DomainEventHandler<T>) handler;
+                @SuppressWarnings("unchecked")
+                DomainEventHandler<DomainEvent> typedHandler = (DomainEventHandler<DomainEvent>) handler;
                 logTrace("Handling event with: {}", typedHandler.getClass().getName());
                 typedHandler.handle(event);
             }
@@ -182,12 +175,15 @@ public class DomainEventPublisher {
         }
     }
 
-    /**
-     * Publishes an event asynchronously to all registered handlers.
-     * 
-     * @param <T> the type of event
-     * @param event the event to publish
-     */
+    @Override
+    public void publishAll(Iterable<DomainEvent> events) {
+        logDebug("Publishing multiple events");
+        for (DomainEvent event : events) {
+            publish(event);
+        }
+    }
+
+    @Override
     public <T extends DomainEvent> void publishAsync(T event) {
         logDebug("Publishing event asynchronously: {} (ID: {})", event.getEventType(), event.getEventId());
         executor.submit(() -> publish(event));

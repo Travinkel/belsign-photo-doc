@@ -1,6 +1,6 @@
 package com.belman.domain.rbac;
 
-import com.belman.domain.services.AuthenticationService;
+import com.belman.domain.security.AuthenticationService;
 
 /**
  * Factory for creating role-based access control components.

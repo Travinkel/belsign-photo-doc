@@ -1,6 +1,6 @@
 package com.belman.infrastructure.security;
 
-import com.belman.domain.services.PasswordHasher;
+import com.belman.domain.security.PasswordHasher;
 import org.mindrot.jbcrypt.BCrypt;
 
 /**

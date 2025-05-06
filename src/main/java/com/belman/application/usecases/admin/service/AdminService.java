@@ -6,8 +6,9 @@ import com.belman.domain.rbac.AccessDeniedException;
 import com.belman.domain.rbac.AccessPolicy;
 import com.belman.domain.rbac.RoleBasedAccessManager;
 import com.belman.domain.repositories.UserRepository;
-import com.belman.domain.services.AuthenticationService;
-import com.belman.domain.services.PasswordHasher;
+import com.belman.domain.security.AuthenticationService;
+import com.belman.domain.security.HashedPassword;
+import com.belman.domain.security.PasswordHasher;
 import com.belman.domain.valueobjects.*;
 
 import java.util.List;
@@ -17,42 +18,22 @@ public class AdminService extends BaseService {
     private final UserRepository userRepository;
     private final RoleBasedAccessManager accessManager;
     private final PasswordHasher passwordHasher;
+    private final AuthenticationService authenticationService;
 
     /**
-     * Creates a new AdminService with the specified UserRepository and PasswordHasher.
+     * Creates a new AdminService with the specified UserRepository, PasswordHasher and AuthenticationService.
      *
-     * @param userRepository the user repository
-     * @param passwordHasher the password hasher
-     * @param currentUser    the current user (must have ADMIN role)
+     * @param userRepository    the user repository
+     * @param passwordHasher    the password hasher
+     * @param authenticationService the authentication service
      */
-    public AdminService(UserRepository userRepository, PasswordHasher passwordHasher, User currentUser) {
+    public AdminService(UserRepository userRepository, PasswordHasher passwordHasher,
+                        AuthenticationService authenticationService) {
         this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;
+        this.authenticationService = authenticationService;
 
-        // Create a simple AuthenticationService that always returns the current user
-        AuthenticationService authService = new AuthenticationService() {
-            @Override
-            public Optional<User> authenticate(String username, String password) {
-                return Optional.of(currentUser);
-            }
-
-            @Override
-            public Optional<User> getCurrentUser() {
-                return Optional.of(currentUser);
-            }
-
-            @Override
-            public void logout() {
-                // No-op
-            }
-
-            @Override
-            public boolean isLoggedIn() {
-                return true;
-            }
-        };
-
-        this.accessManager = new RoleBasedAccessManager(authService, new AccessPolicy(User.Role.ADMIN));
+        this.accessManager = new RoleBasedAccessManager(authenticationService, new AccessPolicy(User.Role.ADMIN));
     }
 
     /**

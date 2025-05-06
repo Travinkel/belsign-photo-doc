@@ -1,7 +1,8 @@
 package com.belman.domain.rbac;
 
 import com.belman.domain.aggregates.User;
-import com.belman.domain.services.AuthenticationService;
+import com.belman.domain.exceptions.AccessDeniedException;
+import com.belman.domain.security.AuthenticationService;
 
 import java.util.Optional;
 

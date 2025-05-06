@@ -48,11 +48,12 @@ jobs:
 
       - name: Manually install NDK 23.1.7779620
         run: |
-          wget https://dl.google.com/android/repository/android-ndk-r23b-linux.zip
-          unzip -q android-ndk-r23b-linux.zip
+          wget https://dl.google.com/android/repository/android-ndk-r23b-linux.zip -O android-ndk.zip
+          unzip -q android-ndk.zip
           mkdir -p $ANDROID_HOME/ndk
           mv android-ndk-r23b $ANDROID_HOME/ndk/23.1.7779620
           echo "ANDROID_NDK=$ANDROID_HOME/ndk/23.1.7779620" >> $GITHUB_ENV
+          rm -f android-ndk.zip # Clean up downloaded file
 
       - name: Accept Android SDK Licenses
         run: yes | sdkmanager --licenses || true
@@ -76,3 +77,4 @@ jobs:
         with:
           name: belsign-apk
           path: target/gluonfx/aarch64-android/*.apk
+
