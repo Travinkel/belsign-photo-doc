@@ -10,7 +10,7 @@ import java.util.Optional;
  * Integrates the Specification pattern for querying.
  */
 public interface OrderRepository {
-    OrderAggregate findById(OrderId id);
+    Optional<OrderAggregate> findById(OrderId id);
     List<OrderAggregate> findAll();
     List<OrderAggregate> findBySpecification(Specification<OrderAggregate> spec);
     void save(OrderAggregate orderAggregate);

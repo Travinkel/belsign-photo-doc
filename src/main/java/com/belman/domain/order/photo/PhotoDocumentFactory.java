@@ -25,11 +25,11 @@ public class PhotoDocumentFactory {
      * @param uploadedAt the timestamp when this photo was uploaded
      * @return a new PhotoDocument instance
      */
-    public static PhotoDocument create(PhotoAngle angle, Photo imagePath,
+    public static PhotoDocument create(PhotoTemplate angle, Photo imagePath,
                                        UserAggregate uploadedBy, Timestamp uploadedAt) {
         return PhotoDocument.builder()
                 .photoId(new PhotoId(UUID.randomUUID().toString()))
-                .angle(angle)
+                .template(angle)
                 .imagePath(imagePath)
                 .uploadedBy(uploadedBy)
                 .uploadedAt(uploadedAt)
@@ -46,12 +46,12 @@ public class PhotoDocumentFactory {
      * @param orderId    the ID of the order to assign this photo to
      * @return a new PhotoDocument instance assigned to the specified order
      */
-    public static PhotoDocument createForOrder(PhotoAngle angle, Photo imagePath,
+    public static PhotoDocument createForOrder(PhotoTemplate angle, Photo imagePath,
                                                UserAggregate uploadedBy, Timestamp uploadedAt,
                                                OrderId orderId) {
         return PhotoDocument.builder()
                 .photoId(new PhotoId(UUID.randomUUID().toString()))
-                .angle(angle)
+                .template(angle)
                 .imagePath(imagePath)
                 .uploadedBy(uploadedBy)
                 .uploadedAt(uploadedAt)
@@ -67,7 +67,7 @@ public class PhotoDocumentFactory {
      * @param uploadedBy reference to the user who uploaded this photo
      * @return a new PhotoDocument instance with the current timestamp
      */
-    public static PhotoDocument createWithCurrentTimestamp(PhotoAngle angle, Photo imagePath,
+    public static PhotoDocument createWithCurrentTimestamp(PhotoTemplate angle, Photo imagePath,
                                                            UserAggregate uploadedBy) {
         return create(angle, imagePath, uploadedBy, Timestamp.now());
     }
@@ -81,7 +81,7 @@ public class PhotoDocumentFactory {
      * @param orderId    the ID of the order to assign this photo to
      * @return a new PhotoDocument instance with the current timestamp, assigned to the specified order
      */
-    public static PhotoDocument createForOrderWithCurrentTimestamp(PhotoAngle angle, Photo imagePath,
+    public static PhotoDocument createForOrderWithCurrentTimestamp(PhotoTemplate angle, Photo imagePath,
                                                                    UserAggregate uploadedBy,
                                                                    OrderId orderId) {
         return createForOrder(angle, imagePath, uploadedBy, Timestamp.now(), orderId);

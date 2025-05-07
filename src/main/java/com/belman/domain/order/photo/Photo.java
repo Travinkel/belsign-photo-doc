@@ -17,4 +17,8 @@ public record Photo(String value) {
             throw new IllegalArgumentException("Image path must not be null or blank");
         }
     }
+
+    public String path() {
+        return null;
+    }
 }

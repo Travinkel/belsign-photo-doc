@@ -4,9 +4,9 @@ import com.belman.domain.common.validation.ValidationResult;
 import com.belman.domain.core.IDomainService;
 import com.belman.domain.order.OrderId;
 import com.belman.domain.order.ProductDescription;
-import com.belman.domain.order.photo.PhotoAngle;
 import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.order.photo.policy.PhotoQualityPolicy;
+import com.belman.domain.order.photo.PhotoTemplate;
+import com.belman.domain.order.photo.policy.IPhotoQualityService;
 import com.belman.domain.services.LoggerFactory;
 
 import java.util.*;
@@ -21,46 +21,39 @@ import java.util.stream.Collectors;
  */
 public class PhotoValidationService implements IDomainService {
 
-    private final PhotoQualityPolicy photoQualityPolicy;
+    private final IPhotoQualityService photoQualityService;
     private final LoggerFactory loggerFactory;
 
     /**
      * Creates a new PhotoValidationService with the specified dependencies.
      *
-     * @param photoQualityPolicy the policy defining photo quality requirements
-     * @param loggerFactory      the factory for creating loggers
+     * @param photoQualityService the service defining photo quality requirements
+     * @param loggerFactory       the factory for creating loggers
      */
-    public PhotoValidationService(PhotoQualityPolicy photoQualityPolicy, LoggerFactory loggerFactory) {
-        this.photoQualityPolicy = Objects.requireNonNull(photoQualityPolicy, "photoQualityPolicy must not be null");
+    public PhotoValidationService(IPhotoQualityService photoQualityService, LoggerFactory loggerFactory) {
+        this.photoQualityService = Objects.requireNonNull(photoQualityService, "photoQualityService must not be null");
         this.loggerFactory = Objects.requireNonNull(loggerFactory, "loggerFactory must not be null");
     }
 
-    /**
-     * Validates that all required angles for a product have corresponding photos.
-     *
-     * @param photos             the photos to validate
-     * @param productDescription the product description determining the required angles
-     * @return a result containing validation messages
-     */
-    public ValidationResult validateRequiredAngles(List<PhotoDocument> photos, ProductDescription productDescription) {
+    public ValidationResult validateRequiredTemplates(List<PhotoDocument> photos, ProductDescription productDescription) {
         Objects.requireNonNull(photos, "photos must not be null");
         Objects.requireNonNull(productDescription, "productDescription must not be null");
 
-        ValidationResult result = new ValidationResult(new ArrayList<>(), new ArrayList<>());
-        Set<PhotoAngle> requiredAngles = photoQualityPolicy.getRequiredAngles(productDescription);
+        ValidationResult result = new ValidationResult();
+        Set<PhotoTemplate> requiredTemplates = photoQualityService.getRequiredTemplates(productDescription);
 
-        // Extract all angles from the provided photos
-        Set<PhotoAngle> providedAngles = photos.stream()
-                .map(PhotoDocument::getAngle)
+        // Extract all templates from the provided photos
+        Set<PhotoTemplate> providedTemplates = photos.stream()
+                .map(PhotoDocument::getTemplate)
                 .collect(Collectors.toSet());
 
-        // Find missing angles
-        Set<PhotoAngle> missingAngles = new HashSet<>(requiredAngles);
-        missingAngles.removeAll(providedAngles);
+        // Find missing templates
+        Set<PhotoTemplate> missingTemplates = new HashSet<>(requiredTemplates);
+        missingTemplates.removeAll(providedTemplates);
 
-        if (!missingAngles.isEmpty()) {
-            for (PhotoAngle missingAngle : missingAngles) {
-                result.addError(String.format("Missing required photo from angle: %s", missingAngle));
+        if (!missingTemplates.isEmpty()) {
+            for (PhotoTemplate missingTemplate : missingTemplates) {
+                result.addError(String.format("Missing required photo for template: %s", missingTemplate));
             }
         }
 
@@ -80,19 +73,15 @@ public class PhotoValidationService implements IDomainService {
 
         ValidationResult result = new ValidationResult();
 
-        // Validate minimum photo count
-        int requiredCount = photoQualityPolicy.getMinimumPhotoCount(productDescription);
+        int requiredCount = photoQualityService.getMinimumPhotoCount(productDescription);
         if (photos.size() < requiredCount) {
-            result.addError(String.format("Insufficient photos. Required: %d, Provided: %d",
-                    requiredCount, photos.size()));
+            result.addError(String.format("Insufficient photos. Required: %d, Provided: %d", requiredCount, photos.size()));
         }
 
         // Validate each individual photo
         for (PhotoDocument photo : photos) {
-            // Check if photo has annotations when required
-            if (photoQualityPolicy.requiresAnnotations(productDescription) && photo.getAnnotations().isEmpty()) {
-                result.addWarning(String.format("Photo %s should have annotations for measurements",
-                        photo.getPhotoId()));
+            if (photoQualityService.requiresAnnotations(productDescription) && photo.getAnnotations().isEmpty()) {
+                result.addWarning(String.format("Photo %s should have annotations for measurements", photo.getPhotoId()));
             }
 
             // Add more quality checks as needed
@@ -101,16 +90,7 @@ public class PhotoValidationService implements IDomainService {
         return result;
     }
 
-    /**
-     * Validates all photos for an order against all business rules.
-     *
-     * @param photos             the photos to validate
-     * @param orderId            the ID of the order the photos belong to
-     * @param productDescription the product description determining the requirements
-     * @return a result containing validation messages
-     */
-    public ValidationResult validateAll(List<PhotoDocument> photos, OrderId orderId,
-                                        ProductDescription productDescription) {
+    public ValidationResult validateAll(List<PhotoDocument> photos, OrderId orderId, ProductDescription productDescription) {
         Objects.requireNonNull(photos, "photos must not be null");
         Objects.requireNonNull(orderId, "orderId must not be null");
         Objects.requireNonNull(productDescription, "productDescription must not be null");
@@ -122,8 +102,7 @@ public class PhotoValidationService implements IDomainService {
             result.addError("One or more photos do not belong to the specified order");
         }
 
-        // Combine results from all validations
-        result.combine(validateRequiredAngles(photos, productDescription));
+        result.combine(validateRequiredTemplates(photos, productDescription));
         result.combine(validatePhotoQuality(photos, productDescription));
 
         return result;

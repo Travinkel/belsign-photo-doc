@@ -1,20 +1,21 @@
 package com.belman.domain.order.photo.policy;
 
 import com.belman.domain.order.ProductDescription;
-import com.belman.domain.order.photo.PhotoAngle;
+import com.belman.domain.order.photo.PhotoTemplate;
 
 import java.util.*;
 
 /**
- * Domain policy that defines quality requirements for photos based on product type.
+ * Default implementation of IPhotoQualityService that defines quality requirements
+ * for photos based on product type.
  * <p>
  * This policy encapsulates business rules about which types of photos are required
  * for different products, minimum quality standards, and annotation requirements.
  */
-public class PhotoQualityPolicy {
+public class PhotoQualityPolicy implements IPhotoQualityService {
 
-    // Map of product categories to required photo angles
-    private final Map<String, Set<PhotoAngle>> requiredAngles;
+    // Map of product categories to required photo templates
+    private final Map<String, Set<PhotoTemplate>> requiredTemplates;
 
     // Map of product categories to minimum number of photos required
     private final Map<String, Integer> minimumPhotoCounts;
@@ -26,39 +27,50 @@ public class PhotoQualityPolicy {
      * Creates a new PhotoQualityPolicy with default settings.
      */
     public PhotoQualityPolicy() {
-        this.requiredAngles = initializeRequiredAngles();
+        this.requiredTemplates = initializeRequiredTemplates();
         this.minimumPhotoCounts = initializeMinimumPhotoCounts();
         this.annotationRequirements = initializeAnnotationRequirements();
     }
 
-    private Map<String, Set<PhotoAngle>> initializeRequiredAngles() {
-        Map<String, Set<PhotoAngle>> angleMap = new HashMap<>();
+    private Map<String, Set<PhotoTemplate>> initializeRequiredTemplates() {
+        Map<String, Set<PhotoTemplate>> templateMap = new HashMap<>();
 
         // Standard products require front, left, right, and back photos
-        Set<PhotoAngle> standardAngles = new HashSet<>();
-        standardAngles.add(PhotoAngle.FRONT);
-        standardAngles.add(PhotoAngle.LEFT);
-        standardAngles.add(PhotoAngle.RIGHT);
-        standardAngles.add(PhotoAngle.BACK);
-        angleMap.put("STANDARD", Collections.unmodifiableSet(standardAngles));
+        templateMap.put("STANDARD", Set.of(
+                PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY,
+                PhotoTemplate.LEFT,
+                PhotoTemplate.RIGHT,
+                PhotoTemplate.BACK
+        ));
 
         // Simple products only require front and back photos
-        Set<PhotoAngle> simpleAngles = new HashSet<>();
-        simpleAngles.add(PhotoAngle.FRONT);
-        simpleAngles.add(PhotoAngle.BACK);
-        angleMap.put("SIMPLE", Collections.unmodifiableSet(simpleAngles));
+        templateMap.put("SIMPLE", Set.of(
+                PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY,
+                PhotoTemplate.BACK
+        ));
 
         // Complex products require photos from all standard angles plus top and bottom
-        Set<PhotoAngle> complexAngles = new HashSet<>();
-        complexAngles.add(PhotoAngle.FRONT);
-        complexAngles.add(PhotoAngle.LEFT);
-        complexAngles.add(PhotoAngle.RIGHT);
-        complexAngles.add(PhotoAngle.BACK);
-        complexAngles.add(PhotoAngle.TOP);
-        complexAngles.add(PhotoAngle.BOTTOM);
-        angleMap.put("COMPLEX", Collections.unmodifiableSet(complexAngles));
+        templateMap.put("COMPLEX", Set.of(
+                PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY,
+                PhotoTemplate.LEFT,
+                PhotoTemplate.RIGHT,
+                PhotoTemplate.BACK,
+                PhotoTemplate.TOP_VIEW_OF_JOINT,
+                PhotoTemplate.BOTTOM
+        ));
 
-        return Collections.unmodifiableMap(angleMap);
+        // Custom products may require additional templates
+        templateMap.put("CUSTOM", Set.of(
+                PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY,
+                PhotoTemplate.LEFT,
+                PhotoTemplate.RIGHT,
+                PhotoTemplate.BACK,
+                PhotoTemplate.TOP_VIEW_OF_JOINT,
+                PhotoTemplate.BOTTOM,
+                PhotoTemplate.CUSTOM
+        ));
+
+        return Collections.unmodifiableMap(templateMap);
     }
 
     private Map<String, Integer> initializeMinimumPhotoCounts() {
@@ -82,16 +94,17 @@ public class PhotoQualityPolicy {
     }
 
     /**
-     * Gets the required photo angles for a given product.
+     * Gets the required photo templates for a given product.
      *
      * @param productDescription the product to get photo requirements for
-     * @return an unmodifiable set of required photo angles
+     * @return an unmodifiable set of required photo templates
      */
-    public Set<PhotoAngle> getRequiredAngles(ProductDescription productDescription) {
+    @Override
+    public Set<PhotoTemplate> getRequiredTemplates(ProductDescription productDescription) {
         Objects.requireNonNull(productDescription, "productDescription must not be null");
 
         String category = determineProductCategory(productDescription);
-        return requiredAngles.getOrDefault(category, Collections.emptySet());
+        return requiredTemplates.getOrDefault(category, Collections.emptySet());
     }
 
     /**
@@ -100,6 +113,7 @@ public class PhotoQualityPolicy {
      * @param productDescription the product to get photo requirements for
      * @return the minimum number of photos required
      */
+    @Override
     public int getMinimumPhotoCount(ProductDescription productDescription) {
         Objects.requireNonNull(productDescription, "productDescription must not be null");
 
@@ -113,6 +127,7 @@ public class PhotoQualityPolicy {
      * @param productDescription the product to check annotation requirements for
      * @return true if annotations are required, false otherwise
      */
+    @Override
     public boolean requiresAnnotations(ProductDescription productDescription) {
         Objects.requireNonNull(productDescription, "productDescription must not be null");
 

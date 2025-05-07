@@ -5,9 +5,9 @@ import com.belman.domain.order.OrderAggregate;
 import com.belman.domain.order.OrderId;
 import com.belman.domain.order.OrderRepository;
 import com.belman.domain.order.photo.Photo;
-import com.belman.domain.order.photo.PhotoAngle;
 import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.order.photo.PhotoId;
+import com.belman.domain.order.photo.PhotoTemplate;
 import com.belman.domain.services.PhotoService;
 import com.belman.domain.user.UserAggregate;
 import com.belman.infrastructure.platform.ErrorHandler;
@@ -73,7 +73,7 @@ public class DefaultPhotoService implements PhotoService {
     }
 
     @Override
-    public PhotoDocument uploadPhoto(File file, OrderId orderId, PhotoAngle angle, UserAggregate uploadedBy) {
+    public PhotoDocument uploadPhoto(File file, OrderId orderId, PhotoTemplate angle, UserAggregate uploadedBy) {
         // Generate a unique ID for the photo
         PhotoId photoId = PhotoId.newId();
 
@@ -95,7 +95,7 @@ public class DefaultPhotoService implements PhotoService {
             // Create a new photo document
             PhotoDocument photo = PhotoDocument.builder()
                     .photoId(photoId)
-                    .angle(angle)
+                    .template(angle)
                     .imagePath(imagePath)
                     .uploadedBy(uploadedBy)
                     .uploadedAt(Timestamp.now())
@@ -103,10 +103,10 @@ public class DefaultPhotoService implements PhotoService {
 
 
             // Find the orderAggregate and add the photo to it
-            OrderAggregate orderAggregate = orderRepository.findById(orderId);
+            Optional<OrderAggregate> orderAggregate = orderRepository.findById(orderId);
             if (orderAggregate != null) {
-                orderAggregate.addPhoto(photo);
-                orderRepository.save(orderAggregate);
+                orderAggregate.get().addPhoto(photo);
+                orderRepository.save(orderAggregate.get());
             }
 
             return photo;
@@ -251,8 +251,8 @@ public class DefaultPhotoService implements PhotoService {
 
     @Override
     public List<PhotoDocument> getPhotosForOrder(OrderId orderId) {
-        OrderAggregate orderAggregate = orderRepository.findById(orderId);
-        return orderAggregate != null ? orderAggregate.getPhotos() : List.of();
+        Optional<OrderAggregate> orderAggregate = orderRepository.findById(orderId);
+        return orderAggregate != null ? orderAggregate.get().getPhotos() : List.of();
     }
 
     @Override

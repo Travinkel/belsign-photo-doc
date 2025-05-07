@@ -1,15 +1,17 @@
 package com.belman.presentation.views.photoreview;
 
+import com.belman.domain.common.Timestamp;
+import com.belman.domain.order.OrderAggregate;
+import com.belman.domain.order.OrderId;
+import com.belman.domain.order.OrderNumber;
+import com.belman.domain.user.UserAggregate;
 import com.belman.presentation.core.BaseViewModel;
 import com.belman.application.core.Inject;
 import com.belman.presentation.navigation.Router;
-import com.belman.domain.aggregates.User;
 import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.order.OrderRepository;
 import com.belman.domain.services.PhotoService;
-import com.belman.domain.valueobjects.OrderId;
-import com.belman.domain.valueobjects.OrderNumber;
-import com.belman.domain.valueobjects.Timestamp;
+
 import com.belman.infrastructure.service.SessionManager;
 import com.belman.presentation.views.login.LoginView;
 import javafx.beans.property.BooleanProperty;
@@ -80,7 +82,7 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
                     selectedOrder.set(orderAggregate);
                     orderSelected.set(true);
                     orderInfo.set("OrderAggregate: " + orderNumberStr + " - Customer: " +
-                                 (orderAggregate.getCustomer() != null ? orderAggregate.getCustomer().getName() : "N/A"));
+                                 (orderAggregate.getCustomerId() != null ? orderAggregate.getCustomerId() : "N/A"));
 
                     // Load photos for this orderAggregate
                     loadPhotosForOrder(orderAggregate.getId());
@@ -141,7 +143,7 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
             PhotoDocument photo = selectedPhoto.get();
 
             // Get the current user and timestamp
-            User currentUser = sessionManager.getCurrentUser()
+            UserAggregate currentUser = sessionManager.getCurrentUser()
                 .orElseThrow(() -> new IllegalStateException("User not logged in"));
             Timestamp now = Timestamp.now();
 
@@ -182,7 +184,7 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
             PhotoDocument photo = selectedPhoto.get();
 
             // Get the current user and timestamp
-            User currentUser = sessionManager.getCurrentUser()
+            UserAggregate currentUser = sessionManager.getCurrentUser()
                 .orElseThrow(() -> new IllegalStateException("User not logged in"));
             Timestamp now = Timestamp.now();
 

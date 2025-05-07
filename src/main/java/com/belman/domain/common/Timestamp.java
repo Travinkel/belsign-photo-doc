@@ -49,4 +49,8 @@ public record Timestamp(Instant value) {
     public String formatted(DateTimeFormatter formatter) {
         return formatter.format(LocalDateTime.ofInstant(value, ZoneId.systemDefault()));
     }
+
+    public Instant toInstant() {
+        return null;
+    }
 }

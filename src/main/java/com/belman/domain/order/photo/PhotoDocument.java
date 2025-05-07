@@ -39,7 +39,7 @@ import java.util.Objects;
 public class PhotoDocument extends Aggregate<PhotoId> {
 
     private OrderId orderId;
-    private final PhotoAngle angle;
+    private final PhotoTemplate template;
     private ApprovalStatus status;
     private final Photo imagePath;
     private ReportType type;
@@ -55,7 +55,7 @@ public class PhotoDocument extends Aggregate<PhotoId> {
     private PhotoDocument(Builder builder) {
         this.annotations = new ArrayList<>(builder.annotations);
         this.photoId = Objects.requireNonNull(builder.photoId, "photoId must not be null");
-        this.angle = Objects.requireNonNull(builder.angle, "angle must not be null");
+        this.template = Objects.requireNonNull(builder.template, "template must not be null");
         this.imagePath = Objects.requireNonNull(builder.imagePath, "imagePath must not be null");
         this.uploadedBy = Objects.requireNonNull(builder.uploadedBy, "uploadedBy must not be null");
         this.uploadedAt = Objects.requireNonNull(builder.uploadedAt, "uploadedAt must not be null");
@@ -162,13 +162,12 @@ public class PhotoDocument extends Aggregate<PhotoId> {
     }
 
     /**
-     * Returns the angle at which this photo was taken.
-     * The angle may be a named angle (FRONT, BACK, LEFT, RIGHT) or a custom angle in degrees.
+     * Returns the photo template for this photo document.
      *
-     * @return the photo angle
+     * @return the photo template
      */
-    public PhotoAngle getAngle() {
-        return angle;
+    public PhotoTemplate getTemplate() {
+        return template;
     }
 
     /**
@@ -282,7 +281,7 @@ public class PhotoDocument extends Aggregate<PhotoId> {
 
     public static class Builder {
         private PhotoId photoId;
-        private PhotoAngle angle;
+        private PhotoTemplate template;
         private Photo imagePath;
         private UserAggregate uploadedBy;
         private Timestamp uploadedAt;
@@ -306,8 +305,8 @@ public class PhotoDocument extends Aggregate<PhotoId> {
             return this;
         }
 
-        public Builder angle(PhotoAngle angle) {
-            this.angle = angle;
+        public Builder template(PhotoTemplate template) {
+            this.template = template;
             return this;
         }
 

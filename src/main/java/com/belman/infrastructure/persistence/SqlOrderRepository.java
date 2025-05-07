@@ -1,18 +1,16 @@
 package com.belman.infrastructure.persistence;
 
-
 import com.belman.domain.common.Timestamp;
 import com.belman.domain.customer.CustomerAggregate;
 import com.belman.domain.customer.CustomerId;
-import com.belman.domain.order.*;
-import com.belman.domain.order.photo.PhotoAngle;
-import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.order.photo.PhotoId;
-import com.belman.domain.specification.Specification;
-import com.belman.domain.user.UserId;
-import com.belman.domain.user.UserRepository;
 import com.belman.domain.customer.CustomerRepository;
 import com.belman.application.core.ServiceLocator;
+import com.belman.domain.order.*;
+import com.belman.domain.order.photo.*;
+import com.belman.domain.specification.Specification;
+import com.belman.domain.user.UserAggregate;
+import com.belman.domain.user.UserId;
+import com.belman.domain.user.UserRepository;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -37,7 +35,7 @@ public class SqlOrderRepository implements OrderRepository {
 
     /**
      * Creates a new SqlOrderRepository with the specified DataSource.
-     * 
+     *
      * @param dataSource the DataSource to use for database connections
      */
     public SqlOrderRepository(DataSource dataSource) {
@@ -45,7 +43,7 @@ public class SqlOrderRepository implements OrderRepository {
     }
 
     @Override
-    public OrderAggregate findById(OrderId id) {
+    public Optional<OrderAggregate> findById(OrderId id) {
         String sql = "SELECT * FROM orders WHERE id = ?";
 
         try (Connection conn = dataSource.getConnection();
@@ -55,14 +53,14 @@ public class SqlOrderRepository implements OrderRepository {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return mapResultSetToOrder(rs);
+                    return Optional.of(mapResultSetToOrder(rs));
                 }
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error finding order by id: " + id.id(), e);
         }
+        return Optional.empty();
 
-        return null;
     }
 
     @Override
@@ -152,12 +150,16 @@ public class SqlOrderRepository implements OrderRepository {
 
             stmt.setString(1, orderAggregate.getId().id().toString());
             stmt.setString(2, orderAggregate.getOrderNumber() != null ? orderAggregate.getOrderNumber().value() : null);
-            stmt.setString(3, orderAggregate.getCustomer() != null ? orderAggregate.getCustomer().getId().id().toString() : null);
-            stmt.setString(4, orderAggregate.getProductDescription() != null ? orderAggregate.getProductDescription().toString() : null);
-            stmt.setString(5, orderAggregate.getDeliveryInformation() != null ? orderAggregate.getDeliveryInformation().toString() : null);
+            stmt.setString(3,
+                    orderAggregate.getCustomerId() != null ? orderAggregate.getCustomerId().toString() : null);
+            stmt.setString(4,
+                    orderAggregate.getProductDescription() != null ? orderAggregate.getProductDescription().toString() :
+                            null);
+            stmt.setString(5, orderAggregate.getDeliveryInformation() != null ?
+                    orderAggregate.getDeliveryInformation().toString() : null);
             stmt.setString(6, orderAggregate.getStatus().name());
-            stmt.setString(7, orderAggregate.getCreatedBy().getId().id().toString());
-            stmt.setTimestamp(8, java.sql.Timestamp.from(orderAggregate.getCreatedAt().toInstant()));
+            stmt.setString(7, orderAggregate.getCreatedBy().toString()); //TODO: Use Reference Properly
+            stmt.setTimestamp(8, java.sql.Timestamp.from(orderAggregate.getCreatedAt().value()));
 
             int rowsAffected = stmt.executeUpdate();
 
@@ -182,9 +184,13 @@ public class SqlOrderRepository implements OrderRepository {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, orderAggregate.getOrderNumber() != null ? orderAggregate.getOrderNumber().value() : null);
-            stmt.setString(2, orderAggregate.getCustomer() != null ? orderAggregate.getCustomer().getId().id().toString() : null);
-            stmt.setString(3, orderAggregate.getProductDescription() != null ? orderAggregate.getProductDescription().toString() : null);
-            stmt.setString(4, orderAggregate.getDeliveryInformation() != null ? orderAggregate.getDeliveryInformation().toString() : null);
+            stmt.setString(2,
+                    orderAggregate.getCustomerId() != null ? orderAggregate.getCustomerId().toString() : null);
+            stmt.setString(3,
+                    orderAggregate.getProductDescription() != null ? orderAggregate.getProductDescription().toString() :
+                            null);
+            stmt.setString(4, orderAggregate.getDeliveryInformation() != null ?
+                    orderAggregate.getDeliveryInformation().toString() : null);
             stmt.setString(5, orderAggregate.getStatus().name());
             stmt.setString(6, orderAggregate.getId().id().toString());
 
@@ -210,7 +216,7 @@ public class SqlOrderRepository implements OrderRepository {
     private boolean photoExists(Connection conn, PhotoId photoId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM photo_documents WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, photoId.value().toString());
+            stmt.setString(1, photoId.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1) > 0;
@@ -221,18 +227,19 @@ public class SqlOrderRepository implements OrderRepository {
     }
 
     private void insertPhoto(Connection conn, PhotoDocument photo) throws SQLException {
-        String sql = "INSERT INTO photo_documents (id, order_id, image_path, angle, status, uploaded_by, uploaded_at, " +
-                     "reviewed_by, reviewed_at, review_comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql =
+                "INSERT INTO photo_documents (id, order_id, image_path, angle, status, uploaded_by, uploaded_at, " +
+                "reviewed_by, reviewed_at, review_comment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, photo.getPhotoId().value().toString());
+            stmt.setString(1, photo.getPhotoId().toString());
             stmt.setString(2, photo.getOrderId().id().toString());
-            stmt.setString(3, photo.getImagePath().path());
+            stmt.setString(3, photo.getImagePath().value());
 
             // Store the angle - use named angle if available, otherwise use degrees
-            String angleStr = photo.getAngle().isNamedAngle() ? 
-                photo.getAngle().namedAngle().name() : 
-                String.valueOf(photo.getAngle().degrees());
+            String angleStr = true ?
+                    photo.getTemplate().name() :
+                    String.valueOf(photo.getTemplate());
             stmt.setString(4, angleStr);
 
             // Store the status
@@ -246,7 +253,7 @@ public class SqlOrderRepository implements OrderRepository {
 
             // Store the reviewed_by user ID if available
             if (photo.getReviewedBy() != null) {
-                stmt.setString(8, photo.getReviewedBy().getId().id().toString());
+                stmt.setString(8, photo.getReviewedBy().id().toString());
             } else {
                 stmt.setNull(8, java.sql.Types.VARCHAR);
             }
@@ -262,7 +269,7 @@ public class SqlOrderRepository implements OrderRepository {
             stmt.setString(10, photo.getReviewComment());
 
             stmt.executeUpdate();
-            LOGGER.info("Photo inserted successfully: " + photo.getPhotoId().value());
+            LOGGER.info("Photo inserted successfully: " + photo.getPhotoId());
         }
     }
 
@@ -274,9 +281,9 @@ public class SqlOrderRepository implements OrderRepository {
             stmt.setString(1, photo.getImagePath().path());
 
             // Store the angle - use named angle if available, otherwise use degrees
-            String angleStr = photo.getAngle().isNamedAngle() ? 
-                photo.getAngle().namedAngle().name() : 
-                String.valueOf(photo.getAngle().degrees());
+            String angleStr = true ? // TODO: Broken
+                    photo.getTemplate().name() :
+                    String.valueOf(photo.getTemplate());
             stmt.setString(2, angleStr);
 
             // Store the status
@@ -284,7 +291,7 @@ public class SqlOrderRepository implements OrderRepository {
 
             // Store the reviewed_by user ID if available
             if (photo.getReviewedBy() != null) {
-                stmt.setString(4, photo.getReviewedBy().getId().id().toString());
+                stmt.setString(4, photo.getReviewedBy().id().toString());
             } else {
                 stmt.setNull(4, java.sql.Types.VARCHAR);
             }
@@ -300,19 +307,19 @@ public class SqlOrderRepository implements OrderRepository {
             stmt.setString(6, photo.getReviewComment());
 
             // Where clause
-            stmt.setString(7, photo.getPhotoId().value().toString());
+            stmt.setString(7, photo.getPhotoId().toString());
 
             stmt.executeUpdate();
-            LOGGER.info("Photo updated successfully: " + photo.getPhotoId().value());
+            LOGGER.info("Photo updated successfully: " + photo.getPhotoId());
         }
     }
 
     private OrderAggregate mapResultSetToOrder(ResultSet rs) throws SQLException {
-        OrderId id = new OrderId(UUID.fromString(rs.getString("id")));
+        OrderId id = new OrderId("order_id");
 
         // Get the created_by user ID and fetch the user
-        UserId createdById = new UserId(UUID.fromString(rs.getString("created_by")));
-        User createdBy = fetchUser(createdById);
+        UserId createdById = new UserId("user_id");
+        UserReference createdBy = fetchUser(createdById);
 
         // Get the creation timestamp
         java.sql.Timestamp sqlTimestamp = rs.getTimestamp("created_at");
@@ -329,22 +336,20 @@ public class SqlOrderRepository implements OrderRepository {
 
         String customerId = rs.getString("customer_id");
         if (customerId != null) {
-            CustomerAggregate customer = fetchCustomer(new CustomerId(UUID.fromString(customerId)));
+            CustomerAggregate customer = fetchCustomer(new CustomerId("dwd"));
             if (customer != null) {
-                orderAggregate.setCustomer(customer);
+                orderAggregate.setCustomerId(customer.getId());
             }
         }
 
         String productDescriptionStr = rs.getString("product_description");
         if (productDescriptionStr != null) {
             // This is simplified - in a real implementation, we would parse the product description properly
-            orderAggregate.setProductDescription(ProductDescription.withName(productDescriptionStr));
         }
 
         String deliveryInfoStr = rs.getString("delivery_information");
         if (deliveryInfoStr != null) {
             // This is simplified - in a real implementation, we would parse the delivery information properly
-            orderAggregate.setDeliveryInformation(DeliveryInformation.basic(deliveryInfoStr, Timestamp.now()));
         }
 
         String statusStr = rs.getString("status");
@@ -358,12 +363,11 @@ public class SqlOrderRepository implements OrderRepository {
         return orderAggregate;
     }
 
-    private User fetchUser(UserId userId) {
+    private UserReference fetchUser(UserId userId) {
         try {
             // Get the UserRepository from the ServiceLocator
             UserRepository userRepository = ServiceLocator.getService(UserRepository.class);
             // Use the UserRepository to find the user by ID
-            return userRepository.findById(userId).orElse(null);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error fetching user: " + userId.id(), e);
         }
@@ -406,33 +410,26 @@ public class SqlOrderRepository implements OrderRepository {
     private PhotoDocument mapResultSetToPhoto(ResultSet rs) throws SQLException {
         // This is a simplified implementation - in a real implementation, we would map all fields properly
         try {
-            PhotoId photoId = new PhotoId(UUID.fromString(rs.getString("id")));
-            OrderId orderId = new OrderId(UUID.fromString(rs.getString("order_id")));
+            PhotoId photoId = new PhotoId("id");
+            OrderId orderId = new OrderId("order_id");
             String imagePath = rs.getString("image_path");
             String angle = rs.getString("angle");
             String status = rs.getString("status");
 
             // Get the uploaded_by user ID and fetch the user
-            UserId uploadedById = new UserId(UUID.fromString(rs.getString("uploaded_by")));
-            User uploadedBy = fetchUser(uploadedById);
+            UserId uploadedById = new UserId(("uploaded_by"));
+            UserReference uploadedBy = fetchUser(uploadedById);
 
             // Get the upload timestamp
             java.sql.Timestamp sqlTimestamp = rs.getTimestamp("uploaded_at");
             Timestamp uploadedAt = new Timestamp(sqlTimestamp.toInstant());
 
-            // Create the photo document
-            PhotoDocument photo = new PhotoDocument(
-                photoId, 
-                createPhotoAngle(angle), 
-                new ImagePath(imagePath), 
-                uploadedBy, 
-                uploadedAt
-            );
+            // TODO: Create the photo document
+
 
             // Set the order ID
-            photo.assignToOrder(orderId);
 
-            return photo;
+            return null;
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error mapping result set to photo", e);
             return null;
@@ -442,30 +439,15 @@ public class SqlOrderRepository implements OrderRepository {
     /**
      * Creates a PhotoAngle from a string representation.
      * Tries to parse the string as a named angle first, then as a custom angle (degrees).
-     * 
+     *
      * @param angleStr the string representation of the angle
      * @return a PhotoAngle object
      */
-    private PhotoAngle createPhotoAngle(String angleStr) {
+    private PhotoTemplate createPhotoAngle(String angleStr) {
         if (angleStr == null || angleStr.isBlank()) {
             // Default to FRONT if no angle is specified
-            return new PhotoAngle(PhotoAngle.NamedAngle.FRONT);
+            return new PhotoTemplate(PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY.name(), "okwodk");
         }
-
-        // Try to parse as a named angle
-        try {
-            PhotoAngle.NamedAngle namedAngle = PhotoAngle.NamedAngle.valueOf(angleStr.toUpperCase());
-            return new PhotoAngle(namedAngle);
-        } catch (IllegalArgumentException e) {
-            // Not a named angle, try to parse as degrees
-            try {
-                double degrees = Double.parseDouble(angleStr.replace("°", ""));
-                return new PhotoAngle(degrees);
-            } catch (NumberFormatException ex) {
-                // Neither a named angle nor a valid number, default to FRONT
-                LOGGER.warning("Invalid angle format: " + angleStr + ", defaulting to FRONT");
-                return new PhotoAngle(PhotoAngle.NamedAngle.FRONT);
-            }
-        }
+        return null;
     }
 }

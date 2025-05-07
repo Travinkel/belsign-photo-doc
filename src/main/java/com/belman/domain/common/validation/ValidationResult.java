@@ -17,12 +17,12 @@ public class ValidationResult {
     private final List<String> errors;
     private final List<String> warnings;
 
-    /**
-     * Creates a new ValidationResult with the specified validity and errors.
-     *
-     * @param valid  whether the validation succeeded
-     * @param errors the list of error messages (must not be null)
-     */
+    public ValidationResult() {
+        this.valid = true;
+        this.errors = new ArrayList<>();
+        this.warnings = new ArrayList<>();
+    }
+
     public ValidationResult(boolean valid, List<String> errors) {
         this.valid = valid;
         this.errors = new ArrayList<>(errors);
@@ -48,6 +48,7 @@ public class ValidationResult {
      * @param error the error message to add
      */
     public void addError(String error) {
+        Objects.requireNonNull(error, "error must not be null");
         this.errors.add(error);
         this.valid = false;
     }
@@ -58,6 +59,7 @@ public class ValidationResult {
      * @param warning the warning message to add
      */
     public void addWarning(String warning) {
+        Objects.requireNonNull(warning, "warning must not be null");
         this.warnings.add(warning);
     }
 
@@ -67,6 +69,7 @@ public class ValidationResult {
      * @param other the other ValidationResult to combine with
      */
     public void combine(ValidationResult other) {
+        Objects.requireNonNull(other, "other ValidationResult must not be null");
         this.errors.addAll(other.errors);
         this.warnings.addAll(other.warnings);
         this.valid = this.valid && other.valid;

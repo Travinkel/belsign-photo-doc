@@ -3,9 +3,9 @@ package com.belman.domain.services;
 
 import com.belman.domain.order.OrderId;
 import com.belman.domain.order.photo.Photo;
-import com.belman.domain.order.photo.PhotoAngle;
 import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.order.photo.PhotoId;
+import com.belman.domain.order.photo.PhotoTemplate;
 import com.belman.domain.user.UserAggregate;
 
 import java.io.File;
@@ -25,7 +25,7 @@ public interface PhotoService {
      * @param uploadedBy the user who uploaded the photo
      * @return the created photo document
      */
-    PhotoDocument uploadPhoto(File file, OrderId orderId, PhotoAngle angle, UserAggregate uploadedBy);
+    PhotoDocument uploadPhoto(File file, OrderId orderId, PhotoTemplate angle, UserAggregate uploadedBy);
     
     /**
      * Deletes a photo document.
