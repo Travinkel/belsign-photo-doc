@@ -28,6 +28,16 @@ public class DependencyRulesTest {
     }
 
     @Test
+    public void infrastructureLayerShouldNotDependOnPresentationLayer() {
+        ArchRule rule = classes()
+                .that().resideInAPackage("com.belman.infrastructure..")
+                .should().onlyDependOnClassesThat().resideOutsideOfPackage("com.belman.presentation..")
+                .because("The infrastructure layer should not depend on the presentation layer");
+
+        rule.check(importedClasses);
+    }
+
+    @Test
     public void applicationLayerShouldOnlyDependOnDomainAndSharedLayers() {
         ArchRule rule = classes()
                 .that().resideInAPackage("com.belman.application..")

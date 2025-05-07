@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
 
 public class NamingConventionsTest {
 
@@ -23,6 +24,16 @@ public class NamingConventionsTest {
                 .that().resideInAPackage("com.belman.service..")
                 .should().haveSimpleNameEndingWith("Service")
                 .because("Service classes should follow the naming convention of ending with 'Service'");
+
+        rule.check(importedClasses);
+    }
+
+    @Test
+    public void constantsShouldBeInUpperSnakeCase() {
+        ArchRule rule = fields()
+                .that().areStatic().andFinal()
+                .should().haveNameMatching("^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$")
+                .because("Constants should be in upper snake case");
 
         rule.check(importedClasses);
     }

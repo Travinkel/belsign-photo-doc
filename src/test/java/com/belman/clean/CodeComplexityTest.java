@@ -1,5 +1,6 @@
 package com.belman.clean;
 
+import com.tngtech.archunit.lang.ArchRule;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -11,6 +12,15 @@ public class CodeComplexityTest {
         // Example: Replace with actual complexity analysis logic
         int cyclomaticComplexity = calculateCyclomaticComplexity("exampleMethod");
         assertTrue(cyclomaticComplexity <= 10, "Cyclomatic complexity should not exceed 10");
+    }
+
+    @Test
+    public void classesShouldHaveAcceptableNumberOfMethods() {
+        ArchRule rule = classes()
+                .should().haveNumberOfMethodsLessThanOrEqualTo(20)
+                .because("Classes should not have too many methods");
+
+        rule.check(importedClasses);
     }
 
     @Test
