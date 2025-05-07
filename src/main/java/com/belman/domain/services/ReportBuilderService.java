@@ -1,8 +1,9 @@
 package com.belman.domain.services;
 
 
+import com.belman.domain.order.OrderAggregate;
 import com.belman.domain.report.ReportAggregate;
-import com.belman.domain.aggregates.User;
+import com.belman.domain.user.UserAggregate;
 
 /**
  * Service for building a QC report based on an order's approved photos.
@@ -14,5 +15,5 @@ public interface ReportBuilderService {
      * @param generatedBy the user generating the report
      * @return the constructed ReportAggregate
      */
-    ReportAggregate buildReport(OrderAggregate orderAggregate, User generatedBy);
+    ReportAggregate buildReport(OrderAggregate orderAggregate, UserAggregate generatedBy);
 }

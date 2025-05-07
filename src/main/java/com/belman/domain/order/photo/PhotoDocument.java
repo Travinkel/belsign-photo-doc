@@ -9,6 +9,9 @@ import com.belman.domain.report.ReportType;
 import com.belman.domain.user.ApprovalStatus;
 import com.belman.domain.user.UserAggregate;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -40,15 +43,17 @@ public class PhotoDocument extends Aggregate<PhotoId> {
     private ApprovalStatus status;
     private final Photo imagePath;
     private ReportType type;
+    private final List<PhotoAnnotation> annotations;
 
     private final UserAggregate uploadedBy;
     private final Timestamp uploadedAt;
-    private UserAggregate reviewedBy;
+    private UserReference reviewedBy;
     private Timestamp reviewedAt;
     private String reviewComment;
     private final PhotoId photoId;
 
     private PhotoDocument(Builder builder) {
+        this.annotations = new ArrayList<>(builder.annotations);
         this.photoId = Objects.requireNonNull(builder.photoId, "photoId must not be null");
         this.angle = Objects.requireNonNull(builder.angle, "angle must not be null");
         this.imagePath = Objects.requireNonNull(builder.imagePath, "imagePath must not be null");
@@ -77,7 +82,7 @@ public class PhotoDocument extends Aggregate<PhotoId> {
      * @throws NullPointerException  if reviewer or reviewedAt is null
      * @throws IllegalStateException if this photo is already approved or rejected
      */
-    public void approve(UserAggregate reviewer, Timestamp reviewedAt) {
+    public void approve(UserReference reviewer, Timestamp reviewedAt) {
         if (this.status != ApprovalStatus.PENDING) {
             throw new IllegalStateException("Photo is already " + this.status.name().toLowerCase());
         }
@@ -95,7 +100,7 @@ public class PhotoDocument extends Aggregate<PhotoId> {
      * @throws NullPointerException  if reviewer or reviewedAt is null
      * @throws IllegalStateException if this photo is already approved or rejected
      */
-    public void reject(UserAggregate reviewer, Timestamp reviewedAt, String reason) {
+    public void reject(UserReference reviewer, Timestamp reviewedAt, String reason) {
         if (this.status != ApprovalStatus.PENDING) {
             throw new IllegalStateException("Photo is already " + this.status.name().toLowerCase());
         }
@@ -199,7 +204,7 @@ public class PhotoDocument extends Aggregate<PhotoId> {
      *
      * @return the user who reviewed this photo, or null if not reviewed
      */
-    public UserAggregate getReviewedBy() {
+    public UserReference getReviewedBy() {
         return reviewedBy;
     }
 
@@ -227,6 +232,15 @@ public class PhotoDocument extends Aggregate<PhotoId> {
     @Override
     public PhotoId getId() {
         return null;
+    }
+
+    /**
+     * Returns the list of annotations associated with this photo document.
+     *
+     * @return an unmodifiable list of photo annotations
+     */
+    public List<PhotoAnnotation> getAnnotations() {
+        return Collections.unmodifiableList(annotations);
     }
 
     public static Builder builder() {
@@ -273,9 +287,19 @@ public class PhotoDocument extends Aggregate<PhotoId> {
         private UserAggregate uploadedBy;
         private Timestamp uploadedAt;
         private OrderId orderId;
+        private List<PhotoAnnotation> annotations = new ArrayList<>();
 
         private Builder() {}
 
+        public Builder annotations(List<PhotoAnnotation> annotations) {
+            this.annotations = new ArrayList<>(annotations);
+            return this;
+        }
+
+        public Builder addAnnotation(PhotoAnnotation annotation) {
+            this.annotations.add(annotation);
+            return this;
+        }
 
         public Builder photoId(PhotoId photoId) {
             this.photoId = photoId;

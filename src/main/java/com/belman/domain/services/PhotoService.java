@@ -1,11 +1,12 @@
 package com.belman.domain.services;
 
-import com.belman.domain.aggregates.User;
+
+import com.belman.domain.order.OrderId;
+import com.belman.domain.order.photo.Photo;
+import com.belman.domain.order.photo.PhotoAngle;
 import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.valueobjects.ImagePath;
-import com.belman.domain.valueobjects.OrderId;
-import com.belman.domain.valueobjects.PhotoAngle;
-import com.belman.domain.valueobjects.PhotoId;
+import com.belman.domain.order.photo.PhotoId;
+import com.belman.domain.user.UserAggregate;
 
 import java.io.File;
 import java.util.List;
@@ -24,7 +25,7 @@ public interface PhotoService {
      * @param uploadedBy the user who uploaded the photo
      * @return the created photo document
      */
-    PhotoDocument uploadPhoto(File file, OrderId orderId, PhotoAngle angle, User uploadedBy);
+    PhotoDocument uploadPhoto(File file, OrderId orderId, PhotoAngle angle, UserAggregate uploadedBy);
     
     /**
      * Deletes a photo document.
@@ -57,5 +58,5 @@ public interface PhotoService {
      * @param orderId the ID of the order
      * @return a unique file path
      */
-    ImagePath generateUniqueFilePath(String originalFileName, OrderId orderId);
+    Photo generateUniqueFilePath(String originalFileName, OrderId orderId);
 }

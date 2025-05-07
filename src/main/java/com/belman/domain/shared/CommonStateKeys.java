@@ -1,6 +1,7 @@
 package com.belman.domain.shared;
 
-import com.belman.domain.aggregates.User;
+
+import com.belman.domain.user.UserAggregate;
 
 /**
  * Predefined state keys for common application state.
@@ -24,8 +25,8 @@ public final class CommonStateKeys {
      * <p>
      * This key is used to store the currently authenticated user.
      */
-    public static final StateKey<User> CURRENT_USER =
-        StateKey.of("currentUser", com.belman.domain.aggregates.User.class);
+    public static final StateKey<UserAggregate> CURRENT_USER =
+        StateKey.of("currentUser", com.belman.domain.user.UserAggregate.class);
 
     /**
      * Key for the authentication token.

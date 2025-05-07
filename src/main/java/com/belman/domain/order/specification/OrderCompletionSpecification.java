@@ -2,8 +2,7 @@ package com.belman.domain.order.specification;
 
 import com.belman.domain.order.OrderAggregate;
 import com.belman.domain.order.OrderStatus;
-import com.belman.domain.photo.ApprovalStatus;
-import com.belman.domain.photo.PhotoDocumentd;
+import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.specification.AbstractSpecification;
 
 import java.util.ArrayList;
@@ -65,8 +64,8 @@ public class OrderCompletionSpecification extends AbstractSpecification<OrderAgg
         }
 
         // Check that all required photos have been taken and approved
-        List<PhotoDocumentd> approvedPhotos = orderAggregate.getPhotos().stream()
-                .filter(photo -> photo.getStatus() == ApprovalStatus.APPROVED)
+        List<PhotoDocument> approvedPhotos = orderAggregate.getPhotos().stream()
+                .filter(photo -> photo.getStatus() == PhotoDocument.ApprovalStatus.APPROVED)
                 .toList();
 
         if (approvedPhotos.size() < requiredPhotoCount) {

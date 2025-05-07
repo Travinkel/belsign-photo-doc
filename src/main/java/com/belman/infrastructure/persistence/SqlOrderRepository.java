@@ -1,21 +1,15 @@
 package com.belman.infrastructure.persistence;
 
-import com.belman.domain.aggregates.User;
+
+import com.belman.domain.common.Timestamp;
 import com.belman.domain.customer.CustomerAggregate;
+import com.belman.domain.customer.CustomerId;
+import com.belman.domain.order.*;
+import com.belman.domain.order.photo.PhotoAngle;
 import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.enums.OrderStatus;
-import com.belman.domain.order.OrderRepository;
+import com.belman.domain.order.photo.PhotoId;
 import com.belman.domain.specification.Specification;
-import com.belman.domain.valueobjects.CustomerId;
-import com.belman.domain.valueobjects.DeliveryInformation;
-import com.belman.domain.valueobjects.OrderId;
-import com.belman.domain.valueobjects.OrderNumber;
-import com.belman.domain.valueobjects.PhotoId;
-import com.belman.domain.valueobjects.ProductDescription;
-import com.belman.domain.valueobjects.Timestamp;
-import com.belman.domain.valueobjects.UserId;
-import com.belman.domain.valueobjects.PhotoAngle;
-import com.belman.domain.valueobjects.ImagePath;
+import com.belman.domain.user.UserId;
 import com.belman.domain.user.UserRepository;
 import com.belman.domain.customer.CustomerRepository;
 import com.belman.application.core.ServiceLocator;

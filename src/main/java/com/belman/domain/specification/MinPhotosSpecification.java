@@ -1,6 +1,8 @@
 package com.belman.domain.specification;
 
 
+import com.belman.domain.order.OrderAggregate;
+
 /**
  * Specification that matches orders with at least a minimum number of photos.
  */
@@ -14,5 +16,20 @@ public final class MinPhotosSpecification implements Specification<OrderAggregat
     @Override
     public boolean isSatisfiedBy(OrderAggregate orderAggregate) {
         return orderAggregate.getPhotos().size() >= minPhotos;
+    }
+
+    @Override
+    public Specification<OrderAggregate> and(Specification<OrderAggregate> other) {
+        return null;
+    }
+
+    @Override
+    public Specification<OrderAggregate> or(Specification<OrderAggregate> other) {
+        return null;
+    }
+
+    @Override
+    public Specification<OrderAggregate> not() {
+        return null;
     }
 }

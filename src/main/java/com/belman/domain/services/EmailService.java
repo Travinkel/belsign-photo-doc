@@ -1,8 +1,8 @@
 package com.belman.domain.services;
 
 
+import com.belman.domain.common.EmailAddress;
 import com.belman.domain.report.ReportAggregate;
-import com.belman.domain.valueobjects.EmailAddress;
 
 import java.io.File;
 import java.util.List;

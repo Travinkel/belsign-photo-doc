@@ -1,7 +1,7 @@
 package com.belman.domain.specification;
 
 import com.belman.domain.order.photo.PhotoAngle;
-import com.belman.domain.photo.PhotoDocumentd;
+import com.belman.domain.order.photo.PhotoDocument;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
  * This specification enforces business rules about what constitutes 
  * an acceptable photo for quality control purposes.
  */
-public final class PhotoQualitySpecification extends AbstractSpecification<PhotoDocumentd> {
+public final class PhotoQualitySpecification extends AbstractSpecification<PhotoDocument> {
 
     private final List<String> validationMessages = new ArrayList<>();
 
@@ -32,7 +32,7 @@ public final class PhotoQualitySpecification extends AbstractSpecification<Photo
     }
 
     @Override
-    public boolean isSatisfiedBy(PhotoDocumentd candidate) {
+    public boolean isSatisfiedBy(PhotoDocument candidate) {
         clearMessages();
 
         boolean isValid = true;
@@ -69,17 +69,17 @@ public final class PhotoQualitySpecification extends AbstractSpecification<Photo
     }
 
     @Override
-    public Specification<PhotoDocumentd> and(Specification<PhotoDocumentd> other) {
+    public Specification<PhotoDocument> and(Specification<PhotoDocument> other) {
         return other; // Simplified implementation due to sealed interface constraints
     }
 
     @Override
-    public Specification<PhotoDocumentd> or(Specification<PhotoDocumentd> other) {
+    public Specification<PhotoDocument> or(Specification<PhotoDocument> other) {
         return this; // Simplified implementation due to sealed interface constraints
     }
 
     @Override
-    public Specification<PhotoDocumentd> not() {
+    public Specification<PhotoDocument> not() {
         return this; // Simplified implementation due to sealed interface constraints
     }
 

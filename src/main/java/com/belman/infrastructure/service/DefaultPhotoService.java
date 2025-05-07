@@ -1,16 +1,17 @@
 package com.belman.infrastructure.service;
 
+import com.belman.domain.common.Timestamp;
+import com.belman.domain.order.OrderAggregate;
+import com.belman.domain.order.OrderId;
+import com.belman.domain.order.OrderRepository;
+import com.belman.domain.order.photo.Photo;
+import com.belman.domain.order.photo.PhotoAngle;
+import com.belman.domain.order.photo.PhotoDocument;
+import com.belman.domain.order.photo.PhotoId;
+import com.belman.domain.services.PhotoService;
+import com.belman.domain.user.UserAggregate;
 import com.belman.infrastructure.platform.ErrorHandler;
 import com.belman.infrastructure.platform.PlatformUtils;
-import com.belman.domain.aggregates.User;
-import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.order.OrderRepository;
-import com.belman.domain.services.PhotoService;
-import com.belman.domain.valueobjects.ImagePath;
-import com.belman.domain.valueobjects.OrderId;
-import com.belman.domain.valueobjects.PhotoAngle;
-import com.belman.domain.valueobjects.PhotoId;
-import com.belman.domain.valueobjects.Timestamp;
 import com.gluonhq.attach.storage.StorageService;
 import com.gluonhq.attach.util.Services;
 
@@ -26,6 +27,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
+
+import static com.belman.domain.order.photo.PhotoDocument.builder;
 
 /**
  * Default implementation of the PhotoService interface.
@@ -54,8 +57,8 @@ public class DefaultPhotoService implements PhotoService {
 
     /**
      * Creates a new DefaultPhotoService.
-     * 
-     * @param orderRepository the order repository
+     *
+     * @param orderRepository       the order repository
      * @param photoStorageDirectory the directory where photos are stored
      */
     public DefaultPhotoService(OrderRepository orderRepository, String photoStorageDirectory) {
@@ -70,33 +73,34 @@ public class DefaultPhotoService implements PhotoService {
     }
 
     @Override
-    public PhotoDocument uploadPhoto(File file, OrderId orderId, PhotoAngle angle, User uploadedBy) {
+    public PhotoDocument uploadPhoto(File file, OrderId orderId, PhotoAngle angle, UserAggregate uploadedBy) {
         // Generate a unique ID for the photo
         PhotoId photoId = PhotoId.newId();
 
         // Generate a unique file path for the photo
-        ImagePath imagePath = generateUniqueFilePath(file.getName(), orderId);
+        Photo imagePath = generateUniqueFilePath(file.getName(), orderId);
 
         try {
             // Check if we're running on a mobile device
             if (PlatformUtils.isRunningOnMobile()) {
                 // Use Gluon's StorageService for mobile devices
-                copyFileWithGluonStorage(file, imagePath.path());
+                copyFileWithGluonStorage(file, imagePath.value());
             } else {
                 // Use standard Java file I/O for desktop
                 Path sourcePath = file.toPath();
-                Path targetPath = Paths.get(photoStorageDirectory, imagePath.path());
+                Path targetPath = Paths.get(photoStorageDirectory, imagePath.value());
                 Files.copy(sourcePath, targetPath, FILE_COPY_OPTION);
             }
 
             // Create a new photo document
-            PhotoDocument photo = new PhotoDocument(
-                photoId,
-                angle,
-                imagePath,
-                uploadedBy,
-                Timestamp.now()
-            );
+            PhotoDocument photo = PhotoDocument.builder()
+                    .photoId(photoId)
+                    .angle(angle)
+                    .imagePath(imagePath)
+                    .uploadedBy(uploadedBy)
+                    .uploadedAt(Timestamp.now())
+                    .build();
+
 
             // Find the orderAggregate and add the photo to it
             OrderAggregate orderAggregate = orderRepository.findById(orderId);
@@ -115,8 +119,8 @@ public class DefaultPhotoService implements PhotoService {
 
     /**
      * Copies a file using Gluon's StorageService.
-     * 
-     * @param sourceFile the source file
+     *
+     * @param sourceFile     the source file
      * @param targetFileName the target file name
      * @throws IOException if an I/O error occurs
      */
@@ -182,10 +186,10 @@ public class DefaultPhotoService implements PhotoService {
                     // Check if we're running on a mobile device
                     if (PlatformUtils.isRunningOnMobile()) {
                         // Use Gluon's StorageService for mobile devices
-                        deleted = deleteFileWithGluonStorage(photo.getImagePath().path());
+                        deleted = deleteFileWithGluonStorage(photo.getImagePath().value());
                     } else {
                         // Use standard Java file I/O for desktop
-                        File file = new File(photoStorageDirectory, photo.getImagePath().path());
+                        File file = new File(photoStorageDirectory, photo.getImagePath().value());
                         deleted = file.delete();
                     }
 
@@ -203,7 +207,7 @@ public class DefaultPhotoService implements PhotoService {
 
     /**
      * Deletes a file using Gluon's StorageService.
-     * 
+     *
      * @param fileName the name of the file to delete
      * @return true if the file was deleted successfully, false otherwise
      */
@@ -266,7 +270,7 @@ public class DefaultPhotoService implements PhotoService {
     }
 
     @Override
-    public ImagePath generateUniqueFilePath(String originalFileName, OrderId orderId) {
+    public Photo generateUniqueFilePath(String originalFileName, OrderId orderId) {
         // Extract the file extension
         String extension = "";
         int lastDotIndex = originalFileName.lastIndexOf(FILE_EXTENSION_SEPARATOR);
@@ -277,6 +281,8 @@ public class DefaultPhotoService implements PhotoService {
         // Generate a unique file name based on the order ID and a timestamp
         String uniqueFileName = orderId.id().toString() + "_" + System.currentTimeMillis() + extension;
 
-        return new ImagePath(uniqueFileName);
+        return new Photo(uniqueFileName);
     }
+
+
 }
