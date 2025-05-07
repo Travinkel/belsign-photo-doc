@@ -1,12 +1,13 @@
-package com.belman.clean;
+package com.belman.cleancode;
 
+import com.belman.domain.common.base.ValueObject;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchRule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class LoggingPracticesTest {
+public class ImmutabilityTest {
     private static JavaClasses importedClasses;
 
     @BeforeAll
@@ -15,14 +16,12 @@ public class LoggingPracticesTest {
     }
 
     @Test
-    public void classesShouldUseProperLogging() {
+    public void valueObjectsShouldBeImmutable() {
         ArchRule rule = classes()
-                .should().containAFieldOfType(Logger.class)
-                .andShould().callMethod(Logger.class, "log").atLeastOnce()
-                .because("Classes should use proper logging practices");
+                .that().areAnnotatedWith(ValueObject.class)
+                .should().beImmutable()
+                .because("Value objects should be immutable");
 
         rule.check(importedClasses);
     }
-
-    // Add more tests for specific logging practices
 }

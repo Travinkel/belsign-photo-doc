@@ -1,4 +1,4 @@
-package com.belman.clean;
+package com.belman.cleancode;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;

@@ -1,4 +1,4 @@
-package com.belman.clean;
+package com.belman.cleancode;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 
-public class MethodCohesionTest {
+public class ExceptionHandlingTest {
     private static JavaClasses importedClasses;
 
     @BeforeAll
@@ -17,14 +17,15 @@ public class MethodCohesionTest {
     }
 
     @Test
-    public void methodsShouldBeHighlyCohesive() {
+    public void exceptionsShouldBeHandledOrDeclared() {
         ArchRule rule = methods()
-                .should().haveRawLinesOfCodeLessThanOrEqualTo(20)
-                .andShould().haveNumberOfAccessedFieldsLessThanOrEqualTo(5)
-                .because("Methods should be highly cohesive");
+                .should().beAnnotatedWith(Throws.class)
+                .orShould().beDeclaredInClassesThat().areAnnotatedWith(Throws.class)
+                .orShould().beAnnotatedWith(HandleExceptions.class)
+                .because("Exceptions should be handled or declared");
 
         rule.check(importedClasses);
     }
 
-    // Add more tests for method cohesion
+    // Add more tests for specific exception handling practices
 }

@@ -1,4 +1,4 @@
-package com.belman.clean;
+package com.belman.cleancode;
 
 import org.junit.jupiter.api.Test;
 

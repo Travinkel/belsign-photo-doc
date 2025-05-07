@@ -1,4 +1,4 @@
-package com.belman.clean;
+package com.belman.cleancode;
 
 import com.tngtech.archunit.lang.ArchRule;
 import org.junit.jupiter.api.Test;
