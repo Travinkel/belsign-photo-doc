@@ -3,12 +3,12 @@ package com.belman.domain.user;
 import com.belman.domain.common.EmailAddress;
 import com.belman.domain.common.PersonName;
 import com.belman.domain.common.PhoneNumber;
+import com.belman.domain.core.AggregateRoot;
+import com.belman.domain.events.DomainEvent;
 import com.belman.domain.security.HashedPassword;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Entity representing a system user in the BelSign application.
@@ -29,18 +29,18 @@ import java.util.Set;
  * - Managing user roles and permissions
  * - Tracking user status and lifecycle
  * <p>
- * Users are referenced by other aggregates like Order and PhotoDocument to track
+ * Users are referenced by other aggregates like OrderAggregate and PhotoDocument to track
  * who created or modified domain objects.
  */
-public class UserAggregate {
-    private final UserId id;
+public class UserAggregate extends AggregateRoot<UserId> {
     private final Username username;
     private HashedPassword password;
     private PersonName name;
     private EmailAddress email;
     private PhoneNumber phoneNumber;
-    private UserStatus status;
+    private ApprovalState approvalState;
     private final Set<UserRole> roles = new HashSet<>();
+    private final List<DomainEvent> domainEvents = new ArrayList<>();
 
     /**
      * Creates a new User with the specified username, password and email.
@@ -51,77 +51,29 @@ public class UserAggregate {
      * @throws NullPointerException if username, password or email is null
      */
     public UserAggregate(Username username, HashedPassword password, EmailAddress email) {
-        this.id = UserId.newId();
+        super(UserId.newId());
         this.username = Objects.requireNonNull(username, "username must not be null");
         this.password = Objects.requireNonNull(password, "password must not be null");
         this.email = Objects.requireNonNull(email, "email must not be null");
-        this.status = UserStatus.ACTIVE; // Default status
+        this.approvalState = new PendingApprovalState(); // Default state
     }
 
-    /**
-     * Creates a new User with the specified ID, username, password and email.
-     *
-     * @param id       the unique identifier for this user
-     * @param username the user's username
-     * @param password the user's password
-     * @param email    the user's email address
-     * @throws NullPointerException if any parameter is null
-     */
-    public UserAggregate(UserId id, Username username, HashedPassword password, EmailAddress email) {
-        this.id = Objects.requireNonNull(id, "id must not be null");
-        this.username = Objects.requireNonNull(username, "username must not be null");
-        this.password = Objects.requireNonNull(password, "password must not be null");
-        this.email = Objects.requireNonNull(email, "email must not be null");
-        this.status = UserStatus.ACTIVE; // Default status
-    }
-
-    /**
-     * Creates a new User with the specified ID, username, password, name, and email.
-     *
-     * @param id       the unique identifier for this user
-     * @param username the user's username
-     * @param password the user's password
-     * @param name     the user's name
-     * @param email    the user's email address
-     * @throws NullPointerException if any parameter is null
-     */
-    public UserAggregate(UserId id, Username username, HashedPassword password, PersonName name, EmailAddress email) {
-        this.id = Objects.requireNonNull(id, "id must not be null");
-        this.username = Objects.requireNonNull(username, "username must not be null");
-        this.password = Objects.requireNonNull(password, "password must not be null");
+    // Constructor for additional properties (e.g., PersonName)
+    public UserAggregate(Username username, HashedPassword password, EmailAddress email, PersonName name) {
+        this(username, password, email);
         this.name = Objects.requireNonNull(name, "name must not be null");
-        this.email = Objects.requireNonNull(email, "email must not be null");
-        this.status = UserStatus.ACTIVE; // Default status
     }
 
-    /**
-     * Creates a new User with all details.
-     *
-     * @param id          the unique identifier for this user
-     * @param username    the user's username
-     * @param password    the user's password
-     * @param name        the user's name
-     * @param email       the user's email address
-     * @param phoneNumber the user's phone number
-     * @param status      the user's status
-     * @throws NullPointerException if any required parameter is null
-     */
-    public UserAggregate(UserId id, Username username, HashedPassword password, PersonName name, EmailAddress email,
-                         PhoneNumber phoneNumber, UserStatus status) {
-        this.id = Objects.requireNonNull(id, "id must not be null");
+    // Constructor for all properties
+    public UserAggregate(UserId id, Username username, HashedPassword password, PersonName name,
+                         EmailAddress email, PhoneNumber phoneNumber, UserStatus status) {
+        super(id);
         this.username = Objects.requireNonNull(username, "username must not be null");
         this.password = Objects.requireNonNull(password, "password must not be null");
         this.name = Objects.requireNonNull(name, "name must not be null");
         this.email = Objects.requireNonNull(email, "email must not be null");
         this.phoneNumber = phoneNumber; // Can be null
-        this.status = Objects.requireNonNull(status, "status must not be null");
-    }
-
-    /**
-     * Returns the unique identifier for this user.
-     */
-    public UserId getId() {
-        return id;
+        this.approvalState = Objects.requireNonNull(status, "status must not be null").toApprovalState();
     }
 
     /**
@@ -140,161 +92,66 @@ public class UserAggregate {
 
     /**
      * Sets or updates the password of this user.
-     *
-     * @param password the new password to set
-     * @throws NullPointerException if password is null
      */
     public void setPassword(HashedPassword password) {
         this.password = Objects.requireNonNull(password, "password must not be null");
     }
 
     /**
-     * Returns the full name of this user.
-     * The name is optional and may be null if not set.
+     * Returns the current approval status of this user.
      */
-    public PersonName getName() {
-        return name;
+    public String getStatus() {
+        return approvalState.getStatus();
     }
 
     /**
-     * Sets or updates the full name of this user.
-     *
-     * @param name the new name to set
-     * @throws NullPointerException if name is null
+     * Approves the user with the given reviewer and timestamp.
      */
-    public void setName(PersonName name) {
-        this.name = Objects.requireNonNull(name, "name must not be null");
+    public void approve(UserAggregate reviewer, Timestamp reviewedAt) {
+        approvalState.approve(reviewer, reviewedAt);
+        domainEvents.add(new UserApprovedEvent(this.getId(), reviewer.getId(), reviewedAt));
     }
 
     /**
-     * Returns the email address of this user.
+     * Rejects the user with the given reviewer, timestamp, and reason.
      */
-    public EmailAddress getEmail() {
-        return email;
+    public void reject(UserAggregate reviewer, Timestamp reviewedAt, String reason) {
+        approvalState.reject(reviewer, reviewedAt, reason);
+        domainEvents.add(new UserRejectedEvent(this.getId(), reviewer.getId(), reviewedAt, reason));
     }
 
     /**
-     * Sets or updates the email address of this user.
-     *
-     * @param email the new email address to set
-     * @throws NullPointerException if email is null
+     * Returns an unmodifiable list of domain events emitted by this aggregate.
      */
-    public void setEmail(EmailAddress email) {
-        this.email = Objects.requireNonNull(email, "email must not be null");
+    public List<DomainEvent> getDomainEvents() {
+        return Collections.unmodifiableList(domainEvents);
     }
 
     /**
-     * Returns the phone number of this user.
-     * The phone number is optional and may be null if not set.
+     * Clears the list of domain events emitted by this aggregate.
      */
-    public PhoneNumber getPhoneNumber() {
-        return phoneNumber;
+    public void clearDomainEvents() {
+        domainEvents.clear();
     }
 
-    /**
-     * Sets or updates the phone number of this user.
-     * Unlike other properties, the phone number can be set to null to indicate
-     * that the user does not have a phone number.
-     *
-     * @param phoneNumber the new phone number to set, or null to clear the phone number
-     */
-    public void setPhoneNumber(PhoneNumber phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void addRole(UserRole role) {
+        Objects.requireNonNull(role, "role must not be null");
+        this.roles.add(role);
     }
 
-    /**
-     * Returns the current status of this user.
-     */
-    public UserStatus getStatus() {
-        return status;
+    public void removeRole(UserRole role) {
+        if (!roles.contains(role)) {
+            throw new IllegalArgumentException("Role does not exist: " + role);
+        }
+        this.roles.remove(role);
     }
 
-    /**
-     * Sets or updates the status of this user.
-     * Changing a user's status affects their ability to log in and use the system.
-     * Consider using the specialized methods activate(), deactivate(),
-     * and lock() instead of this method for better semantic clarity.
-     *
-     * @param status the new status to set
-     * @throws NullPointerException if status is null
-     */
-    public void setStatus(UserStatus status) {
-        this.status = Objects.requireNonNull(status, "status must not be null");
-    }
-
-    /**
-     * Returns an unmodifiable view of the roles assigned to this user.
-     */
     public Set<UserRole> getRoles() {
         return Collections.unmodifiableSet(roles);
     }
 
-    /**
-     * Adds a role to this user's set of roles.
-     *
-     * @param role the role to add
-     * @throws NullPointerException if role is null
-     */
-    public void addRole(UserRole role) {
-        this.roles.add(Objects.requireNonNull(role, "role must not be null"));
-    }
-
-    /**
-     * Removes a role from this user's set of roles.
-     *
-     * @param role the role to remove
-     * @throws NullPointerException if role is null
-     */
-    public void removeRole(UserRole role) {
-        this.roles.remove(Objects.requireNonNull(role, "role must not be null"));
-    }
-
-    /**
-     * Checks if the user is in the ACTIVE status.
-     */
-    public boolean isActive() {
-        return status == UserStatus.ACTIVE;
-    }
-
-    /**
-     * Checks if the user is in the INACTIVE status.
-     */
-    public boolean isInactive() {
-        return status == UserStatus.INACTIVE;
-    }
-
-    /**
-     * Checks if the user is in the LOCKED status.
-     */
-    public boolean isLocked() {
-        return status == UserStatus.LOCKED;
-    }
-
-    /**
-     * Checks if the user is in the PENDING status.
-     */
-    public boolean isPending() {
-        return status == UserStatus.PENDING;
-    }
-
-    /**
-     * Activates this user by setting their status to ACTIVE.
-     */
-    public void activate() {
-        this.status = UserStatus.ACTIVE;
-    }
-
-    /**
-     * Deactivates this user by setting their status to INACTIVE.
-     */
-    public void deactivate() {
-        this.status = UserStatus.INACTIVE;
-    }
-
-    /**
-     * Locks this user by setting their status to LOCKED.
-     */
-    public void lock() {
-        this.status = UserStatus.LOCKED;
+    @Override
+    public UserId getId() {
+        return super.getId();
     }
 }

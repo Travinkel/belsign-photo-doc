@@ -2,7 +2,6 @@ package com.belman.presentation.views.ordergallery;
 
 import com.belman.presentation.core.BaseController;
 import com.belman.presentation.navigation.Router;
-import com.belman.domain.aggregates.Order;
 import com.belman.domain.aggregates.User;
 import com.belman.infrastructure.service.SessionManager;
 import com.belman.presentation.components.TouchFriendlyDialog;
@@ -41,7 +40,7 @@ public class OrderGalleryViewController extends BaseController<OrderGalleryViewM
     private Button filterButton;
 
     @FXML
-    private ListView<Order> orderListView;
+    private ListView<OrderAggregate> orderListView;
 
     @FXML
     private TextArea orderDetailsTextArea;
@@ -116,7 +115,7 @@ public class OrderGalleryViewController extends BaseController<OrderGalleryViewM
         boolean created = getViewModel().createOrder(orderNumber);
 
         if (created) {
-            showInfo("Order created successfully");
+            showInfo("OrderAggregate created successfully");
             newOrderNumberField.clear();
         } else {
             showError(getViewModel().errorMessageProperty().get());

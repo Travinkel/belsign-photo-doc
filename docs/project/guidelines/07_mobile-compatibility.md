@@ -204,14 +204,14 @@ private void capturePhoto() {
 
 ### Barcode Scanning
 
-Implement barcode scanning for quick order lookup:
+Implement barcode scanning for quick orderAggregate lookup:
 
 ```
 private void scanBarcode() {
     Services.get(BarcodeService.class).ifPresent(service -> {
         service.scanBarcode().thenAccept(barcode -> {
             if (barcode != null) {
-                // Look up order by barcode
+                // Look up orderAggregate by barcode
                 orderService.findByBarcode(barcode);
             }
         });

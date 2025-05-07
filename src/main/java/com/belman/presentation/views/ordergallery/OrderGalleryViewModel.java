@@ -3,9 +3,8 @@ package com.belman.presentation.views.ordergallery;
 import com.belman.presentation.core.BaseViewModel;
 import com.belman.application.core.Inject;
 import com.belman.presentation.navigation.Router;
-import com.belman.domain.aggregates.Order;
 import com.belman.domain.aggregates.User;
-import com.belman.domain.repositories.OrderRepository;
+import com.belman.domain.order.OrderRepository;
 import com.belman.domain.valueobjects.OrderId;
 import com.belman.domain.valueobjects.OrderNumber;
 import com.belman.domain.valueobjects.Timestamp;
@@ -43,51 +42,51 @@ public class OrderGalleryViewModel extends BaseViewModel<OrderGalleryViewModel> 
     private final BooleanProperty orderSelected = new SimpleBooleanProperty(false);
     private final BooleanProperty isLoading = new SimpleBooleanProperty(false);
 
-    private final ObjectProperty<Order> selectedOrder = new SimpleObjectProperty<>();
+    private final ObjectProperty<OrderAggregate> selectedOrder = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDate> fromDate = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDate> toDate = new SimpleObjectProperty<>();
 
-    private final ListProperty<Order> orders = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ListProperty<Order> filteredOrders = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<OrderAggregate> orderAggregates = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<OrderAggregate> filteredOrderAggregates = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     @Override
     public void onShow() {
-        // Load all orders when the view is shown
+        // Load all orderAggregates when the view is shown
         loadAllOrders();
     }
 
     /**
-     * Loads all orders from the repository.
+     * Loads all orderAggregates from the repository.
      */
     public void loadAllOrders() {
         isLoading.set(true);
         errorMessage.set("");
 
         try {
-            List<Order> allOrders = orderRepository.findAll();
-            orders.setAll(allOrders);
-            filteredOrders.setAll(allOrders);
+            List<OrderAggregate> allOrderAggregates = orderRepository.findAll();
+            orderAggregates.setAll(allOrderAggregates);
+            filteredOrderAggregates.setAll(allOrderAggregates);
             isLoading.set(false);
         } catch (Exception e) {
-            errorMessage.set("Error loading orders: " + e.getMessage());
+            errorMessage.set("Error loading orderAggregates: " + e.getMessage());
             isLoading.set(false);
         }
     }
 
     /**
-     * Searches for orders based on the search text.
+     * Searches for orderAggregates based on the search text.
      * The search text can be an order number, customer name, or other order property.
      */
     public void searchOrders() {
         String search = searchText.get();
         if (search == null || search.isBlank()) {
-            // If search text is empty, show all orders
-            filteredOrders.setAll(orders);
+            // If search text is empty, show all orderAggregates
+            filteredOrderAggregates.setAll(orderAggregates);
             return;
         }
 
-        // Filter orders based on search text
-        List<Order> filtered = orders.stream()
+        // Filter orderAggregates based on search text
+        List<OrderAggregate> filtered = orderAggregates.stream()
             .filter(order -> {
                 // Check if order number contains search text
                 if (order.getOrderNumber() != null && 
@@ -107,24 +106,24 @@ public class OrderGalleryViewModel extends BaseViewModel<OrderGalleryViewModel> 
             })
             .collect(Collectors.toList());
 
-        filteredOrders.setAll(filtered);
+        filteredOrderAggregates.setAll(filtered);
     }
 
     /**
-     * Filters orders by date range.
+     * Filters orderAggregates by date range.
      */
     public void filterByDateRange() {
         LocalDate from = fromDate.get();
         LocalDate to = toDate.get();
 
         if (from == null && to == null) {
-            // If no date range is specified, show all orders
-            filteredOrders.setAll(orders);
+            // If no date range is specified, show all orderAggregates
+            filteredOrderAggregates.setAll(orderAggregates);
             return;
         }
 
-        // Filter orders based on date range
-        List<Order> filtered = orders.stream()
+        // Filter orderAggregates based on date range
+        List<OrderAggregate> filtered = orderAggregates.stream()
             .filter(order -> {
                 LocalDate orderDate = order.getCreatedAt().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
 
@@ -138,29 +137,29 @@ public class OrderGalleryViewModel extends BaseViewModel<OrderGalleryViewModel> 
             })
             .collect(Collectors.toList());
 
-        filteredOrders.setAll(filtered);
+        filteredOrderAggregates.setAll(filtered);
     }
 
     /**
-     * Sets the selected order and updates the order details.
+     * Sets the selected orderAggregate and updates the orderAggregate details.
      * 
-     * @param order the selected order
+     * @param orderAggregate the selected orderAggregate
      */
-    public void selectOrder(Order order) {
-        if (order != null) {
-            selectedOrder.set(order);
+    public void selectOrder(OrderAggregate orderAggregate) {
+        if (orderAggregate != null) {
+            selectedOrder.set(orderAggregate);
             orderSelected.set(true);
 
-            // Update order details
+            // Update orderAggregate details
             StringBuilder details = new StringBuilder();
-            details.append("Order Number: ").append(order.getOrderNumber()).append("\n");
+            details.append("OrderAggregate Number: ").append(orderAggregate.getOrderNumber()).append("\n");
 
-            if (order.getCustomer() != null) {
-                details.append("Customer: ").append(order.getCustomer().getName()).append("\n");
+            if (orderAggregate.getCustomer() != null) {
+                details.append("Customer: ").append(orderAggregate.getCustomer().getName()).append("\n");
             }
 
-            details.append("Created: ").append(order.getCreatedAt().toString()).append("\n");
-            details.append("Status: ").append(order.getStatus()).append("\n");
+            details.append("Created: ").append(orderAggregate.getCreatedAt().toString()).append("\n");
+            details.append("Status: ").append(orderAggregate.getStatus()).append("\n");
 
             // Add more details as needed
 
@@ -188,11 +187,11 @@ public class OrderGalleryViewModel extends BaseViewModel<OrderGalleryViewModel> 
             OrderNumber orderNum = new OrderNumber(orderNumberStr);
 
             // Check if order already exists
-            boolean exists = orders.stream()
+            boolean exists = orderAggregates.stream()
                 .anyMatch(order -> order.getOrderNumber() != null && order.getOrderNumber().equals(orderNum));
 
             if (exists) {
-                errorMessage.set("Order with this number already exists");
+                errorMessage.set("OrderAggregate with this number already exists");
                 return false;
             }
 
@@ -200,16 +199,16 @@ public class OrderGalleryViewModel extends BaseViewModel<OrderGalleryViewModel> 
             OrderId orderId = OrderId.newId();
             User currentUser = SessionManager.getInstance().getCurrentUser()
                 .orElseThrow(() -> new IllegalStateException("User not logged in"));
-            Order newOrder = new Order(orderId, orderNum, currentUser, Timestamp.now());
+            OrderAggregate newOrderAggregate = new OrderAggregate(orderId, orderNum, currentUser, Timestamp.now());
 
             // Save the new order
-            orderRepository.save(newOrder);
+            orderRepository.save(newOrderAggregate);
 
-            // Refresh the orders list
+            // Refresh the orderAggregates list
             loadAllOrders();
 
             // Select the new order
-            selectOrder(newOrder);
+            selectOrder(newOrderAggregate);
 
             return true;
         } catch (IllegalArgumentException e) {
@@ -243,7 +242,7 @@ public class OrderGalleryViewModel extends BaseViewModel<OrderGalleryViewModel> 
         return isLoading;
     }
 
-    public ObjectProperty<Order> selectedOrderProperty() {
+    public ObjectProperty<OrderAggregate> selectedOrderProperty() {
         return selectedOrder;
     }
 
@@ -255,16 +254,16 @@ public class OrderGalleryViewModel extends BaseViewModel<OrderGalleryViewModel> 
         return toDate;
     }
 
-    public ListProperty<Order> ordersProperty() {
-        return orders;
+    public ListProperty<OrderAggregate> ordersProperty() {
+        return orderAggregates;
     }
 
-    public ListProperty<Order> filteredOrdersProperty() {
-        return filteredOrders;
+    public ListProperty<OrderAggregate> filteredOrdersProperty() {
+        return filteredOrderAggregates;
     }
 
-    public ObservableList<Order> getFilteredOrders() {
-        return filteredOrders.get();
+    public ObservableList<OrderAggregate> getFilteredOrders() {
+        return filteredOrderAggregates.get();
     }
 
     /**

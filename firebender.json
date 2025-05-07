@@ -37,6 +37,6 @@
     "Use Scrum methodology and ScrumWise for backlog and sprint tracking",
     "Document design patterns used with concrete class references in the report",
     "Include relevant UML diagrams and explain architectural tradeoffs in the report",
-    "Use meaningful logging, not `System.out`, and support log-level filtering",
+    "Use meaningful logging, not `System.out`, and support log-level filtering"
   ]
 }

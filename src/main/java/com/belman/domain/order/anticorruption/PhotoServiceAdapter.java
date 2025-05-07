@@ -2,7 +2,7 @@ package com.belman.domain.order.anticorruption;
 
 import com.belman.domain.order.OrderAggregate;
 import com.belman.domain.order.OrderId;
-import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoDocumentd;
 import com.belman.domain.photo.PhotoRepository;
 import com.belman.domain.photo.service.PhotoValidationService;
 import com.belman.domain.photo.service.PhotoValidationService.ValidationResult;
@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Anti-corruption layer adapter that mediates between the Order and Photo bounded contexts.
+ * Anti-corruption layer adapter that mediates between the OrderAggregate and Photo bounded contexts.
  * <p>
- * This adapter provides a clean interface for the Order context to interact with the Photo context
+ * This adapter provides a clean interface for the OrderAggregate context to interact with the Photo context
  * without direct dependencies. It translates concepts between the two contexts and ensures
- * that changes in the Photo context don't impact the Order context directly.
+ * that changes in the Photo context don't impact the OrderAggregate context directly.
  * <p>
  * Following DDD principles, this adapter prevents conceptual leakage between bounded contexts
  * and maintains the integrity of the domain model boundaries.
@@ -43,63 +43,63 @@ public class PhotoServiceAdapter {
      * @param orderId the ID of the order
      * @return a list of photo documents associated with the order
      */
-    public List<PhotoDocument> getPhotosForOrder(OrderId orderId) {
+    public List<PhotoDocumentd> getPhotosForOrder(OrderId orderId) {
         Objects.requireNonNull(orderId, "orderId must not be null");
         return photoRepository.findByOrderId(orderId);
     }
 
     /**
-     * Validates that an order has all required photos with appropriate quality.
+     * Validates that an orderAggregate has all required photos with appropriate quality.
      *
-     * @param order the order to validate photos for
+     * @param orderAggregate the orderAggregate to validate photos for
      * @return a validation result containing any errors or warnings
      */
-    public ValidationResult validateOrderPhotos(OrderAggregate order) {
-        Objects.requireNonNull(order, "order must not be null");
+    public ValidationResult validateOrderPhotos(OrderAggregate orderAggregate) {
+        Objects.requireNonNull(orderAggregate, "orderAggregate must not be null");
 
-        // Fetch all photos for the order
-        List<PhotoDocument> photos = photoRepository.findByOrderId(order.getId());
+        // Fetch all photos for the orderAggregate
+        List<PhotoDocumentd> photos = photoRepository.findByOrderId(orderAggregate.getId());
 
         // Validate the photos against product requirements
-        return photoValidationService.validateAll(photos, order.getId(), order.getProductDescription());
+        return photoValidationService.validateAll(photos, orderAggregate.getId(), orderAggregate.getProductDescription());
     }
 
     /**
-     * Checks if an order has sufficient approved photos for proceeding with order processing.
+     * Checks if an orderAggregate has sufficient approved photos for proceeding with orderAggregate processing.
      *
-     * @param order the order to check
-     * @return true if the order has sufficient approved photos, false otherwise
+     * @param orderAggregate the orderAggregate to check
+     * @return true if the orderAggregate has sufficient approved photos, false otherwise
      */
-    public boolean hasRequiredApprovedPhotos(OrderAggregate order) {
-        Objects.requireNonNull(order, "order must not be null");
+    public boolean hasRequiredApprovedPhotos(OrderAggregate orderAggregate) {
+        Objects.requireNonNull(orderAggregate, "orderAggregate must not be null");
 
-        ValidationResult result = validateOrderPhotos(order);
+        ValidationResult result = validateOrderPhotos(orderAggregate);
         return !result.hasErrors();
     }
 
     /**
-     * Returns a list of validation errors for an order's photos, if any.
+     * Returns a list of validation errors for an orderAggregate's photos, if any.
      *
-     * @param order the order to check
+     * @param orderAggregate the orderAggregate to check
      * @return a list of validation error messages, or an empty list if no errors
      */
-    public List<String> getPhotoValidationErrors(OrderAggregate order) {
-        Objects.requireNonNull(order, "order must not be null");
+    public List<String> getPhotoValidationErrors(OrderAggregate orderAggregate) {
+        Objects.requireNonNull(orderAggregate, "orderAggregate must not be null");
 
-        ValidationResult result = validateOrderPhotos(order);
+        ValidationResult result = validateOrderPhotos(orderAggregate);
         return result.getErrors();
     }
 
     /**
-     * Returns a list of validation warnings for an order's photos, if any.
+     * Returns a list of validation warnings for an orderAggregate's photos, if any.
      *
-     * @param order the order to check
+     * @param orderAggregate the orderAggregate to check
      * @return a list of validation warning messages, or an empty list if no warnings
      */
-    public List<String> getPhotoValidationWarnings(OrderAggregate order) {
-        Objects.requireNonNull(order, "order must not be null");
+    public List<String> getPhotoValidationWarnings(OrderAggregate orderAggregate) {
+        Objects.requireNonNull(orderAggregate, "orderAggregate must not be null");
 
-        ValidationResult result = validateOrderPhotos(order);
+        ValidationResult result = validateOrderPhotos(orderAggregate);
         return result.getWarnings();
     }
 }

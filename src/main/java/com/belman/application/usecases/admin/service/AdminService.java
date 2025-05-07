@@ -1,15 +1,16 @@
 package com.belman.application.usecases.admin.service;
 
 import com.belman.application.core.BaseService;
-import com.belman.domain.aggregates.User;
-import com.belman.domain.rbac.AccessDeniedException;
+import com.belman.domain.common.EmailAddress;
+import com.belman.domain.common.PersonName;
+import com.belman.domain.user.*;
+import com.belman.domain.exceptions.AccessDeniedException;
 import com.belman.domain.rbac.AccessPolicy;
 import com.belman.domain.rbac.RoleBasedAccessManager;
-import com.belman.domain.repositories.UserRepository;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.security.PasswordHasher;
-import com.belman.domain.valueobjects.*;
+import com.belman.domain.user.factory.UserAggregateFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +34,7 @@ public class AdminService extends BaseService {
         this.passwordHasher = passwordHasher;
         this.authenticationService = authenticationService;
 
-        this.accessManager = new RoleBasedAccessManager(authenticationService, new AccessPolicy(User.Role.ADMIN));
+        this.accessManager = new RoleBasedAccessManager(authenticationService, new AccessPolicy(UserRole.ADMIN));
     }
 
     /**
@@ -48,12 +49,12 @@ public class AdminService extends BaseService {
      * @return the created user
      * @throws AccessDeniedException if the current user does not have ADMIN role
      */
-    public User createUser(String username, String password, String firstName, String lastName,
-                           String email, User.Role... roles) throws AccessDeniedException {
+    public UserAggregate createUser(String username, String password, String firstName, String lastName,
+                           String email, UserRole... roles) throws AccessDeniedException {
         accessManager.checkAccess();
 
         // Check if username or email already exists
-        Optional<User> existingUser = userRepository.findByUsername(new Username(username));
+        Optional<UserAggregate> existingUser = userRepository.findByUsername(new Username(username));
         if (existingUser.isPresent()) {
             throw new IllegalArgumentException("Username already exists: " + username);
         }
@@ -64,8 +65,7 @@ public class AdminService extends BaseService {
         }
 
         // Create new user
-        User user = new User(
-                UserId.newId(),
+        UserAggregate user = UserAggregateFactory.createUserWithName(
                 new Username(username),
                 HashedPassword.fromPlainText(password, passwordHasher),
                 new PersonName(firstName, lastName),
@@ -73,14 +73,13 @@ public class AdminService extends BaseService {
         );
 
         // Assign roles
-        for (User.Role role : roles) {
+        for (UserRole role : roles) {
             user.addRole(role);
         }
 
         // Save user
         userRepository.save(user);
         logInfo("User created: " + user.getId().id());
-
         return user;
     }
 
@@ -112,12 +111,12 @@ public class AdminService extends BaseService {
      * @return true if the role was assigned, false if the user was not found
      * @throws AccessDeniedException if the current user does not have ADMIN role
      */
-    public boolean assignRole(UserId userId, User.Role role) throws AccessDeniedException {
+    public boolean assignRole(UserId userId, UserRole role) throws AccessDeniedException {
         accessManager.checkAccess();
 
-        Optional<User> userOpt = userRepository.findById(userId);
+        Optional<UserAggregate> userOpt = userRepository.findById(userId);
         if (userOpt.isPresent()) {
-            User user = userOpt.get();
+            UserAggregate user = userOpt.get();
             user.addRole(role);
             userRepository.save(user);
             logInfo("Role assigned to user: " + role + " -> " + userId.id());
@@ -136,12 +135,12 @@ public class AdminService extends BaseService {
      * @return true if the role was removed, false if the user was not found
      * @throws AccessDeniedException if the current user does not have ADMIN role
      */
-    public boolean removeRole(UserId userId, User.Role role) throws AccessDeniedException {
+    public boolean removeRole(UserId userId, UserRole role) throws AccessDeniedException {
         accessManager.checkAccess();
 
-        Optional<User> userOpt = userRepository.findById(userId);
+        Optional<UserAggregate> userOpt = userRepository.findById(userId);
         if (userOpt.isPresent()) {
-            User user = userOpt.get();
+            UserAggregate user = userOpt.get();
             user.removeRole(role);
             userRepository.save(user);
             logInfo("Role removed from user: " + role + " -> " + userId.id());
@@ -163,20 +162,22 @@ public class AdminService extends BaseService {
     public boolean resetPassword(UserId userId, String newPassword) throws AccessDeniedException {
         accessManager.checkAccess();
 
-        Optional<User> userOpt = userRepository.findById(userId);
+        Optional<UserAggregate> userOpt = userRepository.findById(userId);
         if (userOpt.isPresent()) {
-            User user = userOpt.get();
+            UserAggregate user = userOpt.get();
             // Create a new user with the same properties but a new password
-            User updatedUser = new User(
+            UserAggregate updatedUser = UserAggregateFactory.createFullUser(
                     user.getId(),
                     user.getUsername(),
                     HashedPassword.fromPlainText(newPassword, passwordHasher),
                     user.getName(),
-                    user.getEmail()
+                    user.getEmail(),
+                    user.getPhoneNumber(),
+                    user.getStatus()
             );
 
             // Copy roles
-            for (User.Role role : user.getRoles()) {
+            for (UserRole role : user.roles()) {
                 updatedUser.addRole(role);
             }
 
@@ -195,7 +196,7 @@ public class AdminService extends BaseService {
      * @return a list of all users
      * @throws AccessDeniedException if the current user does not have ADMIN role
      */
-    public List<User> getAllUsers() throws AccessDeniedException {
+    public List<UserAggregate> getAllUsers() throws AccessDeniedException {
         accessManager.checkAccess();
         return userRepository.findAll();
     }
@@ -207,7 +208,7 @@ public class AdminService extends BaseService {
      * @return a list of users with the specified role
      * @throws AccessDeniedException if the current user does not have ADMIN role
      */
-    public List<User> getUsersByRole(User.Role role) throws AccessDeniedException {
+    public List<UserAggregate> getUsersByRole(UserRole role) throws AccessDeniedException {
         accessManager.checkAccess();
         return userRepository.findByRole(role);
     }

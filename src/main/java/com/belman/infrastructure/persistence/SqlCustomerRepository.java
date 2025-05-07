@@ -1,8 +1,8 @@
 package com.belman.infrastructure.persistence;
 
-import com.belman.domain.entities.Customer;
+import com.belman.domain.customer.CustomerAggregate;
 import com.belman.domain.enums.CustomerType;
-import com.belman.domain.repositories.CustomerRepository;
+import com.belman.domain.customer.CustomerRepository;
 import com.belman.domain.specification.Specification;
 import com.belman.domain.valueobjects.Company;
 import com.belman.domain.valueobjects.CustomerId;
@@ -40,7 +40,7 @@ public class SqlCustomerRepository implements CustomerRepository {
     }
 
     @Override
-    public Customer findById(CustomerId id) {
+    public CustomerAggregate findById(CustomerId id) {
         String sql = "SELECT * FROM customers WHERE id = ?";
 
         try (Connection conn = dataSource.getConnection();
@@ -61,9 +61,9 @@ public class SqlCustomerRepository implements CustomerRepository {
     }
 
     @Override
-    public List<Customer> findAll() {
+    public List<CustomerAggregate> findAll() {
         String sql = "SELECT * FROM customers";
-        List<Customer> customers = new ArrayList<>();
+        List<CustomerAggregate> customers = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -80,7 +80,7 @@ public class SqlCustomerRepository implements CustomerRepository {
     }
 
     @Override
-    public List<Customer> findBySpecification(Specification<Customer> spec) {
+    public List<CustomerAggregate> findBySpecification(Specification<CustomerAggregate> spec) {
         // For simplicity, we'll load all customers and filter in memory
         // In a real implementation, this would translate the specification to SQL
         return findAll().stream()
@@ -89,7 +89,7 @@ public class SqlCustomerRepository implements CustomerRepository {
     }
 
     @Override
-    public void save(Customer customer) {
+    public void save(CustomerAggregate customer) {
         // Check if customer already exists
         String checkSql = "SELECT COUNT(*) FROM customers WHERE id = ?";
         boolean customerExists = false;
@@ -117,7 +117,7 @@ public class SqlCustomerRepository implements CustomerRepository {
     }
 
     @Override
-    public void delete(Customer customer) {
+    public void delete(CustomerAggregate customer) {
         String sql = "DELETE FROM customers WHERE id = ?";
 
         try (Connection conn = dataSource.getConnection();
@@ -137,7 +137,7 @@ public class SqlCustomerRepository implements CustomerRepository {
         }
     }
 
-    private void insertCustomer(Customer customer) {
+    private void insertCustomer(CustomerAggregate customer) {
         String sql = "INSERT INTO customers (id, type, person_first_name, person_last_name, company_name, " +
                      "email, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
@@ -179,7 +179,7 @@ public class SqlCustomerRepository implements CustomerRepository {
         }
     }
 
-    private void updateCustomer(Customer customer) {
+    private void updateCustomer(CustomerAggregate customer) {
         String sql = "UPDATE customers SET type = ?, person_first_name = ?, person_last_name = ?, " +
                      "company_name = ?, email = ?, phone_number = ? WHERE id = ?";
 
@@ -222,7 +222,7 @@ public class SqlCustomerRepository implements CustomerRepository {
         }
     }
 
-    private Customer mapResultSetToCustomer(ResultSet rs) throws SQLException {
+    private CustomerAggregate mapResultSetToCustomer(ResultSet rs) throws SQLException {
         CustomerId id = new CustomerId(UUID.fromString(rs.getString("id")));
         CustomerType type = CustomerType.valueOf(rs.getString("type"));
         EmailAddress email = new EmailAddress(rs.getString("email"));
@@ -231,7 +231,7 @@ public class SqlCustomerRepository implements CustomerRepository {
         String phoneNumberStr = rs.getString("phone_number");
         PhoneNumber phoneNumber = phoneNumberStr != null ? new PhoneNumber(phoneNumberStr) : null;
 
-        Customer customer;
+        CustomerAggregate customer;
 
         if (type == CustomerType.INDIVIDUAL) {
             String firstName = rs.getString("person_first_name");
@@ -239,9 +239,9 @@ public class SqlCustomerRepository implements CustomerRepository {
             PersonName personName = new PersonName(firstName, lastName);
 
             if (phoneNumber != null) {
-                customer = Customer.individual(id, personName, email, phoneNumber);
+                customer = CustomerAggregate.individual(id, personName, email, phoneNumber);
             } else {
-                customer = Customer.individual(id, personName, email);
+                customer = CustomerAggregate.individual(id, personName, email);
             }
         } else {
             String companyName = rs.getString("company_name");
@@ -255,9 +255,9 @@ public class SqlCustomerRepository implements CustomerRepository {
             Company company = new Company(companyName, registrationNumber, companyAddress);
 
             if (phoneNumber != null) {
-                customer = Customer.company(id, company, email, phoneNumber);
+                customer = CustomerAggregate.company(id, company, email, phoneNumber);
             } else {
-                customer = Customer.company(id, company, email);
+                customer = CustomerAggregate.company(id, company, email);
             }
         }
 

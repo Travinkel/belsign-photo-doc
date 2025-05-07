@@ -24,7 +24,7 @@ designed to work with:
 ```java
 // Create a temporary test file
 byte[] pdfContent = "Test PDF content".getBytes(StandardCharsets.UTF_8);
-File testFile = GluonTestStorageHelper.createTempTestFile("report.pdf", pdfContent);
+File testFile = GluonTestStorageHelper.createTempTestFile("reportAggregate.pdf", pdfContent);
 
 // Use the file in your test
 // ...

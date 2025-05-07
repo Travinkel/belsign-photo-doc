@@ -1,8 +1,8 @@
 package com.belman.unit.infrastructure;
 
+import com.belman.domain.report.ReportAggregate;
 import com.belman.domain.valueobjects.OrderId;
-import com.belman.domain.entities.PhotoDocument;
-import com.belman.domain.entities.Report;
+import com.belman.domain.photo.PhotoDocument;
 import com.belman.domain.valueobjects.Timestamp;
 import com.belman.domain.valueobjects.EmailAddress;
 import com.belman.domain.valueobjects.HashedPassword;
@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class SmtpEmailServiceTest {
 
     private SmtpEmailService emailService;
-    private Report report;
+    private ReportAggregate reportAggregate;
     private EmailAddress recipient;
 
     @BeforeEach
@@ -42,7 +42,7 @@ class SmtpEmailServiceTest {
             "test@localhost" // Use a test from address
         );
 
-        // Create a test report
+        // Create a test reportAggregate
         OrderId orderId = OrderId.newId();
         Username username = new Username("test-user");
         HashedPassword hashedPassword= new HashedPassword("test-password");
@@ -51,7 +51,7 @@ class SmtpEmailServiceTest {
         Timestamp now = new Timestamp(Instant.now());
         List<PhotoDocument> approvedPhotos = new ArrayList<>();
 
-        report = new Report(orderId, approvedPhotos, qaUser, now);
+        reportAggregate = new ReportAggregate(orderId, approvedPhotos, qaUser, now);
 
         // Create a test recipient
         recipient = new EmailAddress("test-recipient@localhost");
@@ -60,10 +60,10 @@ class SmtpEmailServiceTest {
     @Test
     void sendReportToSingleRecipientShouldReturnTrue() {
         boolean result = emailService.sendReport(
-            report,
+                reportAggregate,
             recipient,
-            "QC Report for Order " + report.getOrderId(),
-            "Please find attached the QC report for your order.",
+                "QC ReportAggregate for OrderAggregate " + reportAggregate.getOrderId(),
+            "Please find attached the QC reportAggregate for your order.",
             Collections.emptyList()
         );
 
@@ -77,10 +77,10 @@ class SmtpEmailServiceTest {
         recipients.add(new EmailAddress("manager@example.com"));
 
         boolean result = emailService.sendReport(
-            report,
+                reportAggregate,
             recipients,
-            "QC Report for Order " + report.getOrderId(),
-            "Please find attached the QC report for your order.",
+                "QC ReportAggregate for OrderAggregate " + reportAggregate.getOrderId(),
+            "Please find attached the QC reportAggregate for your order.",
             Collections.emptyList()
         );
 
@@ -105,7 +105,7 @@ class SmtpEmailServiceTest {
     @Test
     void sendReportWithAttachmentsShouldReturnTrue() throws IOException {
         // Create a temporary file for testing
-        Path tempFile = tempDir.resolve("test-report.pdf");
+        Path tempFile = tempDir.resolve("test-reportAggregate.pdf");
         Files.write(tempFile, "This is a test PDF file".getBytes());
         File attachmentFile = tempFile.toFile();
         tempFiles.add(attachmentFile); // Add to list for cleanup
@@ -114,10 +114,10 @@ class SmtpEmailServiceTest {
         attachments.add(attachmentFile);
 
         boolean result = emailService.sendReport(
-            report,
+                reportAggregate,
             recipient,
-            "QC Report for Order " + report.getOrderId(),
-            "Please find attached the QC report for your order.",
+                "QC ReportAggregate for OrderAggregate " + reportAggregate.getOrderId(),
+            "Please find attached the QC reportAggregate for your order.",
             attachments
         );
 

@@ -3,10 +3,10 @@ package com.belman.application.core;
 // Using the BaseService from the application.core package
 // This class is already in the application.core package, so no import needed
 import com.belman.domain.events.DomainEventPublisher;
-import com.belman.domain.aggregates.User;
 import com.belman.domain.events.UserLoggedInEvent;
 import com.belman.domain.events.UserLoggedOutEvent;
-import com.belman.domain.services.AuthenticationService;
+import com.belman.domain.security.AuthenticationService;
+import com.belman.domain.user.UserAggregate;
 
 import java.util.Optional;
 
@@ -72,7 +72,7 @@ public class SessionManager extends BaseService {
      * @param event the event to handle
      */
     private void handleUserLoggedIn(UserLoggedInEvent event) {
-        logInfo("User logged in: {}", event.getUsername().value());
+        logInfo("User logged in: {}", event.getUsername());
     }
 
     /**
@@ -81,7 +81,7 @@ public class SessionManager extends BaseService {
      * @param event the event to handle
      */
     private void handleUserLoggedOut(UserLoggedOutEvent event) {
-        logInfo("User logged out: {}", event.getUsername().value());
+        logInfo("User logged out: {}", event.getUsername());
     }
 
     /**
@@ -89,7 +89,7 @@ public class SessionManager extends BaseService {
      * 
      * @return an Optional containing the authenticated User if a user is logged in, or empty if no user is logged in
      */
-    public Optional<User> getCurrentUser() {
+    public Optional<UserAggregate> getCurrentUser() {
         return authenticationService.getCurrentUser();
     }
 
@@ -116,7 +116,7 @@ public class SessionManager extends BaseService {
      * @param password the password
      * @return an Optional containing the authenticated User if successful, or empty if authentication failed
      */
-    public Optional<User> login(String username, String password) {
+    public Optional<UserAggregate> login(String username, String password) {
         return authenticationService.authenticate(username, password);
     }
 }

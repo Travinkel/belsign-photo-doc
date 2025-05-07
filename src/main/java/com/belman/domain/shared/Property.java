@@ -1,4 +1,4 @@
-package com.belman.domain.shared;
+package com.belman.domain.state;
 
 import java.util.ArrayList;
 import java.util.List;

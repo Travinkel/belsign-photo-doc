@@ -1,11 +1,11 @@
 package com.belman.application.core;
 
-import com.belman.domain.shared.NestedProperty;
-import com.belman.domain.shared.Property;
+import com.belman.domain.common.validation.ValidationResult;
+import com.belman.domain.state.NestedProperty;
+import com.belman.domain.state.Property;
 import com.belman.domain.shared.StateKey;
-import com.belman.domain.shared.StateSchema;
 import com.belman.domain.shared.StateStore;
-import com.belman.domain.shared.ValidationResult;
+import com.belman.domain.state.StateSchema;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -120,13 +120,24 @@ public class StateManager {
 
     /**
      * Gets a property from the state store using a type-safe key.
-     * 
-     * @param key the type-safe key for the state value
+     *
+     * @param key the key for the state value
      * @param <T> the expected type of the value
      * @return the property, or a new property if not found
      */
     public <T> Property<T> getStateProperty(StateKey<T> key) {
-        return StateStore.getInstance().getPropertyTyped(key);
+        return (Property<T>) StateStore.getInstance().getPropertyTyped(key);
+    }
+
+    /**
+     * Gets a property from the state store using a string key.
+     *
+     * @param key the key for the state value
+     * @param <T> the expected type of the value
+     * @return the property, or a new property if not found
+     */
+    public <T> Property<T> getStateProperty(String key) {
+        return (Property<T>) StateStore.getInstance().getPropertyTyped(StateKey.of(key, Object.class));
     }
 
     /**
@@ -171,7 +182,7 @@ public class StateManager {
      * @return a nested property
      */
     public <T> NestedProperty<T> getNestedProperty(String key) {
-        return StateStore.getInstance().getNestedProperty(key);
+        return (NestedProperty<T>) StateStore.getInstance().getNestedPropertyTyped(StateKey.forUnknownType(key));
     }
 
     /**
@@ -182,7 +193,7 @@ public class StateManager {
      * @return a nested property
      */
     public <T> NestedProperty<T> getNestedProperty(StateKey<T> key) {
-        return StateStore.getInstance().getNestedPropertyTyped(key);
+        return (NestedProperty<T>) StateStore.getInstance().getNestedPropertyTyped(key);
     }
 
     /**
@@ -192,7 +203,7 @@ public class StateManager {
      * @param schema the schema for the state value
      * @param <T> the expected type of the value
      */
-    public <T> void registerSchema(String key, StateSchema<T> schema) {
+    public <T> void registerSchema(String key, com.belman.domain.state.StateSchema<T> schema) {
         StateStore.getInstance().registerSchema(key, schema);
     }
 
@@ -203,7 +214,7 @@ public class StateManager {
      * @param schema the schema for the state value
      * @param <T> the expected type of the value
      */
-    public <T> void registerSchema(StateKey<T> key, StateSchema<T> schema) {
+    public <T> void registerSchema(StateKey<T> key, com.belman.domain.state.StateSchema<T> schema) {
         StateStore.getInstance().registerSchema(key, schema);
     }
 

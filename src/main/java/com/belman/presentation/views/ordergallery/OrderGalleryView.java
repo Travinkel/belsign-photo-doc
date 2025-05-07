@@ -15,7 +15,7 @@ public class OrderGalleryView extends BaseView<OrderGalleryViewModel> {
     @Override
     public void updateAppBar(AppBar appBar) {
         appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> Router.navigateBack()));
-        appBar.setTitleText("Order Gallery");
+        appBar.setTitleText("OrderAggregate Gallery");
         appBar.getActionItems().add(MaterialDesignIcon.POWER_SETTINGS_NEW.button(e -> getViewModel().logout()));
     }
 }

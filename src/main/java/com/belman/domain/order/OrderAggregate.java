@@ -7,7 +7,7 @@ import com.belman.domain.order.events.OrderApprovedEvent;
 import com.belman.domain.order.events.OrderCancelledEvent;
 import com.belman.domain.order.events.OrderCompletedEvent;
 import com.belman.domain.order.events.OrderRejectedEvent;
-import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoDocumentd;
 import com.belman.domain.user.UserReference;
 
 import java.util.ArrayList;
@@ -18,12 +18,12 @@ import java.util.Objects;
 /**
  * Aggregate root representing a customer order in the BelSign system.
  * <p>
- * The Order aggregate is a central entity in the domain model that represents a customer's
+ * The OrderAggregate aggregate is a central entity in the domain model that represents a customer's
  * order for which photo documentation needs to be collected and managed. It serves as the
  * primary container for photo documents and maintains the lifecycle of an order from creation
  * through completion, approval, and delivery.
  * <p>
- * An Order contains:
+ * An OrderAggregate contains:
  * - Basic identification (ID and order number)
  * - Customer information
  * - Product details
@@ -32,8 +32,8 @@ import java.util.Objects;
  * - Collection of associated photo documents
  * - Metadata about creation
  * <p>
- * The Order aggregate enforces business rules related to:
- * - Order status transitions
+ * The OrderAggregate aggregate enforces business rules related to:
+ * - OrderAggregate status transitions
  * - Photo document management
  * - Quality control approval processes
  */
@@ -46,10 +46,10 @@ public class OrderAggregate extends AggregateRoot<OrderId> {
     private OrderStatus status;
     private final UserReference createdBy;
     private final Timestamp createdAt;
-    private final List<PhotoDocument> photoDocuments = new ArrayList<>();
+    private final List<PhotoDocumentd> photoDocuments = new ArrayList<>();
 
     /**
-     * Creates a new Order with the specified ID, creator, and creation time.
+     * Creates a new OrderAggregate with the specified ID, creator, and creation time.
      *
      * @param id        the unique identifier for this order
      * @param createdBy the user who created this order
@@ -63,7 +63,7 @@ public class OrderAggregate extends AggregateRoot<OrderId> {
     }
 
     /**
-     * Creates a new Order with the specified ID, order number, creator, and creation time.
+     * Creates a new OrderAggregate with the specified ID, order number, creator, and creation time.
      *
      * @param id          the unique identifier for this order
      * @param orderNumber the business order number
@@ -79,7 +79,7 @@ public class OrderAggregate extends AggregateRoot<OrderId> {
     }
 
     /**
-     * Creates a new Order with all details.
+     * Creates a new OrderAggregate with all details.
      *
      * @param id                  the unique identifier for this order
      * @param orderNumber         the business order number
@@ -212,7 +212,7 @@ public class OrderAggregate extends AggregateRoot<OrderId> {
     /**
      * Returns an unmodifiable view of all photo documents associated with this order.
      */
-    public List<PhotoDocument> getPhotos() {
+    public List<PhotoDocumentd> getPhotos() {
         return Collections.unmodifiableList(photoDocuments);
     }
 
@@ -222,7 +222,7 @@ public class OrderAggregate extends AggregateRoot<OrderId> {
      * @param photo the photo document to add to this order
      * @throws NullPointerException if photo is null
      */
-    public void addPhoto(PhotoDocument photo) {
+    public void addPhoto(PhotoDocumentd photo) {
         Objects.requireNonNull(photo, "photo must not be null");
         photo.assignToOrder(this.id);
         this.photoDocuments.add(photo);
@@ -231,18 +231,18 @@ public class OrderAggregate extends AggregateRoot<OrderId> {
     /**
      * Returns a filtered list of photo documents that have been approved by QA.
      */
-    public List<PhotoDocument> getApprovedPhotos() {
+    public List<PhotoDocumentd> getApprovedPhotos() {
         return photoDocuments.stream()
-                .filter(PhotoDocument::isApproved)
+                .filter(PhotoDocumentd::isApproved)
                 .toList();
     }
 
     /**
      * Returns a filtered list of photo documents that are still pending QA review.
      */
-    public List<PhotoDocument> getPendingPhotos() {
+    public List<PhotoDocumentd> getPendingPhotos() {
         return photoDocuments.stream()
-                .filter(PhotoDocument::isPending)
+                .filter(PhotoDocumentd::isPending)
                 .toList();
     }
 

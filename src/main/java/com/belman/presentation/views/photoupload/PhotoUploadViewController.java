@@ -3,7 +3,7 @@ package com.belman.presentation.views.photoupload;
 import com.belman.presentation.core.BaseController;
 import com.belman.presentation.navigation.Router;
 import com.belman.domain.aggregates.User;
-import com.belman.domain.entities.PhotoDocument;
+import com.belman.domain.photo.PhotoDocument;
 import com.belman.domain.services.CameraService;
 import com.belman.infrastructure.camera.CameraServiceFactory;
 import com.belman.infrastructure.service.SessionManager;

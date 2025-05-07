@@ -1,4 +1,4 @@
-package com.belman.domain.shared;
+package com.belman.domain.state;
 
 import java.util.List;
 import java.util.Map;
@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  *
  * @param <T> the type of the root object
  */
-public class NestedProperty<T> extends Property<T> {
+public class NestedProperty<T> extends com.belman.domain.state.Property<T> {
 
     /**
      * Creates a new nested property with a null initial value.

@@ -6,9 +6,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import com.belman.domain.common.validation.ValidationResult;
+import com.belman.domain.state.Property;
+import com.belman.domain.state.NestedProperty;
+import com.belman.domain.state.StateSchema;
+import com.belman.domain.shared.StateKey;
+
 /**
  * A global state management store for the application.
- * Inspired by Vuex/Pinia from Vue.js, this class provides a centralized
+ * Inspired by Vuex/Pinja from Vue.js, this class provides a centralized
  * store for managing application state with reactive properties.
  */
 public class StateStore {
@@ -278,7 +284,9 @@ public class StateStore {
         if (key == null) {
             throw new IllegalArgumentException("Key cannot be null");
         }
-        return getProperty(key.getKey());
+        Property<Object> property = state.computeIfAbsent(key.getKey(),
+                k -> new Property<>(null));
+        return (Property<T>) property;
     }
 
     /**

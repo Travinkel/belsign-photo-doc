@@ -2,8 +2,7 @@ package com.belman.domain.report.service;
 
 import com.belman.domain.core.IDomainService;
 import com.belman.domain.order.OrderAggregate;
-import com.belman.domain.order.OrderId;
-import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoDocumentd;
 import com.belman.domain.photo.service.PhotoValidationService;
 import com.belman.domain.report.Report;
 import com.belman.domain.report.ReportId;
@@ -53,7 +52,7 @@ public class PhotoReportGenerationService implements IDomainService {
         Objects.requireNonNull(order, "order must not be null");
         Objects.requireNonNull(requester, "requester must not be null");
 
-        List<PhotoDocument> approvedPhotos = order.getApprovedPhotos();
+        List<PhotoDocumentd> approvedPhotos = order.getApprovedPhotos();
 
         // Validate that we have enough approved photos
         PhotoValidationService.ValidationResult validationResult =
@@ -81,7 +80,7 @@ public class PhotoReportGenerationService implements IDomainService {
                 requester);
 
         // Add the approved photos to the report
-        for (PhotoDocument photo : approvedPhotos) {
+        for (PhotoDocumentd photo : approvedPhotos) {
             report.addPhotoReference(photo.getPhotoId());
         }
 
@@ -97,7 +96,7 @@ public class PhotoReportGenerationService implements IDomainService {
     public PhotoValidationService.ValidationResult validateReportReadiness(OrderAggregate order) {
         Objects.requireNonNull(order, "order must not be null");
 
-        List<PhotoDocument> approvedPhotos = order.getApprovedPhotos();
+        List<PhotoDocumentd> approvedPhotos = order.getApprovedPhotos();
 
         // If no photos are approved, the order is not ready
         if (approvedPhotos.isEmpty()) {

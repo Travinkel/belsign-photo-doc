@@ -16,7 +16,7 @@ public record OrderId(String id) {
      */
     public OrderId {
         if (id == null || id.isBlank()) {
-            throw new IllegalArgumentException("Order ID must not be null or blank");
+            throw new IllegalArgumentException("OrderAggregate ID must not be null or blank");
         }
     }
 

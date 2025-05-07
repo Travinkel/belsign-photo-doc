@@ -1,76 +1,50 @@
 package com.belman.domain.customer;
 
-import com.belman.domain.common.EmailAddress;
+import com.belman.domain.specification.Specification;
+import com.belman.domain.valueobjects.CustomerId;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
- * Repository for managing customers.
- * This interface follows the Repository pattern from Domain-Driven Design.
+ * Repository interface for Customer aggregate.
+ * Integrates the Specification pattern for querying.
  */
 public interface CustomerRepository {
-
     /**
-     * Finds a customer by ID.
-     *
+     * Finds a customer by their unique ID.
+     * 
      * @param id the customer ID to search for
-     * @return an Optional containing the customer if found, or empty if not found
+     * @return the customer with the specified ID, or null if not found
      */
-    Optional<CustomerAggregate> findById(CustomerId id);
-
+    CustomerAggregate findById(CustomerId id);
+    
     /**
-     * Finds a customer by company name (case-insensitive, partial match).
-     *
-     * @param companyName the company name to search for
-     * @return a list of customers matching the company name
-     */
-    List<CustomerAggregate> findByCompanyName(String companyName);
-
-    /**
-     * Finds a customer by contact email.
-     *
-     * @param email the contact email to search for
-     * @return an Optional containing the customer if found, or empty if not found
-     */
-    Optional<CustomerAggregate> findByContactEmail(EmailAddress email);
-
-    /**
-     * Saves a customer.
-     * If the customer already exists, it will be updated.
-     * If the customer does not exist, it will be created.
-     *
-     * @param customer the customer to save
-     */
-    void save(CustomerAggregate customer);
-
-    /**
-     * Deletes a customer by ID.
-     *
-     * @param id the ID of the customer to delete
-     * @return true if the customer was deleted, false if the customer was not found
-     */
-    boolean delete(CustomerId id);
-
-    /**
-     * Gets all customers.
-     *
+     * Finds all customers in the repository.
+     * 
      * @return a list of all customers
      */
     List<CustomerAggregate> findAll();
-
+    
     /**
-     * Gets all active customers.
-     *
-     * @return a list of all active customers
+     * Finds customers that satisfy the given specification.
+     * 
+     * @param spec the specification to filter customers
+     * @return a list of customers that satisfy the specification
      */
-    List<CustomerAggregate> findAllActive();
-
+    List<CustomerAggregate> findBySpecification(Specification<CustomerAggregate> spec);
+    
     /**
-     * Gets all customers of a specific type.
-     *
-     * @param type the customer type to filter by
-     * @return a list of customers of the specified type
+     * Saves a customer to the repository.
+     * If the customer already exists, it will be updated.
+     * 
+     * @param customer the customer to save
      */
-    List<CustomerAggregate> findByType(CustomerType type);
+    void save(CustomerAggregate customer);
+    
+    /**
+     * Deletes a customer from the repository.
+     * 
+     * @param customer the customer to delete
+     */
+    void delete(CustomerAggregate customer);
 }

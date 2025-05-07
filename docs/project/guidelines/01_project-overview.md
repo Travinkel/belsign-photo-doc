@@ -4,7 +4,7 @@
 
 BelSign is a quality control system developed for Belman A/S, a Danish company specializing in the design and
 manufacture of expansion joints and flexible pipe solutions. This module specifically handles photo documentation tied
-to orders, with user role control, report generation, and email dispatch capabilities.
+to orderAggregates, with user role control, reportAggregate generation, and email dispatch capabilities.
 
 ## Company Background
 
@@ -29,11 +29,11 @@ This approach makes it difficult to:
 
 - Find specific images upon customer requests
 - Access documentation in case of quality issues
-- Associate images with specific orders
+- Associate images with specific orderAggregates
 - Generate quality control reports efficiently
 - Time-consuming searches for specific images.
 - Inefficient handling of quality documentation.
-- Limited association between images and specific orders.
+- Limited association between images and specific orderAggregates.
 
 ## Solution: BelSign Photo Documentation Module
 
@@ -42,7 +42,7 @@ documentation throughout the production and quality control process.
 
 ### Key Features
 
-- **Order-Based Photo Management**: Attach images to specific order numbers and save them to a database
+- **Order-Based Photo Management**: Attach images to specific orderAggregate numbers and save them to a database
 - **QC Report Generation**: Automatically generate quality control reports with approved photos
 - **Customer Communication**: Send emails with QC documentation directly to customers
 - **User-Friendly Interface**: Designed for non-technical production workers
@@ -54,7 +54,7 @@ documentation throughout the production and quality control process.
 
 ### Benefits
 
-- **Improved Traceability**: All photos are linked to specific orders
+- **Improved Traceability**: All photos are linked to specific orderAggregates
 - **Enhanced Quality Control**: Structured approval process for documentation
 - **Better Customer Service**: Quick access to documentation when needed
 - **Increased Efficiency**: Streamlined workflow for photo documentation
@@ -66,7 +66,7 @@ The system is designed for three primary user roles:
 
 1. **Production Workers**
     - Take and upload photos
-    - Associate photos with order numbers
+    - Associate photos with orderAggregate numbers
     - Review uploaded photos
 
 2. **Quality Assurance Personnel**

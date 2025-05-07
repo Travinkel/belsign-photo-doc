@@ -4,7 +4,7 @@ import com.belman.application.core.BaseService;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.events.UserLoggedInEvent;
 import com.belman.domain.events.UserLoggedOutEvent;
-import com.belman.domain.repositories.UserRepository;
+import com.belman.domain.user.UserRepository;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.security.PasswordHasher;

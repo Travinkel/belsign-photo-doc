@@ -1,7 +1,7 @@
 # GraalVM + Gluon Substrate Test Compliance Report
 
 ## Overview
-This report analyzes the compatibility of the Backbone framework's test suite with GraalVM native image and Gluon Substrate for mobile deployment.
+This reportAggregate analyzes the compatibility of the Backbone framework's test suite with GraalVM native image and Gluon Substrate for mobile deployment.
 
 ## Test Files Analysis
 
@@ -11,7 +11,7 @@ This report analyzes the compatibility of the Backbone framework's test suite wi
 - **Status**: ⚠️ Needs GraalVM config
 - **Issues**:
   - Uses `java.io.File` with hardcoded file paths which assumes a desktop file system
-  - Creates a file reference to "test-report.pdf" which may not exist on mobile platforms
+  - Creates a file reference to "test-reportAggregate.pdf" which may not exist on mobile platforms
 - **Recommendation**: 
   - Use platform-agnostic file access through Gluon's storage APIs
   - Consider mocking file system operations for tests

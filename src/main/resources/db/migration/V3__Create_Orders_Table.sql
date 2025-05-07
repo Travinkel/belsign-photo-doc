@@ -1,7 +1,7 @@
 USE BelSign;
 
 -- Create Orders Table
-CREATE TABLE orders
+CREATE TABLE orderAggregates
 (
     id                   VARCHAR(36) PRIMARY KEY,
     order_number         VARCHAR(50) NOT NULL UNIQUE,
@@ -16,11 +16,11 @@ CREATE TABLE orders
     FOREIGN KEY (created_by) REFERENCES users (id)
 );
 
--- Create Index on Order Number
-CREATE INDEX idx_orders_order_number ON orders (order_number);
+-- Create Index on OrderAggregate Number
+CREATE INDEX idx_orders_order_number ON orderAggregates (order_number);
 
 -- Create Index on Customer ID
-CREATE INDEX idx_orders_customer_id ON orders (customer_id);
+CREATE INDEX idx_orders_customer_id ON orderAggregates (customer_id);
 
 -- Create Index on Status
-CREATE INDEX idx_orders_status ON orders (status);
+CREATE INDEX idx_orders_status ON orderAggregates (status);

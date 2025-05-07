@@ -8,9 +8,9 @@ represents a bounded context that aligns with a business capability rather than 
 ### Bounded Contexts
 
 - **user:** User management, authentication, authorization, and roles
-- **order:** Order processing, tracking, and fulfillment
+- **orderAggregate:** Order processing, tracking, and fulfillment
 - **photo:** Photo documents, metadata, and categorization
-- **report:** Report generation, formatting, and delivery
+- **reportAggregate:** Report generation, formatting, and delivery
 - **customer:** Customer information and relationships
 - **common:** Shared value objects, specifications, and exceptions used across contexts
 - **security:** Security-related components that apply across multiple contexts

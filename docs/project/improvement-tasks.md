@@ -99,7 +99,7 @@ This document outlines a comprehensive list of tasks to improve the BelSign Phot
 - [ ] **Optimize camera integration**: Improve photo capture functionality
 - [ ] **Enhance offline support**: Improve application behavior when offline
 - [ ] **Implement push notifications**: Add support for mobile push notifications
-- [ ] **Add barcode/QR scanning**: Implement scanning for quick order lookup
+- [ ] **Add barcode/QR scanning**: Implement scanning for quick orderAggregate lookup
 
 ### Performance on Mobile
 - [ ] **Reduce battery usage**: Optimize for lower power consumption

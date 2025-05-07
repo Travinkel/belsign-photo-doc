@@ -2,11 +2,12 @@ package com.belman.application.core;
 
 // Using the BaseService from the application.core package
 // This class is already in the application.core package, so no import needed
+
+import com.belman.domain.events.CommandExecutedEvent;
+import com.belman.domain.events.CommandRedoneEvent;
+import com.belman.domain.events.CommandUndoneEvent;
 import com.belman.domain.events.DomainEventPublisher;
 import com.belman.domain.shared.Command;
-import com.belman.domain.shared.CommandExecutedEvent;
-import com.belman.domain.shared.CommandRedoneEvent;
-import com.belman.domain.shared.CommandUndoneEvent;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

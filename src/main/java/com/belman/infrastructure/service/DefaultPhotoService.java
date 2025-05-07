@@ -2,10 +2,9 @@ package com.belman.infrastructure.service;
 
 import com.belman.infrastructure.platform.ErrorHandler;
 import com.belman.infrastructure.platform.PlatformUtils;
-import com.belman.domain.aggregates.Order;
 import com.belman.domain.aggregates.User;
-import com.belman.domain.entities.PhotoDocument;
-import com.belman.domain.repositories.OrderRepository;
+import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.order.OrderRepository;
 import com.belman.domain.services.PhotoService;
 import com.belman.domain.valueobjects.ImagePath;
 import com.belman.domain.valueobjects.OrderId;
@@ -99,11 +98,11 @@ public class DefaultPhotoService implements PhotoService {
                 Timestamp.now()
             );
 
-            // Find the order and add the photo to it
-            Order order = orderRepository.findById(orderId);
-            if (order != null) {
-                order.addPhoto(photo);
-                orderRepository.save(order);
+            // Find the orderAggregate and add the photo to it
+            OrderAggregate orderAggregate = orderRepository.findById(orderId);
+            if (orderAggregate != null) {
+                orderAggregate.addPhoto(photo);
+                orderRepository.save(orderAggregate);
             }
 
             return photo;
@@ -173,9 +172,9 @@ public class DefaultPhotoService implements PhotoService {
     @Override
     public boolean deletePhoto(PhotoId photoId) {
         // Find the order that contains the photo
-        List<Order> orders = orderRepository.findAll();
-        for (Order order : orders) {
-            List<PhotoDocument> photos = order.getPhotos();
+        List<OrderAggregate> orderAggregates = orderRepository.findAll();
+        for (OrderAggregate orderAggregate : orderAggregates) {
+            List<PhotoDocument> photos = orderAggregate.getPhotos();
             for (PhotoDocument photo : photos) {
                 if (photo.getPhotoId().equals(photoId)) {
                     boolean deleted;
@@ -190,9 +189,9 @@ public class DefaultPhotoService implements PhotoService {
                         deleted = file.delete();
                     }
 
-                    // Remove the photo from the order
-                    order.getPhotos().remove(photo);
-                    orderRepository.save(order);
+                    // Remove the photo from the orderAggregate
+                    orderAggregate.getPhotos().remove(photo);
+                    orderRepository.save(orderAggregate);
 
                     return deleted;
                 }
@@ -248,15 +247,15 @@ public class DefaultPhotoService implements PhotoService {
 
     @Override
     public List<PhotoDocument> getPhotosForOrder(OrderId orderId) {
-        Order order = orderRepository.findById(orderId);
-        return order != null ? order.getPhotos() : List.of();
+        OrderAggregate orderAggregate = orderRepository.findById(orderId);
+        return orderAggregate != null ? orderAggregate.getPhotos() : List.of();
     }
 
     @Override
     public PhotoDocument getPhotoById(PhotoId photoId) {
-        List<Order> orders = orderRepository.findAll();
-        for (Order order : orders) {
-            for (PhotoDocument photo : order.getPhotos()) {
+        List<OrderAggregate> orderAggregates = orderRepository.findAll();
+        for (OrderAggregate orderAggregate : orderAggregates) {
+            for (PhotoDocument photo : orderAggregate.getPhotos()) {
                 if (photo.getPhotoId().equals(photoId)) {
                     return photo;
                 }

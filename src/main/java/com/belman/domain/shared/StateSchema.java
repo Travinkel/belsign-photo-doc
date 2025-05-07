@@ -1,4 +1,6 @@
-package com.belman.domain.shared;
+package com.belman.domain.state;
+
+import com.belman.domain.common.validation.ValidationResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;

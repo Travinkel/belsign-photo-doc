@@ -14,12 +14,12 @@ CREATE TABLE photo_documents (
     review_comment TEXT,
     created_at DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
     updated_at DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
-    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (order_id) REFERENCES orderAggregates(id),
     FOREIGN KEY (uploaded_by) REFERENCES users(id),
     FOREIGN KEY (reviewed_by) REFERENCES users(id)
 );
 
--- Create Index on Order ID
+-- Create Index on OrderAggregate ID
 CREATE INDEX idx_photo_documents_order_id ON photo_documents(order_id);
 
 -- Create Index on Status

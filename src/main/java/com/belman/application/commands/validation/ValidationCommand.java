@@ -1,5 +1,6 @@
 package com.belman.application.commands.validation;
 
+import com.belman.domain.common.validation.ValidationResult;
 import com.belman.domain.shared.Command;
 
 import java.util.ArrayList;

@@ -32,14 +32,14 @@
 
             <!-- Search Section -->
             <HBox spacing="10" alignment="CENTER_LEFT" styleClass="form-row">
-                <TextField fx:id="searchField" promptText="Search orders..." HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="searchField" promptText="Search orderAggregates..." HBox.hgrow="ALWAYS"/>
                 <Button fx:id="searchButton" text="Search" onAction="#handleSearch"/>
             </HBox>
 
             <Label text="Pending Orders:" styleClass="subtitle"/>
 
             <!-- Orders List Section - Grows to fill available space -->
-            <ListView fx:id="pendingOrdersListView" VBox.vgrow="ALWAYS" styleClass="order-list"/>
+            <ListView fx:id="pendingOrdersListView" VBox.vgrow="ALWAYS" styleClass="orderAggregate-list"/>
 
             <!-- Action Buttons Section -->
             <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="form-row">

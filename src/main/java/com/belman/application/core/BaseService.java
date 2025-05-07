@@ -1,8 +1,8 @@
 package com.belman.application.core;
 
+import com.belman.domain.events.DomainEvent;
 import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
-import com.belman.domain.shared.DomainEvent;
 import com.belman.domain.events.DomainEventPublisher;
 
 /**

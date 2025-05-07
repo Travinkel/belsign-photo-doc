@@ -7,7 +7,7 @@ import java.util.Random;
 
 /**
  * Value object representing an order number in the BelSign system.
- * Order numbers follow a specific format: "MM/YY-CUSTOMER-SEQUENCE"
+ * OrderAggregate numbers follow a specific format: "MM/YY-CUSTOMER-SEQUENCE"
  * where:
  * - MM/YY is the month and year when the order was created
  * - CUSTOMER is a customer-specific identifier (often numeric)
@@ -25,7 +25,7 @@ public record OrderNumber(String value) {
      */
     public OrderNumber {
         if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException("Order number must not be null or blank");
+            throw new IllegalArgumentException("OrderAggregate number must not be null or blank");
         }
 
         // Optional validation to enforce format requirements

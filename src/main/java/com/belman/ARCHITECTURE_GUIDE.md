@@ -50,7 +50,7 @@ com.belman
 │   ├── application # Application layer for photos 
 │   ├── infra       # Infrastructure layer for photos
 │   └── ui          # Presentation layer for photos
-├── orders        # Order management feature
+├── orderAggregates        # Order management feature
 ...
 ```
 

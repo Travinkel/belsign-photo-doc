@@ -6,37 +6,37 @@ package com.belman.domain.order;
  */
 public enum OrderStatus {
     /**
-     * Order has been created but not yet started.
+     * OrderAggregate has been created but not yet started.
      */
     PENDING,
 
     /**
-     * Order is currently being processed.
+     * OrderAggregate is currently being processed.
      */
     IN_PROGRESS,
 
     /**
-     * Order has been completed but not yet approved.
+     * OrderAggregate has been completed but not yet approved.
      */
     COMPLETED,
 
     /**
-     * Order has been approved by QA.
+     * OrderAggregate has been approved by QA.
      */
     APPROVED,
 
     /**
-     * Order has been rejected by QA and needs rework.
+     * OrderAggregate has been rejected by QA and needs rework.
      */
     REJECTED,
 
     /**
-     * Order has been delivered to the customer.
+     * OrderAggregate has been delivered to the customer.
      */
     DELIVERED,
 
     /**
-     * Order has been cancelled.
+     * OrderAggregate has been cancelled.
      */
     CANCELLED
 }

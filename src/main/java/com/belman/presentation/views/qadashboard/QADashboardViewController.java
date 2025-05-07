@@ -95,7 +95,7 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
         if (selectedOrder != null) {
             boolean success = getViewModel().generateReport(selectedOrder);
             if (success) {
-                showInfo("Report generated successfully");
+                showInfo("ReportAggregate generated successfully");
             } else {
                 showError(getViewModel().errorMessageProperty().get());
             }

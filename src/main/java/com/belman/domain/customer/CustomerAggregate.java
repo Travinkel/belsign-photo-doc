@@ -1,196 +1,211 @@
 package com.belman.domain.customer;
 
-import com.belman.domain.common.EmailAddress;
-import com.belman.domain.common.PersonName;
-import com.belman.domain.common.PhoneNumber;
+
+import com.belman.domain.enums.CustomerType;
+import com.belman.domain.valueobjects.EmailAddress;
+import com.belman.domain.valueobjects.Company;
+import com.belman.domain.valueobjects.CustomerId;
+import com.belman.domain.valueobjects.PersonName;
+import com.belman.domain.valueobjects.PhoneNumber;
 
 import java.util.Objects;
 
 /**
- * Aggregate root representing a customer in the BelSign system.
- * <p>
- * The Customer aggregate encapsulates all customer-related information,
- * including contact details and company information. Customers are
- * associated with orders and are essential for the order fulfillment process.
+ * Entity representing a customer who can receive QC reports.
+ * Can represent either an individual person or a company.
  */
 public class CustomerAggregate {
     private final CustomerId id;
+    private final CustomerType type;
+    private PersonName personName;
     private Company company;
-    private PersonName contactPerson;
-    private EmailAddress contactEmail;
-    private PhoneNumber contactPhone;
-    private boolean active;
-    private CustomerType customerType;
+    private EmailAddress email;
+    private PhoneNumber phoneNumber;
 
     /**
-     * Creates a new Customer with the specified ID and basic information.
-     *
-     * @param id            the unique identifier for this customer
-     * @param company       the customer's company details
-     * @param contactPerson the name of the primary contact person
-     * @param contactEmail  the email address of the primary contact person
+     * Creates a new individual Customer with the specified ID, name, and email.
+     * 
+     * @param id the unique identifier for this customer
+     * @param personName the person's name
+     * @param email the customer's email address
+     * @return a new individual customer
      */
-    public CustomerAggregate(CustomerId id, Company company, PersonName contactPerson, EmailAddress contactEmail) {
-        this.id = Objects.requireNonNull(id, "id must not be null");
-        this.company = Objects.requireNonNull(company, "company must not be null");
-        this.contactPerson = Objects.requireNonNull(contactPerson, "contactPerson must not be null");
-        this.contactEmail = Objects.requireNonNull(contactEmail, "contactEmail must not be null");
-        this.active = true;
-        this.customerType = CustomerType.REGULAR;
+    public static CustomerAggregate individual(CustomerId id, PersonName personName, EmailAddress email) {
+        return new CustomerAggregate(id, CustomerType.INDIVIDUAL, personName, null, email, null);
     }
 
     /**
-     * Creates a new Customer with all details.
-     *
-     * @param id            the unique identifier for this customer
-     * @param company       the customer's company details
-     * @param contactPerson the name of the primary contact person
-     * @param contactEmail  the email address of the primary contact person
-     * @param contactPhone  the phone number of the primary contact person
-     * @param customerType  the type of customer (REGULAR, VIP, etc.)
-     * @param active        whether the customer is active
+     * Creates a new individual Customer with the specified ID, name, email, and phone number.
+     * 
+     * @param id the unique identifier for this customer
+     * @param personName the person's name
+     * @param email the customer's email address
+     * @param phoneNumber the customer's phone number
+     * @return a new individual customer
      */
-    public CustomerAggregate(CustomerId id, Company company, PersonName contactPerson,
-                             EmailAddress contactEmail, PhoneNumber contactPhone,
-                             CustomerType customerType, boolean active) {
-        this.id = Objects.requireNonNull(id, "id must not be null");
-        this.company = Objects.requireNonNull(company, "company must not be null");
-        this.contactPerson = Objects.requireNonNull(contactPerson, "contactPerson must not be null");
-        this.contactEmail = Objects.requireNonNull(contactEmail, "contactEmail must not be null");
-        this.contactPhone = contactPhone; // Optional, can be null
-        this.customerType = Objects.requireNonNull(customerType, "customerType must not be null");
-        this.active = active;
+    public static CustomerAggregate individual(CustomerId id, PersonName personName, EmailAddress email, PhoneNumber phoneNumber) {
+        return new CustomerAggregate(id, CustomerType.INDIVIDUAL, personName, null, email, phoneNumber);
     }
 
     /**
-     * Returns the unique identifier for this customer.
+     * Creates a new company Customer with the specified ID, company, and email.
+     * 
+     * @param id the unique identifier for this customer
+     * @param company the company
+     * @param email the customer's email address
+     * @return a new company customer
      */
+    public static CustomerAggregate company(CustomerId id, Company company, EmailAddress email) {
+        return new CustomerAggregate(id, CustomerType.COMPANY, null, company, email, null);
+    }
+
+    /**
+     * Creates a new company Customer with the specified ID, company, email, and phone number.
+     * 
+     * @param id the unique identifier for this customer
+     * @param company the company
+     * @param email the customer's email address
+     * @param phoneNumber the customer's phone number
+     * @return a new company customer
+     */
+    public static CustomerAggregate company(CustomerId id, Company company, EmailAddress email, PhoneNumber phoneNumber) {
+        return new CustomerAggregate(id, CustomerType.COMPANY, null, company, email, phoneNumber);
+    }
+
+    /**
+     * Private constructor used by factory methods.
+     */
+    private CustomerAggregate(CustomerId id, CustomerType type, PersonName personName, Company company,
+                              EmailAddress email, PhoneNumber phoneNumber) {
+        this.id = Objects.requireNonNull(id, "id must not be null");
+        this.type = Objects.requireNonNull(type, "type must not be null");
+        this.email = Objects.requireNonNull(email, "email must not be null");
+
+        if (type == CustomerType.INDIVIDUAL) {
+            this.personName = Objects.requireNonNull(personName, "personName must not be null for individual customers");
+        } else {
+            this.company = Objects.requireNonNull(company, "company must not be null for company customers");
+        }
+
+        this.phoneNumber = phoneNumber;
+    }
+
     public CustomerId getId() {
         return id;
     }
 
-    /**
-     * Returns the company details for this customer.
-     */
+    public CustomerType getType() {
+        return type;
+    }
+
+    public boolean isIndividual() {
+        return type == CustomerType.INDIVIDUAL;
+    }
+
+    public boolean isCompany() {
+        return type == CustomerType.COMPANY;
+    }
+
+    public PersonName getPersonName() {
+        if (!isIndividual()) {
+            throw new IllegalStateException("Person name is only available for individual customers");
+        }
+        return personName;
+    }
+
+    public void setPersonName(PersonName personName) {
+        if (!isIndividual()) {
+            throw new IllegalStateException("Cannot set person name for company customers");
+        }
+        this.personName = Objects.requireNonNull(personName, "personName must not be null");
+    }
+
     public Company getCompany() {
+        if (!isCompany()) {
+            throw new IllegalStateException("Company is only available for company customers");
+        }
         return company;
     }
 
-    /**
-     * Sets or updates the company details for this customer.
-     *
-     * @param company the new company details
-     * @throws NullPointerException if company is null
-     */
     public void setCompany(Company company) {
+        if (!isCompany()) {
+            throw new IllegalStateException("Cannot set company for individual customers");
+        }
         this.company = Objects.requireNonNull(company, "company must not be null");
     }
 
     /**
-     * Returns the name of the primary contact person for this customer.
+     * @return the customer's name (person name or company name)
      */
-    public PersonName getContactPerson() {
-        return contactPerson;
+    public String getName() {
+        return isIndividual() ? personName.toString() : company.toString();
+    }
+
+    public EmailAddress getEmail() {
+        return email;
+    }
+
+    public void setEmail(EmailAddress email) {
+        this.email = Objects.requireNonNull(email, "email must not be null");
+    }
+
+    public PhoneNumber getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(PhoneNumber phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     /**
-     * Sets or updates the name of the primary contact person for this customer.
-     *
-     * @param contactPerson the new contact person
-     * @throws NullPointerException if contactPerson is null
+     * Builder class for creating Customer instances.
      */
-    public void setContactPerson(PersonName contactPerson) {
-        this.contactPerson = Objects.requireNonNull(contactPerson, "contactPerson must not be null");
-    }
+    public static class Builder {
+        private CustomerId id;
+        private CustomerType type;
+        private PersonName personName;
+        private Company company;
+        private EmailAddress email;
+        private PhoneNumber phoneNumber;
 
-    /**
-     * Returns the email address of the primary contact person for this customer.
-     */
-    public EmailAddress getContactEmail() {
-        return contactEmail;
-    }
+        public Builder withId(CustomerId id) {
+            this.id = id;
+            return this;
+        }
 
-    /**
-     * Sets or updates the email address of the primary contact person for this customer.
-     *
-     * @param contactEmail the new contact email
-     * @throws NullPointerException if contactEmail is null
-     */
-    public void setContactEmail(EmailAddress contactEmail) {
-        this.contactEmail = Objects.requireNonNull(contactEmail, "contactEmail must not be null");
-    }
+        public Builder withType(CustomerType type) {
+            this.type = type;
+            return this;
+        }
 
-    /**
-     * Returns the phone number of the primary contact person for this customer.
-     * May be null if no phone number is provided.
-     */
-    public PhoneNumber getContactPhone() {
-        return contactPhone;
-    }
+        public Builder withPersonName(PersonName personName) {
+            this.personName = personName;
+            return this;
+        }
 
-    /**
-     * Sets or updates the phone number of the primary contact person for this customer.
-     * Can be null if no phone number is provided.
-     *
-     * @param contactPhone the new contact phone number, or null if none
-     */
-    public void setContactPhone(PhoneNumber contactPhone) {
-        this.contactPhone = contactPhone;
-    }
+        public Builder withCompany(Company company) {
+            this.company = company;
+            return this;
+        }
 
-    /**
-     * Returns whether this customer is active.
-     * Inactive customers are retained in the system but are not available for new orders.
-     */
-    public boolean isActive() {
-        return active;
-    }
+        public Builder withEmail(EmailAddress email) {
+            this.email = email;
+            return this;
+        }
 
-    /**
-     * Sets or updates whether this customer is active.
-     *
-     * @param active true if the customer should be active, false otherwise
-     */
-    public void setActive(boolean active) {
-        this.active = active;
-    }
+        public Builder withPhoneNumber(PhoneNumber phoneNumber) {
+            this.phoneNumber = phoneNumber;
+            return this;
+        }
 
-    /**
-     * Activates this customer, allowing them to place orders.
-     */
-    public void activate() {
-        this.active = true;
-    }
-
-    /**
-     * Deactivates this customer, preventing them from placing new orders.
-     * Existing orders are not affected.
-     */
-    public void deactivate() {
-        this.active = false;
-    }
-
-    /**
-     * Returns the type of this customer (REGULAR, VIP, etc.).
-     */
-    public CustomerType getCustomerType() {
-        return customerType;
-    }
-
-    /**
-     * Sets or updates the type of this customer.
-     *
-     * @param customerType the new customer type
-     * @throws NullPointerException if customerType is null
-     */
-    public void setCustomerType(CustomerType customerType) {
-        this.customerType = Objects.requireNonNull(customerType, "customerType must not be null");
-    }
-
-    /**
-     * Upgrades this customer to VIP status.
-     */
-    public void upgradeToVip() {
-        this.customerType = CustomerType.VIP;
+        public CustomerAggregate build() {
+            if (type == CustomerType.INDIVIDUAL) {
+                return new CustomerAggregate(id, type, personName, null, email, phoneNumber);
+            } else if (type == CustomerType.COMPANY) {
+                return new CustomerAggregate(id, type, null, company, email, phoneNumber);
+            } else {
+                throw new IllegalStateException("Invalid customer type");
+            }
+        }
     }
 }

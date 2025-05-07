@@ -1,7 +1,7 @@
 package com.belman.infrastructure.persistence;
 
 import com.belman.domain.aggregates.User;
-import com.belman.domain.repositories.UserRepository;
+import com.belman.domain.user.UserRepository;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.security.PasswordHasher;
 import com.belman.domain.valueobjects.EmailAddress;

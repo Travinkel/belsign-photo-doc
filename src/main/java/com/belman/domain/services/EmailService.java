@@ -1,7 +1,7 @@
 package com.belman.domain.services;
 
 
-import com.belman.domain.entities.Report;
+import com.belman.domain.report.ReportAggregate;
 import com.belman.domain.valueobjects.EmailAddress;
 
 import java.io.File;
@@ -12,26 +12,26 @@ import java.util.List;
  */
 public interface EmailService {
     /**
-     * Sends a QC report to the specified email addresses.
+     * Sends a QC reportAggregate to the specified email addresses.
      * 
-     * @param report the report to send
+     * @param reportAggregate the reportAggregate to send
      * @param recipients the email addresses of the recipients
      * @param subject the email subject
      * @param message the email message
-     * @param attachments optional file attachments (e.g., PDF report)
+     * @param attachments optional file attachments (e.g., PDF reportAggregate)
      * @return true if the email was sent successfully, false otherwise
      */
-    boolean sendReport(Report report, List<EmailAddress> recipients, String subject, String message, List<File> attachments);
+    boolean sendReport(ReportAggregate reportAggregate, List<EmailAddress> recipients, String subject, String message, List<File> attachments);
     
     /**
-     * Sends a QC report to the specified email address.
+     * Sends a QC reportAggregate to the specified email address.
      * 
-     * @param report the report to send
+     * @param reportAggregate the reportAggregate to send
      * @param recipient the email address of the recipient
      * @param subject the email subject
      * @param message the email message
-     * @param attachments optional file attachments (e.g., PDF report)
+     * @param attachments optional file attachments (e.g., PDF reportAggregate)
      * @return true if the email was sent successfully, false otherwise
      */
-    boolean sendReport(Report report, EmailAddress recipient, String subject, String message, List<File> attachments);
+    boolean sendReport(ReportAggregate reportAggregate, EmailAddress recipient, String subject, String message, List<File> attachments);
 }

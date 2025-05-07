@@ -1,8 +1,8 @@
 package com.belman.infrastructure.persistence;
 
 import com.belman.application.core.BaseService;
-import com.belman.domain.entities.Customer;
-import com.belman.domain.repositories.CustomerRepository;
+import com.belman.domain.customer.CustomerAggregate;
+import com.belman.domain.customer.CustomerRepository;
 import com.belman.domain.specification.Specification;
 import com.belman.domain.valueobjects.CustomerId;
 
@@ -17,27 +17,27 @@ import java.util.stream.Collectors;
  * This implementation is used as a fallback when a database is not available.
  */
 public class InMemoryCustomerRepository extends BaseService implements CustomerRepository {
-    private final Map<CustomerId, Customer> customers = new HashMap<>();
+    private final Map<CustomerId, CustomerAggregate> customers = new HashMap<>();
 
     @Override
-    public Customer findById(CustomerId id) {
+    public CustomerAggregate findById(CustomerId id) {
         return customers.get(id);
     }
 
     @Override
-    public List<Customer> findAll() {
+    public List<CustomerAggregate> findAll() {
         return new ArrayList<>(customers.values());
     }
 
     @Override
-    public List<Customer> findBySpecification(Specification<Customer> spec) {
+    public List<CustomerAggregate> findBySpecification(Specification<CustomerAggregate> spec) {
         return customers.values().stream()
                 .filter(spec::isSatisfiedBy)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public void save(Customer customer) {
+    public void save(CustomerAggregate customer) {
         if (customer == null) {
             throw new IllegalArgumentException("Customer cannot be null");
         }
@@ -45,7 +45,7 @@ public class InMemoryCustomerRepository extends BaseService implements CustomerR
     }
 
     @Override
-    public void delete(Customer customer) {
+    public void delete(CustomerAggregate customer) {
         if (customer == null) {
             throw new IllegalArgumentException("Customer cannot be null");
         }

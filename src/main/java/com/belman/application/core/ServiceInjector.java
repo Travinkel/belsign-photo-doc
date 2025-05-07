@@ -1,10 +1,13 @@
 package com.belman.application.core;
 
-import com.belman.domain.services.AuthenticationService;
-import com.belman.domain.valueobjects.EmailAddress;
-import com.belman.domain.valueobjects.HashedPassword;
-import com.belman.domain.valueobjects.Username;
-import com.belman.domain.aggregates.User;
+
+import com.belman.domain.common.EmailAddress;
+import com.belman.domain.security.AuthenticationService;
+import com.belman.domain.security.HashedPassword;
+import com.belman.domain.user.UserAggregate;
+import com.belman.domain.user.UserRole;
+import com.belman.domain.user.Username;
+import com.belman.infrastructure.security.DefaultAuthenticationService;
 import com.belman.infrastructure.service.SessionManager;
 
 import java.util.Arrays;
@@ -26,14 +29,13 @@ public final class ServiceInjector {
      * This method should be called at application startup before any views are loaded.
      */
     public static void registerServices() {
-        // Register a mock authentication service for development/testing
-        MockAuthenticationService mockAuthService = new MockAuthenticationService();
+        // Register the DefaultAuthenticationService
+        ServiceLocator.registerService(AuthenticationService.class, new DefaultAuthenticationService());
 
-        // Register the mock service
-        ServiceLocator.registerService(AuthenticationService.class, mockAuthService);
-
-        // Initialize SessionManager with the mock service
-        SessionManager sessionManager = SessionManager.getInstance(mockAuthService);
+        // Initialize SessionManager with the registered AuthenticationService
+        SessionManager sessionManager = SessionManager.getInstance(
+            ServiceLocator.getService(AuthenticationService.class)
+        );
 
         // Register other services as needed
         // ServiceLocator.registerService(EmailService.class, new SmtpEmailService(...));
@@ -45,10 +47,10 @@ public final class ServiceInjector {
      * In production, this would be replaced with a real implementation.
      */
     private static class MockAuthenticationService implements AuthenticationService {
-        private User currentUser = null;
+        private UserAggregate currentUser = null;
 
         @Override
-        public Optional<User> authenticate(String username, String password) {
+        public Optional<UserAggregate> authenticate(String username, String password) {
             System.out.println("Mock AuthenticationService: authenticate called with username: " + username);
 
             // For testing, accept any username/password where they match
@@ -57,16 +59,16 @@ public final class ServiceInjector {
                 Username userUsername = new Username(username);
                 HashedPassword hashedPassword = new HashedPassword(password); // In real system, this would be hashed
                 EmailAddress email = new EmailAddress(username + "@example.com");
-                User.Role role = User.Role.PRODUCTION; // Default role
+                UserRole role = UserRole.PRODUCTION; // Default role
 
                 // Assign specific roles based on username for testing
                 if (username.toLowerCase().contains("admin")) {
-                    role = User.Role.ADMIN;
+                    role = UserRole.ADMIN;
                 } else if (username.toLowerCase().contains("qa")) {
-                    role = User.Role.QA;
+                    role = UserRole.QA;
                 }
 
-                User user = new User(userUsername, hashedPassword, email);
+                UserAggregate user = new UserAggregate(userUsername, hashedPassword, email);
                 // Add the assigned role
                 user.addRole(role);
 
@@ -81,7 +83,7 @@ public final class ServiceInjector {
         }
 
         @Override
-        public Optional<User> getCurrentUser() {
+        public Optional<UserAggregate> getCurrentUser() {
             return Optional.ofNullable(currentUser);
         }
 

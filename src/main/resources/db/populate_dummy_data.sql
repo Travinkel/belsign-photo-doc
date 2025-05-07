@@ -1,6 +1,6 @@
 -- Delete any existing conflicting data first
 DELETE FROM photo_documents;
-DELETE FROM orders;
+DELETE FROM orderAggregates;
 DELETE FROM user_roles;
 DELETE FROM users;
 DELETE FROM customers;
@@ -27,7 +27,7 @@ VALUES
     ('3', 'COMPANY', 'French Industrial Solutions', 'Pierre', 'Dupont', 'contact@french-industrial.fr', '+33 123456789');
 
 -- Orders (created_by matches production_worker UUID)
-INSERT INTO orders (id, order_number, customer_id, status, created_by, created_at)
+INSERT INTO orderAggregates (id, order_number, customer_id, status, created_by, created_at)
 VALUES
     ('1', 'ORD-45-230501-WLD-0001', '1', 'APPROVED', 'c0d872d3-0c7f-4e17-9773-1f4e9647b964', '2023-05-01 10:00:00'),
     ('2', 'ORD-49-230615-EXP-0002', '2', 'APPROVED', 'c0d872d3-0c7f-4e17-9773-1f4e9647b964', '2023-06-15 09:00:00'),

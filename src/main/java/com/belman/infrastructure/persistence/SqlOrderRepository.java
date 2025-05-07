@@ -1,11 +1,10 @@
 package com.belman.infrastructure.persistence;
 
-import com.belman.domain.aggregates.Order;
 import com.belman.domain.aggregates.User;
-import com.belman.domain.entities.Customer;
-import com.belman.domain.entities.PhotoDocument;
+import com.belman.domain.customer.CustomerAggregate;
+import com.belman.domain.photo.PhotoDocument;
 import com.belman.domain.enums.OrderStatus;
-import com.belman.domain.repositories.OrderRepository;
+import com.belman.domain.order.OrderRepository;
 import com.belman.domain.specification.Specification;
 import com.belman.domain.valueobjects.CustomerId;
 import com.belman.domain.valueobjects.DeliveryInformation;
@@ -17,8 +16,8 @@ import com.belman.domain.valueobjects.Timestamp;
 import com.belman.domain.valueobjects.UserId;
 import com.belman.domain.valueobjects.PhotoAngle;
 import com.belman.domain.valueobjects.ImagePath;
-import com.belman.domain.repositories.UserRepository;
-import com.belman.domain.repositories.CustomerRepository;
+import com.belman.domain.user.UserRepository;
+import com.belman.domain.customer.CustomerRepository;
 import com.belman.application.core.ServiceLocator;
 
 import javax.sql.DataSource;
@@ -52,7 +51,7 @@ public class SqlOrderRepository implements OrderRepository {
     }
 
     @Override
-    public Order findById(OrderId id) {
+    public OrderAggregate findById(OrderId id) {
         String sql = "SELECT * FROM orders WHERE id = ?";
 
         try (Connection conn = dataSource.getConnection();
@@ -73,26 +72,26 @@ public class SqlOrderRepository implements OrderRepository {
     }
 
     @Override
-    public List<Order> findAll() {
+    public List<OrderAggregate> findAll() {
         String sql = "SELECT * FROM orders";
-        List<Order> orders = new ArrayList<>();
+        List<OrderAggregate> orderAggregates = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                orders.add(mapResultSetToOrder(rs));
+                orderAggregates.add(mapResultSetToOrder(rs));
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error finding all orders", e);
+            LOGGER.log(Level.SEVERE, "Error finding all orderAggregates", e);
         }
 
-        return orders;
+        return orderAggregates;
     }
 
     @Override
-    public List<Order> findBySpecification(Specification<Order> spec) {
+    public List<OrderAggregate> findBySpecification(Specification<OrderAggregate> spec) {
         // For simplicity, we'll load all orders and filter in memory
         // In a real implementation, this would translate the specification to SQL
         return findAll().stream()
@@ -101,15 +100,15 @@ public class SqlOrderRepository implements OrderRepository {
     }
 
     @Override
-    public void save(Order order) {
-        // Check if order already exists
+    public void save(OrderAggregate orderAggregate) {
+        // Check if orderAggregate already exists
         String checkSql = "SELECT COUNT(*) FROM orders WHERE id = ?";
         boolean orderExists = false;
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(checkSql)) {
 
-            stmt.setString(1, order.getId().id().toString());
+            stmt.setString(1, orderAggregate.getId().id().toString());
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -117,19 +116,19 @@ public class SqlOrderRepository implements OrderRepository {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error checking if order exists: " + order.getId().id(), e);
-            throw new RuntimeException("Error checking if order exists", e);
+            LOGGER.log(Level.SEVERE, "Error checking if orderAggregate exists: " + orderAggregate.getId().id(), e);
+            throw new RuntimeException("Error checking if orderAggregate exists", e);
         }
 
         if (orderExists) {
-            updateOrder(order);
+            updateOrder(orderAggregate);
         } else {
-            insertOrder(order);
+            insertOrder(orderAggregate);
         }
     }
 
     @Override
-    public Optional<Order> findByOrderNumber(OrderNumber orderNumber) {
+    public Optional<OrderAggregate> findByOrderNumber(OrderNumber orderNumber) {
         String sql = "SELECT * FROM orders WHERE order_number = ?";
 
         try (Connection conn = dataSource.getConnection();
@@ -149,7 +148,7 @@ public class SqlOrderRepository implements OrderRepository {
         return Optional.empty();
     }
 
-    private void insertOrder(Order order) {
+    private void insertOrder(OrderAggregate orderAggregate) {
         String sql = "INSERT INTO orders (id, order_number, customer_id, product_description, " +
                      "delivery_information, status, created_by, created_at) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -157,60 +156,60 @@ public class SqlOrderRepository implements OrderRepository {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, order.getId().id().toString());
-            stmt.setString(2, order.getOrderNumber() != null ? order.getOrderNumber().value() : null);
-            stmt.setString(3, order.getCustomer() != null ? order.getCustomer().getId().id().toString() : null);
-            stmt.setString(4, order.getProductDescription() != null ? order.getProductDescription().toString() : null);
-            stmt.setString(5, order.getDeliveryInformation() != null ? order.getDeliveryInformation().toString() : null);
-            stmt.setString(6, order.getStatus().name());
-            stmt.setString(7, order.getCreatedBy().getId().id().toString());
-            stmt.setTimestamp(8, java.sql.Timestamp.from(order.getCreatedAt().toInstant()));
+            stmt.setString(1, orderAggregate.getId().id().toString());
+            stmt.setString(2, orderAggregate.getOrderNumber() != null ? orderAggregate.getOrderNumber().value() : null);
+            stmt.setString(3, orderAggregate.getCustomer() != null ? orderAggregate.getCustomer().getId().id().toString() : null);
+            stmt.setString(4, orderAggregate.getProductDescription() != null ? orderAggregate.getProductDescription().toString() : null);
+            stmt.setString(5, orderAggregate.getDeliveryInformation() != null ? orderAggregate.getDeliveryInformation().toString() : null);
+            stmt.setString(6, orderAggregate.getStatus().name());
+            stmt.setString(7, orderAggregate.getCreatedBy().getId().id().toString());
+            stmt.setTimestamp(8, java.sql.Timestamp.from(orderAggregate.getCreatedAt().toInstant()));
 
             int rowsAffected = stmt.executeUpdate();
 
             if (rowsAffected > 0) {
                 // Insert photos
-                for (PhotoDocument photo : order.getPhotos()) {
+                for (PhotoDocument photo : orderAggregate.getPhotos()) {
                     insertPhoto(conn, photo);
                 }
-                LOGGER.info("Order inserted successfully: " + order.getId().id());
+                LOGGER.info("OrderAggregate inserted successfully: " + orderAggregate.getId().id());
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error inserting order: " + order.getId().id(), e);
-            throw new RuntimeException("Error inserting order", e);
+            LOGGER.log(Level.SEVERE, "Error inserting orderAggregate: " + orderAggregate.getId().id(), e);
+            throw new RuntimeException("Error inserting orderAggregate", e);
         }
     }
 
-    private void updateOrder(Order order) {
+    private void updateOrder(OrderAggregate orderAggregate) {
         String sql = "UPDATE orders SET order_number = ?, customer_id = ?, product_description = ?, " +
                      "delivery_information = ?, status = ? WHERE id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, order.getOrderNumber() != null ? order.getOrderNumber().value() : null);
-            stmt.setString(2, order.getCustomer() != null ? order.getCustomer().getId().id().toString() : null);
-            stmt.setString(3, order.getProductDescription() != null ? order.getProductDescription().toString() : null);
-            stmt.setString(4, order.getDeliveryInformation() != null ? order.getDeliveryInformation().toString() : null);
-            stmt.setString(5, order.getStatus().name());
-            stmt.setString(6, order.getId().id().toString());
+            stmt.setString(1, orderAggregate.getOrderNumber() != null ? orderAggregate.getOrderNumber().value() : null);
+            stmt.setString(2, orderAggregate.getCustomer() != null ? orderAggregate.getCustomer().getId().id().toString() : null);
+            stmt.setString(3, orderAggregate.getProductDescription() != null ? orderAggregate.getProductDescription().toString() : null);
+            stmt.setString(4, orderAggregate.getDeliveryInformation() != null ? orderAggregate.getDeliveryInformation().toString() : null);
+            stmt.setString(5, orderAggregate.getStatus().name());
+            stmt.setString(6, orderAggregate.getId().id().toString());
 
             int rowsAffected = stmt.executeUpdate();
 
             if (rowsAffected > 0) {
                 // Update photos (this is simplified - in a real implementation, we would need to handle photo updates more carefully)
-                for (PhotoDocument photo : order.getPhotos()) {
+                for (PhotoDocument photo : orderAggregate.getPhotos()) {
                     if (photoExists(conn, photo.getPhotoId())) {
                         updatePhoto(conn, photo);
                     } else {
                         insertPhoto(conn, photo);
                     }
                 }
-                LOGGER.info("Order updated successfully: " + order.getId().id());
+                LOGGER.info("OrderAggregate updated successfully: " + orderAggregate.getId().id());
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error updating order: " + order.getId().id(), e);
-            throw new RuntimeException("Error updating order", e);
+            LOGGER.log(Level.SEVERE, "Error updating orderAggregate: " + orderAggregate.getId().id(), e);
+            throw new RuntimeException("Error updating orderAggregate", e);
         }
     }
 
@@ -314,7 +313,7 @@ public class SqlOrderRepository implements OrderRepository {
         }
     }
 
-    private Order mapResultSetToOrder(ResultSet rs) throws SQLException {
+    private OrderAggregate mapResultSetToOrder(ResultSet rs) throws SQLException {
         OrderId id = new OrderId(UUID.fromString(rs.getString("id")));
 
         // Get the created_by user ID and fetch the user
@@ -325,44 +324,44 @@ public class SqlOrderRepository implements OrderRepository {
         java.sql.Timestamp sqlTimestamp = rs.getTimestamp("created_at");
         Timestamp createdAt = new Timestamp(sqlTimestamp.toInstant());
 
-        // Create the order with the required fields
-        Order order = new Order(id, createdBy, createdAt);
+        // Create the orderAggregate with the required fields
+        OrderAggregate orderAggregate = new OrderAggregate(id, createdBy, createdAt);
 
         // Set optional fields
         String orderNumberStr = rs.getString("order_number");
         if (orderNumberStr != null) {
-            order.setOrderNumber(new OrderNumber(orderNumberStr));
+            orderAggregate.setOrderNumber(new OrderNumber(orderNumberStr));
         }
 
         String customerId = rs.getString("customer_id");
         if (customerId != null) {
-            Customer customer = fetchCustomer(new CustomerId(UUID.fromString(customerId)));
+            CustomerAggregate customer = fetchCustomer(new CustomerId(UUID.fromString(customerId)));
             if (customer != null) {
-                order.setCustomer(customer);
+                orderAggregate.setCustomer(customer);
             }
         }
 
         String productDescriptionStr = rs.getString("product_description");
         if (productDescriptionStr != null) {
             // This is simplified - in a real implementation, we would parse the product description properly
-            order.setProductDescription(ProductDescription.withName(productDescriptionStr));
+            orderAggregate.setProductDescription(ProductDescription.withName(productDescriptionStr));
         }
 
         String deliveryInfoStr = rs.getString("delivery_information");
         if (deliveryInfoStr != null) {
             // This is simplified - in a real implementation, we would parse the delivery information properly
-            order.setDeliveryInformation(DeliveryInformation.basic(deliveryInfoStr, Timestamp.now()));
+            orderAggregate.setDeliveryInformation(DeliveryInformation.basic(deliveryInfoStr, Timestamp.now()));
         }
 
         String statusStr = rs.getString("status");
         if (statusStr != null) {
-            order.setStatus(OrderStatus.valueOf(statusStr));
+            orderAggregate.setStatus(OrderStatus.valueOf(statusStr));
         }
 
-        // Load photos for this order
-        loadPhotos(order);
+        // Load photos for this orderAggregate
+        loadPhotos(orderAggregate);
 
-        return order;
+        return orderAggregate;
     }
 
     private User fetchUser(UserId userId) {
@@ -377,7 +376,7 @@ public class SqlOrderRepository implements OrderRepository {
         return null;
     }
 
-    private Customer fetchCustomer(CustomerId customerId) {
+    private CustomerAggregate fetchCustomer(CustomerId customerId) {
         try {
             // Get the CustomerRepository from the ServiceLocator
             CustomerRepository customerRepository = ServiceLocator.getService(CustomerRepository.class);
@@ -389,24 +388,24 @@ public class SqlOrderRepository implements OrderRepository {
         return null;
     }
 
-    private void loadPhotos(Order order) {
+    private void loadPhotos(OrderAggregate orderAggregate) {
         String sql = "SELECT * FROM photo_documents WHERE order_id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, order.getId().id().toString());
+            stmt.setString(1, orderAggregate.getId().id().toString());
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     PhotoDocument photo = mapResultSetToPhoto(rs);
                     if (photo != null) {
-                        order.addPhoto(photo);
+                        orderAggregate.addPhoto(photo);
                     }
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error loading photos for order: " + order.getId().id(), e);
+            LOGGER.log(Level.SEVERE, "Error loading photos for orderAggregate: " + orderAggregate.getId().id(), e);
         }
     }
 

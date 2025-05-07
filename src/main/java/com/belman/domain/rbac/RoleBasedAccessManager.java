@@ -1,9 +1,9 @@
 package com.belman.domain.rbac;
 
-import com.belman.domain.aggregates.User;
 import com.belman.domain.core.DomainService;
 import com.belman.domain.exceptions.AccessDeniedException;
 import com.belman.domain.security.AuthenticationService;
+import com.belman.domain.user.UserAggregate;
 
 import java.util.Optional;
 
@@ -33,7 +33,7 @@ public class RoleBasedAccessManager extends DomainService {
      * @return true if the current user has access, false otherwise
      */
     public boolean hasAccess() {
-        Optional<User> currentUser = authenticationService.getCurrentUser();
+        Optional<UserAggregate> currentUser = authenticationService.getCurrentUser();
         return currentUser.isPresent() && accessPolicy.hasAccess(currentUser.get());
     }
 
@@ -43,7 +43,7 @@ public class RoleBasedAccessManager extends DomainService {
      * @param user the user to check
      * @return true if the user has access, false otherwise
      */
-    public boolean hasAccess(User user) {
+    public boolean hasAccess(UserAggregate user) {
         return user != null && accessPolicy.hasAccess(user);
     }
 
@@ -73,7 +73,7 @@ public class RoleBasedAccessManager extends DomainService {
      * @param user the user to check
      * @throws AccessDeniedException if the user does not have access
      */
-    public void checkAccess(User user) throws AccessDeniedException {
+    public void checkAccess(UserAggregate user) throws AccessDeniedException {
         if (!hasAccess(user)) {
             throw new AccessDeniedException("Access denied. User does not have the required role.");
         }

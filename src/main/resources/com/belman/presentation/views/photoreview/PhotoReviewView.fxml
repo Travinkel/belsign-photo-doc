@@ -31,14 +31,14 @@
 
             <Label text="Photo Review" styleClass="title"/>
 
-            <!-- Order Number Section -->
+            <!-- OrderAggregate Number Section -->
             <HBox spacing="10" alignment="CENTER_LEFT" styleClass="form-row">
                 <Label text="Order Number:" styleClass="form-label"/>
-                <TextField fx:id="orderNumberField" promptText="Enter order number" HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="orderNumberField" promptText="Enter orderAggregate number" HBox.hgrow="ALWAYS"/>
                 <Button fx:id="searchButton" text="Search" onAction="#handleSearchOrder"/>
             </HBox>
 
-            <Label fx:id="orderInfoLabel" text="No order selected" styleClass="body-text"/>
+            <Label fx:id="orderInfoLabel" text="No orderAggregate selected" styleClass="body-text"/>
 
             <!-- Photo List Section - Grows to fill available space -->
             <ListView fx:id="photoListView" VBox.vgrow="ALWAYS" styleClass="photo-list"/>

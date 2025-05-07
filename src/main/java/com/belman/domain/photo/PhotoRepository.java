@@ -10,7 +10,7 @@ import java.util.Optional;
  * Repository for managing photo documents.
  * This interface follows the Repository pattern from Domain-Driven Design and provides a collection-like interface for accessing photo document aggregates.
  */
-public interface PhotoRepository extends Repository<PhotoDocument, PhotoId> {
+public interface PhotoRepository extends Repository<PhotoDocumentd, PhotoId> {
 
     /**
      * Finds a photo document by ID.
@@ -18,7 +18,7 @@ public interface PhotoRepository extends Repository<PhotoDocument, PhotoId> {
      * @param id the photo ID to search for
      * @return an Optional containing the photo document if found, or empty if not found
      */
-    Optional<PhotoDocument> findById(PhotoId id);
+    Optional<PhotoDocumentd> findById(PhotoId id);
 
     /**
      * Finds all photo documents for a specific order.
@@ -26,7 +26,7 @@ public interface PhotoRepository extends Repository<PhotoDocument, PhotoId> {
      * @param orderId the order ID to search for
      * @return a list of photo documents for the specified order
      */
-    List<PhotoDocument> findByOrderId(OrderId orderId);
+    List<PhotoDocumentd> findByOrderId(OrderId orderId);
 
     /**
      * Finds all photo documents with a specific approval status.
@@ -34,7 +34,7 @@ public interface PhotoRepository extends Repository<PhotoDocument, PhotoId> {
      * @param status the approval status to search for
      * @return a list of photo documents with the specified approval status
      */
-    List<PhotoDocument> findByStatus(ApprovalStatus status);
+    List<PhotoDocumentd> findByStatus(ApprovalStatus status);
 
     /**
      * Finds all photo documents for a specific order with a specific approval status.
@@ -43,5 +43,5 @@ public interface PhotoRepository extends Repository<PhotoDocument, PhotoId> {
      * @param status  the approval status to search for
      * @return a list of photo documents for the specified order with the specified approval status
      */
-    List<PhotoDocument> findByOrderIdAndStatus(OrderId orderId, ApprovalStatus status);
+    List<PhotoDocumentd> findByOrderIdAndStatus(OrderId orderId, ApprovalStatus status);
 }

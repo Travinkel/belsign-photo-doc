@@ -5,32 +5,32 @@ package com.belman.domain.report;
  */
 public enum ReportStatus {
     /**
-     * Report has been created but not yet processed.
+     * ReportAggregate has been created but not yet processed.
      */
     PENDING,
 
     /**
-     * Report is being processed and generated.
+     * ReportAggregate is being processed and generated.
      */
     PROCESSING,
 
     /**
-     * Report has been generated and is ready for review.
+     * ReportAggregate has been generated and is ready for review.
      */
     GENERATED,
 
     /**
-     * Report has been reviewed and approved.
+     * ReportAggregate has been reviewed and approved.
      */
     APPROVED,
 
     /**
-     * Report has been delivered to the customer.
+     * ReportAggregate has been delivered to the customer.
      */
     DELIVERED,
 
     /**
-     * Report has been rejected and needs to be regenerated.
+     * ReportAggregate has been rejected and needs to be regenerated.
      */
     REJECTED
 }

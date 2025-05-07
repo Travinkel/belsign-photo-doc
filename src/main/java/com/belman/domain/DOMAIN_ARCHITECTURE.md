@@ -52,14 +52,14 @@ Responsible for managing photo documents, including metadata, approval workflows
 
 ### Order Context
 
-Manages customer orders and their lifecycle, including status tracking and completion criteria.
+Manages customer orderAggregates and their lifecycle, including status tracking and completion criteria.
 
 **Key Components:**
 
-- `OrderAggregate` (Aggregate Root): Represents a customer order
-- `OrderId`: Value object for order identification
-- `OrderNumber`: Value object for business-readable order identification
-- `OrderStatus`: Enum for order lifecycle states
+- `OrderAggregate` (Aggregate Root): Represents a customer orderAggregate
+- `OrderId`: Value object for orderAggregate identification
+- `OrderNumber`: Value object for business-readable orderAggregate identification
+- `OrderStatus`: Enum for orderAggregate lifecycle states
 - `ProductDescription`: Value object for product details
 - `DeliveryInformation`: Value object for delivery details
 
@@ -69,11 +69,11 @@ Handles the generation and management of quality control reports.
 
 **Key Components:**
 
-- `Report` (Aggregate Root): Represents a quality documentation report
-- `ReportId`: Value object for report identification
+- `Report` (Aggregate Root): Represents a quality documentation reportAggregate
+- `ReportId`: Value object for reportAggregate identification
 - `ReportType`: Enum for different types of reports
-- `ReportStatus`: Enum for report workflow states
-- `ReportFormat`: Enum for report output formats
+- `ReportStatus`: Enum for reportAggregate workflow states
+- `ReportFormat`: Enum for reportAggregate output formats
 - `PhotoReportGenerationService`: Domain service for creating reports from photos
 
 ### User Context
@@ -164,8 +164,8 @@ com.belman.domain
 ├── core            # Core domain concepts (Entity, AggregateRoot)
 ├── specification   # Specification pattern infrastructure
 ├── photo           # Photo bounded context
-├── order           # Order bounded context
-├── report          # Report bounded context
+├── orderAggregate           # Order bounded context
+├── reportAggregate          # Report bounded context
 ├── user            # User bounded context
 └── customer        # Customer bounded context
 ```

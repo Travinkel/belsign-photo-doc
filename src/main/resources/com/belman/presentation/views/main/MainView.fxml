@@ -50,7 +50,7 @@
                     <Label text="This system allows you to:" 
                            style="-fx-font-size: 14px;"/>
                     <VBox alignment="CENTER_LEFT" spacing="5" style="-fx-padding: 10 0 0 50;">
-                        <Label text="• Attach images to order numbers" />
+                        <Label text="• Attach images to orderAggregate numbers" />
                         <Label text="• Generate QC reports automatically" />
                         <Label text="• Send documentation directly to customers" />
                     </VBox>

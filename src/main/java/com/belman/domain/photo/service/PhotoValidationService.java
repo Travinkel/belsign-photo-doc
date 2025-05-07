@@ -1,5 +1,6 @@
 package com.belman.domain.photo.service;
 
+import com.belman.domain.common.validation.ValidationResult;
 import com.belman.domain.core.IDomainService;
 import com.belman.domain.order.OrderId;
 import com.belman.domain.order.ProductDescription;
@@ -40,7 +41,7 @@ public class PhotoValidationService implements IDomainService {
      * @param productDescription the product description determining the required angles
      * @return a result containing validation messages
      */
-    public ValidationResult validateRequiredAngles(List<PhotoDocument> photos, ProductDescription productDescription) {
+    public ValidationResult validateRequiredAngles(List<PhotoDocumentd> photos, ProductDescription productDescription) {
         Objects.requireNonNull(photos, "photos must not be null");
         Objects.requireNonNull(productDescription, "productDescription must not be null");
 
@@ -49,7 +50,7 @@ public class PhotoValidationService implements IDomainService {
 
         // Extract all angles from the provided photos
         Set<PhotoAngle> providedAngles = photos.stream()
-                .map(PhotoDocument::getAngle)
+                .map(photos::getAngle)
                 .collect(HashSet::new, HashSet::add, HashSet::addAll);
 
         // Find missing angles
@@ -72,7 +73,7 @@ public class PhotoValidationService implements IDomainService {
      * @param productDescription the product description determining the requirements
      * @return a result containing validation messages
      */
-    public ValidationResult validatePhotoQuality(List<PhotoDocument> photos, ProductDescription productDescription) {
+    public ValidationResult validatePhotoQuality(List<PhotoDocumentd> photos, ProductDescription productDescription) {
         Objects.requireNonNull(photos, "photos must not be null");
         Objects.requireNonNull(productDescription, "productDescription must not be null");
 
@@ -86,7 +87,7 @@ public class PhotoValidationService implements IDomainService {
         }
 
         // Validate each individual photo
-        for (PhotoDocument photo : photos) {
+        for (PhotoDocumentd photo : photos) {
             // Check if photo has annotations when required
             if (photoQualityPolicy.requiresAnnotations(productDescription) && photo.getAnnotations().isEmpty()) {
                 result.addWarning(String.format("Photo %s should have annotations for measurements",
@@ -107,7 +108,7 @@ public class PhotoValidationService implements IDomainService {
      * @param productDescription the product description determining the requirements
      * @return a result containing validation messages
      */
-    public ValidationResult validateAll(List<PhotoDocument> photos, OrderId orderId,
+    public ValidationResult validateAll(List<PhotoDocumentd> photos, OrderId orderId,
                                         ProductDescription productDescription) {
         Objects.requireNonNull(photos, "photos must not be null");
         Objects.requireNonNull(orderId, "orderId must not be null");
@@ -125,87 +126,5 @@ public class PhotoValidationService implements IDomainService {
         result.combine(validatePhotoQuality(photos, productDescription));
 
         return result;
-    }
-
-    /**
-     * Class representing the result of a validation operation.
-     * Contains lists of error and warning messages.
-     */
-    public static class ValidationResult {
-        private final List<String> errors = new ArrayList<>();
-        private final List<String> warnings = new ArrayList<>();
-
-        /**
-         * Adds an error message to this result.
-         *
-         * @param message the error message
-         */
-        public void addError(String message) {
-            errors.add(message);
-        }
-
-        /**
-         * Adds a warning message to this result.
-         *
-         * @param message the warning message
-         */
-        public void addWarning(String message) {
-            warnings.add(message);
-        }
-
-        /**
-         * Combines another validation result into this one.
-         *
-         * @param other the other validation result to combine
-         */
-        public void combine(ValidationResult other) {
-            errors.addAll(other.errors);
-            warnings.addAll(other.warnings);
-        }
-
-        /**
-         * Returns whether this result has any errors.
-         *
-         * @return true if there are errors, false otherwise
-         */
-        public boolean hasErrors() {
-            return !errors.isEmpty();
-        }
-
-        /**
-         * Returns whether this result has any warnings.
-         *
-         * @return true if there are warnings, false otherwise
-         */
-        public boolean hasWarnings() {
-            return !warnings.isEmpty();
-        }
-
-        /**
-         * Returns whether this result is valid (no errors).
-         *
-         * @return true if there are no errors, false otherwise
-         */
-        public boolean isValid() {
-            return errors.isEmpty();
-        }
-
-        /**
-         * Returns the list of error messages.
-         *
-         * @return the list of error messages
-         */
-        public List<String> getErrors() {
-            return Collections.unmodifiableList(errors);
-        }
-
-        /**
-         * Returns the list of warning messages.
-         *
-         * @return the list of warning messages
-         */
-        public List<String> getWarnings() {
-            return Collections.unmodifiableList(warnings);
-        }
     }
 }

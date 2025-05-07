@@ -1,8 +1,8 @@
 package com.belman.domain.events;
 
-import com.belman.domain.aggregates.User;
-import com.belman.domain.shared.AbstractDomainEvent;
-import com.belman.domain.valueobjects.Username;
+
+import com.belman.domain.user.UserAggregate;
+import com.belman.domain.user.Username;
 
 /**
  * Event that is published when a user logs in.
@@ -15,7 +15,7 @@ public class UserLoggedInEvent extends AbstractDomainEvent {
      * 
      * @param user the user who logged in
      */
-    public UserLoggedInEvent(User user) {
+    public UserLoggedInEvent(UserAggregate user) {
         super();
         this.username = user.getUsername();
     }
@@ -32,6 +32,6 @@ public class UserLoggedInEvent extends AbstractDomainEvent {
     @Override
     public String toString() {
         return String.format("UserLoggedInEvent[username=%s, timestamp=%s, id=%s]",
-                username.value(), getTimestamp(), getEventId());
+                username.value(), getEventId());
     }
 }

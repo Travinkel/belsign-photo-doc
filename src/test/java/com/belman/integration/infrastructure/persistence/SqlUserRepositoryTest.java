@@ -2,7 +2,7 @@ package com.belman.integration.infrastructure.persistence;
 
 import com.belman.domain.aggregates.User;
 import com.belman.domain.enums.UserStatus;
-import com.belman.domain.repositories.UserRepository;
+import com.belman.domain.user.UserRepository;
 import com.belman.domain.services.PasswordHasher;
 import com.belman.domain.valueobjects.EmailAddress;
 import com.belman.domain.valueobjects.HashedPassword;

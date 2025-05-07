@@ -22,13 +22,13 @@ public class PDFExportService {
             contentStream.setFont(PDType1Font.HELVETICA_BOLD, 18);
             contentStream.beginText();
             contentStream.newLineAtOffset(50, 750);
-            contentStream.showText("Quality Control Report");
+            contentStream.showText("Quality Control ReportAggregate");
             contentStream.endText();
 
             contentStream.setFont(PDType1Font.HELVETICA, 12);
             contentStream.beginText();
             contentStream.newLineAtOffset(50, 720);
-            contentStream.showText("Order: " + report.getOrder().getOrderNumber());
+            contentStream.showText("OrderAggregate: " + report.getOrder().getOrderNumber());
             contentStream.newLineAtOffset(0, -20);
             contentStream.showText("Created by: " + report.getCreatedBy().getUsername());
             contentStream.newLineAtOffset(0, -20);

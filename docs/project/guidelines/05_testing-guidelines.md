@@ -248,9 +248,9 @@ Mockito is used for mocking dependencies in unit tests:
 void generateReport_withApprovedPhotos_shouldCreateReport() {
     // Given
     OrderId orderId = new OrderId("123");
-    Order order = mock(Order.class);
-    when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-    when(order.canGenerateReport()).thenReturn(true);
+    Order orderAggregate = mock(Order.class);
+    when(orderRepository.findById(orderId)).thenReturn(Optional.of(orderAggregate));
+    when(orderAggregate.canGenerateReport()).thenReturn(true);
     
     // When
     reportService.generateReport(orderId);
@@ -299,16 +299,16 @@ Use in-memory repositories for testing:
 
 ```java
 public class InMemoryOrderRepository implements OrderRepository {
-    private final Map<OrderId, Order> orders = new HashMap<>();
+    private final Map<OrderId, Order> orderAggregates = new HashMap<>();
     
     @Override
     public Optional<Order> findById(OrderId id) {
-        return Optional.ofNullable(orders.get(id));
+        return Optional.ofNullable(orderAggregates.get(id));
     }
     
     @Override
-    public void save(Order order) {
-        orders.put(order.getId(), order);
+    public void save(Order orderAggregate) {
+        orderAggregates.put(orderAggregate.getId(), orderAggregate);
     }
     
     // Other methods

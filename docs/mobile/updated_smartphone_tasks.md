@@ -60,7 +60,7 @@
 ### Testing the Application
 1. [ ] Test user authentication (login/logout)
 2. [ ] Test photo capture functionality
-3. [ ] Test order number entry
+3. [ ] Test orderAggregate number entry
 4. [ ] Test photo upload
 5. [ ] Test photo list view
 6. [ ] Test photo deletion

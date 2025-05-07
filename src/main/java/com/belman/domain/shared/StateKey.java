@@ -42,6 +42,16 @@ public final class StateKey<T> {
     }
 
     /**
+     * Creates a StateKey for unknown type scenarios.
+     *
+     * @param key  the key string
+     * @return a new StateKey with a null type
+     */
+    public static StateKey<Object> forUnknownType(String key) {
+        return new StateKey<>(key, Object.class);
+    }
+
+    /**
      * Gets the key string.
      *
      * @return the key string

@@ -99,7 +99,7 @@ The project uses Gluon Mobile for cross-platform development. When making UI cha
 
 BelSign is a quality control system developed for Belman A/S, a Danish company specializing in the design and
 manufacture of expansion joints and flexible pipe solutions. This module specifically handles photo documentation tied
-to orders, with user role control, report generation, and email dispatch capabilities.
+to orderAggregates, with user role control, reportAggregate generation, and email dispatch capabilities.
 
 ## Company Background
 
@@ -124,11 +124,11 @@ This approach makes it difficult to:
 
 - Find specific images upon customer requests
 - Access documentation in case of quality issues
-- Associate images with specific orders
+- Associate images with specific orderAggregates
 - Generate quality control reports efficiently
 - Time-consuming searches for specific images.
 - Inefficient handling of quality documentation.
-- Limited association between images and specific orders.
+- Limited association between images and specific orderAggregates.
 
 ## Solution: BelSign Photo Documentation Module
 
@@ -137,7 +137,7 @@ documentation throughout the production and quality control process.
 
 ### Key Features
 
-- **Order-Based Photo Management**: Attach images to specific order numbers and save them to a database
+- **Order-Based Photo Management**: Attach images to specific orderAggregate numbers and save them to a database
 - **QC Report Generation**: Automatically generate quality control reports with approved photos
 - **Customer Communication**: Send emails with QC documentation directly to customers
 - **User-Friendly Interface**: Designed for non-technical production workers
@@ -149,7 +149,7 @@ documentation throughout the production and quality control process.
 
 ### Benefits
 
-- **Improved Traceability**: All photos are linked to specific orders
+- **Improved Traceability**: All photos are linked to specific orderAggregates
 - **Enhanced Quality Control**: Structured approval process for documentation
 - **Better Customer Service**: Quick access to documentation when needed
 - **Increased Efficiency**: Streamlined workflow for photo documentation
@@ -161,7 +161,7 @@ The system is designed for three primary user roles:
 
 1. **Production Workers**
     - Take and upload photos
-    - Associate photos with order numbers
+    - Associate photos with orderAggregate numbers
     - Review uploaded photos
 
 2. **Quality Assurance Personnel**
@@ -257,7 +257,7 @@ The architecture employs interface-based design to achieve high modularity, loos
 // Domain layer interface
 public interface OrderRepository {
     Optional<Order> findById(OrderId id);
-    void save(Order order);
+    void save(Order orderAggregate);
 }
 
 // Infrastructure layer implementation
@@ -268,7 +268,7 @@ public class SqlOrderRepository implements OrderRepository {
     }
 
     @Override
-    public void save(Order order) {
+    public void save(Order orderAggregate) {
         // implementation details
     }
 }
@@ -758,7 +758,7 @@ Reactive Extensions: Considering RxJava for more complex async operations
       Optional<Order> findById(OrderId id);
       Optional<Order> findByOrderNumber(OrderNumber orderNumber);
       List<Order> findBySpecification(Specification<Order> spec);
-      void save(Order order);
+      void save(Order orderAggregate);
   }
 
   // Infrastructure layer
@@ -779,14 +779,14 @@ Reactive Extensions: Considering RxJava for more complex async operations
       // Constructor
 
       public Report generateQCReport(OrderId orderId) {
-          Order order = orderRepository.findById(orderId)
-              .orElseThrow(() -> new EntityNotFoundException("Order not found"));
+          Order orderAggregate = orderRepository.findById(orderId)
+              .orElseThrow(() -> new EntityNotFoundException("OrderAggregate not found"));
 
-          if (!order.canGenerateReport()) {
-              throw new BusinessRuleViolationException("Cannot generate report without approved photos");
+          if (!orderAggregate.canGenerateReport()) {
+              throw new BusinessRuleViolationException("Cannot generate reportAggregate without approved photos");
           }
 
-          // Generate report logic
+          // Generate reportAggregate logic
       }
   }
   ```
@@ -1115,9 +1115,9 @@ Mockito is used for mocking dependencies in unit tests:
 void generateReport_withApprovedPhotos_shouldCreateReport() {
     // Given
     OrderId orderId = new OrderId("123");
-    Order order = mock(Order.class);
-    when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-    when(order.canGenerateReport()).thenReturn(true);
+    Order orderAggregate = mock(Order.class);
+    when(orderRepository.findById(orderId)).thenReturn(Optional.of(orderAggregate));
+    when(orderAggregate.canGenerateReport()).thenReturn(true);
 
     // When
     reportService.generateReport(orderId);
@@ -1166,16 +1166,16 @@ Use in-memory repositories for testing:
 
 ```java
 public class InMemoryOrderRepository implements OrderRepository {
-    private final Map<OrderId, Order> orders = new HashMap<>();
+    private final Map<OrderId, Order> orderAggregates = new HashMap<>();
 
     @Override
     public Optional<Order> findById(OrderId id) {
-        return Optional.ofNullable(orders.get(id));
+        return Optional.ofNullable(orderAggregates.get(id));
     }
 
     @Override
-    public void save(Order order) {
-        orders.put(order.getId(), order);
+    public void save(Order orderAggregate) {
+        orderAggregates.put(orderAggregate.getId(), orderAggregate);
     }
 
     // Other methods
@@ -1800,14 +1800,14 @@ private void capturePhoto() {
 
 ### Barcode Scanning
 
-Implement barcode scanning for quick order lookup:
+Implement barcode scanning for quick orderAggregate lookup:
 
 ```
 private void scanBarcode() {
     Services.get(BarcodeService.class).ifPresent(service -> {
         service.scanBarcode().thenAccept(barcode -> {
             if (barcode != null) {
-                // Look up order by barcode
+                // Look up orderAggregate by barcode
                 orderService.findByBarcode(barcode);
             }
         });

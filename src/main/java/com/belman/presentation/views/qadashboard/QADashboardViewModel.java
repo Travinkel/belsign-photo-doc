@@ -3,8 +3,7 @@ package com.belman.presentation.views.qadashboard;
 import com.belman.presentation.core.BaseViewModel;
 import com.belman.application.core.Inject;
 import com.belman.presentation.navigation.Router;
-import com.belman.domain.aggregates.Order;
-import com.belman.domain.repositories.OrderRepository;
+import com.belman.domain.order.OrderRepository;
 import com.belman.infrastructure.service.SessionManager;
 import com.belman.presentation.views.login.LoginView;
 import com.belman.presentation.views.photoreview.PhotoReviewView;
@@ -54,12 +53,12 @@ public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
      */
     public void loadPendingOrders() {
         try {
-            // In a real implementation, this would filter orders by status
-            // For now, we'll just load all orders
-            List<Order> orders = orderRepository.findAll();
+            // In a real implementation, this would filter orderAggregates by status
+            // For now, we'll just load all orderAggregates
+            List<OrderAggregate> orderAggregates = orderRepository.findAll();
 
             // Convert to order numbers for display
-            List<String> orderNumbers = orders.stream()
+            List<String> orderNumbers = orderAggregates.stream()
                 .map(order -> order.getOrderNumber().toString())
                 .collect(Collectors.toList());
 

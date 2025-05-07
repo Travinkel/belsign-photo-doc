@@ -1,7 +1,7 @@
 package com.belman.unit.infrastructure.service;
 
 import com.belman.domain.aggregates.User;
-import com.belman.domain.repositories.UserRepository;
+import com.belman.domain.user.UserRepository;
 import com.belman.domain.services.AuthenticationService;
 import com.belman.domain.services.PasswordHasher;
 import com.belman.domain.valueobjects.EmailAddress;

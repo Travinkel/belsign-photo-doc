@@ -130,7 +130,7 @@ These tasks can be addressed after medium-priority items to further refine and e
 - [ ] **Add gesture support**: Implement common mobile gestures
 - [ ] **Improve mobile navigation**: Enhance navigation patterns for mobile devices
 - [ ] **Implement push notifications**: Add support for mobile push notifications
-- [ ] **Add barcode/QR scanning**: Implement scanning for quick order lookup
+- [ ] **Add barcode/QR scanning**: Implement scanning for quick orderAggregate lookup
 - [ ] **Reduce battery usage**: Optimize for lower power consumption
 - [ ] **Minimize network usage**: Reduce data transfer for mobile networks
 - [ ] **Optimize storage usage**: Minimize local storage requirements

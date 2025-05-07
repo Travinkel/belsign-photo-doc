@@ -58,8 +58,8 @@ We follow Scrum with **two-week sprints**. Each sprint begins with Planning, whe
 | **Timeframe** | **Milestone** |
 | --- | --- |
 | **April 2025** | Sprint 1: System scaffolding, database connectivity, basic image upload |
-| **May 2025** | Sprint 2: Role-based workflows, report generation, email integration |
-| **Late May** | Final refinements, user testing, report writing |
+| **May 2025** | Sprint 2: Role-based workflows, reportAggregate generation, email integration |
+| **Late May** | Final refinements, user testing, reportAggregate writing |
 | **June 2nd** | Final submission of software + technical documentation |
 
 ## 2.3 Initial Product Backlog
@@ -71,29 +71,29 @@ We have identified the following major epics and user stories from the project r
     - *As a user, I want a logout function so I can end my session securely.* (1 point)
 - **Epic: Upload Photos (Production Worker)**
     - *As a Production Worker, I want to take pictures directly from the tablet* (5 pts) – connects the tablet camera to the app.
-    - *As a Production Worker, I want to select or enter the order number before upload* (2 pts) – ensures photos are linked to the correct order.
+    - *As a Production Worker, I want to select or enter the orderAggregate number before upload* (2 pts) – ensures photos are linked to the correct orderAggregate.
     - *As a Production Worker, I want to upload multiple pictures at once* (3 pts) – batch upload efficiency.
-    - *As a Production Worker, I want to see a list of my uploaded images for the current order* (3 pts) – a confirmation view.
+    - *As a Production Worker, I want to see a list of my uploaded images for the current orderAggregate* (3 pts) – a confirmation view.
     - *As a Production Worker, I want to delete wrongly uploaded images* (3 pts) – correct mistakes before QA review.
 - **Epic: Approve Photos (QA)**
-    - *As a QA Engineer, I want to view images attached to each order* (2 pts) – browse and inspect uploads.
+    - *As a QA Engineer, I want to view images attached to each orderAggregate* (2 pts) – browse and inspect uploads.
     - *As a QA Engineer, I want to approve or reject uploaded images* (3 pts) – to validate weld quality.
     - *As a QA Engineer, I want to add comments to image documentation* (1 pt) – annotate issues or approvals.
-    - *As a QA Engineer, I want to generate a preview of the QC report* (2 pts) – see the final report format before sending.
+    - *As a QA Engineer, I want to generate a preview of the QC reportAggregate* (2 pts) – see the final reportAggregate format before sending.
 - **Epic: Admin Management**
     - *As an Admin, I want to create and delete user accounts* (2 pts) – manage system access.
     - *As an Admin, I want to assign roles to users* (2 pts) – control permissions (e.g. QA vs Operator).
     - *As an Admin, I want to reset user passwords* (2 pts) – handle account recovery.
 - **Epic: System – Reports & Storage**
-    - *As the System, I want to save images and metadata in a database linked to the order number* (8 pts) – core data storage.
+    - *As the System, I want to save images and metadata in a database linked to the orderAggregate number* (8 pts) – core data storage.
     - *As the System, I want to auto-generate QC reports from approved images* (8 pts) – combine images/comments into a PDF.
-    - *As the System, I want to send QC reports to customers via email* (3 pts) – automatic report distribution.
+    - *As the System, I want to send QC reports to customers via email* (3 pts) – automatic reportAggregate distribution.
 
 ### Acceptance Criteria (Examples)
 
-- **Story: Upload Pictures (Production Worker):** Given a logged-in Production Worker on a tablet, when they activate the camera and take photos of an expansion joint, *then* the app should allow selecting or entering an order number and uploading all images. *And* each uploaded image is stored with its metadata (timestamp, user ID, order number)file-s5auxkkhgo6pcbnbuf98dd.
-- **Story: Approve/Reject Images (QA):** Given a logged-in QA user viewing an order’s gallery, when they approve or reject an image, *then* the system records this decision and updates the image status. Comments can be added, and the status (approved/rejected) is visible in the report previewfile-s5auxkkhgo6pcbnbuf98ddfile-s5auxkkhgo6pcbnbuf98dd.
-- **Story: Generate QC Report (System):** Given a set of approved images and QA comments for an order, when a report is generated, *then* the system produces a formatted PDF containing all images and comments, ready to be sent to the customerfile-s5auxkkhgo6pcbnbuf98dd.
+- **Story: Upload Pictures (Production Worker):** Given a logged-in Production Worker on a tablet, when they activate the camera and take photos of an expansion joint, *then* the app should allow selecting or entering an orderAggregate number and uploading all images. *And* each uploaded image is stored with its metadata (timestamp, user ID, orderAggregate number)file-s5auxkkhgo6pcbnbuf98dd.
+- **Story: Approve/Reject Images (QA):** Given a logged-in QA user viewing an orderAggregate’s gallery, when they approve or reject an image, *then* the system records this decision and updates the image status. Comments can be added, and the status (approved/rejected) is visible in the reportAggregate previewfile-s5auxkkhgo6pcbnbuf98ddfile-s5auxkkhgo6pcbnbuf98dd.
+- **Story: Generate QC Report (System):** Given a set of approved images and QA comments for an orderAggregate, when a reportAggregate is generated, *then* the system produces a formatted PDF containing all images and comments, ready to be sent to the customerfile-s5auxkkhgo6pcbnbuf98dd.
 - **Story: Create User (Admin):** Given an Admin on the user management screen, when they create a new user with a role, *then* the user appears in the user list with the correct role assignment. The new user can log in with credentials, and their role controls their access level
 
 ### Burndown Chart Tracking Plan
@@ -128,7 +128,7 @@ The flow is from Presentation → Application → Domain → Infrastructure laye
 | Layer | Presentation Layer (View + Controller + ViewModel) | Responsibilities | Technologies Used |
 | --- | --- | --- | --- |
 | GUI Layer (Presentation) | **Presentation Layer (View + Controller + ViewModel)** | Handles user interface (Views and ViewModels) and user interactions. Views are FXML-based with separate ViewModels to manage UI state and commands. Navigation between views is dynamic (SPA style) using a custom Router | JavaFX 21, FXML, Gluon Glisten |
-| Business Logic Layer (BLL) | **Application Layer**   | Contains services implementing business use-cases like authentication, photo uploading, QC report generation, and emailing. ViewModels interact with this layer through clearly defined service interfaces. | Plain Java services |
+| Business Logic Layer (BLL) | **Application Layer**   | Contains services implementing business use-cases like authentication, photo uploading, QC reportAggregate generation, and emailing. ViewModels interact with this layer through clearly defined service interfaces. | Plain Java services |
 | Business Logic Layer (BLL) | **Domain Layer** | Defines the core business entities (User, Order, PhotoDocument, QCReport) and their rules. This layer is pure Java and independent of external frameworks. | Java 23 (Records, Sealed Classes, etc.) |
 | Data Access Layer (DAL) | **Infrastructure Layer** | Implements technical details like database persistence (MSSQL), PDF generation (Apache PDFBox), and email sending. Also contains the Router for navigation control. | MSSQL, JDBC, PDFBox, JavaMail, Gluon Attach modules
 **Note**: This depends on the Application layer, not the other way around (Dependency Inversion). |
@@ -192,7 +192,7 @@ Each ViewModel implements lifecycle hooks (`onShow()`, `onHide()`) to manage sta
 
 ### 2.4.5 Lifecycle and State Management
 
-A global `UserSession` singleton manages the logged-in user's information, current working order, and permissions.
+A global `UserSession` singleton manages the logged-in user's information, current working orderAggregate, and permissions.
 
 Views and ViewModels can query the `UserSession` to determine access rights and personalize the UI.
 
@@ -218,7 +218,7 @@ Because of strict layering and DDD-inspired modeling, adding new features like a
 
 This system applies **Domain-Driven Design (DDD)** to model the core business logic in a way that reflects the real-world workflow of Belman’s production and quality control processes. The domain layer is designed to be rich in behavior, cohesive, and independent of infrastructure or presentation frameworks.
 
-In the spirit of Domain-Driven Design, the quality control component of Belsign represents a **Core Domain** for Belman A/S. It directly impacts production workflows, customer communication, and documentation integrity. This area demands rich modeling and precise business rules. Other potential subdomains (such as report formatting or authentication) may be considered **supporting** or **generic**, but the quality validation and image lifecycle form the **heart of the business logic**.
+In the spirit of Domain-Driven Design, the quality control component of Belsign represents a **Core Domain** for Belman A/S. It directly impacts production workflows, customer communication, and documentation integrity. This area demands rich modeling and precise business rules. Other potential subdomains (such as reportAggregate formatting or authentication) may be considered **supporting** or **generic**, but the quality validation and image lifecycle form the **heart of the business logic**.
 
 ### Entities
 
@@ -227,10 +227,10 @@ Entities have a unique identity and lifecycle. They encapsulate behavior and dom
 | Entity | Description |
 | --- | --- |
 | `Order` | Root of the image approval aggregate. Contains metadata and QCImages. |
-| `QCImage` | Attached to an order. Contains timestamp, storage reference, and status. |
+| `QCImage` | Attached to an orderAggregate. Contains timestamp, storage reference, and status. |
 | `User` | Represents a system user with a defined role: `PRODUCTION`, `QA`, `ADMIN`. |
-| `Report` | Generated from an order. May be previewed or emailed to the customer. |
-| `Approval` | Tracks a QA employee’s decision on a QC image or report. |
+| `Report` | Generated from an orderAggregate. May be previewed or emailed to the customer. |
+| `Approval` | Tracks a QA employee’s decision on a QC image or reportAggregate. |
 
 ### Value Objects
 
@@ -250,7 +250,7 @@ An **Aggregate** is a cluster of domain objects treated as a unit. The **Aggrega
 - All interactions with `QCImage` go through the `Order` entity.
 - Invariants like “max image count” or “cannot approve an image twice” are enforced at the root level.
 
-> This ensures transactional integrity and encapsulates the rules for how images relate to orders.
+> This ensures transactional integrity and encapsulates the rules for how images relate to orderAggregates.
 >
 
 ---
@@ -260,7 +260,7 @@ An **Aggregate** is a cluster of domain objects treated as a unit. The **Aggrega
 Some business logic doesn’t belong to a single entity. Instead, it operates across multiple entities or value objects.
 
 - `ImageValidationService` – applies rules like max image size, supported formats, or corruption checks.
-- `ReportBuilderService` – aggregates order + image data into a structured report.
+- `ReportBuilderService` – aggregates orderAggregate + image data into a structured reportAggregate.
 
 These are **stateless** and used by application services to execute workflows.
 
@@ -312,7 +312,7 @@ To preserve separation of concerns, the **ViewModel** acts as a boundary object 
 - It transforms `DTO`s into GUI-bound objects and vice versa.
 - It exposes **commands** (like `submitImage()`, `generateReport()`) which internally call Application Services.
 
-> Example: OrderViewModel holds data for order ID, customer name, image list, and approval state. It communicates with ImageUploadService without accessing domain logic directly.
+> Example: OrderViewModel holds data for orderAggregate ID, customer name, image list, and approval state. It communicates with ImageUploadService without accessing domain logic directly.
 >
 
 ---
@@ -555,9 +555,9 @@ For example:
 | Operation | How to handle it |
 | --- | --- |
 | Uploading a large photo file | JavaFX `Task` in `ImageUploadService` |
-| Generating a QC report (PDF) | JavaFX `Task` in `ReportGenerationService` |
+| Generating a QC reportAggregate (PDF) | JavaFX `Task` in `ReportGenerationService` |
 | Sending an email with attachment | JavaFX `Task` in `EmailService` |
-| Loading lots of orders | JavaFX `Task` in `OrderRepository` (optional) |
+| Loading lots of orderAggregates | JavaFX `Task` in `OrderRepository` (optional) |
 
 **Thread safety best practice:**
 

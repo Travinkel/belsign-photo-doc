@@ -1,226 +1,395 @@
 package com.belman.domain.report;
 
-import com.belman.domain.common.Timestamp;
-import com.belman.domain.order.OrderId;
-import com.belman.domain.user.UserReference;
+import com.belman.domain.aggregates.User;
+import com.belman.domain.customer.CustomerAggregate;
+import com.belman.domain.enums.ReportFormat;
+import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.valueobjects.ReportId;
+import com.belman.domain.enums.ReportStatus;
+import com.belman.domain.valueobjects.OrderId;
+import com.belman.domain.valueobjects.Timestamp;
 
-import java.net.URL;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 /**
- * Aggregate root representing a report in the BelSign system.
- * <p>
- * Reports are generated from order data, particularly from approved photos,
- * and can be delivered to customers in various formats. Reports capture
- * the state of an order's photo documentation at a specific point in time.
+ * Entity representing a QC report for an order.
+ * Contains approved photos and metadata about its creation.
+ * 
+ * Use the {@code builder()} method to create instances of this class.
  */
 public class ReportAggregate {
     private final ReportId id;
     private final OrderId orderId;
-    private String title;
+    private final List<PhotoDocument> approvedPhotos;
+    private final User generatedBy;
+    private final Timestamp generatedAt;
+    private CustomerAggregate recipient;
     private ReportFormat format;
     private ReportStatus status;
-    private URL fileUrl;
-    private final Timestamp createdAt;
-    private final UserReference createdBy;
-    private Timestamp completedAt;
-    private String errorMessage;
-    private final Set<String> includedPhotoIds = new HashSet<>();
+    private String comments;
+    private int version;
 
     /**
-     * Creates a new Report with the basic information needed for generation.
-     *
-     * @param id        the unique identifier for this report
-     * @param orderId   the ID of the order this report is for
-     * @param title     the title of the report
-     * @param format    the format of the report
-     * @param createdBy reference to the user who created this report
-     * @param createdAt the timestamp when this report was created
+     * Creates a new ReportAggregate using the provided builder.
+     * 
+     * @param builder the builder containing the report's properties
      */
-    public ReportAggregate(ReportId id, OrderId orderId, String title, ReportFormat format,
-                           UserReference createdBy, Timestamp createdAt) {
-        this.id = Objects.requireNonNull(id, "id must not be null");
-        this.orderId = Objects.requireNonNull(orderId, "orderId must not be null");
-        this.title = Objects.requireNonNull(title, "title must not be null");
-        this.format = Objects.requireNonNull(format, "format must not be null");
-        this.createdBy = Objects.requireNonNull(createdBy, "createdBy must not be null");
-        this.createdAt = Objects.requireNonNull(createdAt, "createdAt must not be null");
-        this.status = ReportStatus.PENDING;
+    private ReportAggregate(Builder builder) {
+        this.id = Objects.requireNonNull(builder.id, "id must not be null");
+        this.orderId = Objects.requireNonNull(builder.orderId, "orderId must not be null");
+        this.approvedPhotos = Objects.requireNonNull(builder.approvedPhotos, "approvedPhotos must not be null");
+        this.generatedBy = Objects.requireNonNull(builder.generatedBy, "generatedBy must not be null");
+        this.generatedAt = Objects.requireNonNull(builder.generatedAt, "generatedAt must not be null");
+        this.recipient = builder.recipient;
+        this.format = builder.format != null ? builder.format : ReportFormat.PDF;
+        this.status = builder.status != null ? builder.status : ReportStatus.DRAFT;
+        this.comments = builder.comments;
+        this.version = builder.version > 0 ? builder.version : 1;
     }
 
     /**
-     * Returns the unique identifier for this report.
+     * Creates a new builder for constructing ReportAggregate instances.
+     * 
+     * @return a new ReportAggregate builder
      */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * Creates a new ReportAggregate with the specified details.
+     * This constructor is maintained for backward compatibility with existing tests.
+     * 
+     * @param orderId the ID of the order this report is for
+     * @param approvedPhotos the approved photos to include in the report
+     * @param generatedBy the user who generated this report
+     * @param generatedAt the time when this report was generated
+     * @deprecated Use {@link Builder} instead
+     */
+    @Deprecated
+    public ReportAggregate(OrderId orderId, List<PhotoDocument> approvedPhotos, User generatedBy, Timestamp generatedAt) {
+        this(builder()
+            .id(ReportId.newId())
+            .orderId(orderId)
+            .approvedPhotos(approvedPhotos)
+            .generatedBy(generatedBy)
+            .generatedAt(generatedAt));
+    }
+
+    /**
+     * Creates a new ReportAggregate with the specified details.
+     * 
+     * @param id the unique identifier for this report
+     * @param orderId the ID of the order this report is for
+     * @param approvedPhotos the approved photos to include in the report
+     * @param generatedBy the user who generated this report
+     * @param generatedAt the time when this report was generated
+     * @deprecated Use {@link Builder} instead
+     */
+    @Deprecated
+    public ReportAggregate(ReportId id, OrderId orderId, List<PhotoDocument> approvedPhotos, User generatedBy, Timestamp generatedAt) {
+        this(builder()
+            .id(id)
+            .orderId(orderId)
+            .approvedPhotos(approvedPhotos)
+            .generatedBy(generatedBy)
+            .generatedAt(generatedAt));
+    }
+
+    /**
+     * Creates a new ReportAggregate with the specified details, including recipient and format.
+     * 
+     * @param id the unique identifier for this report
+     * @param orderId the ID of the order this report is for
+     * @param approvedPhotos the approved photos to include in the report
+     * @param generatedBy the user who generated this report
+     * @param generatedAt the time when this report was generated
+     * @param recipient the customer who will receive this report
+     * @param format the format of the report
+     * @deprecated Use {@link Builder} instead
+     */
+    @Deprecated
+    public ReportAggregate(ReportId id, OrderId orderId, List<PhotoDocument> approvedPhotos, User generatedBy,
+                           Timestamp generatedAt, CustomerAggregate recipient, ReportFormat format) {
+        this(builder()
+            .id(id)
+            .orderId(orderId)
+            .approvedPhotos(approvedPhotos)
+            .generatedBy(generatedBy)
+            .generatedAt(generatedAt)
+            .recipient(recipient)
+            .format(format));
+    }
+
     public ReportId getId() {
         return id;
     }
 
-    /**
-     * Returns the ID of the order this report is for.
-     */
     public OrderId getOrderId() {
         return orderId;
     }
 
-    /**
-     * Returns the title of this report.
-     */
-    public String getTitle() {
-        return title;
+    public List<PhotoDocument> getApprovedPhotos() {
+        return Collections.unmodifiableList(approvedPhotos);
     }
 
-    /**
-     * Sets or updates the title of this report.
-     *
-     * @param title the new title
-     * @throws NullPointerException  if title is null
-     * @throws IllegalStateException if the report is not in PENDING status
-     */
-    public void setTitle(String title) {
-        if (status != ReportStatus.PENDING) {
-            throw new IllegalStateException("Cannot update title for a report that is not in PENDING status");
-        }
-        this.title = Objects.requireNonNull(title, "title must not be null");
+    public User getGeneratedBy() {
+        return generatedBy;
     }
 
-    /**
-     * Returns the format of this report.
-     */
+    public Timestamp getGeneratedAt() {
+        return generatedAt;
+    }
+
+    public CustomerAggregate getRecipient() {
+        return recipient;
+    }
+
+    public void setRecipient(CustomerAggregate recipient) {
+        this.recipient = Objects.requireNonNull(recipient, "recipient must not be null");
+    }
+
     public ReportFormat getFormat() {
         return format;
     }
 
-    /**
-     * Sets or updates the format of this report.
-     *
-     * @param format the new format
-     * @throws NullPointerException  if format is null
-     * @throws IllegalStateException if the report is not in PENDING status
-     */
     public void setFormat(ReportFormat format) {
-        if (status != ReportStatus.PENDING) {
-            throw new IllegalStateException("Cannot update format for a report that is not in PENDING status");
-        }
         this.format = Objects.requireNonNull(format, "format must not be null");
     }
 
-    /**
-     * Returns the current status of this report.
-     */
     public ReportStatus getStatus() {
         return status;
     }
 
-    /**
-     * Returns the URL where the report file can be accessed, if available.
-     */
-    public URL getFileUrl() {
-        return fileUrl;
+    public void setStatus(ReportStatus status) {
+        this.status = Objects.requireNonNull(status, "status must not be null");
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+    public int getVersion() {
+        return version;
     }
 
     /**
-     * Returns the timestamp when this report was created.
+     * Increments the version number of this report.
+     * Should be called when making significant changes to the report.
      */
-    public Timestamp getCreatedAt() {
-        return createdAt;
+    public void incrementVersion() {
+        this.version++;
     }
 
     /**
-     * Returns reference to the user who created this report.
+     * Finalizes this report, changing its status to FINAL.
+     * Once finalized, a report cannot be modified.
+     * 
+     * @throws IllegalStateException if the report has no recipient
      */
-    public UserReference getCreatedBy() {
-        return createdBy;
-    }
-
-    /**
-     * Returns the timestamp when this report was completed, if available.
-     */
-    public Timestamp getCompletedAt() {
-        return completedAt;
-    }
-
-    /**
-     * Returns the error message if the report generation failed, or null if no error.
-     */
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    /**
-     * Adds a photo to be included in this report.
-     *
-     * @param photoId the ID of the photo to include
-     * @throws IllegalStateException if the report is not in PENDING status
-     */
-    public void includePhoto(String photoId) {
-        if (status != ReportStatus.PENDING) {
-            throw new IllegalStateException("Cannot modify included photos for a report that is not in PENDING status");
+    public void finalizeReport() {
+        if (recipient == null) {
+            throw new IllegalStateException("Cannot finalize a report without a recipient");
         }
-        includedPhotoIds.add(photoId);
+        this.status = ReportStatus.FINAL;
     }
 
     /**
-     * Returns the IDs of all photos included in this report.
+     * Marks this report as sent to the customer.
+     * 
+     * @throws IllegalStateException if the report is not in FINAL status
      */
-    public Set<String> getIncludedPhotoIds() {
-        return Set.copyOf(includedPhotoIds);
-    }
-
-    /**
-     * Marks this report as generating.
-     *
-     * @throws IllegalStateException if the report is not in PENDING status
-     */
-    public void startGeneration() {
-        if (status != ReportStatus.PENDING) {
-            throw new IllegalStateException("Cannot start generation for a report that is not in PENDING status");
+    public void markAsSent() {
+        if (status != ReportStatus.FINAL) {
+            throw new IllegalStateException("Cannot mark a report as sent if it is not finalized");
         }
-        status = ReportStatus.GENERATING;
-    }
-
-    /**
-     * Marks this report as completed with the generated file URL.
-     *
-     * @param fileUrl     the URL where the report file can be accessed
-     * @param completedAt the timestamp when the report was completed
-     * @throws NullPointerException  if fileUrl or completedAt is null
-     * @throws IllegalStateException if the report is not in GENERATING status
-     */
-    public void complete(URL fileUrl, Timestamp completedAt) {
-        if (status != ReportStatus.GENERATING) {
-            throw new IllegalStateException("Cannot complete a report that is not in GENERATING status");
-        }
-        this.fileUrl = Objects.requireNonNull(fileUrl, "fileUrl must not be null");
-        this.completedAt = Objects.requireNonNull(completedAt, "completedAt must not be null");
-        this.status = ReportStatus.COMPLETED;
-    }
-
-    /**
-     * Marks this report as failed with an error message.
-     *
-     * @param errorMessage the error message describing why the report generation failed
-     * @throws NullPointerException  if errorMessage is null
-     * @throws IllegalStateException if the report is not in GENERATING status
-     */
-    public void fail(String errorMessage) {
-        if (status != ReportStatus.GENERATING) {
-            throw new IllegalStateException("Cannot mark as failed a report that is not in GENERATING status");
-        }
-        this.errorMessage = Objects.requireNonNull(errorMessage, "errorMessage must not be null");
-        this.status = ReportStatus.FAILED;
+        this.status = ReportStatus.SENT;
     }
 
     /**
      * Archives this report.
-     *
-     * @throws IllegalStateException if the report is not in COMPLETED status
      */
     public void archive() {
-        if (status != ReportStatus.COMPLETED) {
-            throw new IllegalStateException("Cannot archive a report that is not in COMPLETED status");
+        this.status = ReportStatus.ARCHIVED;
+    }
+
+    /**
+     * @return true if this report is in draft status and can be modified
+     */
+    public boolean isDraft() {
+        return status == ReportStatus.DRAFT;
+    }
+
+    /**
+     * @return true if this report is finalized and cannot be modified
+     */
+    public boolean isFinal() {
+        return status == ReportStatus.FINAL;
+    }
+
+    /**
+     * @return true if this report has been sent to the customer
+     */
+    public boolean isSent() {
+        return status == ReportStatus.SENT;
+    }
+
+    /**
+     * @return true if this report has been archived
+     */
+    public boolean isArchived() {
+        return status == ReportStatus.ARCHIVED;
+    }
+    /**
+     * Builder for creating ReportAggregate instances.
+     * This class follows the Builder pattern to simplify the creation of complex ReportAggregate objects.
+     */
+    public static class Builder {
+        private ReportId id;
+        private OrderId orderId;
+        private List<PhotoDocument> approvedPhotos;
+        private User generatedBy;
+        private Timestamp generatedAt;
+        private CustomerAggregate recipient;
+        private ReportFormat format;
+        private ReportStatus status;
+        private String comments;
+        private int version;
+
+        /**
+         * Creates a new Builder instance.
+         */
+        private Builder() {
+            // Default constructor
         }
-        status = ReportStatus.ARCHIVED;
+
+        /**
+         * Sets the report ID.
+         * 
+         * @param id the report ID
+         * @return this builder for method chaining
+         */
+        public Builder id(ReportId id) {
+            this.id = id;
+            return this;
+        }
+
+        /**
+         * Sets the order ID.
+         * 
+         * @param orderId the order ID
+         * @return this builder for method chaining
+         */
+        public Builder orderId(OrderId orderId) {
+            this.orderId = orderId;
+            return this;
+        }
+
+        /**
+         * Sets the approved photos.
+         * 
+         * @param approvedPhotos the approved photos
+         * @return this builder for method chaining
+         */
+        public Builder approvedPhotos(List<PhotoDocument> approvedPhotos) {
+            this.approvedPhotos = approvedPhotos;
+            return this;
+        }
+
+        /**
+         * Sets the user who generated the report.
+         * 
+         * @param generatedBy the user who generated the report
+         * @return this builder for method chaining
+         */
+        public Builder generatedBy(User generatedBy) {
+            this.generatedBy = generatedBy;
+            return this;
+        }
+
+        /**
+         * Sets the time when the report was generated.
+         * 
+         * @param generatedAt the time when the report was generated
+         * @return this builder for method chaining
+         */
+        public Builder generatedAt(Timestamp generatedAt) {
+            this.generatedAt = generatedAt;
+            return this;
+        }
+
+        /**
+         * Sets the recipient of the report.
+         * 
+         * @param recipient the recipient
+         * @return this builder for method chaining
+         */
+        public Builder recipient(CustomerAggregate recipient) {
+            this.recipient = recipient;
+            return this;
+        }
+
+        /**
+         * Sets the format of the report.
+         * 
+         * @param format the format
+         * @return this builder for method chaining
+         */
+        public Builder format(ReportFormat format) {
+            this.format = format;
+            return this;
+        }
+
+        /**
+         * Sets the status of the report.
+         * 
+         * @param status the status
+         * @return this builder for method chaining
+         */
+        public Builder status(ReportStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        /**
+         * Sets the comments for the report.
+         * 
+         * @param comments the comments
+         * @return this builder for method chaining
+         */
+        public Builder comments(String comments) {
+            this.comments = comments;
+            return this;
+        }
+
+        /**
+         * Sets the version of the report.
+         * 
+         * @param version the version
+         * @return this builder for method chaining
+         */
+        public Builder version(int version) {
+            this.version = version;
+            return this;
+        }
+
+        /**
+         * Builds a new ReportAggregate instance with the properties set in this builder.
+         * 
+         * @return a new ReportAggregate instance
+         * @throws NullPointerException if any required property is null
+         */
+        public ReportAggregate build() {
+            if (id == null) {
+                id = ReportId.newId();
+            }
+            return new ReportAggregate(this);
+        }
     }
 }

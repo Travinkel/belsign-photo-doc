@@ -2,14 +2,12 @@ package com.belman.infrastructure.config;
 
 import com.belman.application.core.ServiceRegistry;
 import com.belman.infrastructure.logging.EmojiLogger;
-import com.belman.infrastructure.logging.EmojiLoggerFactory;
-import com.belman.domain.repositories.CustomerRepository;
-import com.belman.domain.repositories.OrderRepository;
-import com.belman.domain.repositories.UserRepository;
+import com.belman.domain.customer.CustomerRepository;
+import com.belman.domain.order.OrderRepository;
+import com.belman.domain.user.UserRepository;
 import com.belman.domain.rbac.AccessPolicyFactory;
 import com.belman.domain.rbac.RoleBasedAccessControlFactory;
 import com.belman.domain.services.AuthenticationService;
-import com.belman.domain.services.LoggerFactory;
 import com.belman.domain.services.PhotoService;
 import com.belman.infrastructure.persistence.InMemoryCustomerRepository;
 import com.belman.infrastructure.persistence.InMemoryOrderRepository;

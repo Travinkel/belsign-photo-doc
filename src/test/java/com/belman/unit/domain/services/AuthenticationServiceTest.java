@@ -2,7 +2,7 @@ package com.belman.unit.domain.services;
 
 import com.belman.domain.aggregates.User;
 import com.belman.domain.enums.UserStatus;
-import com.belman.domain.repositories.UserRepository;
+import com.belman.domain.user.UserRepository;
 import com.belman.domain.services.AuthenticationService;
 import com.belman.domain.services.PasswordHasher;
 import com.belman.domain.valueobjects.EmailAddress;
@@ -17,11 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import java.lang.reflect.Field;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 

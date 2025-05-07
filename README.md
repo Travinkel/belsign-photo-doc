@@ -5,7 +5,7 @@ A modern SPA-style JavaFX + Gluon Mobile application for Belman A/S, developed a
 ## Overview
 
 BelSign is a quality control system used to trace and document welding and production steps.  
-This module handles **photo documentation** tied to orders, with user role control, report generation, and email dispatch.
+This module handles **photo documentation** tied to orderAggregates, with user role control, reportAggregate generation, and email dispatch.
 
 ### Company Background
 
@@ -17,7 +17,7 @@ Before shipping items from production, Belman needs to document joints, weldings
 
 ### Solution Requirements
 
-- Attach images to an order number and save them to a database
+- Attach images to an orderAggregate number and save them to a database
 - Autogenerate QC reports
 - Enable sending of emails with QC documentation directly to customers
 - User-friendly GUI for non-technical production workers
@@ -75,16 +75,16 @@ We have identified the following major epics and user stories from the project r
 
 ### Epic: Upload Photos (Production Worker)
 - *As a Production Worker, I want to take pictures directly from the tablet* (5 pts)
-- *As a Production Worker, I want to select or enter the order number before upload* (2 pts)
+- *As a Production Worker, I want to select or enter the orderAggregate number before upload* (2 pts)
 - *As a Production Worker, I want to upload multiple pictures at once* (3 pts)
-- *As a Production Worker, I want to see a list of my uploaded images for the current order* (3 pts)
+- *As a Production Worker, I want to see a list of my uploaded images for the current orderAggregate* (3 pts)
 - *As a Production Worker, I want to delete wrongly uploaded images* (3 pts)
 
 ### Epic: Approve Photos (QA)
-- *As a QA Engineer, I want to view images attached to each order* (2 pts)
+- *As a QA Engineer, I want to view images attached to each orderAggregate* (2 pts)
 - *As a QA Engineer, I want to approve or reject uploaded images* (3 pts)
 - *As a QA Engineer, I want to add comments to image documentation* (1 pt)
-- *As a QA Engineer, I want to generate a preview of the QC report* (2 pts)
+- *As a QA Engineer, I want to generate a preview of the QC reportAggregate* (2 pts)
 
 ### Epic: Admin Management
 - *As an Admin, I want to create and delete user accounts* (2 pts)
@@ -92,12 +92,12 @@ We have identified the following major epics and user stories from the project r
 - *As an Admin, I want to reset user passwords* (2 pts)
 
 ### Epic: System – Reports & Storage
-- *As the System, I want to save images and metadata in a database linked to the order number* (8 pts)
+- *As the System, I want to save images and metadata in a database linked to the orderAggregate number* (8 pts)
 - *As the System, I want to auto-generate QC reports from approved images* (8 pts)
 - *As the System, I want to send QC reports to customers via email* (3 pts)
 
 ### Key Acceptance Criteria
-- **Upload Pictures:** Production Worker can take photos, select order number, and upload images with metadata.
+- **Upload Pictures:** Production Worker can take photos, select orderAggregate number, and upload images with metadata.
 - **Approve/Reject Images:** QA can review, approve/reject images, and add comments.
 - **Generate QC Report:** System produces formatted PDF with approved images and comments.
 - **User Management:** Admin can create users with appropriate roles and permissions.

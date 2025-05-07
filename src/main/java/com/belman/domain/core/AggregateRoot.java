@@ -34,6 +34,7 @@ public abstract class AggregateRoot<ID> {
      * Registers a domain event to be dispatched when the aggregate is persisted.
      *
      * @param event the domain event to register
+     * @throws IllegalArgumentException if the event is null
      */
     protected void registerDomainEvent(DomainEvent event) {
         Objects.requireNonNull(event, "event must not be null");
@@ -46,7 +47,7 @@ public abstract class AggregateRoot<ID> {
      *
      * @return an unmodifiable list of domain events
      */
-    public List<DomainEvent> getDomainEvents() {
+    public List<DomainEvent> pullDomainEvents() {
         List<DomainEvent> events = new ArrayList<>(this.domainEvents);
         this.domainEvents.clear();
         return Collections.unmodifiableList(events);
@@ -70,9 +71,27 @@ public abstract class AggregateRoot<ID> {
         this.domainEvents.clear();
     }
 
+    /**
+     * Checks equality based on the aggregate's identifier.
+     *
+     * @param obj the object to compare
+     * @return true if the objects are equal, false otherwise
+     */
     @Override
-    public abstract boolean equals(Object obj);
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        AggregateRoot<?> that = (AggregateRoot<?>) obj;
+        return Objects.equals(getId(), that.getId());
+    }
 
+    /**
+     * Computes the hash code based on the aggregate's identifier.
+     *
+     * @return the hash code
+     */
     @Override
-    public abstract int hashCode();
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
 }

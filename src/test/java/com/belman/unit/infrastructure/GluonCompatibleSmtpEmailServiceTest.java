@@ -1,8 +1,8 @@
 package com.belman.unit.infrastructure;
 
 import com.belman.domain.valueobjects.OrderId;
-import com.belman.domain.entities.PhotoDocument;
-import com.belman.domain.entities.Report;
+import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.report.ReportAggregate;
 import com.belman.domain.valueobjects.Timestamp;
 import com.belman.domain.valueobjects.EmailAddress;
 import com.belman.domain.valueobjects.HashedPassword;
@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class GluonCompatibleSmtpEmailServiceTest {
 
     private SmtpEmailService emailService;
-    private Report report;
+    private ReportAggregate reportAggregate;
     private EmailAddress recipient;
     private List<File> testFiles;
 
@@ -48,7 +48,7 @@ class GluonCompatibleSmtpEmailServiceTest {
             "test@localhost" // Use a test from address
         );
 
-        // Create a test report
+        // Create a test reportAggregate
         OrderId orderId = OrderId.newId();
         Username username = new Username("test-user");
         HashedPassword hashedPassword= new HashedPassword("test-password");
@@ -57,7 +57,7 @@ class GluonCompatibleSmtpEmailServiceTest {
         Timestamp now = new Timestamp(Instant.now());
         List<PhotoDocument> approvedPhotos = new ArrayList<>();
 
-        report = new Report(orderId, approvedPhotos, qaUser, now);
+        reportAggregate = new ReportAggregate(orderId, approvedPhotos, qaUser, now);
 
         // Create a test recipient
         recipient = new EmailAddress("test-recipient@localhost");
@@ -65,7 +65,7 @@ class GluonCompatibleSmtpEmailServiceTest {
         // Create test files using the GluonTestStorageHelper
         testFiles = new ArrayList<>();
         byte[] pdfContent = "This is a test PDF file".getBytes(StandardCharsets.UTF_8);
-        testFiles.add(GluonTestStorageHelper.createTempTestFile("test-report.pdf", pdfContent));
+        testFiles.add(GluonTestStorageHelper.createTempTestFile("test-reportAggregate.pdf", pdfContent));
     }
 
     @AfterEach
@@ -75,13 +75,13 @@ class GluonCompatibleSmtpEmailServiceTest {
     }
 
     @Test
-    @DisplayName("Send report to a single recipient should succeed")
+    @DisplayName("Send reportAggregate to a single recipient should succeed")
     void sendReportToSingleRecipientShouldReturnTrue() {
         boolean result = emailService.sendReport(
-            report,
+                reportAggregate,
             recipient,
-            "QC Report for Order " + report.getOrderId(),
-            "Please find attached the QC report for your order.",
+                "QC ReportAggregate for OrderAggregate " + reportAggregate.getOrderId(),
+            "Please find attached the QC reportAggregate for your order.",
             Collections.emptyList()
         );
 
@@ -89,17 +89,17 @@ class GluonCompatibleSmtpEmailServiceTest {
     }
 
     @Test
-    @DisplayName("Send report to multiple recipients should succeed")
+    @DisplayName("Send reportAggregate to multiple recipients should succeed")
     void sendReportToMultipleRecipientsShouldReturnTrue() {
         List<EmailAddress> recipients = new ArrayList<>();
         recipients.add(recipient);
         recipients.add(new EmailAddress("manager@example.com"));
 
         boolean result = emailService.sendReport(
-            report,
+                reportAggregate,
             recipients,
-            "QC Report for Order " + report.getOrderId(),
-            "Please find attached the QC report for your order.",
+                "QC ReportAggregate for OrderAggregate " + reportAggregate.getOrderId(),
+            "Please find attached the QC reportAggregate for your order.",
             Collections.emptyList()
         );
 
@@ -107,13 +107,13 @@ class GluonCompatibleSmtpEmailServiceTest {
     }
 
     @Test
-    @DisplayName("Send report with file attachments should succeed")
+    @DisplayName("Send reportAggregate with file attachments should succeed")
     void sendReportWithAttachmentsShouldReturnTrue() {
         boolean result = emailService.sendReport(
-            report,
+                reportAggregate,
             recipient,
-            "QC Report for Order " + report.getOrderId(),
-            "Please find attached the QC report for your order.",
+                "QC ReportAggregate for OrderAggregate " + reportAggregate.getOrderId(),
+            "Please find attached the QC reportAggregate for your order.",
             testFiles
         );
 

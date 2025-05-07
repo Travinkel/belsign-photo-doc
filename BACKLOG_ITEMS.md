@@ -58,31 +58,31 @@ This document contains the product backlog items for the BelSign Photo Documenta
 ### User Stories
 
 1. **Order Creation** (Priority: Critical, Estimate: 8 points)
-   - As a Production Worker, I want to create new orders to associate photos with them.
+   - As a Production Worker, I want to create new orderAggregates to associate photos with them.
    - Acceptance Criteria:
-     - User can enter order number and basic details
-     - System validates order number format
-     - System prevents duplicate order numbers
+     - User can enter orderAggregate number and basic details
+     - System validates orderAggregate number format
+     - System prevents duplicate orderAggregate numbers
      - Order is immediately available for photo association
 
 2. **Order Search and Filtering** (Priority: High, Estimate: 5 points)
-   - As a User, I want to search and filter orders to find the ones I need to work with.
+   - As a User, I want to search and filter orderAggregates to find the ones I need to work with.
    - Acceptance Criteria:
-     - Users can search by order number, date, status
+     - Users can search by orderAggregate number, date, status
      - System provides filtering options
      - Search results update in real-time
-     - System handles large numbers of orders efficiently
+     - System handles large numbers of orderAggregates efficiently
 
 3. **Order Details View** (Priority: High, Estimate: 5 points)
-   - As a User, I want to view detailed information about an order.
+   - As a User, I want to view detailed information about an orderAggregate.
    - Acceptance Criteria:
-     - System displays all relevant order information
+     - System displays all relevant orderAggregate information
      - System shows summary of associated photos
      - QA users can see approval status
      - Interface adapts to different screen sizes
 
 4. **Order Status Tracking** (Priority: Medium, Estimate: 5 points)
-   - As a User, I want to track the status of orders through the documentation process.
+   - As a User, I want to track the status of orderAggregates through the documentation process.
    - Acceptance Criteria:
      - System shows current status (new, in progress, pending approval, approved, etc.)
      - Status updates automatically based on actions
@@ -128,7 +128,7 @@ This document contains the product backlog items for the BelSign Photo Documenta
 5. **Photo Management** (Priority: Medium, Estimate: 8 points)
    - As a Production Worker, I want to manage photos I've uploaded.
    - Acceptance Criteria:
-     - User can view all photos for an order
+     - User can view all photos for an orderAggregate
      - User can delete photos before QA review
      - User can edit metadata before QA review
      - User receives notifications about rejected photos
@@ -176,7 +176,7 @@ This document contains the product backlog items for the BelSign Photo Documenta
 1. **QC Report Generation** (Priority: Critical, Estimate: 13 points)
    - As a QA Engineer, I want to generate quality control reports.
    - Acceptance Criteria:
-     - System compiles approved photos into a structured report
+     - System compiles approved photos into a structured reportAggregate
      - Report includes all relevant metadata and comments
      - Report is generated in PDF format
      - Report has professional formatting with company branding
@@ -184,15 +184,15 @@ This document contains the product backlog items for the BelSign Photo Documenta
 2. **Report Preview** (Priority: High, Estimate: 5 points)
    - As a QA Engineer, I want to preview reports before finalizing them.
    - Acceptance Criteria:
-     - System shows a preview of the report
+     - System shows a preview of the reportAggregate
      - User can make adjustments if needed
      - Preview accurately represents the final output
      - Preview loads quickly even with many photos
 
 3. **Report Templates** (Priority: Medium, Estimate: 8 points)
-   - As an Administrator, I want to configure report templates.
+   - As an Administrator, I want to configure reportAggregate templates.
    - Acceptance Criteria:
-     - Admin can define report structure and formatting
+     - Admin can define reportAggregate structure and formatting
      - Templates can include dynamic fields
      - Multiple templates can be created for different purposes
      - Templates can be updated without developer intervention

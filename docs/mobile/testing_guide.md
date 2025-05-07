@@ -115,7 +115,7 @@ Before testing the application on mobile devices, ensure you have the following:
 
 1. **Take Photo**
    - Go to the Photo Upload screen
-   - Enter an order number and search
+   - Enter an orderAggregate number and search
    - Tap the "Take Photo" button
    - Verify that the camera opens
    - Take a photo and verify that it's captured correctly
@@ -123,7 +123,7 @@ Before testing the application on mobile devices, ensure you have the following:
 
 2. **Select Photo from Gallery**
    - Go to the Photo Upload screen
-   - Enter an order number and search
+   - Enter an orderAggregate number and search
    - Tap the "Select Photo" button
    - Verify that the gallery opens
    - Select a photo and verify that it's loaded correctly
@@ -176,7 +176,7 @@ Before testing the application on mobile devices, ensure you have the following:
    - Verify that the upload succeeds
 
 2. **Invalid Input**
-   - Enter an invalid order number
+   - Enter an invalid orderAggregate number
    - Verify that an appropriate error message is displayed
    - Enter an invalid angle value
    - Verify that an appropriate error message is displayed

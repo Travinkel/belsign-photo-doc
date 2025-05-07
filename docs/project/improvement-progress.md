@@ -39,7 +39,7 @@ Updated exception handling in the `DefaultPhotoService` class to use the new `Er
 ### Test Coverage Reporting
 Added JaCoCo Maven plugin for test coverage reporting:
 - Configured JaCoCo to prepare the agent for test coverage collection
-- Set up report generation after tests are run
+- Set up reportAggregate generation after tests are run
 - Reports are generated in the target/site/jacoco directory
 
 ### Test Isolation Improvements
@@ -81,12 +81,12 @@ These tests significantly increase the test coverage of the domain layer, which 
 Added integration tests for repository implementations to ensure they correctly implement the repository interfaces:
 
 - Created InMemoryOrderRepositoryTest with 8 test methods covering:
-  - Saving new orders
-  - Finding orders by ID
-  - Finding orders by order number
-  - Finding all orders
-  - Finding orders by specification
-  - Updating existing orders
+  - Saving new orderAggregates
+  - Finding orderAggregates by ID
+  - Finding orderAggregates by orderAggregate number
+  - Finding all orderAggregates
+  - Finding orderAggregates by specification
+  - Updating existing orderAggregates
 
 These integration tests verify that the repository implementations correctly handle data persistence and retrieval, ensuring that the application's data access layer works as expected.
 
@@ -365,14 +365,14 @@ Strengthened the domain model by enhancing key value objects with better validat
 - Improved input validation with trimming of whitespace
 
 ### OrderNumber Value Object Improvements
-- Added comprehensive class-level documentation explaining the purpose and format of order numbers
+- Added comprehensive class-level documentation explaining the purpose and format of orderAggregate numbers
 - Enhanced the regex pattern to capture component groups for easier extraction
 - Implemented a factory method `of()` to create OrderNumber instances from component parts:
   - Department code (1-2 digits)
   - Year (2 digits)
   - Customer code (6 digits)
   - Sequential number (8 digits)
-- Added getter methods for each component of the order number:
+- Added getter methods for each component of the orderAggregate number:
   - `getDepartmentCode()`
   - `getYear()`
   - `getCustomerCode()`

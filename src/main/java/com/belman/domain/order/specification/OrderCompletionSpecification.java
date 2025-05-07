@@ -3,7 +3,7 @@ package com.belman.domain.order.specification;
 import com.belman.domain.order.OrderAggregate;
 import com.belman.domain.order.OrderStatus;
 import com.belman.domain.photo.ApprovalStatus;
-import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoDocumentd;
 import com.belman.domain.specification.AbstractSpecification;
 
 import java.util.ArrayList;
@@ -53,25 +53,25 @@ public class OrderCompletionSpecification extends AbstractSpecification<OrderAgg
     }
 
     @Override
-    public boolean isSatisfiedBy(OrderAggregate order) {
+    public boolean isSatisfiedBy(OrderAggregate orderAggregate) {
         clearMessages();
 
         boolean isValid = true;
 
-        // Check that the order is in PRODUCTION status
-        if (order.getStatus() != OrderStatus.IN_PROGRESS) {
-            validationMessages.add("Order must be in IN_PROGRESS status to be completed");
+        // Check that the orderAggregate is in PRODUCTION status
+        if (orderAggregate.getStatus() != OrderStatus.IN_PROGRESS) {
+            validationMessages.add("OrderAggregate must be in IN_PROGRESS status to be completed");
             isValid = false;
         }
 
         // Check that all required photos have been taken and approved
-        List<PhotoDocument> approvedPhotos = order.getPhotos().stream()
+        List<PhotoDocumentd> approvedPhotos = orderAggregate.getPhotos().stream()
                 .filter(photo -> photo.getStatus() == ApprovalStatus.APPROVED)
                 .toList();
 
         if (approvedPhotos.size() < requiredPhotoCount) {
             validationMessages.add(String.format(
-                    "Order requires at least %d approved photos (found %d)",
+                    "OrderAggregate requires at least %d approved photos (found %d)",
                     requiredPhotoCount, approvedPhotos.size()));
             isValid = false;
         }

@@ -1,8 +1,10 @@
 package com.belman.domain.rbac;
 
-import com.belman.domain.aggregates.User;
-import com.belman.domain.aggregates.User.Role;
 
+import User.User;
+import com.belman.domain.user.UserRole;
+
+import javax.management.relation.Role;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -17,10 +19,10 @@ public class AccessPolicy {
 
     /**
      * Creates a new AccessPolicy with the specified allowed roles.
-     * 
+     *
      * @param roles the roles that are allowed to access the resource
      */
-    public AccessPolicy(Role... roles) {
+    public AccessPolicy(UserRole roles) {
         this.allowedRoles = roles.length > 0 ? 
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(roles))) : 
             Collections.emptySet();

@@ -3,10 +3,9 @@ package com.belman.presentation.views.photoreview;
 import com.belman.presentation.core.BaseViewModel;
 import com.belman.application.core.Inject;
 import com.belman.presentation.navigation.Router;
-import com.belman.domain.aggregates.Order;
 import com.belman.domain.aggregates.User;
-import com.belman.domain.entities.PhotoDocument;
-import com.belman.domain.repositories.OrderRepository;
+import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.order.OrderRepository;
 import com.belman.domain.services.PhotoService;
 import com.belman.domain.valueobjects.OrderId;
 import com.belman.domain.valueobjects.OrderNumber;
@@ -47,7 +46,7 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
     private final BooleanProperty orderSelected = new SimpleBooleanProperty(false);
     private final BooleanProperty photoSelected = new SimpleBooleanProperty(false);
 
-    private final ObjectProperty<Order> selectedOrder = new SimpleObjectProperty<>();
+    private final ObjectProperty<OrderAggregate> selectedOrder = new SimpleObjectProperty<>();
     private final ObjectProperty<PhotoDocument> selectedPhoto = new SimpleObjectProperty<>();
 
     private final ListProperty<PhotoDocument> photos = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -74,23 +73,23 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
             OrderNumber orderNum = new OrderNumber(orderNumberStr);
 
             // In a real application, you would search by OrderNumber
-            // For simplicity, we'll just get all orders and find the one with the matching number
-            List<Order> orders = orderRepository.findAll();
-            for (Order order : orders) {
-                if (order.getOrderNumber() != null && order.getOrderNumber().equals(orderNum)) {
-                    selectedOrder.set(order);
+            // For simplicity, we'll just get all orderAggregates and find the one with the matching number
+            List<OrderAggregate> orderAggregates = orderRepository.findAll();
+            for (OrderAggregate orderAggregate : orderAggregates) {
+                if (orderAggregate.getOrderNumber() != null && orderAggregate.getOrderNumber().equals(orderNum)) {
+                    selectedOrder.set(orderAggregate);
                     orderSelected.set(true);
-                    orderInfo.set("Order: " + orderNumberStr + " - Customer: " + 
-                                 (order.getCustomer() != null ? order.getCustomer().getName() : "N/A"));
+                    orderInfo.set("OrderAggregate: " + orderNumberStr + " - Customer: " +
+                                 (orderAggregate.getCustomer() != null ? orderAggregate.getCustomer().getName() : "N/A"));
 
-                    // Load photos for this order
-                    loadPhotosForOrder(order.getId());
+                    // Load photos for this orderAggregate
+                    loadPhotosForOrder(orderAggregate.getId());
 
                     return true;
                 }
             }
 
-            errorMessage.set("Order not found: " + orderNumberStr);
+            errorMessage.set("OrderAggregate not found: " + orderNumberStr);
             return false;
         } catch (IllegalArgumentException e) {
             errorMessage.set("Invalid order number format");

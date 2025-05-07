@@ -275,7 +275,7 @@
                     <graalvmHome>${env.GRAALVM_HOME}</graalvmHome>
                     <nativeImageArgs>
                         <arg>--no-fallback</arg>
-                        <arg>--report-unsupported-elements-at-runtime</arg>
+                        <arg>--reportAggregate-unsupported-elements-at-runtime</arg>
                         <arg>--allow-incomplete-classpath</arg>
                         <arg>-H:+ReportExceptionStackTraces</arg>
                         <arg>-H:+AddAllCharsets</arg>
@@ -334,10 +334,10 @@
                         </goals>
                     </execution>
                     <execution>
-                        <id>report</id>
+                        <id>reportAggregate</id>
                         <phase>test</phase>
                         <goals>
-                            <goal>report</goal>
+                            <goal>reportAggregate</goal>
                         </goals>
                     </execution>
                 </executions>

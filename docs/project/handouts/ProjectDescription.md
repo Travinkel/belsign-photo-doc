@@ -41,13 +41,13 @@ This makes it hard to find images upon the request of customers or in case of qu
 Solution
 Belman would like a system that is able to
 
-Attach images to an order number and save them to a DB
+Attach images to an orderAggregate number and save them to a DB
 Autogenerate QC reports
 Enable sending of emails with QC documentation directly to customers
 It is also important that the GUI is
 
 Very user friendly, as production workers are non-technical, must be easy to add pictures and follow the process
-Able to generate a report preview
+Able to generate a reportAggregate preview
 The system must be designed to be tablet friendly (requirement), as it ultimately must run on a tablet (not a requirement)
 The system has multiple user groups
 
@@ -106,11 +106,11 @@ You should pay special attention to the source code, so it appears readable and 
 
 You must use the 3-layered architecture.
 
-You must use design patterns in design and implementation and these must be documented in the report.
+You must use design patterns in design and implementation and these must be documented in the reportAggregate.
 
 At least one of the core classes must be tested through an automated JUnit test.
 
-Installation guides, passwords and other information needed by examiners, must be prepared and included in appendices to the report.
+Installation guides, passwords and other information needed by examiners, must be prepared and included in appendices to the reportAggregate.
 
 Exam Project
 Bog
@@ -122,18 +122,18 @@ Teacher Contact
 Exam
 Curriculum
 3. Report Requirements
-You can assume that the reader of the report has an in-depth knowledge of the terminologies, techniques and tools presented throughout the first two semes­ters at the Computer Science Study.
+You can assume that the reader of the reportAggregate has an in-depth knowledge of the terminologies, techniques and tools presented throughout the first two semes­ters at the Computer Science Study.
 
-It will be highly weighted that the report has a good layout, is understandable and complete, according to the needs of the reader. Regarding the content of the report it will be highly weighted that you are arguing precisely for important decisions about the models, structures, limitations etc.
+It will be highly weighted that the reportAggregate has a good layout, is understandable and complete, according to the needs of the reader. Regarding the content of the reportAggregate it will be highly weighted that you are arguing precisely for important decisions about the models, structures, limitations etc.
 
-The report should be readable both at a superior and a detailed level. This re­quires that the report contains an introduction, including a problem definition and a conclusion. It should make sense to the reader reading just these two parts of the report. The introduction must state which limitations you have set for your project.
+The reportAggregate should be readable both at a superior and a detailed level. This re­quires that the reportAggregate contains an introduction, including a problem definition and a conclusion. It should make sense to the reader reading just these two parts of the reportAggregate. The introduction must state which limitations you have set for your project.
 
-The size of the report is minimum 20 pages and maximum 40 pages per group, not counting front page, table of contents, reference list, and appendices for the report. The maximum size is not a goal but should be an upper limit. It will be fine if you are able to make a good report with fewer pages. One page is 2400 characters including spaces and footnotes.
+The size of the reportAggregate is minimum 20 pages and maximum 40 pages per group, not counting front page, table of contents, reference list, and appendices for the reportAggregate. The maximum size is not a goal but should be an upper limit. It will be fine if you are able to make a good reportAggregate with fewer pages. One page is 2400 characters including spaces and footnotes.
 
-The report must contain part of your source code in a readable form. The part of source code to include in the report must cover your solution(s) in a vertical sense. It means that the included source code must be examples from all layers. Further the examples must be selected such it is possible to follow the implementation from the upper layer (GUI for instance), passing the business layer, and ending at the data access layer. Remember also to include the business entities used.
+The reportAggregate must contain part of your source code in a readable form. The part of source code to include in the reportAggregate must cover your solution(s) in a vertical sense. It means that the included source code must be examples from all layers. Further the examples must be selected such it is possible to follow the implementation from the upper layer (GUI for instance), passing the business layer, and ending at the data access layer. Remember also to include the business entities used.
 
 Structure of Report
-The following is proposal to the structure of the report
+The following is proposal to the structure of the reportAggregate
 
 Front page with project title, date, names of group members and name of education must be included.
 
@@ -182,15 +182,15 @@ Use APA or Harvard reference style
 This is only a proposal. Be critical of the sections/headlines, e.g. do not write a section called "Design Patterns", if you did not implement any design patterns in that sprint. Same goes for Unit test.
 
 4. Handing in
-The date and time for handing in the final report is
+The date and time for handing in the final reportAggregate is
 
 2nd of June 2025, at 10:00
 
 The hand-in must be done using WiseFlow - details about how to complete a hand-in of the exam project will be given during the project. But essential you will upload two documents to the WiseFlow server:
 
-The report in .pdf format
+The reportAggregate in .pdf format
 A zip-file containing the software project
-WiseFlow is an automated hand-in system, that will check your report for plagiarism. You have an individual responsibility to check your work. This means that you are individually responsible for the project handed in. Plagiarism is a serious offence and in some cases can result in being expelled from the academy. If in doubt if something is plagiarism, ask a teacher for advice.
+WiseFlow is an automated hand-in system, that will check your reportAggregate for plagiarism. You have an individual responsibility to check your work. This means that you are individually responsible for the project handed in. Plagiarism is a serious offence and in some cases can result in being expelled from the academy. If in doubt if something is plagiarism, ask a teacher for advice.
 
 5. Exam
 The exam is composed of a group presentation and an individual exam.

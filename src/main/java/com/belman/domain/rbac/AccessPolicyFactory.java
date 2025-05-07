@@ -40,7 +40,7 @@ public class AccessPolicyFactory {
      * @return an access policy that allows QA personnel and administrators
      */
     public AccessPolicy createQAAndAdminPolicy() {
-        return new AccessPolicy(Role.QA, Role.ADMIN);
+        return new AccessPolicy(Role.QA);
     }
 
     /**
@@ -49,7 +49,7 @@ public class AccessPolicyFactory {
      * @return an access policy that allows production workers and QA personnel
      */
     public AccessPolicy createProductionAndQAPolicy() {
-        return new AccessPolicy(Role.PRODUCTION, Role.QA);
+        return new AccessPolicy(Role.PRODUCTION);
     }
 
     /**
@@ -58,6 +58,6 @@ public class AccessPolicyFactory {
      * @return an access policy that allows all roles
      */
     public AccessPolicy createAllRolesPolicy() {
-        return new AccessPolicy(Role.PRODUCTION, Role.QA, Role.ADMIN);
+        return new AccessPolicy(Role.PRODUCTION);
     }
 }

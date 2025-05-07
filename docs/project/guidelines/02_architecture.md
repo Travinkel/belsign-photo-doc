@@ -41,7 +41,7 @@ The architecture employs interface-based design to achieve high modularity, loos
 // Domain layer interface
 public interface OrderRepository {
     Optional<Order> findById(OrderId id);
-    void save(Order order);
+    void save(Order orderAggregate);
 }
 
 // Infrastructure layer implementation
@@ -52,7 +52,7 @@ public class SqlOrderRepository implements OrderRepository {
     }
 
     @Override
-    public void save(Order order) {
+    public void save(Order orderAggregate) {
         // implementation details
     }
 }

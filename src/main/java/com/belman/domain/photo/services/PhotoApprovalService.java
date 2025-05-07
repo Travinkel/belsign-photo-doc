@@ -2,7 +2,7 @@ package com.belman.domain.photo.services;
 
 import com.belman.domain.common.Timestamp;
 import com.belman.domain.photo.ApprovalStatus;
-import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoDocumentd;
 import com.belman.domain.photo.events.PhotoApprovedEvent;
 import com.belman.domain.photo.events.PhotoRejectedEvent;
 import com.belman.domain.user.UserReference;
@@ -37,7 +37,7 @@ public class PhotoApprovalService {
      * @throws IllegalArgumentException if the photo is not in a state that can be approved
      * @throws IllegalArgumentException if the reviewer doesn't have approval authority
      */
-    public void approvePhoto(PhotoDocument photo, UserReference reviewer, Timestamp timestamp) {
+    public void approvePhoto(PhotoDocumentd photo, UserReference reviewer, Timestamp timestamp) {
         Objects.requireNonNull(photo, "Photo must not be null");
         Objects.requireNonNull(reviewer, "Reviewer must not be null");
         Objects.requireNonNull(timestamp, "Timestamp must not be null");
@@ -68,7 +68,7 @@ public class PhotoApprovalService {
      * @throws IllegalArgumentException if the photo is not in a state that can be rejected
      * @throws IllegalArgumentException if the reviewer doesn't have approval authority
      */
-    public void rejectPhoto(PhotoDocument photo, UserReference reviewer, Timestamp timestamp, String reason) {
+    public void rejectPhoto(PhotoDocumentd photo, UserReference reviewer, Timestamp timestamp, String reason) {
         Objects.requireNonNull(photo, "Photo must not be null");
         Objects.requireNonNull(reviewer, "Reviewer must not be null");
         Objects.requireNonNull(timestamp, "Timestamp must not be null");

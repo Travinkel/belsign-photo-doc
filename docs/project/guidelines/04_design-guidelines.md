@@ -209,7 +209,7 @@
       Optional<Order> findById(OrderId id);
       Optional<Order> findByOrderNumber(OrderNumber orderNumber);
       List<Order> findBySpecification(Specification<Order> spec);
-      void save(Order order);
+      void save(Order orderAggregate);
   }
   
   // Infrastructure layer
@@ -230,14 +230,14 @@
       // Constructor
       
       public Report generateQCReport(OrderId orderId) {
-          Order order = orderRepository.findById(orderId)
-              .orElseThrow(() -> new EntityNotFoundException("Order not found"));
+          Order orderAggregate = orderRepository.findById(orderId)
+              .orElseThrow(() -> new EntityNotFoundException("OrderAggregate not found"));
               
-          if (!order.canGenerateReport()) {
-              throw new BusinessRuleViolationException("Cannot generate report without approved photos");
+          if (!orderAggregate.canGenerateReport()) {
+              throw new BusinessRuleViolationException("Cannot generate reportAggregate without approved photos");
           }
           
-          // Generate report logic
+          // Generate reportAggregate logic
       }
   }
   ```
