@@ -1,13 +1,10 @@
 package com.belman.domain.report;
 
-import com.belman.domain.aggregates.User;
+import com.belman.domain.common.Timestamp;
 import com.belman.domain.customer.CustomerAggregate;
-import com.belman.domain.enums.ReportFormat;
-import com.belman.domain.photo.PhotoDocument;
-import com.belman.domain.valueobjects.ReportId;
-import com.belman.domain.enums.ReportStatus;
-import com.belman.domain.valueobjects.OrderId;
-import com.belman.domain.valueobjects.Timestamp;
+import com.belman.domain.order.OrderId;
+import com.belman.domain.order.photo.PhotoDocument;
+import com.belman.domain.user.UserAggregate;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +20,7 @@ public class ReportAggregate {
     private final ReportId id;
     private final OrderId orderId;
     private final List<PhotoDocument> approvedPhotos;
-    private final User generatedBy;
+    private final UserAggregate generatedBy;
     private final Timestamp generatedAt;
     private CustomerAggregate recipient;
     private ReportFormat format;
@@ -44,7 +41,7 @@ public class ReportAggregate {
         this.generatedAt = Objects.requireNonNull(builder.generatedAt, "generatedAt must not be null");
         this.recipient = builder.recipient;
         this.format = builder.format != null ? builder.format : ReportFormat.PDF;
-        this.status = builder.status != null ? builder.status : ReportStatus.DRAFT;
+        this.status = builder.status != null ? builder.status : ReportStatus.PENDING;
         this.comments = builder.comments;
         this.version = builder.version > 0 ? builder.version : 1;
     }
@@ -69,7 +66,7 @@ public class ReportAggregate {
      * @deprecated Use {@link Builder} instead
      */
     @Deprecated
-    public ReportAggregate(OrderId orderId, List<PhotoDocument> approvedPhotos, User generatedBy, Timestamp generatedAt) {
+    public ReportAggregate(OrderId orderId, List<PhotoDocument> approvedPhotos, UserAggregate generatedBy, Timestamp generatedAt) {
         this(builder()
             .id(ReportId.newId())
             .orderId(orderId)
@@ -89,7 +86,7 @@ public class ReportAggregate {
      * @deprecated Use {@link Builder} instead
      */
     @Deprecated
-    public ReportAggregate(ReportId id, OrderId orderId, List<PhotoDocument> approvedPhotos, User generatedBy, Timestamp generatedAt) {
+    public ReportAggregate(ReportId id, OrderId orderId, List<PhotoDocument> approvedPhotos, UserAggregate generatedBy, Timestamp generatedAt) {
         this(builder()
             .id(id)
             .orderId(orderId)
@@ -111,7 +108,7 @@ public class ReportAggregate {
      * @deprecated Use {@link Builder} instead
      */
     @Deprecated
-    public ReportAggregate(ReportId id, OrderId orderId, List<PhotoDocument> approvedPhotos, User generatedBy,
+    public ReportAggregate(ReportId id, OrderId orderId, List<PhotoDocument> approvedPhotos, UserAggregate generatedBy,
                            Timestamp generatedAt, CustomerAggregate recipient, ReportFormat format) {
         this(builder()
             .id(id)
@@ -135,7 +132,7 @@ public class ReportAggregate {
         return Collections.unmodifiableList(approvedPhotos);
     }
 
-    public User getGeneratedBy() {
+    public UserAggregate getGeneratedBy() {
         return generatedBy;
     }
 
@@ -188,7 +185,7 @@ public class ReportAggregate {
     }
 
     /**
-     * Finalizes this report, changing its status to FINAL.
+     * Finalizes this report, changing its status to GENERATED.
      * Once finalized, a report cannot be modified.
      * 
      * @throws IllegalStateException if the report has no recipient
@@ -197,19 +194,19 @@ public class ReportAggregate {
         if (recipient == null) {
             throw new IllegalStateException("Cannot finalize a report without a recipient");
         }
-        this.status = ReportStatus.FINAL;
+        this.status = ReportStatus.GENERATED;
     }
 
     /**
      * Marks this report as sent to the customer.
      * 
-     * @throws IllegalStateException if the report is not in FINAL status
+     * @throws IllegalStateException if the report is not in APPROVED status
      */
     public void markAsSent() {
-        if (status != ReportStatus.FINAL) {
-            throw new IllegalStateException("Cannot mark a report as sent if it is not finalized");
+        if (status != ReportStatus.APPROVED) {
+            throw new IllegalStateException("Cannot mark a report as sent if it is not approved");
         }
-        this.status = ReportStatus.SENT;
+        this.status = ReportStatus.DELIVERED;
     }
 
     /**
@@ -223,21 +220,21 @@ public class ReportAggregate {
      * @return true if this report is in draft status and can be modified
      */
     public boolean isDraft() {
-        return status == ReportStatus.DRAFT;
+        return status == ReportStatus.PENDING || status == ReportStatus.PROCESSING;
     }
 
     /**
      * @return true if this report is finalized and cannot be modified
      */
     public boolean isFinal() {
-        return status == ReportStatus.FINAL;
+        return status == ReportStatus.GENERATED || status == ReportStatus.APPROVED;
     }
 
     /**
      * @return true if this report has been sent to the customer
      */
     public boolean isSent() {
-        return status == ReportStatus.SENT;
+        return status == ReportStatus.DELIVERED;
     }
 
     /**
@@ -246,6 +243,7 @@ public class ReportAggregate {
     public boolean isArchived() {
         return status == ReportStatus.ARCHIVED;
     }
+
     /**
      * Builder for creating ReportAggregate instances.
      * This class follows the Builder pattern to simplify the creation of complex ReportAggregate objects.
@@ -254,7 +252,7 @@ public class ReportAggregate {
         private ReportId id;
         private OrderId orderId;
         private List<PhotoDocument> approvedPhotos;
-        private User generatedBy;
+        private UserAggregate generatedBy;
         private Timestamp generatedAt;
         private CustomerAggregate recipient;
         private ReportFormat format;
@@ -308,7 +306,7 @@ public class ReportAggregate {
          * @param generatedBy the user who generated the report
          * @return this builder for method chaining
          */
-        public Builder generatedBy(User generatedBy) {
+        public Builder generatedBy(UserAggregate generatedBy) {
             this.generatedBy = generatedBy;
             return this;
         }
@@ -393,3 +391,4 @@ public class ReportAggregate {
         }
     }
 }
+

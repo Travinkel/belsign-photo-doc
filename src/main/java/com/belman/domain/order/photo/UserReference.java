@@ -1,4 +1,4 @@
-package com.belman.domain.photo;
+package com.belman.domain.order.photo;
 
 import com.belman.domain.user.UserId;
 import com.belman.domain.user.Username;

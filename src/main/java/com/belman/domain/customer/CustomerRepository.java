@@ -1,7 +1,6 @@
 package com.belman.domain.customer;
 
 import com.belman.domain.specification.Specification;
-import com.belman.domain.valueobjects.CustomerId;
 
 import java.util.List;
 

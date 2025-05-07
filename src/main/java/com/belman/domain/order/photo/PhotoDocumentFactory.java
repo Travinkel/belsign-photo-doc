@@ -1,7 +1,8 @@
-package com.belman.domain.photo;
+package com.belman.domain.order.photo;
 
 import com.belman.domain.common.Timestamp;
 import com.belman.domain.order.OrderId;
+import com.belman.domain.user.UserAggregate;
 
 import java.util.UUID;
 
@@ -24,10 +25,15 @@ public class PhotoDocumentFactory {
      * @param uploadedAt the timestamp when this photo was uploaded
      * @return a new PhotoDocument instance
      */
-    public static PhotoDocumentd create(PhotoAngle angle, ImagePath imagePath,
-                                        UserReference uploadedBy, Timestamp uploadedAt) {
-        PhotoId photoId = new PhotoId(UUID.randomUUID().toString());
-        return new PhotoDocumentd(photoId, angle, imagePath, uploadedBy, uploadedAt);
+    public static PhotoDocument create(PhotoAngle angle, Photo imagePath,
+                                       UserAggregate uploadedBy, Timestamp uploadedAt) {
+        return PhotoDocument.builder()
+                .photoId(new PhotoId(UUID.randomUUID().toString()))
+                .angle(angle)
+                .imagePath(imagePath)
+                .uploadedBy(uploadedBy)
+                .uploadedAt(uploadedAt)
+                .build();
     }
 
     /**
@@ -40,12 +46,17 @@ public class PhotoDocumentFactory {
      * @param orderId    the ID of the order to assign this photo to
      * @return a new PhotoDocument instance assigned to the specified order
      */
-    public static PhotoDocumentd createForOrder(PhotoAngle angle, ImagePath imagePath,
-                                                UserReference uploadedBy, Timestamp uploadedAt,
-                                                OrderId orderId) {
-        PhotoDocumentd photo = create(angle, imagePath, uploadedBy, uploadedAt);
-        photo.assignToOrder(orderId);
-        return photo;
+    public static PhotoDocument createForOrder(PhotoAngle angle, Photo imagePath,
+                                               UserAggregate uploadedBy, Timestamp uploadedAt,
+                                               OrderId orderId) {
+        return PhotoDocument.builder()
+                .photoId(new PhotoId(UUID.randomUUID().toString()))
+                .angle(angle)
+                .imagePath(imagePath)
+                .uploadedBy(uploadedBy)
+                .uploadedAt(uploadedAt)
+                .orderId(orderId)
+                .build();
     }
 
     /**
@@ -56,8 +67,8 @@ public class PhotoDocumentFactory {
      * @param uploadedBy reference to the user who uploaded this photo
      * @return a new PhotoDocument instance with the current timestamp
      */
-    public static PhotoDocumentd createWithCurrentTimestamp(PhotoAngle angle, ImagePath imagePath,
-                                                            UserReference uploadedBy) {
+    public static PhotoDocument createWithCurrentTimestamp(PhotoAngle angle, Photo imagePath,
+                                                           UserAggregate uploadedBy) {
         return create(angle, imagePath, uploadedBy, Timestamp.now());
     }
 
@@ -70,9 +81,9 @@ public class PhotoDocumentFactory {
      * @param orderId    the ID of the order to assign this photo to
      * @return a new PhotoDocument instance with the current timestamp, assigned to the specified order
      */
-    public static PhotoDocumentd createForOrderWithCurrentTimestamp(PhotoAngle angle, ImagePath imagePath,
-                                                                    UserReference uploadedBy,
-                                                                    OrderId orderId) {
+    public static PhotoDocument createForOrderWithCurrentTimestamp(PhotoAngle angle, Photo imagePath,
+                                                                   UserAggregate uploadedBy,
+                                                                   OrderId orderId) {
         return createForOrder(angle, imagePath, uploadedBy, Timestamp.now(), orderId);
     }
 }

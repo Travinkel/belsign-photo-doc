@@ -1,8 +1,6 @@
 package com.belman.domain.order;
 
 import com.belman.domain.specification.Specification;
-import com.belman.domain.valueobjects.OrderId;
-import com.belman.domain.valueobjects.OrderNumber;
 
 import java.util.List;
 import java.util.Optional;

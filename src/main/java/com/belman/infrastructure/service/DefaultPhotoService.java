@@ -3,7 +3,7 @@ package com.belman.infrastructure.service;
 import com.belman.infrastructure.platform.ErrorHandler;
 import com.belman.infrastructure.platform.PlatformUtils;
 import com.belman.domain.aggregates.User;
-import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.order.OrderRepository;
 import com.belman.domain.services.PhotoService;
 import com.belman.domain.valueobjects.ImagePath;

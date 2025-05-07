@@ -2,8 +2,7 @@ package com.belman.domain.order.services;
 
 import com.belman.domain.order.OrderAggregate;
 import com.belman.domain.order.OrderStatus;
-import com.belman.domain.photo.ApprovalStatus;
-import com.belman.domain.photo.PhotoDocumentd;
+import com.belman.domain.order.photo.PhotoDocument;
 
 import java.util.List;
 import java.util.Objects;
@@ -27,7 +26,7 @@ public class OrderDomainService {
      * @param photos the photos associated with the orderAggregate
      * @return true if the orderAggregate is ready for QA review, false otherwise
      */
-    public boolean isReadyForQaReview(OrderAggregate orderAggregate, List<PhotoDocumentd> photos) {
+    public boolean isReadyForQaReview(OrderAggregate orderAggregate, List<PhotoDocument> photos) {
         Objects.requireNonNull(orderAggregate, "OrderAggregate must not be null");
         Objects.requireNonNull(photos, "Photos must not be null");
 
@@ -53,13 +52,13 @@ public class OrderDomainService {
      * @param photos the photos associated with the orderAggregate
      * @return true if the orderAggregate has sufficient photo documentation, false otherwise
      */
-    public boolean hasSufficientPhotoDocumentation(OrderAggregate orderAggregate, List<PhotoDocumentd> photos) {
+    public boolean hasSufficientPhotoDocumentation(OrderAggregate orderAggregate, List<PhotoDocument> photos) {
         Objects.requireNonNull(orderAggregate, "OrderAggregate must not be null");
         Objects.requireNonNull(photos, "Photos must not be null");
 
         // Count approved photos
         long approvedPhotoCount = photos.stream()
-                .filter(photo -> photo.getStatus() == ApprovalStatus.APPROVED)
+                .filter(photo -> photo.getStatus() == PhotoDocument.ApprovalStatus.APPROVED)
                 .count();
 
         // Apply business rule: must have at least one approved photo
@@ -77,7 +76,7 @@ public class OrderDomainService {
      * @param photos the photos associated with the orderAggregate
      * @return true if the orderAggregate can be approved, false otherwise
      */
-    public boolean canApproveOrder(OrderAggregate orderAggregate, List<PhotoDocumentd> photos) {
+    public boolean canApproveOrder(OrderAggregate orderAggregate, List<PhotoDocument> photos) {
         Objects.requireNonNull(orderAggregate, "OrderAggregate must not be null");
         Objects.requireNonNull(photos, "Photos must not be null");
 

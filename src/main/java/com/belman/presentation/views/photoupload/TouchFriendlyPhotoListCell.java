@@ -1,6 +1,6 @@
 package com.belman.presentation.views.photoupload;
 
-import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.order.photo.PhotoDocument;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;

@@ -4,7 +4,7 @@ import com.belman.presentation.core.BaseViewModel;
 import com.belman.application.core.Inject;
 import com.belman.presentation.navigation.Router;
 import com.belman.domain.aggregates.User;
-import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.order.OrderRepository;
 import com.belman.domain.services.PhotoService;
 import com.belman.domain.valueobjects.OrderId;

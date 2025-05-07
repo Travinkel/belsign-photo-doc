@@ -1,11 +1,29 @@
 package com.belman.domain.user;
 
-import java.sql.Timestamp;
+import com.belman.domain.user.ApprovalStatus;
+import com.belman.domain.user.UserAggregate;
+import java.time.Instant;
 
 public interface ApprovalState {
-    String getStatus();
+    ApprovalStatus getStatusEnum();
 
-    void approve(UserAggregate user, UserAggregate reviewer, Timestamp reviewedAt);
+    ApprovalState approve(UserAggregate user, UserAggregate reviewer, Instant reviewedAt);
 
-    void reject(UserAggregate user, UserAggregate reviewer, Timestamp reviewedAt, String reason);
+    ApprovalState reject(UserAggregate user, UserAggregate reviewer, Instant reviewedAt, String reason);
+
+    boolean isPending();
+    boolean isApproved();
+    boolean isRejected();
+
+    static ApprovalState createPendingState() {
+        return new PendingApprovalState();
+    }
+
+    static ApprovalState createApproved() {
+        return new ApprovedState();
+    }
+
+    static ApprovalState createRejected(String reason) {
+        return new RejectedState(reason);
+    }
 }

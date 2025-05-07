@@ -1,6 +1,5 @@
 package com.belman.domain.events;
 
-import com.belman.domain.shared.AbstractDomainEvent;
 
 public class AppLifecycleEvent extends AbstractDomainEvent {
 
@@ -31,6 +30,6 @@ public class AppLifecycleEvent extends AbstractDomainEvent {
     @Override
     public String toString() {
         return String.format("AppLifecycleEvent[type=%s, timestamp=%s, id=%s]",
-                type.name(), getTimestamp(), getEventId());
+                type.name(), getEventId());
     }
 }

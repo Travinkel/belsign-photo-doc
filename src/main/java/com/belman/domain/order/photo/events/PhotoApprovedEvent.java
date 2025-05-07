@@ -1,7 +1,7 @@
-package com.belman.domain.photo.events;
+package com.belman.domain.order.photo.events;
 
 import com.belman.domain.events.AbstractDomainEvent;
-import com.belman.domain.photo.PhotoId;
+import com.belman.domain.order.photo.PhotoId;
 import com.belman.domain.order.OrderId;
 
 import java.time.Instant;

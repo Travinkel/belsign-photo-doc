@@ -4,6 +4,7 @@ import com.belman.domain.common.EmailAddress;
 import com.belman.domain.common.PersonName;
 import com.belman.domain.common.PhoneNumber;
 import com.belman.domain.security.HashedPassword;
+import com.belman.domain.user.ApprovalState;
 import com.belman.domain.user.UserAggregate;
 import com.belman.domain.user.UserId;
 import com.belman.domain.user.Username;
@@ -37,12 +38,10 @@ public class UserAggregateFactory {
     // Create User with all details manually defined (useful for updates or clone operations)
     public static UserAggregate createFullUser(UserId userId, Username username,
                                                HashedPassword password, PersonName name,
-                                               EmailAddress email, PhoneNumber phoneNumber,
-                                               UserStatus status) {
+                                               EmailAddress email, PhoneNumber phoneNumber) {
         validateRequiredFields(username, password, email);
         validateUserId(userId);
         validateName(name);
-        validateStatus(status);
         return new UserAggregate(
                 userId,
                 username,
@@ -50,7 +49,7 @@ public class UserAggregateFactory {
                 name,
                 email,
                 phoneNumber,
-                status
+                ApprovalState.createPending()
         );
     }
 
@@ -78,13 +77,6 @@ public class UserAggregateFactory {
     private static void validateName(PersonName name) {
         if (name == null) {
             throw new IllegalArgumentException("PersonName cannot be null.");
-        }
-    }
-
-    // Validate UserStatus
-    private static void validateStatus(UserStatus status) {
-        if (status == null) {
-            throw new IllegalArgumentException("UserStatus cannot be null.");
         }
     }
 }

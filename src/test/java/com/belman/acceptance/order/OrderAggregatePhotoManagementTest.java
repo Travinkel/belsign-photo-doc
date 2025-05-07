@@ -3,7 +3,7 @@ package com.belman.acceptance.order;
 import com.belman.acceptance.BaseAcceptanceTest;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.customer.CustomerAggregate;
-import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.enums.CustomerType;
 import com.belman.domain.enums.OrderStatus;
 import com.belman.domain.order.OrderRepository;

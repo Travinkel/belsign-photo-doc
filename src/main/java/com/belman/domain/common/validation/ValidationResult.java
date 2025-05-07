@@ -1,8 +1,11 @@
 package com.belman.domain.common.validation;
 
+import com.belman.domain.order.OrderAggregate;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents the result of a validation operation, indicating whether it was successful
@@ -10,8 +13,9 @@ import java.util.List;
  */
 public class ValidationResult {
 
-    private final boolean valid;
+    private boolean valid;
     private final List<String> errors;
+    private final List<String> warnings;
 
     /**
      * Creates a new ValidationResult with the specified validity and errors.
@@ -22,6 +26,50 @@ public class ValidationResult {
     public ValidationResult(boolean valid, List<String> errors) {
         this.valid = valid;
         this.errors = new ArrayList<>(errors);
+        this.warnings = new ArrayList<>();
+    }
+
+    /**
+     * Creates a new ValidationResult with the specified validity, errors, and warnings.
+     *
+     * @param valid    whether the validation succeeded
+     * @param errors   the list of error messages (must not be null)
+     * @param warnings the list of warning messages (must not be null)
+     */
+    public ValidationResult(boolean valid, List<String> errors, List<String> warnings) {
+        this.valid = valid;
+        this.errors = new ArrayList<>(errors);
+        this.warnings = new ArrayList<>(warnings);
+    }
+
+    /**
+     * Adds an error message to the ValidationResult.
+     *
+     * @param error the error message to add
+     */
+    public void addError(String error) {
+        this.errors.add(error);
+        this.valid = false;
+    }
+
+    /**
+     * Adds a warning message to the ValidationResult.
+     *
+     * @param warning the warning message to add
+     */
+    public void addWarning(String warning) {
+        this.warnings.add(warning);
+    }
+
+    /**
+     * Combines this ValidationResult with another ValidationResult.
+     *
+     * @param other the other ValidationResult to combine with
+     */
+    public void combine(ValidationResult other) {
+        this.errors.addAll(other.errors);
+        this.warnings.addAll(other.warnings);
+        this.valid = this.valid && other.valid;
     }
 
     /**
@@ -71,11 +119,35 @@ public class ValidationResult {
         return Collections.unmodifiableList(errors);
     }
 
+    /**
+     * Returns the list of warning messages associated with this ValidationResult.
+     *
+     * @return the list of warning messages (empty if no warnings)
+     */
+    public List<String> getWarnings() {
+        return Collections.unmodifiableList(warnings);
+    }
+
     @Override
     public String toString() {
         return "ValidationResult{" +
                "valid=" + valid +
                ", errors=" + errors +
+               ", warnings=" + warnings +
                '}';
+    }
+
+    public boolean hasRequiredApprovedPhotos(OrderAggregate orderAggregate) {
+        Objects.requireNonNull(orderAggregate, "orderAggregate must not be null");
+
+        ValidationResult result = validateOrderPhotos(orderAggregate);
+        return result.isValid();
+    }
+
+    private ValidationResult validateOrderPhotos(OrderAggregate orderAggregate) {
+        if (orderAggregate.getPhotos().size() < 3) {
+            return ValidationResult.failure("Order must have at least 3 approved photos.");
+        }
+        return ValidationResult.success();
     }
 }

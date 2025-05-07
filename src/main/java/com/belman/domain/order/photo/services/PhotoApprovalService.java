@@ -1,11 +1,11 @@
-package com.belman.domain.photo.services;
+package com.belman.domain.order.photo.services;
 
 import com.belman.domain.common.Timestamp;
-import com.belman.domain.photo.ApprovalStatus;
-import com.belman.domain.photo.PhotoDocumentd;
-import com.belman.domain.photo.events.PhotoApprovedEvent;
-import com.belman.domain.photo.events.PhotoRejectedEvent;
+import com.belman.domain.order.photo.PhotoDocument;
+import com.belman.domain.order.photo.events.PhotoApprovedEvent;
+import com.belman.domain.order.photo.events.PhotoRejectedEvent;
 import com.belman.domain.user.UserReference;
+import com.belman.infrastructure.logging.Logger;
 
 import java.util.Objects;
 
@@ -16,6 +16,7 @@ import java.util.Objects;
  * photos are approved or rejected.
  */
 public class PhotoApprovalService {
+    private static final Logger LOGGER = Logger.getLogger(PhotoApprovalService.class);
 
     private final PhotoEventPublisher eventPublisher;
 
@@ -37,12 +38,12 @@ public class PhotoApprovalService {
      * @throws IllegalArgumentException if the photo is not in a state that can be approved
      * @throws IllegalArgumentException if the reviewer doesn't have approval authority
      */
-    public void approvePhoto(PhotoDocumentd photo, UserReference reviewer, Timestamp timestamp) {
+    public void approvePhoto(PhotoDocument photo, UserReference reviewer, Timestamp timestamp) {
         Objects.requireNonNull(photo, "Photo must not be null");
         Objects.requireNonNull(reviewer, "Reviewer must not be null");
         Objects.requireNonNull(timestamp, "Timestamp must not be null");
 
-        if (photo.getStatus() != ApprovalStatus.PENDING) {
+        if (photo.getStatus() != PhotoDocument.ApprovalStatus.PENDING) {
             throw new IllegalArgumentException("Only pending photos can be approved");
         }
 
@@ -68,25 +69,35 @@ public class PhotoApprovalService {
      * @throws IllegalArgumentException if the photo is not in a state that can be rejected
      * @throws IllegalArgumentException if the reviewer doesn't have approval authority
      */
-    public void rejectPhoto(PhotoDocumentd photo, UserReference reviewer, Timestamp timestamp, String reason) {
+    public void rejectPhoto(PhotoDocument photo, UserReference reviewer, Timestamp timestamp, String reason) {
+        validatePhotoAndReviewer(photo, reviewer, timestamp);
+        Objects.requireNonNull(reason, "Rejection reason must not be null");
+
+        if (reason.trim().isEmpty()) {
+            throw new PhotoApprovalException("Rejection reason cannot be empty");
+        }
+
+        if (photo.getStatus() != PhotoDocument.ApprovalStatus.PENDING) {
+            throw new PhotoApprovalException("Only pending photos can be rejected");
+        }
+
+        // TODO: Implement QA permission check
+        // if (!hasQAPermissions(reviewer)) {
+        //     throw new PhotoApprovalException("Reviewer does not have QA permissions");
+        // }
+
+        photo.reject(reviewer, timestamp, reason);
+
+        if (photo.getOrderId() != null) {
+            eventPublisher.publish(new PhotoRejectedEvent(photo.getPhotoId(), photo.getOrderId(), reason));
+            LOGGER.info("Photo rejected: " + photo.getPhotoId());
+        }
+    }
+
+    private void validatePhotoAndReviewer(PhotoDocument photo, UserReference reviewer, Timestamp timestamp) {
         Objects.requireNonNull(photo, "Photo must not be null");
         Objects.requireNonNull(reviewer, "Reviewer must not be null");
         Objects.requireNonNull(timestamp, "Timestamp must not be null");
-
-        if (photo.getStatus() != ApprovalStatus.PENDING) {
-            throw new IllegalArgumentException("Only pending photos can be rejected");
-        }
-
-        // In a real implementation, we would validate that the reviewer has QA permissions
-        // This would typically be handled by a role-based access control system
-
-        // Apply the rejection
-        photo.reject(reviewer, timestamp, reason);
-
-        // Publish event
-        if (photo.getOrderId() != null) {
-            eventPublisher.publish(new PhotoRejectedEvent(photo.getPhotoId(), photo.getOrderId(), reason));
-        }
     }
 
     /**
@@ -100,5 +111,11 @@ public class PhotoApprovalService {
          * @param event the event to publish
          */
         void publish(Object event);
+    }
+
+    public static class PhotoApprovalException extends RuntimeException {
+        public PhotoApprovalException(String message) {
+            super(message);
+        }
     }
 }

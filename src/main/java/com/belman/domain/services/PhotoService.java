@@ -1,7 +1,7 @@
 package com.belman.domain.services;
 
 import com.belman.domain.aggregates.User;
-import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.valueobjects.ImagePath;
 import com.belman.domain.valueobjects.OrderId;
 import com.belman.domain.valueobjects.PhotoAngle;

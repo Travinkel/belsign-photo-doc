@@ -3,6 +3,7 @@ package com.belman.domain.rbac;
 import com.belman.domain.core.DomainService;
 import com.belman.domain.exceptions.AccessDeniedException;
 import com.belman.domain.security.AuthenticationService;
+import com.belman.domain.services.LoggerFactory;
 import com.belman.domain.user.UserAggregate;
 
 import java.util.Optional;
@@ -77,5 +78,10 @@ public class RoleBasedAccessManager extends DomainService {
         if (!hasAccess(user)) {
             throw new AccessDeniedException("Access denied. User does not have the required role.");
         }
+    }
+
+    @Override
+    protected LoggerFactory getLoggerFactory() {
+        return null;
     }
 }

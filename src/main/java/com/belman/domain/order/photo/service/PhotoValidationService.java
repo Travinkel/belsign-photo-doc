@@ -1,15 +1,16 @@
-package com.belman.domain.photo.service;
+package com.belman.domain.order.photo.service;
 
 import com.belman.domain.common.validation.ValidationResult;
 import com.belman.domain.core.IDomainService;
 import com.belman.domain.order.OrderId;
 import com.belman.domain.order.ProductDescription;
-import com.belman.domain.photo.PhotoAngle;
-import com.belman.domain.photo.PhotoDocument;
-import com.belman.domain.photo.policy.PhotoQualityPolicy;
+import com.belman.domain.order.photo.PhotoAngle;
+import com.belman.domain.order.photo.PhotoDocument;
+import com.belman.domain.order.photo.policy.PhotoQualityPolicy;
 import com.belman.domain.services.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Domain service responsible for validating photos according to business rules.
@@ -41,17 +42,17 @@ public class PhotoValidationService implements IDomainService {
      * @param productDescription the product description determining the required angles
      * @return a result containing validation messages
      */
-    public ValidationResult validateRequiredAngles(List<PhotoDocumentd> photos, ProductDescription productDescription) {
+    public ValidationResult validateRequiredAngles(List<PhotoDocument> photos, ProductDescription productDescription) {
         Objects.requireNonNull(photos, "photos must not be null");
         Objects.requireNonNull(productDescription, "productDescription must not be null");
 
-        ValidationResult result = new ValidationResult();
+        ValidationResult result = new ValidationResult(new ArrayList<>(), new ArrayList<>());
         Set<PhotoAngle> requiredAngles = photoQualityPolicy.getRequiredAngles(productDescription);
 
         // Extract all angles from the provided photos
         Set<PhotoAngle> providedAngles = photos.stream()
-                .map(photos::getAngle)
-                .collect(HashSet::new, HashSet::add, HashSet::addAll);
+                .map(PhotoDocument::getAngle)
+                .collect(Collectors.toSet());
 
         // Find missing angles
         Set<PhotoAngle> missingAngles = new HashSet<>(requiredAngles);
@@ -73,7 +74,7 @@ public class PhotoValidationService implements IDomainService {
      * @param productDescription the product description determining the requirements
      * @return a result containing validation messages
      */
-    public ValidationResult validatePhotoQuality(List<PhotoDocumentd> photos, ProductDescription productDescription) {
+    public ValidationResult validatePhotoQuality(List<PhotoDocument> photos, ProductDescription productDescription) {
         Objects.requireNonNull(photos, "photos must not be null");
         Objects.requireNonNull(productDescription, "productDescription must not be null");
 
@@ -87,7 +88,7 @@ public class PhotoValidationService implements IDomainService {
         }
 
         // Validate each individual photo
-        for (PhotoDocumentd photo : photos) {
+        for (PhotoDocument photo : photos) {
             // Check if photo has annotations when required
             if (photoQualityPolicy.requiresAnnotations(productDescription) && photo.getAnnotations().isEmpty()) {
                 result.addWarning(String.format("Photo %s should have annotations for measurements",
@@ -108,7 +109,7 @@ public class PhotoValidationService implements IDomainService {
      * @param productDescription the product description determining the requirements
      * @return a result containing validation messages
      */
-    public ValidationResult validateAll(List<PhotoDocumentd> photos, OrderId orderId,
+    public ValidationResult validateAll(List<PhotoDocument> photos, OrderId orderId,
                                         ProductDescription productDescription) {
         Objects.requireNonNull(photos, "photos must not be null");
         Objects.requireNonNull(orderId, "orderId must not be null");

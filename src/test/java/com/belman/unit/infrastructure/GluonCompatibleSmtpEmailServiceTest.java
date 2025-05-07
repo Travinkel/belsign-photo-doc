@@ -1,7 +1,7 @@
 package com.belman.unit.infrastructure;
 
 import com.belman.domain.valueobjects.OrderId;
-import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.report.ReportAggregate;
 import com.belman.domain.valueobjects.Timestamp;
 import com.belman.domain.valueobjects.EmailAddress;

@@ -1,6 +1,6 @@
 package com.belman.domain.specification;
 
-import com.belman.domain.photo.PhotoAngle;
+import com.belman.domain.order.photo.PhotoAngle;
 import com.belman.domain.photo.PhotoDocumentd;
 
 import java.util.ArrayList;

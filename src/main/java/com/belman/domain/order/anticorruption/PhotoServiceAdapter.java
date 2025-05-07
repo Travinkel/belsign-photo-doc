@@ -1,11 +1,11 @@
 package com.belman.domain.order.anticorruption;
 
+import com.belman.domain.common.validation.ValidationResult;
 import com.belman.domain.order.OrderAggregate;
 import com.belman.domain.order.OrderId;
-import com.belman.domain.photo.PhotoDocumentd;
-import com.belman.domain.photo.PhotoRepository;
-import com.belman.domain.photo.service.PhotoValidationService;
-import com.belman.domain.photo.service.PhotoValidationService.ValidationResult;
+import com.belman.domain.order.photo.PhotoDocument;
+import com.belman.domain.order.photo.PhotoRepository;
+import com.belman.domain.order.photo.service.PhotoValidationService;
 
 import java.util.List;
 import java.util.Objects;
@@ -43,7 +43,7 @@ public class PhotoServiceAdapter {
      * @param orderId the ID of the order
      * @return a list of photo documents associated with the order
      */
-    public List<PhotoDocumentd> getPhotosForOrder(OrderId orderId) {
+    public List<PhotoDocument> getPhotosForOrder(OrderId orderId) {
         Objects.requireNonNull(orderId, "orderId must not be null");
         return photoRepository.findByOrderId(orderId);
     }
@@ -58,7 +58,7 @@ public class PhotoServiceAdapter {
         Objects.requireNonNull(orderAggregate, "orderAggregate must not be null");
 
         // Fetch all photos for the orderAggregate
-        List<PhotoDocumentd> photos = photoRepository.findByOrderId(orderAggregate.getId());
+        List<PhotoDocument> photos = photoRepository.findByOrderId(orderAggregate.getId());
 
         // Validate the photos against product requirements
         return photoValidationService.validateAll(photos, orderAggregate.getId(), orderAggregate.getProductDescription());
@@ -74,7 +74,7 @@ public class PhotoServiceAdapter {
         Objects.requireNonNull(orderAggregate, "orderAggregate must not be null");
 
         ValidationResult result = validateOrderPhotos(orderAggregate);
-        return !result.hasErrors();
+        return result.getErrors().isEmpty();
     }
 
     /**
@@ -100,6 +100,6 @@ public class PhotoServiceAdapter {
         Objects.requireNonNull(orderAggregate, "orderAggregate must not be null");
 
         ValidationResult result = validateOrderPhotos(orderAggregate);
-        return result.getWarnings();
+        return result.getErrors();
     }
 }

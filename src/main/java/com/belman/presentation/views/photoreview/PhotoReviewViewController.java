@@ -3,7 +3,7 @@ package com.belman.presentation.views.photoreview;
 import com.belman.presentation.core.BaseController;
 import com.belman.presentation.navigation.Router;
 import com.belman.domain.aggregates.User;
-import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.infrastructure.service.SessionManager;
 import com.belman.presentation.components.TouchFriendlyDialog;
 import com.belman.presentation.views.photoupload.PhotoUploadView;

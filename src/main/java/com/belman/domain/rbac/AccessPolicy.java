@@ -1,7 +1,7 @@
 package com.belman.domain.rbac;
 
 
-import User.User;
+import com.belman.domain.user.UserAggregate;
 import com.belman.domain.user.UserRole;
 
 import javax.management.relation.Role;
@@ -15,15 +15,15 @@ import java.util.Set;
  * This class is used to check if a user has the required roles to perform an action.
  */
 public class AccessPolicy {
-    private final Set<Role> allowedRoles;
+    private final Set<UserRole> allowedRoles;
 
     /**
      * Creates a new AccessPolicy with the specified allowed roles.
      *
      * @param roles the roles that are allowed to access the resource
      */
-    public AccessPolicy(UserRole roles) {
-        this.allowedRoles = roles.length > 0 ? 
+    public AccessPolicy(UserRole... roles) {
+        this.allowedRoles = roles.length > 0 ?
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(roles))) : 
             Collections.emptySet();
     }
@@ -34,7 +34,7 @@ public class AccessPolicy {
      * @param user the user to check
      * @return true if the user has any of the required roles, false otherwise
      */
-    public boolean hasAccess(User user) {
+    public boolean hasAccess(UserAggregate user) {
         if (user == null) {
             return false;
         }
@@ -45,8 +45,8 @@ public class AccessPolicy {
         }
 
         // Check if the user has any of the allowed roles
-        Set<Role> userRoles = user.getRoles();
-        for (Role role : allowedRoles) {
+        Set<UserRole> userRoles = user.getRoles();
+        for (UserRole role : allowedRoles) {
             if (userRoles.contains(role)) {
                 return true;
             }
@@ -60,7 +60,7 @@ public class AccessPolicy {
      * 
      * @return an unmodifiable set of the allowed roles
      */
-    public Set<Role> getAllowedRoles() {
+    public Set<UserRole> getAllowedRoles() {
         return allowedRoles;
     }
 }

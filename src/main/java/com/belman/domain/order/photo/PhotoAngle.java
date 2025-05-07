@@ -1,4 +1,4 @@
-package com.belman.domain.photo;
+package com.belman.domain.order.photo;
 
 /**
  * Value object representing the angle at which a photo was taken.

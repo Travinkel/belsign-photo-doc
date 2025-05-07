@@ -2,7 +2,7 @@ package com.belman.unit.domain.aggregates;
 
 import com.belman.domain.aggregates.User;
 import com.belman.domain.customer.CustomerAggregate;
-import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.enums.OrderStatus;
 import com.belman.domain.valueobjects.*;
 import org.junit.jupiter.api.BeforeEach;

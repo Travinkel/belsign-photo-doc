@@ -4,11 +4,7 @@ import com.belman.domain.events.DomainEvent;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Base class for all aggregate roots in the domain model.
@@ -21,7 +17,7 @@ import java.util.Objects;
  *
  * @param <ID> the type of identifier used by this aggregate
  */
-public abstract class AggregateRoot<ID> implements Serializable {
+public abstract class Aggregate<ID> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -126,7 +122,7 @@ public abstract class AggregateRoot<ID> implements Serializable {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        AggregateRoot<?> that = (AggregateRoot<?>) obj;
+        Aggregate<?> that = (Aggregate<?>) obj;
         return Objects.equals(getId(), that.getId());
     }
 

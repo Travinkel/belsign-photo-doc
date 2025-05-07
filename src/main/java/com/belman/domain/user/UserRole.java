@@ -29,5 +29,24 @@ public enum UserRole {
      * Administrators who can manage users and system settings.
      * This role has the highest level of access and can perform all operations.
      */
-    ADMIN
+    ADMIN;
+
+    /**
+     * Checks if this role has permission to perform the given action.
+     *
+     * @param action The action to check permission for
+     * @return true if the role has permission, false otherwise
+     */
+    public boolean canPerform(String action) {
+        switch (this) {
+            case ADMIN:
+                return true; // Admins can do everything
+            case QA:
+                return "review".equals(action) || "approve".equals(action) || "reject".equals(action);
+            case PRODUCTION:
+                return "upload".equals(action) || "create_order".equals(action);
+            default:
+                return false;
+        }
+    }
 }

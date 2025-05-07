@@ -2,9 +2,9 @@ package com.belman.infrastructure.persistence;
 
 import com.belman.application.core.BaseService;
 import com.belman.domain.customer.CustomerAggregate;
+import com.belman.domain.customer.CustomerId;
 import com.belman.domain.customer.CustomerRepository;
 import com.belman.domain.specification.Specification;
-import com.belman.domain.valueobjects.CustomerId;
 
 import java.util.ArrayList;
 import java.util.HashMap;

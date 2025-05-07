@@ -1,8 +1,6 @@
 package com.belman.domain.events;
 
 import com.belman.domain.services.Logger;
-import com.belman.domain.shared.DomainEvent;
-import com.belman.domain.shared.DomainEventHandler;
 
 /**
  * Default implementation of the DomainEventHandlerImplementation interface.

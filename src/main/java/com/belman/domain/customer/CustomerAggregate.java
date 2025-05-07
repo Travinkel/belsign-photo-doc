@@ -1,12 +1,10 @@
 package com.belman.domain.customer;
 
 
-import com.belman.domain.enums.CustomerType;
-import com.belman.domain.valueobjects.EmailAddress;
-import com.belman.domain.valueobjects.Company;
-import com.belman.domain.valueobjects.CustomerId;
-import com.belman.domain.valueobjects.PersonName;
-import com.belman.domain.valueobjects.PhoneNumber;
+
+import com.belman.domain.common.EmailAddress;
+import com.belman.domain.common.PersonName;
+import com.belman.domain.common.PhoneNumber;
 
 import java.util.Objects;
 

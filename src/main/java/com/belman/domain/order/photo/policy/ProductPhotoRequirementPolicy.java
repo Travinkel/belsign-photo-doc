@@ -1,37 +1,25 @@
-package com.belman.domain.photo.policy;
+package com.belman.domain.order.photo.policy;
 
 import com.belman.domain.order.ProductDescription;
-import com.belman.domain.photo.PhotoAngle;
+import com.belman.domain.order.photo.PhotoAngle;
 
 import java.util.*;
 
 /**
- * Domain policy that defines quality requirements for photos based on product type.
- * <p>
+ * Domain policy that defines photo documentation requirements for different product types.
  * This policy encapsulates business rules about which types of photos are required
- * for different products, minimum quality standards, and annotation requirements.
+ * for specific product categories and types.
  */
-public class PhotoQualityPolicy {
+public class ProductPhotoRequirementPolicy {
 
     // Map of product categories to required photo angles
-    private final Map<String, Set<PhotoAngle>> requiredAngles;
+    private static final Map<String, Set<PhotoAngle>> REQUIRED_ANGLES;
 
     // Map of product categories to minimum number of photos required
-    private final Map<String, Integer> minimumPhotoCounts;
+    private static final Map<String, Integer> MINIMUM_PHOTO_COUNT;
 
-    // Map of product categories to annotation requirements
-    private final Map<String, Boolean> annotationRequirements;
-
-    /**
-     * Creates a new PhotoQualityPolicy with default settings.
-     */
-    public PhotoQualityPolicy() {
-        this.requiredAngles = initializeRequiredAngles();
-        this.minimumPhotoCounts = initializeMinimumPhotoCounts();
-        this.annotationRequirements = initializeAnnotationRequirements();
-    }
-
-    private Map<String, Set<PhotoAngle>> initializeRequiredAngles() {
+    static {
+        // Initialize photo angle requirements by product category
         Map<String, Set<PhotoAngle>> angleMap = new HashMap<>();
 
         // Standard products require front, left, right, and back photos
@@ -58,27 +46,16 @@ public class PhotoQualityPolicy {
         complexAngles.add(PhotoAngle.BOTTOM);
         angleMap.put("COMPLEX", Collections.unmodifiableSet(complexAngles));
 
-        return Collections.unmodifiableMap(angleMap);
-    }
+        REQUIRED_ANGLES = Collections.unmodifiableMap(angleMap);
 
-    private Map<String, Integer> initializeMinimumPhotoCounts() {
+        // Initialize minimum photo counts by product category
         Map<String, Integer> countMap = new HashMap<>();
         countMap.put("STANDARD", 4);
         countMap.put("SIMPLE", 2);
         countMap.put("COMPLEX", 6);
         countMap.put("CUSTOM", 8);
 
-        return Collections.unmodifiableMap(countMap);
-    }
-
-    private Map<String, Boolean> initializeAnnotationRequirements() {
-        Map<String, Boolean> requirementsMap = new HashMap<>();
-        requirementsMap.put("STANDARD", true);
-        requirementsMap.put("SIMPLE", false);
-        requirementsMap.put("COMPLEX", true);
-        requirementsMap.put("CUSTOM", true);
-
-        return Collections.unmodifiableMap(requirementsMap);
+        MINIMUM_PHOTO_COUNT = Collections.unmodifiableMap(countMap);
     }
 
     /**
@@ -91,7 +68,7 @@ public class PhotoQualityPolicy {
         Objects.requireNonNull(productDescription, "productDescription must not be null");
 
         String category = determineProductCategory(productDescription);
-        return requiredAngles.getOrDefault(category, Collections.emptySet());
+        return REQUIRED_ANGLES.getOrDefault(category, Collections.emptySet());
     }
 
     /**
@@ -104,20 +81,7 @@ public class PhotoQualityPolicy {
         Objects.requireNonNull(productDescription, "productDescription must not be null");
 
         String category = determineProductCategory(productDescription);
-        return minimumPhotoCounts.getOrDefault(category, 2); // Default to 2 photos minimum
-    }
-
-    /**
-     * Determines if annotations are required for photos of a given product.
-     *
-     * @param productDescription the product to check annotation requirements for
-     * @return true if annotations are required, false otherwise
-     */
-    public boolean requiresAnnotations(ProductDescription productDescription) {
-        Objects.requireNonNull(productDescription, "productDescription must not be null");
-
-        String category = determineProductCategory(productDescription);
-        return annotationRequirements.getOrDefault(category, false);
+        return MINIMUM_PHOTO_COUNT.getOrDefault(category, 2); // Default to 2 photos minimum
     }
 
     /**
@@ -128,11 +92,15 @@ public class PhotoQualityPolicy {
      * @return the product category
      */
     private String determineProductCategory(ProductDescription productDescription) {
-        String name = productDescription.name().toLowerCase();
-        String specifications = productDescription.specifications().toLowerCase();
-        String notes = productDescription.notes() != null ? productDescription.notes().toLowerCase() : "";
+        // In a real implementation, this would examine product attributes
+        // to determine the correct category.
+        // This is a simplified example.
 
-        String combined = name + " " + specifications + " " + notes;
+        // Combine name, specifications and notes for categorization
+        String combined = String.join(" ",
+                productDescription.name(),
+                productDescription.specifications(),
+                productDescription.notes() != null ? productDescription.notes() : "").toLowerCase();
 
         if (combined.contains("custom") || combined.contains("special order")) {
             return "CUSTOM";
