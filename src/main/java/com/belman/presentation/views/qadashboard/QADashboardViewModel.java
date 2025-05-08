@@ -1,10 +1,10 @@
 package com.belman.presentation.views.qadashboard;
 
 import com.belman.presentation.core.BaseViewModel;
-import com.belman.application.core.Inject;
+import com.belman.business.core.Inject;
 import com.belman.presentation.navigation.Router;
-import com.belman.domain.order.OrderRepository;
-import com.belman.infrastructure.service.SessionManager;
+import com.belman.business.domain.order.OrderRepository;
+import com.belman.data.service.SessionManager;
 import com.belman.presentation.views.login.LoginView;
 import com.belman.presentation.views.photoreview.PhotoReviewView;
 import javafx.beans.property.SimpleStringProperty;

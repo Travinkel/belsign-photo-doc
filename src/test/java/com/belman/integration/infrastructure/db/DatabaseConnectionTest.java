@@ -1,12 +1,11 @@
 package com.belman.integration.infrastructure.db;
 
-import com.belman.infrastructure.config.DatabaseConfig;
+import com.belman.data.config.DatabaseConfig;
 import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import static org.junit.jupiter.api.Assertions.*;

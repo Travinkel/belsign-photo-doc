@@ -2,14 +2,13 @@ package com.belman.unit.domain.valueobjects;
 
 import com.belman.domain.services.PasswordHasher;
 import com.belman.domain.valueobjects.HashedPassword;
-import com.belman.infrastructure.security.BCryptPasswordHasher;
+import com.belman.data.security.BCryptPasswordHasher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mindrot.jbcrypt.BCrypt;
 
 import static org.junit.jupiter.api.Assertions.*;
 

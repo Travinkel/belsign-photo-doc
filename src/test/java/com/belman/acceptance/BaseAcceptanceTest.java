@@ -1,10 +1,9 @@
 package com.belman.acceptance;
 
-import com.belman.infrastructure.config.DatabaseConfig;
+import com.belman.data.config.DatabaseConfig;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * Base class for all acceptance tests.

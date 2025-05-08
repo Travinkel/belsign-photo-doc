@@ -3,7 +3,7 @@ package com.belman.presentation.views.ordergallery;
 import com.belman.presentation.core.BaseController;
 import com.belman.presentation.navigation.Router;
 import com.belman.domain.aggregates.User;
-import com.belman.infrastructure.service.SessionManager;
+import com.belman.data.service.SessionManager;
 import com.belman.presentation.components.TouchFriendlyDialog;
 import com.belman.presentation.views.photoupload.PhotoUploadView;
 import com.belman.presentation.views.qadashboard.QADashboardView;

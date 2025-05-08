@@ -1,6 +1,6 @@
 package com.belman.unit.infrastructure.security;
 
-import com.belman.infrastructure.security.SecureConfigStorage;
+import com.belman.data.security.SecureConfigStorage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,6 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.Properties;
 

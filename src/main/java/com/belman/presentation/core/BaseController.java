@@ -1,6 +1,6 @@
 package com.belman.presentation.core;
 
-import com.belman.application.core.ControllerLifecycle;
+import com.belman.business.core.ControllerLifecycle;
 import javafx.application.Platform;
 import javafx.fxml.Initializable;
 

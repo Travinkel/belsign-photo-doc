@@ -1,6 +1,6 @@
 package com.belman.presentation.navigation.commands;
 
-import com.belman.domain.shared.Command;
+import com.belman.business.domain.shared.Command;
 import com.belman.presentation.navigation.Router;
 import com.belman.presentation.core.TransitionPresets;
 import com.belman.presentation.core.ViewTransition;

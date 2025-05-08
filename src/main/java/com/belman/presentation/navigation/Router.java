@@ -4,12 +4,12 @@ import com.belman.presentation.core.FadeViewTransition;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
-import com.belman.infrastructure.logging.EmojiLogger;
-import com.belman.application.core.StateManager;
+import com.belman.data.logging.EmojiLogger;
+import com.belman.business.core.StateManager;
 import com.belman.presentation.core.SlideDirection;
 import com.belman.presentation.core.SlideViewTransition;
 import com.belman.presentation.core.ViewTransition;
-import com.belman.infrastructure.platform.PlatformUtils;
+import com.belman.data.platform.PlatformUtils;
 
 import java.util.HashMap;
 import java.util.Map;

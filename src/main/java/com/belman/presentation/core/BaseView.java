@@ -1,7 +1,6 @@
 package com.belman.presentation.core;
 
-import com.belman.application.core.LifecycleManager;
-import com.belman.application.core.ServiceLocator;
+import com.belman.business.core.LifecycleManager;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.control.ProgressIndicator;
@@ -24,7 +23,7 @@ import java.net.URL;
  * 
  * @param <T> The type of ViewModel associated with this view
  */
-public abstract class BaseView<T extends BaseViewModel<?>> extends View implements com.belman.application.core.ViewLifecycle<T, BaseController<?>> {
+public abstract class BaseView<T extends BaseViewModel<?>> extends View implements com.belman.business.core.ViewLifecycle<T, BaseController<?>> {
 
     private final BaseController<?> controller;
     protected final T viewModel;

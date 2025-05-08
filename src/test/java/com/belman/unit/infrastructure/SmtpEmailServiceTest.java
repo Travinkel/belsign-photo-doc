@@ -1,14 +1,14 @@
 package com.belman.unit.infrastructure;
 
-import com.belman.domain.report.ReportAggregate;
+import com.belman.business.domain.report.ReportAggregate;
 import com.belman.domain.valueobjects.OrderId;
-import com.belman.domain.order.photo.PhotoDocument;
+import com.belman.business.domain.order.photo.PhotoDocument;
 import com.belman.domain.valueobjects.Timestamp;
 import com.belman.domain.valueobjects.EmailAddress;
 import com.belman.domain.valueobjects.HashedPassword;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.valueobjects.Username;
-import com.belman.infrastructure.email.SmtpEmailService;
+import com.belman.data.email.SmtpEmailService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

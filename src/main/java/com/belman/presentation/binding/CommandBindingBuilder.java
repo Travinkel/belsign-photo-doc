@@ -1,7 +1,7 @@
 package com.belman.presentation.binding;
 
-import com.belman.domain.shared.Command;
-import com.belman.application.core.CommandManager;
+import com.belman.business.domain.shared.Command;
+import com.belman.business.core.CommandManager;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.MenuItem;
 

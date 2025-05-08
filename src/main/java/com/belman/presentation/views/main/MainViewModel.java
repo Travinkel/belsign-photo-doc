@@ -1,12 +1,12 @@
 package com.belman.presentation.views.main;
 
 
-import com.belman.application.core.StateManager;
+import com.belman.business.core.StateManager;
 import com.belman.presentation.core.BaseViewModel;
-import com.belman.infrastructure.logging.EmojiLogger;
+import com.belman.data.logging.EmojiLogger;
 import com.belman.presentation.navigation.Router;
 import com.belman.domain.aggregates.User;
-import com.belman.infrastructure.service.SessionManager;
+import com.belman.data.service.SessionManager;
 import com.belman.presentation.views.login.LoginView;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;

@@ -1,6 +1,6 @@
 package com.belman.cleancode;
 
-import com.belman.domain.common.base.ValueObject;
+import com.belman.business.domain.common.base.ValueObject;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchRule;

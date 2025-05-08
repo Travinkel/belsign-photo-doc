@@ -1,6 +1,6 @@
 package com.belman.presentation.navigation;
 
-import com.belman.application.routing.RouteGuard;
+import com.belman.business.routing.RouteGuard;
 import com.belman.presentation.views.admin.AdminView;
 import com.belman.presentation.views.ordergallery.OrderGalleryView;
 import com.belman.presentation.views.photoreview.PhotoReviewView;
@@ -8,7 +8,7 @@ import com.belman.presentation.views.photoupload.PhotoUploadView;
 import com.belman.presentation.views.qadashboard.QADashboardView;
 import com.belman.presentation.views.reportpreview.ReportPreviewView;
 import com.belman.presentation.views.usermanagement.UserManagementView;
-import com.belman.domain.services.Logger;
+import com.belman.business.domain.services.Logger;
 import com.gluonhq.charm.glisten.mvc.View;
 
 import java.util.HashMap;

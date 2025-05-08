@@ -1,6 +1,6 @@
 package com.belman.presentation.core;
 
-import com.belman.application.core.ViewModelLifecycle;
+import com.belman.business.core.ViewModelLifecycle;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;

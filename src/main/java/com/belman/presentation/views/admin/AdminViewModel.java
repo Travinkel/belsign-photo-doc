@@ -1,6 +1,6 @@
 package com.belman.presentation.views.admin;
 
-import com.belman.application.usecases.admin.service.AdminService;
+import com.belman.business.usecases.admin.service.AdminService;
 import com.belman.presentation.core.BaseViewModel;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.aggregates.User.Role;

@@ -1,7 +1,7 @@
 package com.belman.unit.infrastructure.service;
 
 import com.belman.domain.aggregates.User;
-import com.belman.domain.user.UserRepository;
+import com.belman.business.domain.user.UserRepository;
 import com.belman.domain.services.AuthenticationService;
 import com.belman.domain.services.PasswordHasher;
 import com.belman.domain.valueobjects.EmailAddress;
@@ -9,10 +9,10 @@ import com.belman.domain.valueobjects.HashedPassword;
 import com.belman.domain.valueobjects.PersonName;
 import com.belman.domain.valueobjects.UserId;
 import com.belman.domain.valueobjects.Username;
-import com.belman.infrastructure.persistence.InMemoryUserRepository;
-import com.belman.infrastructure.security.BCryptPasswordHasher;
-import com.belman.infrastructure.service.DefaultAuthenticationService;
-import com.belman.infrastructure.service.SessionManager;
+import com.belman.data.persistence.InMemoryUserRepository;
+import com.belman.data.security.BCryptPasswordHasher;
+import com.belman.data.service.DefaultAuthenticationService;
+import com.belman.data.service.SessionManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,10 +1,10 @@
 package com.belman.presentation.views.login;
 
 import com.belman.presentation.core.BaseViewModel;
-import com.belman.infrastructure.logging.EmojiLogger;
+import com.belman.data.logging.EmojiLogger;
 import com.belman.presentation.navigation.Router;
 import com.belman.domain.aggregates.User;
-import com.belman.infrastructure.service.SessionManager;
+import com.belman.data.service.SessionManager;
 import com.belman.presentation.views.photoupload.PhotoUploadView;
 import com.belman.presentation.views.qadashboard.QADashboardView;
 import com.belman.presentation.views.usermanagement.UserManagementView;

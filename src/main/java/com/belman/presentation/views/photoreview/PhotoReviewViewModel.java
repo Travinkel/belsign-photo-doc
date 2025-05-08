@@ -1,18 +1,18 @@
 package com.belman.presentation.views.photoreview;
 
-import com.belman.domain.common.Timestamp;
-import com.belman.domain.order.OrderAggregate;
-import com.belman.domain.order.OrderId;
-import com.belman.domain.order.OrderNumber;
-import com.belman.domain.user.UserAggregate;
+import com.belman.business.domain.common.Timestamp;
+import com.belman.business.domain.order.OrderAggregate;
+import com.belman.business.domain.order.OrderId;
+import com.belman.business.domain.order.OrderNumber;
+import com.belman.business.domain.order.photo.UserReference;
 import com.belman.presentation.core.BaseViewModel;
-import com.belman.application.core.Inject;
+import com.belman.business.core.Inject;
 import com.belman.presentation.navigation.Router;
-import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.order.OrderRepository;
-import com.belman.domain.services.PhotoService;
+import com.belman.business.domain.order.photo.PhotoDocument;
+import com.belman.business.domain.order.OrderRepository;
+import com.belman.business.domain.services.PhotoService;
 
-import com.belman.infrastructure.service.SessionManager;
+import com.belman.data.service.SessionManager;
 import com.belman.presentation.views.login.LoginView;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -55,7 +55,6 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
 
     @Override
     public void onShow() {
-        // Clear any previous data
         clearForm();
     }
 
@@ -66,156 +65,116 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
      * @return true if the order was found, false otherwise
      */
     public boolean searchOrder(String orderNumberStr) {
-        if (orderNumberStr == null || orderNumberStr.isBlank()) {
-            errorMessage.set("Please enter an order number");
+        if (isNullOrEmpty(orderNumberStr)) {
+            setErrorMessage("Please enter an order number");
             return false;
         }
 
         try {
             OrderNumber orderNum = new OrderNumber(orderNumberStr);
-
-            // In a real application, you would search by OrderNumber
-            // For simplicity, we'll just get all orderAggregates and find the one with the matching number
             List<OrderAggregate> orderAggregates = orderRepository.findAll();
-            for (OrderAggregate orderAggregate : orderAggregates) {
-                if (orderAggregate.getOrderNumber() != null && orderAggregate.getOrderNumber().equals(orderNum)) {
-                    selectedOrder.set(orderAggregate);
-                    orderSelected.set(true);
-                    orderInfo.set("OrderAggregate: " + orderNumberStr + " - Customer: " +
-                                 (orderAggregate.getCustomerId() != null ? orderAggregate.getCustomerId() : "N/A"));
 
-                    // Load photos for this orderAggregate
-                    loadPhotosForOrder(orderAggregate.getId());
-
-                    return true;
-                }
-            }
-
-            errorMessage.set("OrderAggregate not found: " + orderNumberStr);
-            return false;
+            return orderAggregates.stream()
+                .filter(order -> order.getOrderNumber() != null && order.getOrderNumber().equals(orderNum))
+                .findFirst()
+                .map(this::handleOrderFound)
+                .orElseGet(() -> {
+                    setErrorMessage("Order not found: " + orderNumberStr);
+                    return false;
+                });
         } catch (IllegalArgumentException e) {
-            errorMessage.set("Invalid order number format");
+            setErrorMessage("Invalid order number format");
             return false;
         }
     }
 
-    /**
-     * Loads photos for the specified order.
-     * 
-     * @param orderId the ID of the order
-     */
-    private void loadPhotosForOrder(OrderId orderId) {
-        List<PhotoDocument> orderPhotos = photoService.getPhotosForOrder(orderId);
-        photos.setAll(orderPhotos);
+    private boolean handleOrderFound(OrderAggregate orderAggregate) {
+        selectedOrder.set(orderAggregate);
+        orderSelected.set(true);
+        orderInfo.set("Order: " + orderAggregate.getOrderNumber().value() + " - Customer: " +
+                      (orderAggregate.getCustomerId() != null ? orderAggregate.getCustomerId() : "N/A"));
+        loadPhotosForOrder(orderAggregate.getId());
+        return true;
     }
 
-    /**
-     * Sets the selected photo.
-     * 
-     * @param photo the selected photo
-     */
+    private void loadPhotosForOrder(OrderId orderId) {
+        try {
+            List<PhotoDocument> orderPhotos = photoService.getPhotosForOrder(orderId);
+            photos.setAll(orderPhotos);
+        } catch (Exception e) {
+            setErrorMessage("Error loading photos: " + e.getMessage());
+        }
+    }
+
     public void setSelectedPhoto(PhotoDocument photo) {
         if (photo != null) {
             selectedPhoto.set(photo);
             photoSelected.set(true);
-
-            // Pre-fill comment if it exists
-            if (photo.getReviewComment() != null) {
-                commentText.set(photo.getReviewComment());
-            } else {
-                commentText.set("");
-            }
+            commentText.set(photo.getReviewComment() != null ? photo.getReviewComment() : "");
         }
     }
 
-    /**
-     * Approves the selected photo.
-     * 
-     * @return true if the photo was approved successfully, false otherwise
-     */
     public boolean approvePhoto() {
-        if (!photoSelected.get()) {
-            errorMessage.set("Please select a photo first");
-            return false;
-        }
+        if (!validatePhotoSelection()) return false;
 
         try {
             PhotoDocument photo = selectedPhoto.get();
-
-            // Get the current user and timestamp
-            UserAggregate currentUser = sessionManager.getCurrentUser()
-                .orElseThrow(() -> new IllegalStateException("User not logged in"));
-            Timestamp now = Timestamp.now();
-
-            // Approve the photo
-            photo.approve(currentUser, now);
-
-            // Save the updated photo (this would typically be done through a repository)
-            // For now, we'll just refresh the photos list
-            loadPhotosForOrder(selectedOrder.get().getId());
-
-            // Clear the selection
+            UserReference currentUser = getCurrentUser();
+            photo.approve(currentUser, Timestamp.now());
+            refreshPhotos();
             clearPhotoSelection();
-
             return true;
         } catch (Exception e) {
-            errorMessage.set("Error approving photo: " + e.getMessage());
+            setErrorMessage("Error approving photo: " + e.getMessage());
             return false;
         }
     }
 
-    /**
-     * Rejects the selected photo.
-     * 
-     * @return true if the photo was rejected successfully, false otherwise
-     */
     public boolean rejectPhoto() {
-        if (!photoSelected.get()) {
-            errorMessage.set("Please select a photo first");
-            return false;
-        }
+        if (!validatePhotoSelection()) return false;
 
-        if (commentText.get() == null || commentText.get().isBlank()) {
-            errorMessage.set("Please provide a reason for rejection");
+        if (isNullOrEmpty(commentText.get())) {
+            setErrorMessage("Please provide a reason for rejection");
             return false;
         }
 
         try {
             PhotoDocument photo = selectedPhoto.get();
-
-            // Get the current user and timestamp
-            UserAggregate currentUser = sessionManager.getCurrentUser()
-                .orElseThrow(() -> new IllegalStateException("User not logged in"));
-            Timestamp now = Timestamp.now();
-
-            // Reject the photo with comment
-            photo.reject(currentUser, now, commentText.get());
-
-            // Refresh the photos list
-            loadPhotosForOrder(selectedOrder.get().getId());
-
-            // Clear the selection
+            UserReference currentUser = getCurrentUser();
+            photo.reject(currentUser, Timestamp.now(), commentText.get());
+            refreshPhotos();
             clearPhotoSelection();
-
             return true;
         } catch (Exception e) {
-            errorMessage.set("Error rejecting photo: " + e.getMessage());
+            setErrorMessage("Error rejecting photo: " + e.getMessage());
             return false;
         }
     }
 
-    /**
-     * Clears the photo selection.
-     */
+    private boolean validatePhotoSelection() {
+        if (!photoSelected.get()) {
+            setErrorMessage("Please select a photo first");
+            return false;
+        }
+        return true;
+    }
+
+    private UserReference getCurrentUser() {
+        return sessionManager.getCurrentUser()
+                .map(user -> new UserReference(user.getId(), user.getUsername()))
+                .orElseThrow(() -> new IllegalStateException("User not logged in"));
+    }
+
+    private void refreshPhotos() {
+        loadPhotosForOrder(selectedOrder.get().getId());
+    }
+
     private void clearPhotoSelection() {
         selectedPhoto.set(null);
         photoSelected.set(false);
         commentText.set("");
     }
 
-    /**
-     * Clears the form.
-     */
     public void clearForm() {
         orderNumber.set("");
         orderInfo.set("No order selected");
@@ -226,6 +185,14 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
         selectedOrder.set(null);
         selectedPhoto.set(null);
         photos.clear();
+    }
+
+    protected void setErrorMessage(String message) {
+        errorMessage.set(message);
+    }
+
+    private boolean isNullOrEmpty(String str) {
+        return str == null || str.isBlank();
     }
 
     // Getters for properties
@@ -266,20 +233,13 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
         return photos.get();
     }
 
-    /**
-     * Logs out the current user and navigates to the login view.
-     */
     public void logout() {
         try {
-            // Log out the user
-            if (sessionManager != null) {
-                sessionManager.logout();
-            }
-
-            // Navigate to the login view
+            sessionManager.logout();
             Router.navigateTo(LoginView.class);
         } catch (Exception e) {
-            errorMessage.set("Error logging out: " + e.getMessage());
+            setErrorMessage("Error logging out: " + e.getMessage());
         }
     }
 }
+

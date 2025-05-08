@@ -1,14 +1,14 @@
 package com.belman.presentation.views.ordergallery;
 
 import com.belman.presentation.core.BaseViewModel;
-import com.belman.application.core.Inject;
+import com.belman.business.core.Inject;
 import com.belman.presentation.navigation.Router;
 import com.belman.domain.aggregates.User;
-import com.belman.domain.order.OrderRepository;
+import com.belman.business.domain.order.OrderRepository;
 import com.belman.domain.valueobjects.OrderId;
 import com.belman.domain.valueobjects.OrderNumber;
 import com.belman.domain.valueobjects.Timestamp;
-import com.belman.infrastructure.service.SessionManager;
+import com.belman.data.service.SessionManager;
 import com.belman.presentation.views.login.LoginView;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;

@@ -1,18 +1,18 @@
 package com.belman.presentation.views.usermanagement;
 
 import com.belman.presentation.core.BaseViewModel;
-import com.belman.application.core.Inject;
+import com.belman.business.core.Inject;
 import com.belman.presentation.navigation.Router;
 import com.belman.domain.aggregates.User;
 import com.belman.domain.aggregates.User.Role;
 import com.belman.domain.enums.UserStatus;
-import com.belman.domain.user.UserRepository;
+import com.belman.business.domain.user.UserRepository;
 import com.belman.domain.valueobjects.EmailAddress;
 import com.belman.domain.valueobjects.HashedPassword;
 import com.belman.domain.valueobjects.PersonName;
 import com.belman.domain.valueobjects.UserId;
 import com.belman.domain.valueobjects.Username;
-import com.belman.infrastructure.service.SessionManager;
+import com.belman.data.service.SessionManager;
 import com.belman.presentation.views.login.LoginView;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
