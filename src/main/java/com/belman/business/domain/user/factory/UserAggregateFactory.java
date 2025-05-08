@@ -9,16 +9,14 @@ import com.belman.business.domain.user.UserAggregate;
 import com.belman.business.domain.user.UserId;
 import com.belman.business.domain.user.Username;
 
+import java.util.HashSet;
+
 public class UserAggregateFactory {
 
     // Create User with minimum required properties
     public static UserAggregate createUser(Username username, HashedPassword password, EmailAddress email) {
         validateRequiredFields(username, password, email);
-        return new UserAggregate(
-                username,
-                password,
-                email
-        );
+        return UserAggregate.createNewUser(username, password, email);
     }
 
     // Create User with full properties including PersonName
@@ -26,12 +24,12 @@ public class UserAggregateFactory {
                                                    PersonName name, EmailAddress email) {
         validateRequiredFields(username, password, email);
         validateName(name);
-        return new UserAggregate(
-                username,
-                password,
-                email,
-                name
-        );
+        return new UserAggregate.Builder()
+                .username(username)
+                .password(password)
+                .email(email)
+                .name(name)
+                .build();
     }
 
     // Create User with all details manually defined (useful for updates or clone operations)
@@ -41,14 +39,15 @@ public class UserAggregateFactory {
         validateRequiredFields(username, password, email);
         validateUserId(userId);
         validateName(name);
-        return new UserAggregate(
+        return UserAggregate.reconstitute(
                 userId,
                 username,
                 password,
                 name,
                 email,
                 phoneNumber,
-                ApprovalState.createPending()
+                ApprovalState.createPendingState(),
+                new HashSet<>()
         );
     }
 

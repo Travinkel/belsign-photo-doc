@@ -4,7 +4,9 @@ import com.belman.business.core.BaseService;
 import com.belman.business.domain.customer.CustomerAggregate;
 import com.belman.business.domain.customer.CustomerId;
 import com.belman.business.domain.customer.CustomerRepository;
+import com.belman.business.domain.services.LoggerFactory;
 import com.belman.business.domain.specification.Specification;
+import com.belman.data.logging.EmojiLoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +20,13 @@ import java.util.stream.Collectors;
  */
 public class InMemoryCustomerRepository extends BaseService implements CustomerRepository {
     private final Map<CustomerId, CustomerAggregate> customers = new HashMap<>();
+
+    /**
+     * Creates a new InMemoryCustomerRepository.
+     */
+    public InMemoryCustomerRepository() {
+        super(EmojiLoggerFactory.getInstance());
+    }
 
     @Override
     public CustomerAggregate findById(CustomerId id) {

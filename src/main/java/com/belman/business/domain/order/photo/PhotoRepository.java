@@ -1,5 +1,6 @@
 package com.belman.business.domain.order.photo;
 
+import com.belman.business.domain.core.Aggregate;
 import com.belman.business.domain.core.Repository;
 import com.belman.business.domain.order.OrderId;
 import com.belman.business.domain.user.ApprovalStatus;

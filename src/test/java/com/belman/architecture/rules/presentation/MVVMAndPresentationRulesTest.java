@@ -71,7 +71,7 @@ public class MVVMAndPresentationRulesTest {
     }
 
     @Test
-    public void viewModelsShouldResideInPresentationLayer() {
+    public void viewModelsShouldHaveCorrectNaming() {
         ArchRule rule = classes()
                 .that().haveSimpleNameEndingWith("ViewModel")
                 .should().resideInAPackage("com.belman.presentation..");

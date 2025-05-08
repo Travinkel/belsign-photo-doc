@@ -1,10 +1,11 @@
 package com.belman.presentation.views.admin;
 
+import com.belman.business.domain.user.UserRole;
+import com.belman.business.domain.user.UserAggregate;
 import com.belman.business.usecases.admin.service.AdminService;
 import com.belman.presentation.core.BaseViewModel;
-import com.belman.domain.aggregates.User;
-import com.belman.domain.aggregates.User.Role;
-import com.belman.domain.rbac.AccessDeniedException;
+import com.belman.business.domain.user.UserId;
+import com.belman.business.domain.exceptions.AccessDeniedException;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -34,15 +35,15 @@ public class AdminViewModel extends BaseViewModel<AdminViewModel> {
     private final StringProperty firstName = new SimpleStringProperty();
     private final StringProperty lastName = new SimpleStringProperty();
     private final StringProperty email = new SimpleStringProperty();
-    private final ObjectProperty<Role> selectedRole = new SimpleObjectProperty<>();
+    private final ObjectProperty<UserRole> selectedRole = new SimpleObjectProperty<>();
 
     // Properties for user list
-    private final ObservableList<User> users = FXCollections.observableArrayList();
-    private final ObjectProperty<User> selectedUser = new SimpleObjectProperty<>();
+    private final ObservableList<UserAggregate> users = FXCollections.observableArrayList();
+    private final ObjectProperty<UserAggregate> selectedUser = new SimpleObjectProperty<>();
 
     // Properties for role management
-    private final ObservableList<Role> availableRoles = FXCollections.observableArrayList(Role.values());
-    private final ObjectProperty<Role> roleToAssign = new SimpleObjectProperty<>();
+    private final ObservableList<UserRole> availableRoles = FXCollections.observableArrayList(UserRole.values());
+    private final ObjectProperty<UserRole> roleToAssign = new SimpleObjectProperty<>();
 
     // Properties for password reset
     private final StringProperty newPassword = new SimpleStringProperty();
@@ -76,7 +77,7 @@ public class AdminViewModel extends BaseViewModel<AdminViewModel> {
         statusMessage.set("Loading users...");
 
         try {
-            List<User> allUsers = adminService.getAllUsers();
+            List<UserAggregate> allUsers = adminService.getAllUsers();
             users.clear();
             users.addAll(allUsers);
             statusMessage.set("Loaded " + allUsers.size() + " users");
@@ -99,13 +100,13 @@ public class AdminViewModel extends BaseViewModel<AdminViewModel> {
         statusMessage.set("Creating user...");
 
         try {
-            User user = adminService.createUser(
+            UserAggregate user = adminService.createUser(
                 username.get(),
                 password.get(),
                 firstName.get(),
                 lastName.get(),
                 email.get(),
-                selectedRole.get()
+                    new UserRole[]{selectedRole.get()}
             );
 
             users.add(user);
@@ -198,7 +199,7 @@ public class AdminViewModel extends BaseViewModel<AdminViewModel> {
      * 
      * @param role the role to remove
      */
-    public void removeRole(Role role) {
+    public void removeRole(UserRole role) {
         if (selectedUser.get() == null) {
             statusMessage.set("No user selected");
             return;
@@ -299,23 +300,23 @@ public class AdminViewModel extends BaseViewModel<AdminViewModel> {
         return email;
     }
 
-    public ObjectProperty<Role> selectedRoleProperty() {
+    public ObjectProperty<UserRole> selectedRoleProperty() {
         return selectedRole;
     }
 
-    public ObservableList<User> getUsers() {
+    public ObservableList<UserAggregate> getUsers() {
         return users;
     }
 
-    public ObjectProperty<User> selectedUserProperty() {
+    public ObjectProperty<UserAggregate> selectedUserProperty() {
         return selectedUser;
     }
 
-    public ObservableList<Role> getAvailableRoles() {
+    public ObservableList<UserRole> getAvailableRoles() {
         return availableRoles;
     }
 
-    public ObjectProperty<Role> roleToAssignProperty() {
+    public ObjectProperty<UserRole> roleToAssignProperty() {
         return roleToAssign;
     }
 

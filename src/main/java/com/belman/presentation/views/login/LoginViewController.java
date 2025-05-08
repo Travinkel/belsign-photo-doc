@@ -36,10 +36,10 @@ public class LoginViewController extends BaseController<LoginViewModel> {
     private CheckBox rememberMeCheckBox;
 
     @Override
-    public void initializeBinding() {
+    protected void setupBindings() {
         // Bind UI components to ViewModel properties
         if (getViewModel() == null) {
-            System.err.println("Error in LoginViewController.initializeBinding(): ViewModel is null");
+            System.err.println("Error in LoginViewController.setupBindings(): ViewModel is null");
             // Create a temporary view model if it's null - this is just a safety measure
             LoginViewModel tempViewModel = new LoginViewModel();
             setViewModel(tempViewModel);
@@ -60,6 +60,12 @@ public class LoginViewController extends BaseController<LoginViewModel> {
         // Set up key event handlers for Enter key
         usernameField.setOnAction(this::handleLoginButtonAction);
         passwordField.setOnAction(this::handleLoginButtonAction);
+    }
+
+    @Override
+    public void initializeBinding() {
+        // Call setupBindings to avoid duplication
+        setupBindings();
     }
 
     /**

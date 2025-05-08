@@ -11,22 +11,17 @@ public class RejectedState implements ApprovalState {
     }
 
     @Override
-    public String getStatus() {
-        return "REJECTED";
-    }
-
-    @Override
     public ApprovalStatus getStatusEnum() {
         return ApprovalStatus.REJECTED;
     }
 
     @Override
-    public void approve(UserAggregate user, UserAggregate reviewer, Instant reviewedAt) {
+    public ApprovalState approve(UserAggregate user, UserAggregate reviewer, Instant reviewedAt) {
         throw new UnsupportedOperationException("Cannot approve a rejected state");
     }
 
     @Override
-    public void reject(UserAggregate user, UserAggregate reviewer, Instant reviewedAt, String reason) {
+    public ApprovalState reject(UserAggregate user, UserAggregate reviewer, Instant reviewedAt, String reason) {
         throw new UnsupportedOperationException("Already rejected.");
     }
 
@@ -42,6 +37,10 @@ public class RejectedState implements ApprovalState {
 
     @Override
     public boolean isRejected() {
-        return false;
+        return true;
+    }
+
+    public String getReason() {
+        return reason;
     }
 }

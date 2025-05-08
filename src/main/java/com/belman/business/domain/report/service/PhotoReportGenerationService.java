@@ -1,17 +1,22 @@
 package com.belman.business.domain.report.service;
 
+import com.belman.business.domain.common.Timestamp;
 import com.belman.business.domain.common.validation.ValidationResult;
 import com.belman.business.domain.core.IDomainService;
 import com.belman.business.domain.order.OrderAggregate;
 import com.belman.business.domain.order.ProductDescription;
 import com.belman.business.domain.order.photo.PhotoDocument;
+import com.belman.business.domain.order.photo.policy.IPhotoQualityService;
 import com.belman.business.domain.order.photo.service.PhotoValidationService;
 import com.belman.business.domain.report.ReportAggregate;
 import com.belman.business.domain.report.ReportId;
 import com.belman.business.domain.report.ReportStatus;
 import com.belman.business.domain.report.ReportType;
 import com.belman.business.domain.services.LoggerFactory;
+import com.belman.business.domain.user.UserAggregate;
 import com.belman.business.domain.user.UserReference;
+
+import java.time.Instant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,19 +34,23 @@ public class PhotoReportGenerationService implements IDomainService {
 
     private final PhotoValidationService photoValidationService;
     private final LoggerFactory loggerFactory;
+    private final IPhotoQualityService photoQualityPolicy;
 
     /**
      * Creates a new PhotoReportGenerationService with the specified dependencies.
      *
      * @param photoValidationService the service for validating photos
      * @param loggerFactory          the factory for creating loggers
+     * @param photoQualityPolicy     the policy for photo quality requirements
      */
     public PhotoReportGenerationService(
             PhotoValidationService photoValidationService,
-            LoggerFactory loggerFactory) {
+            LoggerFactory loggerFactory,
+            IPhotoQualityService photoQualityPolicy) {
         this.photoValidationService = Objects.requireNonNull(
                 photoValidationService, "photoValidationService must not be null");
         this.loggerFactory = Objects.requireNonNull(loggerFactory, "loggerFactory must not be null");
+        this.photoQualityPolicy = Objects.requireNonNull(photoQualityPolicy, "photoQualityPolicy must not be null");
     }
 
     /**
@@ -74,17 +83,16 @@ public class PhotoReportGenerationService implements IDomainService {
 
         // Create the report
         ReportId reportId = new ReportId(UUID.randomUUID().toString());
-        ReportAggregate report = new ReportAggregate(
-                reportId,
-                order.getId(),
-                ReportType.PHOTO_DOCUMENTATION,
-                ReportStatus.PENDING,
-                requester);
 
-        // Add the approved photos to the report
-        for (PhotoDocument photo : approvedPhotos) {
-            report.addPhotoReference(photo.getPhotoId());
-        }
+        // Use the builder to create the report with the correct parameters
+        ReportAggregate report = ReportAggregate.builder()
+                .id(reportId)
+                .orderId(order.getId())
+                .approvedPhotos(approvedPhotos)
+                // Skip generatedBy since we have a UserReference but need a UserAggregate
+                .generatedAt(new Timestamp(Instant.now()))
+                .status(ReportStatus.PENDING)
+                .build();
 
         return report;
     }
@@ -119,7 +127,7 @@ public class PhotoReportGenerationService implements IDomainService {
         ValidationResult result = new ValidationResult(true, new ArrayList<>());
 
         // Validate minimum photo count
-        int requiredCount = photoQualityPolicy.getMinimumPhotoCount(productDescription);
+        int requiredCount = this.photoQualityPolicy.getMinimumPhotoCount(productDescription);
         if (photos.size() < requiredCount) {
             result.addError(String.format("Insufficient photos. Required: %d, Provided: %d",
                     requiredCount, photos.size()));
@@ -128,7 +136,7 @@ public class PhotoReportGenerationService implements IDomainService {
         // Validate each individual photo
         for (PhotoDocument photo : photos) {
             // Check if photo has annotations when required
-            if (photoQualityPolicy.requiresAnnotations(productDescription) && photo.getAnnotations().isEmpty()) {
+            if (this.photoQualityPolicy.requiresAnnotations(productDescription) && photo.getAnnotations().isEmpty()) {
                 result.addWarning(String.format("Photo %s should have annotations for measurements",
                         photo.getPhotoId()));
             }

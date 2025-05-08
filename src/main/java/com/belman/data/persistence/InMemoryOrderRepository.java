@@ -20,7 +20,7 @@ public class InMemoryOrderRepository implements OrderRepository {
 
     @Override
     public Optional<OrderAggregate> findById(OrderId id) {
-        return ordersById.get(id);
+        return Optional.ofNullable(ordersById.get(id));
     }
 
     @Override

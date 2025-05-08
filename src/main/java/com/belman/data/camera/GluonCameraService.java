@@ -3,6 +3,8 @@ package com.belman.data.camera;
 import com.belman.business.core.BaseService;
 import com.belman.data.platform.ErrorHandler;
 import com.belman.business.domain.services.CameraService;
+import com.belman.business.domain.services.LoggerFactory;
+import com.belman.data.logging.EmojiLoggerFactory;
 import com.gluonhq.attach.pictures.PicturesService;
 import com.gluonhq.attach.storage.StorageService;
 import com.gluonhq.attach.util.Services;
@@ -41,6 +43,7 @@ public class GluonCameraService extends BaseService implements CameraService {
      * @param tempDirectory the directory to store temporary files
      */
     public GluonCameraService(String tempDirectory) {
+        super(EmojiLoggerFactory.getInstance());
         this.tempDirectory = tempDirectory;
 
         // Create the temporary directory if it doesn't exist

@@ -4,7 +4,7 @@ import com.belman.business.domain.common.Timestamp;
 import com.belman.business.domain.order.photo.PhotoDocument;
 import com.belman.business.domain.order.photo.events.PhotoApprovedEvent;
 import com.belman.business.domain.order.photo.events.PhotoRejectedEvent;
-import com.belman.business.domain.order.photo.UserReference;
+import com.belman.business.domain.user.UserReference;
 import com.belman.data.logging.Logger;
 
 import java.util.Objects;

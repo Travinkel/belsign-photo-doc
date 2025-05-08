@@ -5,12 +5,14 @@ import com.belman.business.domain.common.EmailAddress;
 import com.belman.business.domain.common.PersonName;
 import com.belman.business.domain.user.*;
 import com.belman.business.domain.exceptions.AccessDeniedException;
-import com.belman.business.domain.rbac.AccessPolicy;
-import com.belman.business.domain.rbac.RoleBasedAccessManager;
+import com.belman.business.domain.user.rbac.AccessPolicy;
+import com.belman.business.domain.user.rbac.RoleBasedAccessManager;
 import com.belman.business.domain.security.AuthenticationService;
 import com.belman.business.domain.security.HashedPassword;
 import com.belman.business.domain.security.PasswordHasher;
+import com.belman.business.domain.services.LoggerFactory;
 import com.belman.business.domain.user.factory.UserAggregateFactory;
+import com.belman.data.logging.EmojiLoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +32,7 @@ public class AdminService extends BaseService {
      */
     public AdminService(UserRepository userRepository, PasswordHasher passwordHasher,
                         AuthenticationService authenticationService) {
+        super(EmojiLoggerFactory.getInstance());
         this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;
         this.authenticationService = authenticationService;
@@ -172,8 +175,7 @@ public class AdminService extends BaseService {
                     HashedPassword.fromPlainText(newPassword, passwordHasher),
                     user.getName(),
                     user.getEmail(),
-                    user.getPhoneNumber(),
-                    user.getStatus()
+                    user.getPhoneNumber()
             );
 
             // Copy roles

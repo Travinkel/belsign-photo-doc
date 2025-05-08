@@ -2,6 +2,8 @@ package com.belman.cleancode;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class TestCoverageTest {
     @Test
     public void allClassesShouldHaveCorrespondingTests() {

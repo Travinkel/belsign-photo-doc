@@ -1,6 +1,6 @@
 package com.belman.unit.domain.valueobjects;
 
-import com.belman.domain.valueobjects.EmailAddress;
+import com.belman.business.domain.common.EmailAddress;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -23,11 +23,11 @@ public class EmailAddressTest {
     void constructor_withValidEmail_shouldCreateEmailAddress(String email) {
         // Act
         EmailAddress emailAddress = new EmailAddress(email);
-        
+
         // Assert
         assertEquals(email, emailAddress.value());
     }
-    
+
     @ParameterizedTest
     @ValueSource(strings = {
         "",
@@ -45,63 +45,63 @@ public class EmailAddressTest {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             new EmailAddress(email);
         });
-        
+
         assertEquals("Invalid email address", exception.getMessage());
     }
-    
+
     @Test
     void constructor_withNullEmail_shouldThrowException() {
         // Act & Assert
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             new EmailAddress(null);
         });
-        
+
         assertEquals("Invalid email address", exception.getMessage());
     }
-    
+
     @Test
-    void getValue_shouldReturnEmailValue() {
+    void value_shouldReturnEmailValue() {
         // Arrange
         String email = "test@example.com";
         EmailAddress emailAddress = new EmailAddress(email);
-        
+
         // Act
-        String value = emailAddress.getValue();
-        
+        String value = emailAddress.value();
+
         // Assert
         assertEquals(email, value);
     }
-    
+
     @Test
     void toString_shouldReturnEmailValue() {
         // Arrange
         String email = "test@example.com";
         EmailAddress emailAddress = new EmailAddress(email);
-        
+
         // Act
         String stringValue = emailAddress.toString();
-        
+
         // Assert
         assertEquals(email, stringValue);
     }
-    
+
     @Test
     void equals_withSameEmail_shouldBeEqual() {
         // Arrange
         EmailAddress email1 = new EmailAddress("test@example.com");
         EmailAddress email2 = new EmailAddress("test@example.com");
-        
+
         // Act & Assert
         assertEquals(email1, email2);
         assertEquals(email1.hashCode(), email2.hashCode());
     }
-    
+
     @Test
     void equals_withDifferentEmail_shouldNotBeEqual() {
         // Arrange
         EmailAddress email1 = new EmailAddress("test1@example.com");
         EmailAddress email2 = new EmailAddress("test2@example.com");
-        
+
         // Act & Assert
         assertNotEquals(email1, email2);
     }

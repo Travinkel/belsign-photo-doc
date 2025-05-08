@@ -7,6 +7,7 @@ import com.belman.business.domain.events.CommandExecutedEvent;
 import com.belman.business.domain.events.CommandRedoneEvent;
 import com.belman.business.domain.events.CommandUndoneEvent;
 import com.belman.business.domain.events.DomainEventPublisher;
+import com.belman.business.domain.services.LoggerFactory;
 import com.belman.business.domain.shared.Command;
 
 import java.util.ArrayDeque;
@@ -35,8 +36,11 @@ public class CommandManager extends BaseService {
 
     /**
      * Private constructor to enforce singleton pattern.
+     * 
+     * @param loggerFactory the factory to create loggers
      */
-    private CommandManager() {
+    private CommandManager(LoggerFactory loggerFactory) {
+        super(loggerFactory);
         this.eventPublisher = DomainEventPublisher.getInstance();
     }
 
@@ -47,7 +51,8 @@ public class CommandManager extends BaseService {
      */
     public static synchronized CommandManager getInstance() {
         if (instance == null) {
-            instance = new CommandManager();
+            LoggerFactory loggerFactory = ServiceLocator.getService(LoggerFactory.class);
+            instance = new CommandManager(loggerFactory);
         }
         return instance;
     }

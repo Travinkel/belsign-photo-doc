@@ -2,7 +2,8 @@ package com.belman.presentation.views.photoreview;
 
 import com.belman.presentation.core.BaseController;
 import com.belman.presentation.navigation.Router;
-import com.belman.domain.aggregates.User;
+import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.domain.user.UserRole;
 import com.belman.business.domain.order.photo.PhotoDocument;
 import com.belman.data.service.SessionManager;
 import com.belman.presentation.components.TouchFriendlyDialog;
@@ -53,7 +54,7 @@ public class PhotoReviewViewController extends BaseController<PhotoReviewViewMod
     private ProgressIndicator progressIndicator;
 
     @Override
-    public void initializeBinding() {
+    public void setupBindings() {
         // Bind text fields to view model properties
         orderNumberField.textProperty().bindBidirectional(getViewModel().orderNumberProperty());
         orderInfoLabel.textProperty().bind(getViewModel().orderInfoProperty());
@@ -167,14 +168,14 @@ public class PhotoReviewViewController extends BaseController<PhotoReviewViewMod
         // Get the current user and check their role
         SessionManager sessionManager = SessionManager.getInstance();
         if (sessionManager != null && sessionManager.isLoggedIn()) {
-            User user = sessionManager.getCurrentUser().orElse(null);
+            UserAggregate user = sessionManager.getCurrentUser().orElse(null);
             if (user != null) {
                 // Navigate to the appropriate view based on the user's role
-                if (user.getRoles().contains(User.Role.ADMIN)) {
+                if (user.getRoles().contains(UserRole.ADMIN)) {
                     Router.navigateTo(UserManagementView.class);
-                } else if (user.getRoles().contains(User.Role.QA)) {
+                } else if (user.getRoles().contains(UserRole.QA)) {
                     Router.navigateTo(QADashboardView.class);
-                } else if (user.getRoles().contains(User.Role.PRODUCTION)) {
+                } else if (user.getRoles().contains(UserRole.PRODUCTION)) {
                     Router.navigateTo(PhotoUploadView.class);
                 } else {
                     // Fallback to QADashboardView if no specific role is found
@@ -191,14 +192,15 @@ public class PhotoReviewViewController extends BaseController<PhotoReviewViewMod
     /**
      * Shows an error message using a touch-friendly dialog.
      */
-    private void showError(String message) {
+    @Override
+    protected void showError(String message) {
         TouchFriendlyDialog.showError("Error", message);
     }
 
     /**
      * Shows an information message using a touch-friendly dialog.
      */
-    private void showInfo(String message) {
+    protected void showInfo(String message) {
         TouchFriendlyDialog.showInformation("Information", message);
     }
 }

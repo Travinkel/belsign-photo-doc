@@ -10,12 +10,12 @@ public class ApprovedState implements ApprovalState {
     }
 
     @Override
-    public void approve(UserAggregate user, UserAggregate reviewer, Instant reviewedAt) {
+    public ApprovalState approve(UserAggregate user, UserAggregate reviewer, Instant reviewedAt) {
         throw new UnsupportedOperationException("Cannot approve a photo that is already in the approved state.");
     }
 
     @Override
-    public void reject(UserAggregate user, UserAggregate reviewer, Instant reviewedAt, String reason) {
+    public ApprovalState reject(UserAggregate user, UserAggregate reviewer, Instant reviewedAt, String reason) {
         throw new UnsupportedOperationException("Cannot reject a photo that is already in the approved state.");
     }
 

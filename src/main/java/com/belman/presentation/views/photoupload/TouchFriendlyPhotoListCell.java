@@ -62,7 +62,7 @@ public class TouchFriendlyPhotoListCell extends ListCell<PhotoDocument> {
         container.setAlignment(Pos.CENTER_LEFT);
         container.setPadding(new Insets(8));
         container.getChildren().addAll(statusIndicator, content);
-        
+
         // Set the graphic to null initially
         setGraphic(null);
     }
@@ -90,8 +90,8 @@ public class TouchFriendlyPhotoListCell extends ListCell<PhotoDocument> {
             }
 
             // Update the labels with photo information
-            photoIdLabel.setText("Photo ID: " + item.getPhotoId().value());
-            angleLabel.setText("Angle: " + item.getAngle().degrees() + "°");
+            photoIdLabel.setText("Photo ID: " + item.getPhotoId().id());
+            angleLabel.setText("Template: " + item.getTemplate().name());
             statusLabel.setText("Status: " + item.getStatus().name());
             uploaderLabel.setText("Uploaded by: " + item.getUploadedBy().getUsername().value());
             timestampLabel.setText("Uploaded at: " + item.getUploadedAt().toInstant().toString());

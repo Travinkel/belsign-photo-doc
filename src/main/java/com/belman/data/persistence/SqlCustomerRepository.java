@@ -1,14 +1,14 @@
 package com.belman.data.persistence;
 
 import com.belman.business.domain.customer.CustomerAggregate;
-import com.belman.domain.enums.CustomerType;
+import com.belman.business.domain.customer.CustomerType;
 import com.belman.business.domain.customer.CustomerRepository;
 import com.belman.business.domain.specification.Specification;
-import com.belman.domain.valueobjects.Company;
-import com.belman.domain.valueobjects.CustomerId;
-import com.belman.domain.valueobjects.EmailAddress;
-import com.belman.domain.valueobjects.PersonName;
-import com.belman.domain.valueobjects.PhoneNumber;
+import com.belman.business.domain.customer.Company;
+import com.belman.business.domain.customer.CustomerId;
+import com.belman.business.domain.common.EmailAddress;
+import com.belman.business.domain.common.PersonName;
+import com.belman.business.domain.common.PhoneNumber;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -159,7 +159,7 @@ public class SqlCustomerRepository implements CustomerRepository {
                 stmt.setString(5, customer.getCompany().toString());
             }
 
-            stmt.setString(6, customer.getEmail().getValue());
+            stmt.setString(6, customer.getEmail().value());
 
             // Set phone number if available
             if (customer.getPhoneNumber() != null) {
@@ -200,7 +200,7 @@ public class SqlCustomerRepository implements CustomerRepository {
                 stmt.setString(4, customer.getCompany().toString());
             }
 
-            stmt.setString(5, customer.getEmail().getValue());
+            stmt.setString(5, customer.getEmail().value());
 
             // Set phone number if available
             if (customer.getPhoneNumber() != null) {
@@ -223,7 +223,7 @@ public class SqlCustomerRepository implements CustomerRepository {
     }
 
     private CustomerAggregate mapResultSetToCustomer(ResultSet rs) throws SQLException {
-        CustomerId id = new CustomerId(UUID.fromString(rs.getString("id")));
+        CustomerId id = new CustomerId(rs.getString("id"));
         CustomerType type = CustomerType.valueOf(rs.getString("type"));
         EmailAddress email = new EmailAddress(rs.getString("email"));
 

@@ -38,35 +38,35 @@ public class PhotoQualityPolicy implements IPhotoQualityService {
         // Standard products require front, left, right, and back photos
         templateMap.put("STANDARD", Set.of(
                 PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY,
-                PhotoTemplate.LEFT,
-                PhotoTemplate.RIGHT,
-                PhotoTemplate.BACK
+                PhotoTemplate.LEFT_VIEW_OF_ASSEMBLY,
+                PhotoTemplate.RIGHT_VIEW_OF_ASSEMBLY,
+                PhotoTemplate.BACK_VIEW_OF_ASSEMBLY
         ));
 
         // Simple products only require front and back photos
         templateMap.put("SIMPLE", Set.of(
                 PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY,
-                PhotoTemplate.BACK
+                PhotoTemplate.BACK_VIEW_OF_ASSEMBLY
         ));
 
         // Complex products require photos from all standard angles plus top and bottom
         templateMap.put("COMPLEX", Set.of(
                 PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY,
-                PhotoTemplate.LEFT,
-                PhotoTemplate.RIGHT,
-                PhotoTemplate.BACK,
+                PhotoTemplate.LEFT_VIEW_OF_ASSEMBLY,
+                PhotoTemplate.RIGHT_VIEW_OF_ASSEMBLY,
+                PhotoTemplate.BACK_VIEW_OF_ASSEMBLY,
                 PhotoTemplate.TOP_VIEW_OF_JOINT,
-                PhotoTemplate.BOTTOM
+                PhotoTemplate.BOTTOM_VIEW_OF_ASSEMBLY
         ));
 
         // Custom products may require additional templates
         templateMap.put("CUSTOM", Set.of(
                 PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY,
-                PhotoTemplate.LEFT,
-                PhotoTemplate.RIGHT,
-                PhotoTemplate.BACK,
+                PhotoTemplate.LEFT_VIEW_OF_ASSEMBLY,
+                PhotoTemplate.RIGHT_VIEW_OF_ASSEMBLY,
+                PhotoTemplate.BACK_VIEW_OF_ASSEMBLY,
                 PhotoTemplate.TOP_VIEW_OF_JOINT,
-                PhotoTemplate.BOTTOM,
+                PhotoTemplate.BOTTOM_VIEW_OF_ASSEMBLY,
                 PhotoTemplate.CUSTOM
         ));
 

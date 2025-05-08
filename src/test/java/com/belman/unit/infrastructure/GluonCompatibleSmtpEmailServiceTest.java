@@ -1,13 +1,13 @@
 package com.belman.unit.infrastructure;
 
-import com.belman.domain.valueobjects.OrderId;
+import com.belman.business.domain.order.OrderId;
 import com.belman.business.domain.order.photo.PhotoDocument;
 import com.belman.business.domain.report.ReportAggregate;
-import com.belman.domain.valueobjects.Timestamp;
-import com.belman.domain.valueobjects.EmailAddress;
-import com.belman.domain.valueobjects.HashedPassword;
-import com.belman.domain.aggregates.User;
-import com.belman.domain.valueobjects.Username;
+import com.belman.business.domain.common.Timestamp;
+import com.belman.business.domain.common.EmailAddress;
+import com.belman.business.domain.security.HashedPassword;
+import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.domain.user.Username;
 import com.belman.data.email.SmtpEmailService;
 import com.belman.unit.backbone.util.GluonTestStorageHelper;
 import org.junit.jupiter.api.AfterEach;
@@ -53,7 +53,12 @@ class GluonCompatibleSmtpEmailServiceTest {
         Username username = new Username("test-user");
         HashedPassword hashedPassword= new HashedPassword("test-password");
         EmailAddress email = new EmailAddress("test@localhost");
-        User qaUser = new User(username, hashedPassword, email);
+        UserAggregate qaUser = new UserAggregate.Builder()
+            .id(com.belman.business.domain.user.UserId.newId())
+            .username(username)
+            .password(hashedPassword)
+            .email(email)
+            .build();
         Timestamp now = new Timestamp(Instant.now());
         List<PhotoDocument> approvedPhotos = new ArrayList<>();
 

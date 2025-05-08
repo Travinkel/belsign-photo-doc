@@ -1,4 +1,4 @@
-package com.belman.business.domain.rbac;
+package com.belman.business.domain.user.rbac;
 
 import com.belman.business.domain.security.AuthenticationService;
 

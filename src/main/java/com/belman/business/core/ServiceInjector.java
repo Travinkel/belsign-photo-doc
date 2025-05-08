@@ -5,6 +5,7 @@ import com.belman.business.domain.common.EmailAddress;
 import com.belman.business.domain.security.AuthenticationService;
 import com.belman.business.domain.security.HashedPassword;
 import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.domain.user.UserRepository;
 import com.belman.business.domain.user.UserRole;
 import com.belman.business.domain.user.Username;
 import com.belman.data.security.DefaultAuthenticationService;
@@ -27,8 +28,11 @@ public final class ServiceInjector {
      * This method should be called at application startup before any views are loaded.
      */
     public static void registerServices() {
+        // Get the UserRepository service
+        UserRepository userRepository = ServiceLocator.getService(UserRepository.class);
+
         // Register the DefaultAuthenticationService
-        ServiceLocator.registerService(AuthenticationService.class, new DefaultAuthenticationService());
+        ServiceLocator.registerService(AuthenticationService.class, new DefaultAuthenticationService(userRepository));
 
         // Initialize SessionManager with the registered AuthenticationService
         SessionManager sessionManager = SessionManager.getInstance(
@@ -66,7 +70,7 @@ public final class ServiceInjector {
                     role = UserRole.QA;
                 }
 
-                UserAggregate user = new UserAggregate(userUsername, hashedPassword, email);
+                UserAggregate user = UserAggregate.createNewUser(userUsername, hashedPassword, email);
                 // Add the assigned role
                 user.addRole(role);
 

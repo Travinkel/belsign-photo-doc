@@ -3,15 +3,16 @@ package com.belman.presentation.views.usermanagement;
 import com.belman.presentation.core.BaseViewModel;
 import com.belman.business.core.Inject;
 import com.belman.presentation.navigation.Router;
-import com.belman.domain.aggregates.User;
-import com.belman.domain.aggregates.User.Role;
-import com.belman.domain.enums.UserStatus;
+import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.domain.user.UserRole;
+import com.belman.business.domain.user.UserStatus;
 import com.belman.business.domain.user.UserRepository;
-import com.belman.domain.valueobjects.EmailAddress;
-import com.belman.domain.valueobjects.HashedPassword;
-import com.belman.domain.valueobjects.PersonName;
-import com.belman.domain.valueobjects.UserId;
-import com.belman.domain.valueobjects.Username;
+import com.belman.business.domain.user.ApprovalStatus;
+import com.belman.business.domain.common.EmailAddress;
+import com.belman.business.domain.security.HashedPassword;
+import com.belman.business.domain.common.PersonName;
+import com.belman.business.domain.user.UserId;
+import com.belman.business.domain.user.Username;
 import com.belman.data.service.SessionManager;
 import com.belman.presentation.views.login.LoginView;
 import javafx.beans.property.*;
@@ -34,14 +35,14 @@ public class UserManagementViewModel extends BaseViewModel<UserManagementViewMod
     private UserRepository userRepository;
 
     // Properties for the user list
-    private final ObservableList<User> users = FXCollections.observableArrayList();
-    private final FilteredList<User> filteredUsers = new FilteredList<>(users);
+    private final ObservableList<UserAggregate> users = FXCollections.observableArrayList();
+    private final FilteredList<UserAggregate> filteredUsers = new FilteredList<>(users);
 
     // Properties for the search filter
     private final StringProperty searchFilter = new SimpleStringProperty("");
 
     // Properties for the selected user
-    private final ObjectProperty<User> selectedUser = new SimpleObjectProperty<>();
+    private final ObjectProperty<UserAggregate> selectedUser = new SimpleObjectProperty<>();
     private final BooleanProperty userSelected = new SimpleBooleanProperty(false);
 
     // Properties for the user form
@@ -72,7 +73,7 @@ public class UserManagementViewModel extends BaseViewModel<UserManagementViewMod
      */
     public void loadUsers() {
         try {
-            List<User> allUsers = userRepository.findAll();
+            List<UserAggregate> allUsers = userRepository.findAll();
             users.setAll(allUsers);
             filterUsers();
         } catch (Exception e) {
@@ -120,7 +121,7 @@ public class UserManagementViewModel extends BaseViewModel<UserManagementViewMod
      * 
      * @param user the user to select
      */
-    public void selectUser(User user) {
+    public void selectUser(UserAggregate user) {
         selectedUser.set(user);
         userSelected.set(true);
         isNewUser = false;
@@ -135,13 +136,22 @@ public class UserManagementViewModel extends BaseViewModel<UserManagementViewMod
             lastName.set("");
         }
         email.set(user.getEmail() != null ? user.getEmail().value() : "");
-        status.set(user.getStatus());
+
+        // Convert ApprovalStatus to UserStatus
+        ApprovalStatus approvalStatus = user.getApprovalState().getStatusEnum();
+        if (approvalStatus == ApprovalStatus.APPROVED) {
+            status.set(UserStatus.ACTIVE);
+        } else if (approvalStatus == ApprovalStatus.REJECTED) {
+            status.set(UserStatus.SUSPENDED);
+        } else {
+            status.set(UserStatus.PENDING);
+        }
 
         // Set role checkboxes
-        Set<Role> roles = user.getRoles();
-        adminRole.set(roles.contains(Role.ADMIN));
-        qaRole.set(roles.contains(Role.QA));
-        productionRole.set(roles.contains(Role.PRODUCTION));
+        Set<UserRole> roles = user.getRoles();
+        adminRole.set(roles.contains(UserRole.ADMIN));
+        qaRole.set(roles.contains(UserRole.QA));
+        productionRole.set(roles.contains(UserRole.PRODUCTION));
 
         // Clear password field
         password.set("");
@@ -198,7 +208,7 @@ public class UserManagementViewModel extends BaseViewModel<UserManagementViewMod
             }
 
             // Create or update user
-            User user;
+            UserAggregate user;
             if (isNewUser) {
                 // Create new user
                 Username usernameObj = new Username(username.get());
@@ -206,42 +216,59 @@ public class UserManagementViewModel extends BaseViewModel<UserManagementViewMod
                 HashedPassword passwordObj = new HashedPassword(password.get());
 
                 // Create a set of roles
-                Set<Role> roles = new HashSet<>();
-                if (adminRole.get()) roles.add(Role.ADMIN);
-                if (qaRole.get()) roles.add(Role.QA);
-                if (productionRole.get()) roles.add(Role.PRODUCTION);
+                Set<UserRole> roles = new HashSet<>();
+                if (adminRole.get()) roles.add(UserRole.ADMIN);
+                if (qaRole.get()) roles.add(UserRole.QA);
+                if (productionRole.get()) roles.add(UserRole.PRODUCTION);
 
                 // Create the user
-                UserId userId = new UserId(UUID.randomUUID());
+                UserId userId = new UserId(UUID.randomUUID().toString());
                 PersonName personName = new PersonName(firstName.get(), lastName.get());
-                user = new User(userId, usernameObj, passwordObj, personName, emailObj);
 
-                // Set status
-                user.setStatus(status.get());
+                // Use the builder pattern to create the user
+                UserAggregate.Builder builder = new UserAggregate.Builder()
+                    .id(userId)
+                    .username(usernameObj)
+                    .password(passwordObj)
+                    .name(personName)
+                    .email(emailObj);
 
                 // Add roles
-                for (Role role : roles) {
-                    user.addRole(role);
+                for (UserRole role : roles) {
+                    builder.addRole(role);
                 }
+
+                user = builder.build();
             } else {
-                // Update existing user
-                user = selectedUser.get();
-
-                // Update user properties
+                // Since UserAggregate doesn't have setter methods for most properties,
+                // we need to create a new UserAggregate with the updated values
+                UserId userId = selectedUser.get().getId();
+                Username usernameObj = new Username(username.get());
+                HashedPassword passwordObj = selectedUser.get().getPassword(); // Keep the existing password
                 PersonName personName = new PersonName(firstName.get(), lastName.get());
-                user.setName(personName);
-                user.setEmail(new EmailAddress(email.get()));
-                user.setStatus(status.get());
+                EmailAddress emailObj = new EmailAddress(email.get());
 
-                // Update roles - first remove all roles, then add the selected ones
-                Set<Role> currentRoles = user.getRoles();
-                for (Role role : currentRoles) {
-                    user.removeRole(role);
+                // Create a set of roles
+                Set<UserRole> roles = new HashSet<>();
+                if (adminRole.get()) roles.add(UserRole.ADMIN);
+                if (qaRole.get()) roles.add(UserRole.QA);
+                if (productionRole.get()) roles.add(UserRole.PRODUCTION);
+
+                // Use the builder pattern to create the user
+                UserAggregate.Builder builder = new UserAggregate.Builder()
+                    .id(userId)
+                    .username(usernameObj)
+                    .password(passwordObj)
+                    .name(personName)
+                    .email(emailObj);
+
+                // Add roles
+                for (UserRole role : roles) {
+                    builder.addRole(role);
                 }
 
-                if (adminRole.get()) user.addRole(Role.ADMIN);
-                if (qaRole.get()) user.addRole(Role.QA);
-                if (productionRole.get()) user.addRole(Role.PRODUCTION);
+                // Build the updated user
+                user = builder.build();
 
                 // Note: We can't update the password directly as there's no setPassword method
                 // In a real application, we would need to create a new User object or use a
@@ -329,7 +356,7 @@ public class UserManagementViewModel extends BaseViewModel<UserManagementViewMod
 
     // Getters for properties
 
-    public ObservableList<User> getUsersProperty() {
+    public ObservableList<UserAggregate> getUsersProperty() {
         return filteredUsers;
     }
 

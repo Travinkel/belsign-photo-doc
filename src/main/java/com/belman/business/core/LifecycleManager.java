@@ -10,6 +10,7 @@ import com.gluonhq.attach.lifecycle.LifecycleEvent;
 import com.gluonhq.attach.lifecycle.LifecycleService;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.mvc.View;
+import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 
 import java.util.HashMap;
@@ -343,10 +344,10 @@ public class LifecycleManager {
      * Initializes the lifecycle manager with the given application.
      * This method sets up the lifecycle manager to work with the application.
      * 
-     * @param app the MobileApplication instance
+     * @param app the Application instance (can be a MobileApplication or any other JavaFX Application)
      * @param loggerFactory the factory to create loggers
      */
-    public static void init(MobileApplication app, LoggerFactory loggerFactory) {
+    public static void init(Application app, LoggerFactory loggerFactory) {
         // Initialize the logger first
         initialize(loggerFactory);
 

@@ -5,10 +5,11 @@ import com.belman.business.core.Inject;
 import com.belman.presentation.navigation.Router;
 import com.belman.business.domain.order.photo.PhotoDocument;
 import com.belman.business.domain.order.OrderRepository;
+import com.belman.business.domain.order.OrderAggregate;
+import com.belman.business.domain.order.OrderId;
+import com.belman.business.domain.order.OrderNumber;
+import com.belman.business.domain.order.photo.PhotoTemplate;
 import com.belman.business.domain.services.PhotoService;
-import com.belman.domain.valueobjects.OrderId;
-import com.belman.domain.valueobjects.OrderNumber;
-import com.belman.domain.valueobjects.PhotoAngle;
 import com.belman.data.service.SessionManager;
 import com.belman.presentation.views.login.LoginView;
 import javafx.beans.property.BooleanProperty;
@@ -79,8 +80,8 @@ public class PhotoUploadViewModel extends BaseViewModel<PhotoUploadViewModel> {
                 if (orderAggregate.getOrderNumber() != null && orderAggregate.getOrderNumber().equals(orderNum)) {
                     selectedOrder.set(orderAggregate);
                     orderSelected.set(true);
-                    orderInfo.set("OrderAggregate: " + orderNumberStr + " - Customer: " +
-                                 (orderAggregate.getCustomer() != null ? orderAggregate.getCustomer().getName() : "N/A"));
+                    orderInfo.set("OrderAggregate: " + orderNumberStr + " - Customer ID: " +
+                                 (orderAggregate.getCustomerId() != null ? orderAggregate.getCustomerId().id() : "N/A"));
 
                     // Load photos for this orderAggregate
                     loadPhotosForOrder(orderAggregate.getId());
@@ -141,13 +142,14 @@ public class PhotoUploadViewModel extends BaseViewModel<PhotoUploadViewModel> {
         }
 
         try {
-            double angle = Double.parseDouble(photoAngle.get());
-            PhotoAngle photoAngleObj = new PhotoAngle(angle);
+            // Use a predefined template based on the angle input
+            // For simplicity, we'll use ANGLED_VIEW_OF_JOINT for any angle
+            PhotoTemplate photoTemplate = PhotoTemplate.ANGLED_VIEW_OF_JOINT;
 
             PhotoDocument photo = photoService.uploadPhoto(
                 selectedPhotoFile.get(),
                 selectedOrder.get().getId(),
-                photoAngleObj,
+                photoTemplate,
                 sessionManager.getCurrentUser().orElseThrow(() -> new IllegalStateException("User not logged in"))
             );
 

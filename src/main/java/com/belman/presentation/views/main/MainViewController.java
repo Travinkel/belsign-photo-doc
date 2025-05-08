@@ -18,7 +18,7 @@ public class MainViewController extends BaseController<MainViewModel> {
     private Button logoutButton;
 
     @Override
-    public void initializeBinding() {
+    protected void setupBindings() {
         // Bind UI components to ViewModel properties if they exist
         // This is important for tests where the FXML might not have these elements
         if (welcomeLabel != null) {
@@ -29,6 +29,12 @@ public class MainViewController extends BaseController<MainViewModel> {
         if (logoutButton != null) {
             logoutButton.setOnAction(this::handleLogoutButtonAction);
         }
+    }
+
+    @Override
+    public void initializeBinding() {
+        // Call setupBindings to avoid duplication
+        setupBindings();
     }
 
     /**

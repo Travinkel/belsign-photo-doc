@@ -1,6 +1,6 @@
 package com.belman.unit.domain.valueobjects;
 
-import com.belman.domain.valueobjects.PhoneNumber;
+import com.belman.business.domain.common.PhoneNumber;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,11 +27,11 @@ public class PhoneNumberTest {
     void constructor_withValidPhoneNumber_shouldCreatePhoneNumber(String phoneNumberStr) {
         // Act
         PhoneNumber phoneNumber = new PhoneNumber(phoneNumberStr);
-        
+
         // Assert
         assertEquals(phoneNumberStr, phoneNumber.value());
     }
-    
+
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {
@@ -45,51 +45,51 @@ public class PhoneNumberTest {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             new PhoneNumber(phoneNumberStr);
         });
-        
+
         assertEquals("Invalid phone number format", exception.getMessage());
     }
-    
+
     @Test
-    void getFormatted_shouldReturnFormattedPhoneNumber() {
+    void getNormalized_shouldReturnNormalizedPhoneNumber() {
         // Arrange
         PhoneNumber phoneNumber = new PhoneNumber("+4512345678");
-        
+
         // Act
-        String formatted = phoneNumber.getFormatted();
-        
+        String normalized = phoneNumber.getNormalized();
+
         // Assert
-        assertEquals("+4512345678", formatted);
+        assertEquals("4512345678", normalized);
     }
-    
+
     @Test
     void toString_shouldReturnPhoneNumberValue() {
         // Arrange
         PhoneNumber phoneNumber = new PhoneNumber("+4512345678");
-        
+
         // Act
         String result = phoneNumber.toString();
-        
+
         // Assert
         assertEquals("+4512345678", result);
     }
-    
+
     @Test
     void equals_withSameValues_shouldBeEqual() {
         // Arrange
         PhoneNumber phoneNumber1 = new PhoneNumber("+4512345678");
         PhoneNumber phoneNumber2 = new PhoneNumber("+4512345678");
-        
+
         // Act & Assert
         assertEquals(phoneNumber1, phoneNumber2);
         assertEquals(phoneNumber1.hashCode(), phoneNumber2.hashCode());
     }
-    
+
     @Test
     void equals_withDifferentValues_shouldNotBeEqual() {
         // Arrange
         PhoneNumber phoneNumber1 = new PhoneNumber("+4512345678");
         PhoneNumber phoneNumber2 = new PhoneNumber("+4587654321");
-        
+
         // Act & Assert
         assertNotEquals(phoneNumber1, phoneNumber2);
     }

@@ -121,6 +121,7 @@ public class StateManager {
      * @param <T> the expected type of the value
      * @return the property, or a new property if not found
      */
+    @SuppressWarnings("unchecked")
     public <T> Property<T> getStateProperty(StateKey<T> key) {
         return (Property<T>) StateStore.getInstance().getPropertyTyped(key);
     }
@@ -132,6 +133,7 @@ public class StateManager {
      * @param <T> the expected type of the value
      * @return the property, or a new property if not found
      */
+    @SuppressWarnings("unchecked")
     public <T> Property<T> getStateProperty(String key) {
         return (Property<T>) StateStore.getInstance().getPropertyTyped(StateKey.of(key, Object.class));
     }
@@ -177,6 +179,7 @@ public class StateManager {
      * @param <T> the expected type of the value
      * @return a nested property
      */
+    @SuppressWarnings("unchecked")
     public <T> NestedProperty<T> getNestedProperty(String key) {
         return (NestedProperty<T>) StateStore.getInstance().getNestedPropertyTyped(StateKey.forUnknownType(key));
     }
@@ -188,6 +191,7 @@ public class StateManager {
      * @param <T> the expected type of the value
      * @return a nested property
      */
+    @SuppressWarnings("unchecked")
     public <T> NestedProperty<T> getNestedProperty(StateKey<T> key) {
         return (NestedProperty<T>) StateStore.getInstance().getNestedPropertyTyped(key);
     }

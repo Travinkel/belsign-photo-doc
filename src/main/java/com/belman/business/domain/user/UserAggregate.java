@@ -12,26 +12,8 @@ import java.time.Instant;
 import java.util.*;
 
 /**
- * Entity representing a system user in the BelSign application.
- * <p>
- * The User aggregate is a core domain entity that represents a user of the system.
- * It encapsulates user identity, authentication credentials, contact information,
- * and authorization roles. Users can have different roles (PRODUCTION, QA, ADMIN)
- * which determine their permissions within the system.
- * <p>
- * Users go through a lifecycle represented by their status:
- * - PENDING: Newly created users awaiting activation
- * - ACTIVE: Users who can log in and use the system
- * - INACTIVE: Users who have been deactivated but not deleted
- * - LOCKED: Users who have been locked out due to security concerns
- * <p>
- * This aggregate is responsible for:
- * - Maintaining user identity and profile information
- * - Managing user roles and permissions
- * - Tracking user status and lifecycle
- * <p>
- * Users are referenced by other aggregates like OrderAggregate and PhotoDocument to track
- * who created or modified domain objects.
+ * Represents a user in the system.
+ * This is an aggregate root entity in the domain model.
  */
 public class UserAggregate extends AggregateRoot<UserId> {
     private final UserId id;
@@ -166,6 +148,20 @@ public class UserAggregate extends AggregateRoot<UserId> {
     }
 
     /**
+     * Returns the email address of this user.
+     */
+    public EmailAddress getEmail() {
+        return email;
+    }
+
+    /**
+     * Returns the name of this user.
+     */
+    public PersonName getName() {
+        return name;
+    }
+
+    /**
      * Approves the user with the given reviewer and timestamp.
      */
     public void approve(UserAggregate reviewer, Instant reviewedAt) {
@@ -217,15 +213,33 @@ public class UserAggregate extends AggregateRoot<UserId> {
         return Collections.unmodifiableSet(roles);
     }
 
+    /**
+     * Alias for getRoles() to maintain backward compatibility.
+     */
+    public Set<UserRole> roles() {
+        return getRoles();
+    }
+
     @Override
     public UserId getId() {
-        return new UserId(username.value());
+        return id;
+    }
+
+    /**
+     * Returns the phone number of this user.
+     */
+    public PhoneNumber getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    /**
+     * Returns the status of this user.
+     */
+    public UserStatus getStatus() {
+        return UserStatus.ACTIVE; // Default to ACTIVE for now
     }
 
     public void setApprovalState(ApprovalState newState) {
         this.approvalState = Objects.requireNonNull(newState, "Approval state cannot be null");
     }
-
 }
-
-

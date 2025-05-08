@@ -1,8 +1,8 @@
 package com.belman.presentation.views.admin;
 
 import com.belman.presentation.core.BaseController;
-import com.belman.domain.aggregates.User;
-import com.belman.domain.aggregates.User.Role;
+import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.domain.user.UserRole;
 
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
@@ -31,22 +31,22 @@ public class AdminViewController extends BaseController<AdminViewModel> {
     @FXML private TextField firstNameField;
     @FXML private TextField lastNameField;
     @FXML private TextField emailField;
-    @FXML private ComboBox<Role> roleComboBox;
+    @FXML private ComboBox<UserRole> roleComboBox;
     @FXML private Button createUserButton;
     @FXML private Button clearFormButton;
 
     // User list
-    @FXML private TableView<User> userTable;
-    @FXML private TableColumn<User, String> usernameColumn;
-    @FXML private TableColumn<User, String> nameColumn;
-    @FXML private TableColumn<User, String> emailColumn;
-    @FXML private TableColumn<User, Set<Role>> rolesColumn;
+    @FXML private TableView<UserAggregate> userTable;
+    @FXML private TableColumn<UserAggregate, String> usernameColumn;
+    @FXML private TableColumn<UserAggregate, String> nameColumn;
+    @FXML private TableColumn<UserAggregate, String> emailColumn;
+    @FXML private TableColumn<UserAggregate, Set<UserRole>> rolesColumn;
     @FXML private Button deleteUserButton;
 
     // Role management
-    @FXML private ComboBox<Role> roleToAssignComboBox;
+    @FXML private ComboBox<UserRole> roleToAssignComboBox;
     @FXML private Button assignRoleButton;
-    @FXML private ListView<Role> userRolesListView;
+    @FXML private ListView<UserRole> userRolesListView;
     @FXML private Button removeRoleButton;
 
     // Password reset
@@ -90,7 +90,12 @@ public class AdminViewController extends BaseController<AdminViewModel> {
             }
         ));
         emailColumn.setCellValueFactory(data -> Bindings.createStringBinding(
-            () -> data.getValue().getEmail().getValue()
+                () -> {
+                    if (data.getValue().getEmail() != null) {
+                        return data.getValue().getEmail().value();
+                    }
+                    return "";
+                }
         ));
         rolesColumn.setCellValueFactory(data -> Bindings.createObjectBinding(
             () -> data.getValue().getRoles()
@@ -131,11 +136,16 @@ public class AdminViewController extends BaseController<AdminViewModel> {
         );
     }
 
+    @Override
+    protected void setupBindings() {
+        // Example implementation for required bindings based on project logic
+    }
+
     /**
      * Updates the user roles list view based on the selected user.
      */
     private void updateUserRolesList() {
-        User selectedUser = getViewModel().selectedUserProperty().get();
+        UserAggregate selectedUser = getViewModel().selectedUserProperty().get();
         if (selectedUser != null) {
             userRolesListView.setItems(FXCollections.observableArrayList(selectedUser.getRoles()));
         } else {
@@ -180,7 +190,7 @@ public class AdminViewController extends BaseController<AdminViewModel> {
      */
     @FXML
     private void handleRemoveRole() {
-        Role selectedRole = userRolesListView.getSelectionModel().getSelectedItem();
+        UserRole selectedRole = userRolesListView.getSelectionModel().getSelectedItem();
         if (selectedRole != null) {
             getViewModel().removeRole(selectedRole);
         }

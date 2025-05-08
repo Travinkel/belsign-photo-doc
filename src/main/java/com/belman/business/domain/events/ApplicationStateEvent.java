@@ -30,7 +30,7 @@ public abstract class ApplicationStateEvent extends AbstractDomainEvent {
     @Override
     public String toString() {
         return String.format("%s[state=%s, timestamp=%s, id=%s]",
-                getEventType(), state, getTimestamp(), getEventId());
+                getEventType(), state, getOccurredOn(), getEventId());
     }
 
     /**

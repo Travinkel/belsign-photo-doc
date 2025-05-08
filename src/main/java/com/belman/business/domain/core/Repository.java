@@ -13,7 +13,7 @@ import java.util.Optional;
  * @param <T>  the type of the aggregate root entity this repository manages
  * @param <ID> the type of the identifier of the aggregate root
  */
-public interface Repository<T extends AggregateRoot<ID>, ID> {
+public interface Repository<T extends Aggregate<ID>, ID> {
 
     /**
      * Finds an aggregate by its unique identifier.

@@ -1,14 +1,18 @@
 package com.belman.data.security;
 
 import com.belman.business.core.BaseService;
-import com.belman.domain.aggregates.User;
+import com.belman.business.domain.user.UserAggregate;
 import com.belman.business.domain.events.UserLoggedInEvent;
 import com.belman.business.domain.events.UserLoggedOutEvent;
 import com.belman.business.domain.user.UserRepository;
 import com.belman.business.domain.security.AuthenticationService;
 import com.belman.business.domain.security.HashedPassword;
 import com.belman.business.domain.security.PasswordHasher;
-import com.belman.domain.valueobjects.Username;
+import com.belman.business.domain.services.LoggerFactory;
+import com.belman.business.domain.user.Username;
+import com.belman.business.domain.user.ApprovalState;
+import com.belman.business.domain.user.ApprovalStatus;
+import com.belman.data.logging.EmojiLoggerFactory;
 
 import java.util.Optional;
 import java.util.Map;
@@ -22,7 +26,7 @@ import java.time.Duration;
 public class DefaultAuthenticationService extends BaseService implements AuthenticationService {
     private final UserRepository userRepository;
     private final PasswordHasher passwordHasher;
-    private User currentUser;
+    private UserAggregate currentUser;
     private Instant lastActivityTime;
 
     // Constants for brute force protection
@@ -55,6 +59,7 @@ public class DefaultAuthenticationService extends BaseService implements Authent
      * @param userRepository the user repository
      */
     public DefaultAuthenticationService(UserRepository userRepository) {
+        super(EmojiLoggerFactory.getInstance());
         this.userRepository = userRepository;
         this.passwordHasher = new BCryptPasswordHasher();
     }
@@ -97,7 +102,7 @@ public class DefaultAuthenticationService extends BaseService implements Authent
     }
 
     @Override
-    public Optional<User> authenticate(String username, String password) {
+    public Optional<UserAggregate> authenticate(String username, String password) {
         if (username == null || username.isBlank() || password == null || password.isBlank()) {
             return Optional.empty();
         }
@@ -110,20 +115,20 @@ public class DefaultAuthenticationService extends BaseService implements Authent
             }
 
             // Find the user by username
-            Optional<User> userOpt = userRepository.findByUsername(new Username(username));
+            Optional<UserAggregate> userOpt = userRepository.findByUsername(new Username(username));
 
             if (userOpt.isPresent()) {
-                User user = userOpt.get();
+                UserAggregate user = userOpt.get();
 
-                // Check if the user is active
-                if (!user.isActive()) {
+                // Check if the user is active (approved)
+                if (!user.getApprovalState().isApproved()) {
                     logWarn(LOG_USER_NOT_ACTIVE, username);
                     recordFailedLoginAttempt(username);
                     return Optional.empty();
                 }
 
-                // Check if the user is locked
-                if (user.isLocked()) {
+                // Check if the user is locked (rejected)
+                if (user.getApprovalState().isRejected()) {
                     logWarn(LOG_USER_LOCKED, username);
                     recordFailedLoginAttempt(username);
                     return Optional.empty();
@@ -153,7 +158,9 @@ public class DefaultAuthenticationService extends BaseService implements Authent
                     // If max failed attempts reached, lock the user account in the database
                     FailedLoginTracker tracker = failedLoginAttempts.get(username);
                     if (tracker != null && tracker.getAttempts() >= MAX_FAILED_ATTEMPTS) {
-                        user.lock();
+                        // Reject the user (equivalent to locking)
+                        ApprovalState rejectedState = ApprovalState.createRejected("Locked due to too many failed login attempts");
+                        user.setApprovalState(rejectedState);
                         userRepository.save(user);
                         logWarn(LOG_USER_LOCKED_FAILED_ATTEMPTS, username);
                     }
@@ -225,7 +232,7 @@ public class DefaultAuthenticationService extends BaseService implements Authent
     }
 
     @Override
-    public Optional<User> getCurrentUser() {
+    public Optional<UserAggregate> getCurrentUser() {
         // Check for session timeout
         if (currentUser != null && isSessionTimedOut()) {
             logInfo(LOG_SESSION_TIMEOUT, currentUser.getUsername().value());

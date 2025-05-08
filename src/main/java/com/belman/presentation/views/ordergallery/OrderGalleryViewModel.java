@@ -3,11 +3,13 @@ package com.belman.presentation.views.ordergallery;
 import com.belman.presentation.core.BaseViewModel;
 import com.belman.business.core.Inject;
 import com.belman.presentation.navigation.Router;
-import com.belman.domain.aggregates.User;
+import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.domain.user.UserReference;
+import com.belman.business.domain.order.OrderAggregate;
 import com.belman.business.domain.order.OrderRepository;
-import com.belman.domain.valueobjects.OrderId;
-import com.belman.domain.valueobjects.OrderNumber;
-import com.belman.domain.valueobjects.Timestamp;
+import com.belman.business.domain.order.OrderId;
+import com.belman.business.domain.order.OrderNumber;
+import com.belman.business.domain.common.Timestamp;
 import com.belman.data.service.SessionManager;
 import com.belman.presentation.views.login.LoginView;
 import javafx.beans.property.BooleanProperty;
@@ -94,9 +96,9 @@ public class OrderGalleryViewModel extends BaseViewModel<OrderGalleryViewModel> 
                     return true;
                 }
 
-                // Check if customer name contains search text
-                if (order.getCustomer() != null && 
-                    order.getCustomer().getName().toLowerCase().contains(search.toLowerCase())) {
+                // Check if customer ID contains search text
+                if (order.getCustomerId() != null && 
+                    order.getCustomerId().id().toLowerCase().contains(search.toLowerCase())) {
                     return true;
                 }
 
@@ -154,8 +156,8 @@ public class OrderGalleryViewModel extends BaseViewModel<OrderGalleryViewModel> 
             StringBuilder details = new StringBuilder();
             details.append("OrderAggregate Number: ").append(orderAggregate.getOrderNumber()).append("\n");
 
-            if (orderAggregate.getCustomer() != null) {
-                details.append("Customer: ").append(orderAggregate.getCustomer().getName()).append("\n");
+            if (orderAggregate.getCustomerId() != null) {
+                details.append("Customer ID: ").append(orderAggregate.getCustomerId().id()).append("\n");
             }
 
             details.append("Created: ").append(orderAggregate.getCreatedAt().toString()).append("\n");
@@ -197,9 +199,10 @@ public class OrderGalleryViewModel extends BaseViewModel<OrderGalleryViewModel> 
 
             // Create new order
             OrderId orderId = OrderId.newId();
-            User currentUser = SessionManager.getInstance().getCurrentUser()
+            UserAggregate currentUser = SessionManager.getInstance().getCurrentUser()
                 .orElseThrow(() -> new IllegalStateException("User not logged in"));
-            OrderAggregate newOrderAggregate = new OrderAggregate(orderId, orderNum, currentUser, Timestamp.now());
+            UserReference userRef = UserReference.from(currentUser);
+            OrderAggregate newOrderAggregate = new OrderAggregate(orderId, orderNum, userRef, Timestamp.now());
 
             // Save the new order
             orderRepository.save(newOrderAggregate);

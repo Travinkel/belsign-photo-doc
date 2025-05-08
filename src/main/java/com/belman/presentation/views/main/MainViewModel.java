@@ -5,7 +5,7 @@ import com.belman.business.core.StateManager;
 import com.belman.presentation.core.BaseViewModel;
 import com.belman.data.logging.EmojiLogger;
 import com.belman.presentation.navigation.Router;
-import com.belman.domain.aggregates.User;
+import com.belman.business.domain.user.UserAggregate;
 import com.belman.data.service.SessionManager;
 import com.belman.presentation.views.login.LoginView;
 import javafx.beans.property.SimpleStringProperty;
@@ -53,7 +53,7 @@ public class MainViewModel extends BaseViewModel<MainViewModel> {
         logger.debug("Updating welcome message");
         try {
             logger.debug("Getting current user from sessionManager");
-            Optional<User> currentUser = sessionManager.getCurrentUser();
+            Optional<UserAggregate> currentUser = sessionManager.getCurrentUser();
 
             if (currentUser.isPresent()) {
                 String name = currentUser.get().getUsername().value();

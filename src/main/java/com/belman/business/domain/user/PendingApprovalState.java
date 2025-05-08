@@ -10,12 +10,29 @@ public class PendingApprovalState implements ApprovalState {
     }
 
     @Override
-    public void approve(UserAggregate user, UserAggregate reviewer, Instant reviewedAt) {
+    public ApprovalState approve(UserAggregate user, UserAggregate reviewer, Instant reviewedAt) {
         user.setApprovalState(ApprovalState.createApproved());
+        return ApprovalState.createApproved();
     }
 
     @Override
-    public void reject(UserAggregate user, UserAggregate reviewer, Instant reviewedAt, String reason) {
+    public ApprovalState reject(UserAggregate user, UserAggregate reviewer, Instant reviewedAt, String reason) {
         user.setApprovalState(ApprovalState.createRejected(reason));
+        return ApprovalState.createRejected(reason);
+    }
+
+    @Override
+    public boolean isPending() {
+        return true;
+    }
+
+    @Override
+    public boolean isApproved() {
+        return false;
+    }
+
+    @Override
+    public boolean isRejected() {
+        return false;
     }
 }

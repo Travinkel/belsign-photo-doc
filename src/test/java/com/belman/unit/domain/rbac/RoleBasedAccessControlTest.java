@@ -1,17 +1,17 @@
 package com.belman.unit.domain.rbac;
 
-import com.belman.domain.aggregates.User;
-import com.belman.domain.aggregates.User.Role;
-import com.belman.domain.rbac.AccessDeniedException;
-import com.belman.business.domain.rbac.AccessPolicy;
-import com.belman.business.domain.rbac.AccessPolicyFactory;
-import com.belman.business.domain.rbac.RoleBasedAccessController;
-import com.belman.business.domain.rbac.RoleBasedAccessControlFactory;
-import com.belman.domain.services.AuthenticationService;
-import com.belman.domain.valueobjects.EmailAddress;
-import com.belman.domain.valueobjects.HashedPassword;
-import com.belman.domain.valueobjects.UserId;
-import com.belman.domain.valueobjects.Username;
+import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.domain.user.UserRole;
+import com.belman.business.domain.exceptions.AccessDeniedException;
+import com.belman.business.domain.user.rbac.AccessPolicy;
+import com.belman.business.domain.user.rbac.AccessPolicyFactory;
+import com.belman.business.domain.user.rbac.RoleBasedAccessController;
+import com.belman.business.domain.user.rbac.RoleBasedAccessControlFactory;
+import com.belman.business.domain.security.AuthenticationService;
+import com.belman.business.domain.common.EmailAddress;
+import com.belman.business.domain.security.HashedPassword;
+import com.belman.business.domain.user.UserId;
+import com.belman.business.domain.user.Username;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,9 +33,9 @@ public class RoleBasedAccessControlTest {
 
     private AccessPolicyFactory accessPolicyFactory;
     private RoleBasedAccessControlFactory rbacFactory;
-    private User adminUser;
-    private User qaUser;
-    private User productionUser;
+    private UserAggregate adminUser;
+    private UserAggregate qaUser;
+    private UserAggregate productionUser;
 
     @BeforeEach
     void setUp() {
@@ -46,29 +46,29 @@ public class RoleBasedAccessControlTest {
         rbacFactory = new RoleBasedAccessControlFactory(authenticationService, accessPolicyFactory);
 
         // Create test users with different roles
-        adminUser = new User(
-            UserId.newId(),
-            new Username("admin"),
-            new HashedPassword("admin-password"),
-            new EmailAddress("admin@example.com")
-        );
-        adminUser.addRole(Role.ADMIN);
+        adminUser = new UserAggregate.Builder()
+            .id(UserId.newId())
+            .username(new Username("admin"))
+            .password(new HashedPassword("admin-password"))
+            .email(new EmailAddress("admin@example.com"))
+            .addRole(UserRole.ADMIN)
+            .build();
 
-        qaUser = new User(
-            UserId.newId(),
-            new Username("qa"),
-            new HashedPassword("qa-password"),
-            new EmailAddress("qa@example.com")
-        );
-        qaUser.addRole(Role.QA);
+        qaUser = new UserAggregate.Builder()
+            .id(UserId.newId())
+            .username(new Username("qa"))
+            .password(new HashedPassword("qa-password"))
+            .email(new EmailAddress("qa@example.com"))
+            .addRole(UserRole.QA)
+            .build();
 
-        productionUser = new User(
-            UserId.newId(),
-            new Username("production"),
-            new HashedPassword("production-password"),
-            new EmailAddress("production@example.com")
-        );
-        productionUser.addRole(Role.PRODUCTION);
+        productionUser = new UserAggregate.Builder()
+            .id(UserId.newId())
+            .username(new Username("production"))
+            .password(new HashedPassword("production-password"))
+            .email(new EmailAddress("production@example.com"))
+            .addRole(UserRole.PRODUCTION)
+            .build();
     }
 
     @Test

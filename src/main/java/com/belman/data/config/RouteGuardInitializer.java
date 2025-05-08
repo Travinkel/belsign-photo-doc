@@ -1,7 +1,7 @@
 package com.belman.data.config;
 
-import com.belman.business.domain.rbac.AccessPolicyFactory;
-import com.belman.business.domain.rbac.RoleBasedAccessControlFactory;
+import com.belman.business.domain.user.rbac.AccessPolicyFactory;
+import com.belman.business.domain.user.rbac.RoleBasedAccessControlFactory;
 import com.belman.business.domain.security.AuthenticationService;
 import com.belman.business.domain.services.Logger;
 import com.belman.business.routing.RouteGuard;

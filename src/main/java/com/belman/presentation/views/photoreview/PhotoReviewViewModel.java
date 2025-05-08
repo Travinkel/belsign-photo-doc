@@ -4,7 +4,7 @@ import com.belman.business.domain.common.Timestamp;
 import com.belman.business.domain.order.OrderAggregate;
 import com.belman.business.domain.order.OrderId;
 import com.belman.business.domain.order.OrderNumber;
-import com.belman.business.domain.order.photo.UserReference;
+import com.belman.business.domain.user.UserReference;
 import com.belman.presentation.core.BaseViewModel;
 import com.belman.business.core.Inject;
 import com.belman.presentation.navigation.Router;
@@ -242,4 +242,3 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
         }
     }
 }
-

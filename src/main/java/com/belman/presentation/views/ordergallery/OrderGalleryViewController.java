@@ -2,7 +2,9 @@ package com.belman.presentation.views.ordergallery;
 
 import com.belman.presentation.core.BaseController;
 import com.belman.presentation.navigation.Router;
-import com.belman.domain.aggregates.User;
+import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.domain.user.UserRole;
+import com.belman.business.domain.order.OrderAggregate;
 import com.belman.data.service.SessionManager;
 import com.belman.presentation.components.TouchFriendlyDialog;
 import com.belman.presentation.views.photoupload.PhotoUploadView;
@@ -61,7 +63,7 @@ public class OrderGalleryViewController extends BaseController<OrderGalleryViewM
     private Label errorLabel;
 
     @Override
-    public void initializeBinding() {
+    public void setupBindings() {
         // Bind text fields to view model properties
         searchTextField.textProperty().bindBidirectional(getViewModel().searchTextProperty());
         orderDetailsTextArea.textProperty().bind(getViewModel().orderDetailsProperty());
@@ -131,14 +133,14 @@ public class OrderGalleryViewController extends BaseController<OrderGalleryViewM
         // Get the current user and check their role
         SessionManager sessionManager = SessionManager.getInstance();
         if (sessionManager != null && sessionManager.isLoggedIn()) {
-            User user = sessionManager.getCurrentUser().orElse(null);
+            UserAggregate user = sessionManager.getCurrentUser().orElse(null);
             if (user != null) {
                 // Navigate to the appropriate view based on the user's role
-                if (user.getRoles().contains(User.Role.ADMIN)) {
+                if (user.getRoles().contains(UserRole.ADMIN)) {
                     Router.navigateTo(UserManagementView.class);
-                } else if (user.getRoles().contains(User.Role.QA)) {
+                } else if (user.getRoles().contains(UserRole.QA)) {
                     Router.navigateTo(QADashboardView.class);
-                } else if (user.getRoles().contains(User.Role.PRODUCTION)) {
+                } else if (user.getRoles().contains(UserRole.PRODUCTION)) {
                     Router.navigateTo(PhotoUploadView.class);
                 } else {
                     // Fallback to PhotoUploadView if no specific role is found
@@ -155,7 +157,8 @@ public class OrderGalleryViewController extends BaseController<OrderGalleryViewM
     /**
      * Shows an error message using a touch-friendly dialog.
      */
-    private void showError(String message) {
+    @Override
+    protected void showError(String message) {
         TouchFriendlyDialog.showError("Error", message);
     }
 

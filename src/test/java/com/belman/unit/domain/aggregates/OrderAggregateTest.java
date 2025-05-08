@@ -1,10 +1,26 @@
 package com.belman.unit.domain.aggregates;
 
-import com.belman.domain.aggregates.User;
+import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.domain.user.UserReference;
 import com.belman.business.domain.customer.CustomerAggregate;
+import com.belman.business.domain.customer.CustomerType;
+import com.belman.business.domain.order.OrderAggregate;
+import com.belman.business.domain.order.OrderId;
+import com.belman.business.domain.order.OrderNumber;
+import com.belman.business.domain.order.OrderStatus;
+import com.belman.business.domain.order.ProductDescription;
+import com.belman.business.domain.order.DeliveryInformation;
 import com.belman.business.domain.order.photo.PhotoDocument;
-import com.belman.domain.enums.OrderStatus;
-import com.belman.domain.valueobjects.*;
+import com.belman.business.domain.order.photo.PhotoId;
+import com.belman.business.domain.order.photo.Photo;
+import com.belman.business.domain.order.photo.PhotoTemplate;
+import com.belman.business.domain.common.Timestamp;
+import com.belman.business.domain.common.EmailAddress;
+import com.belman.business.domain.security.HashedPassword;
+import com.belman.business.domain.customer.CustomerId;
+import com.belman.business.domain.customer.Company;
+import com.belman.business.domain.user.UserId;
+import com.belman.business.domain.user.Username;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +36,8 @@ class OrderAggregateTest {
 
     private OrderId orderId;
     private OrderNumber orderNumber;
-    private User createdBy;
+    private UserAggregate createdBy;
+    private UserReference userRef;
     private Timestamp createdAt;
     private CustomerAggregate customer;
     private ProductDescription productDescription;
@@ -36,41 +53,68 @@ class OrderAggregateTest {
         // Create a user
         UserId userId = UserId.newId();
         Username username = new Username("testuser");
-        HashedPassword password = new HashedPassword("hashedpassword123");
+        HashedPassword password = HashedPassword.fromPlainText("password123", null);
         EmailAddress userEmail = new EmailAddress("user@example.com");
-        createdBy = new User(userId, username, password, userEmail);
+
+        createdBy = new UserAggregate.Builder()
+            .id(userId)
+            .username(username)
+            .password(password)
+            .email(userEmail)
+            .build();
+
+        userRef = new UserReference(userId, username);
 
         // Create a timestamp
         createdAt = new Timestamp(Instant.now());
 
         // Create a customer
-        CustomerId customerId = new CustomerId(java.util.UUID.randomUUID());
+        CustomerId customerId = CustomerId.newId();
         EmailAddress customerEmail = new EmailAddress("customer@example.com");
-        Company company = Company.withName("Test Company");
-        customer = CustomerAggregate.company(customerId, company, customerEmail);
+        Company company = new Company("Test Company", "123 Test St", "REG-12345");
+
+        customer = new CustomerAggregate.Builder()
+            .withId(customerId)
+            .withType(CustomerType.COMPANY)
+            .withCompany(company)
+            .withEmail(customerEmail)
+            .build();
 
         // Create a product description
         productDescription = new ProductDescription("Test Product", "A test product", "Test specifications");
 
         // Create delivery information
-        deliveryInformation = new DeliveryInformation("123 Test St", new Timestamp(Instant.now().plusSeconds(86400)), "Handle with care");
+        deliveryInformation = new DeliveryInformation(
+            "123 Test St", 
+            java.time.LocalDate.now().plusDays(1), 
+            "Handle with care",
+            new EmailAddress("delivery@example.com"),
+            "+1234567890"
+        );
 
         // Create a photo document
         PhotoId photoId = PhotoId.newId();
-        PhotoAngle angle = new PhotoAngle(PhotoAngle.NamedAngle.FRONT);
-        ImagePath imagePath = new ImagePath("/path/to/image.jpg");
-        photoDocument = new PhotoDocument(photoId, angle, imagePath, createdBy, createdAt);
+        PhotoTemplate template = PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY;
+        Photo photo = new Photo("/path/to/image.jpg");
+
+        photoDocument = PhotoDocument.builder()
+            .photoId(photoId)
+            .template(template)
+            .imagePath(photo)
+            .uploadedBy(createdBy)
+            .uploadedAt(createdAt)
+            .build();
     }
 
     @Test
     void constructor_withValidParameters_shouldCreateOrder() {
         // When
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
 
         // Then
         assertEquals(orderId, orderAggregate.getId());
         assertEquals(orderNumber, orderAggregate.getOrderNumber());
-        assertEquals(createdBy, orderAggregate.getCreatedBy());
+        assertEquals(userRef, orderAggregate.getCreatedBy());
         assertEquals(createdAt, orderAggregate.getCreatedAt());
         assertEquals(OrderStatus.PENDING, orderAggregate.getStatus());
         assertTrue(orderAggregate.getPhotos().isEmpty());
@@ -79,13 +123,13 @@ class OrderAggregateTest {
     @Test
     void constructor_withNullId_shouldThrowException() {
         // When/Then
-        assertThrows(NullPointerException.class, () -> new OrderAggregate(null, orderNumber, createdBy, createdAt));
+        assertThrows(NullPointerException.class, () -> new OrderAggregate(null, orderNumber, userRef, createdAt));
     }
 
     @Test
     void constructor_withNullOrderNumber_shouldThrowException() {
         // When/Then
-        assertThrows(NullPointerException.class, () -> new OrderAggregate(orderId, null, createdBy, createdAt));
+        assertThrows(NullPointerException.class, () -> new OrderAggregate(orderId, null, userRef, createdAt));
     }
 
     @Test
@@ -97,13 +141,13 @@ class OrderAggregateTest {
     @Test
     void constructor_withNullCreatedAt_shouldThrowException() {
         // When/Then
-        assertThrows(NullPointerException.class, () -> new OrderAggregate(orderId, orderNumber, createdBy, null));
+        assertThrows(NullPointerException.class, () -> new OrderAggregate(orderId, orderNumber, userRef, null));
     }
 
     @Test
     void setOrderNumber_withValidOrderNumber_shouldUpdateOrderNumber() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, userRef, createdAt);
 
         // When
         orderAggregate.setOrderNumber(orderNumber);
@@ -115,37 +159,37 @@ class OrderAggregateTest {
     @Test
     void setOrderNumber_withNullOrderNumber_shouldThrowException() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, userRef, createdAt);
 
         // When/Then
         assertThrows(NullPointerException.class, () -> orderAggregate.setOrderNumber(null));
     }
 
     @Test
-    void setCustomer_withValidCustomer_shouldUpdateCustomer() {
+    void setCustomerId_withValidCustomerId_shouldUpdateCustomerId() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
 
         // When
-        orderAggregate.setCustomer(customer);
+        orderAggregate.setCustomerId(customer.getId());
 
         // Then
-        assertEquals(customer, orderAggregate.getCustomer());
+        assertEquals(customer.getId(), orderAggregate.getCustomerId());
     }
 
     @Test
-    void setCustomer_withNullCustomer_shouldThrowException() {
+    void setCustomerId_withNullCustomerId_shouldThrowException() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
 
         // When/Then
-        assertThrows(NullPointerException.class, () -> orderAggregate.setCustomer(null));
+        assertThrows(NullPointerException.class, () -> orderAggregate.setCustomerId(null));
     }
 
     @Test
     void setProductDescription_withValidProductDescription_shouldUpdateProductDescription() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
 
         // When
         orderAggregate.setProductDescription(productDescription);
@@ -157,7 +201,7 @@ class OrderAggregateTest {
     @Test
     void setProductDescription_withNullProductDescription_shouldThrowException() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
 
         // When/Then
         assertThrows(NullPointerException.class, () -> orderAggregate.setProductDescription(null));
@@ -166,7 +210,7 @@ class OrderAggregateTest {
     @Test
     void setDeliveryInformation_withValidDeliveryInformation_shouldUpdateDeliveryInformation() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
 
         // When
         orderAggregate.setDeliveryInformation(deliveryInformation);
@@ -178,7 +222,7 @@ class OrderAggregateTest {
     @Test
     void setDeliveryInformation_withNullDeliveryInformation_shouldThrowException() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
 
         // When/Then
         assertThrows(NullPointerException.class, () -> orderAggregate.setDeliveryInformation(null));
@@ -187,7 +231,7 @@ class OrderAggregateTest {
     @Test
     void setStatus_withValidStatus_shouldUpdateStatus() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
 
         // When
         orderAggregate.setStatus(OrderStatus.COMPLETED);
@@ -199,7 +243,7 @@ class OrderAggregateTest {
     @Test
     void setStatus_withNullStatus_shouldThrowException() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
 
         // When/Then
         assertThrows(NullPointerException.class, () -> orderAggregate.setStatus(null));
@@ -208,7 +252,7 @@ class OrderAggregateTest {
     @Test
     void addPhoto_withValidPhoto_shouldAddPhotoToOrder() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
 
         // When
         orderAggregate.addPhoto(photoDocument);
@@ -223,7 +267,7 @@ class OrderAggregateTest {
     @Test
     void addPhoto_withNullPhoto_shouldThrowException() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
 
         // When/Then
         assertThrows(NullPointerException.class, () -> orderAggregate.addPhoto(null));
@@ -232,11 +276,22 @@ class OrderAggregateTest {
     @Test
     void getApprovedPhotos_withMixedPhotos_shouldReturnOnlyApprovedPhotos() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
 
         // Create an approved photo
-        PhotoDocument approvedPhoto = new PhotoDocument(PhotoId.newId(), new PhotoAngle(PhotoAngle.NamedAngle.RIGHT), new ImagePath("/path/to/approved.jpg"), createdBy, createdAt);
-        approvedPhoto.approve(createdBy, createdAt);
+        PhotoId photoId = PhotoId.newId();
+        PhotoTemplate template = PhotoTemplate.RIGHT_VIEW_OF_ASSEMBLY;
+        Photo photo = new Photo("/path/to/approved.jpg");
+
+        PhotoDocument approvedPhoto = PhotoDocument.builder()
+            .photoId(photoId)
+            .template(template)
+            .imagePath(photo)
+            .uploadedBy(createdBy)
+            .uploadedAt(createdAt)
+            .build();
+
+        approvedPhoto.approve(userRef, createdAt);
 
         // Add both photos
         orderAggregate.addPhoto(photoDocument); // Pending
@@ -254,11 +309,22 @@ class OrderAggregateTest {
     @Test
     void getPendingPhotos_withMixedPhotos_shouldReturnOnlyPendingPhotos() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
 
         // Create an approved photo
-        PhotoDocument approvedPhoto = new PhotoDocument(PhotoId.newId(), new PhotoAngle(PhotoAngle.NamedAngle.LEFT), new ImagePath("/path/to/approved.jpg"), createdBy, createdAt);
-        approvedPhoto.approve(createdBy, createdAt);
+        PhotoId photoId = PhotoId.newId();
+        PhotoTemplate template = PhotoTemplate.LEFT_VIEW_OF_ASSEMBLY;
+        Photo photo = new Photo("/path/to/approved.jpg");
+
+        PhotoDocument approvedPhoto = PhotoDocument.builder()
+            .photoId(photoId)
+            .template(template)
+            .imagePath(photo)
+            .uploadedBy(createdBy)
+            .uploadedAt(createdAt)
+            .build();
+
+        approvedPhoto.approve(userRef, createdAt);
 
         // Add both photos
         orderAggregate.addPhoto(photoDocument); // Pending
@@ -276,7 +342,7 @@ class OrderAggregateTest {
     @Test
     void isReadyForQaReview_withCompletedStatusAndPhotos_shouldReturnTrue() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
         orderAggregate.setStatus(OrderStatus.COMPLETED);
         orderAggregate.addPhoto(photoDocument);
 
@@ -287,7 +353,7 @@ class OrderAggregateTest {
     @Test
     void isReadyForQaReview_withCompletedStatusButNoPhotos_shouldReturnFalse() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
         orderAggregate.setStatus(OrderStatus.COMPLETED);
 
         // When/Then
@@ -297,7 +363,7 @@ class OrderAggregateTest {
     @Test
     void isReadyForQaReview_withPendingStatusAndPhotos_shouldReturnFalse() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
         orderAggregate.addPhoto(photoDocument);
 
         // When/Then
@@ -305,38 +371,38 @@ class OrderAggregateTest {
     }
 
     @Test
-    void isApproved_withApprovedStatus_shouldReturnTrue() {
+    void getStatus_withApprovedStatus_shouldReturnApproved() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
         orderAggregate.setStatus(OrderStatus.APPROVED);
 
         // When/Then
-        assertTrue(orderAggregate.isApproved());
-        assertFalse(orderAggregate.isRejected());
-        assertFalse(orderAggregate.isDelivered());
+        assertEquals(OrderStatus.APPROVED, orderAggregate.getStatus());
+        assertNotEquals(OrderStatus.REJECTED, orderAggregate.getStatus());
+        assertNotEquals(OrderStatus.DELIVERED, orderAggregate.getStatus());
     }
 
     @Test
-    void isRejected_withRejectedStatus_shouldReturnTrue() {
+    void getStatus_withRejectedStatus_shouldReturnRejected() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
         orderAggregate.setStatus(OrderStatus.REJECTED);
 
         // When/Then
-        assertFalse(orderAggregate.isApproved());
-        assertTrue(orderAggregate.isRejected());
-        assertFalse(orderAggregate.isDelivered());
+        assertNotEquals(OrderStatus.APPROVED, orderAggregate.getStatus());
+        assertEquals(OrderStatus.REJECTED, orderAggregate.getStatus());
+        assertNotEquals(OrderStatus.DELIVERED, orderAggregate.getStatus());
     }
 
     @Test
-    void isDelivered_withDeliveredStatus_shouldReturnTrue() {
+    void getStatus_withDeliveredStatus_shouldReturnDelivered() {
         // Given
-        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, createdBy, createdAt);
+        OrderAggregate orderAggregate = new OrderAggregate(orderId, orderNumber, userRef, createdAt);
         orderAggregate.setStatus(OrderStatus.DELIVERED);
 
         // When/Then
-        assertFalse(orderAggregate.isApproved());
-        assertFalse(orderAggregate.isRejected());
-        assertTrue(orderAggregate.isDelivered());
+        assertNotEquals(OrderStatus.APPROVED, orderAggregate.getStatus());
+        assertNotEquals(OrderStatus.REJECTED, orderAggregate.getStatus());
+        assertEquals(OrderStatus.DELIVERED, orderAggregate.getStatus());
     }
 }

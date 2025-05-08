@@ -35,7 +35,7 @@ public class SplashViewController extends BaseController<SplashViewModel> {
     private Timeline loadingTimeline;
 
     @Override
-    public void initializeBinding() {
+    protected void setupBindings() {
         try {
             // Bind UI components to ViewModel properties
             messageLabel.textProperty().bind(getViewModel().messageProperty());
@@ -48,6 +48,12 @@ public class SplashViewController extends BaseController<SplashViewModel> {
         } catch (Exception e) {
             handleInitializationError(e);
         }
+    }
+
+    @Override
+    public void initializeBinding() {
+        // Call setupBindings to avoid duplication
+        setupBindings();
     }
 
     /**

@@ -5,7 +5,9 @@ import com.belman.business.domain.events.DomainEvents;
 import com.belman.business.domain.events.UserLoggedInEvent;
 import com.belman.business.domain.events.UserLoggedOutEvent;
 import com.belman.business.domain.security.AuthenticationService;
+import com.belman.business.domain.services.LoggerFactory;
 import com.belman.business.domain.user.UserAggregate;
+import com.belman.data.logging.EmojiLoggerFactory;
 
 import java.util.Optional;
 
@@ -23,6 +25,7 @@ public class SessionManager extends BaseService {
      * @param authenticationService the authentication service
      */
     private SessionManager(AuthenticationService authenticationService) {
+        super(EmojiLoggerFactory.getInstance());
         this.authenticationService = authenticationService;
 
         // Register event handlers

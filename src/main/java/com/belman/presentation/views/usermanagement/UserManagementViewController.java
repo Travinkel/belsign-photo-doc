@@ -1,8 +1,8 @@
 package com.belman.presentation.views.usermanagement;
 
 import com.belman.presentation.core.BaseController;
-import com.belman.domain.aggregates.User;
-import com.belman.domain.enums.UserStatus;
+import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.domain.user.UserStatus;
 import com.belman.presentation.components.TouchFriendlyDialog;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -23,7 +23,7 @@ public class UserManagementViewController extends BaseController<UserManagementV
     private TextField searchField;
 
     @FXML
-    private ListView<User> userListView;
+    private ListView<UserAggregate> userListView;
 
     @FXML
     private TextField usernameField;
@@ -65,7 +65,7 @@ public class UserManagementViewController extends BaseController<UserManagementV
     private Label errorMessageLabel;
 
     @Override
-    public void initializeBinding() {
+    public void setupBindings() {
         // Bind UI components to ViewModel properties
         errorMessageLabel.textProperty().bind(getViewModel().errorMessageProperty());
 
@@ -178,7 +178,8 @@ public class UserManagementViewController extends BaseController<UserManagementV
      * 
      * @param message the error message
      */
-    private void showError(String message) {
+    @Override
+    protected void showError(String message) {
         TouchFriendlyDialog.showError("Error", message);
     }
 
@@ -194,16 +195,18 @@ public class UserManagementViewController extends BaseController<UserManagementV
     /**
      * Custom cell for displaying users in the list view.
      */
-    private static class UserListCell extends ListCell<User> {
+    private static class UserListCell extends ListCell<UserAggregate> {
         @Override
-        protected void updateItem(User user, boolean empty) {
+        protected void updateItem(UserAggregate user, boolean empty) {
             super.updateItem(user, empty);
 
             if (empty || user == null) {
                 setText(null);
                 setGraphic(null);
             } else {
-                setText(user.getUsername().value() + " (" + user.getStatus() + ")");
+                // Convert ApprovalStatus to a string representation
+                String statusText = user.getApprovalState().getStatusEnum().toString();
+                setText(user.getUsername().value() + " (" + statusText + ")");
             }
         }
     }

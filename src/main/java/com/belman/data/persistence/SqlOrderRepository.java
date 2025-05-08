@@ -9,7 +9,7 @@ import com.belman.business.domain.order.*;
 import com.belman.business.domain.order.photo.PhotoDocument;
 import com.belman.business.domain.order.photo.PhotoId;
 import com.belman.business.domain.order.photo.PhotoTemplate;
-import com.belman.business.domain.order.photo.UserReference;
+import com.belman.business.domain.user.UserReference;
 import com.belman.business.domain.specification.Specification;
 import com.belman.business.domain.user.UserId;
 import com.belman.business.domain.user.UserRepository;

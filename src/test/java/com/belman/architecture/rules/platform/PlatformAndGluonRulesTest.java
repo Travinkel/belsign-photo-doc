@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class PlatformAndGluonRulesTest {
 
+    private static final String CONFIG_PATH = "src/main/resources/META-INF/native-image/reflect-config.json";
     private static JavaClasses importedClasses;
 
     @BeforeAll

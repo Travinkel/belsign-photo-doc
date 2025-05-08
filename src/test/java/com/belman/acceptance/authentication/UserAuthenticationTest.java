@@ -1,17 +1,18 @@
 package com.belman.acceptance.authentication;
 
 import com.belman.acceptance.BaseAcceptanceTest;
-import com.belman.domain.aggregates.User;
-import com.belman.domain.services.AuthenticationService;
-import com.belman.domain.services.PasswordHasher;
-import com.belman.domain.valueobjects.EmailAddress;
-import com.belman.domain.valueobjects.HashedPassword;
-import com.belman.domain.valueobjects.PersonName;
-import com.belman.domain.valueobjects.UserId;
-import com.belman.domain.valueobjects.Username;
+import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.domain.security.AuthenticationService;
+import com.belman.business.domain.security.PasswordHasher;
+import com.belman.business.domain.common.EmailAddress;
+import com.belman.business.domain.security.HashedPassword;
+import com.belman.business.domain.common.PersonName;
+import com.belman.business.domain.user.UserId;
+import com.belman.business.domain.user.Username;
+import com.belman.business.domain.user.UserRole;
 import com.belman.data.persistence.InMemoryUserRepository;
 import com.belman.data.security.BCryptPasswordHasher;
-import com.belman.data.service.DefaultAuthenticationService;
+import com.belman.data.security.DefaultAuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UserAuthenticationTest extends BaseAcceptanceTest {
 
     private AuthenticationService authService;
-    private User testUser;
+    private UserAggregate testUser;
     private PasswordHasher passwordHasher;
     private static final String TEST_USERNAME = "testuser";
     private static final String TEST_PASSWORD = "password123";
@@ -48,12 +49,13 @@ public class UserAuthenticationTest extends BaseAcceptanceTest {
         HashedPassword password = HashedPassword.fromPlainText(TEST_PASSWORD, passwordHasher);
         EmailAddress email = new EmailAddress(TEST_EMAIL);
 
-        testUser = new User(userId, username, password, email);
-        testUser.addRole(User.Role.PRODUCTION);
+        // Create a new user using the builder pattern
+        testUser = UserAggregate.createNewUser(username, password, email);
+        testUser.addRole(UserRole.PRODUCTION);
 
         // Save the test user to the repository
         userRepository.save(testUser);
-        logDebug("Test user created: " + testUser.getUsername().getValue());
+        logDebug("Test user created: " + testUser.getUsername().value());
     }
 
     @Test
@@ -62,17 +64,17 @@ public class UserAuthenticationTest extends BaseAcceptanceTest {
         logDebug("Testing login with valid credentials");
 
         // Attempt to log in with valid credentials
-        Optional<User> authenticatedUserOpt = authService.authenticate(TEST_USERNAME, TEST_PASSWORD);
+        Optional<UserAggregate> authenticatedUserOpt = authService.authenticate(TEST_USERNAME, TEST_PASSWORD);
 
         // Verify that authentication succeeded
         assertTrue(authenticatedUserOpt.isPresent(), "Authentication should succeed with valid credentials");
 
-        User authenticatedUser = authenticatedUserOpt.get();
-        assertEquals(TEST_USERNAME, authenticatedUser.getUsername().getValue(), 
+        UserAggregate authenticatedUser = authenticatedUserOpt.get();
+        assertEquals(TEST_USERNAME, authenticatedUser.getUsername().value(), 
                 "Authenticated user should have the expected username");
-        assertEquals(TEST_EMAIL, authenticatedUser.getEmail().getValue(),
+        assertEquals(TEST_EMAIL, authenticatedUser.getEmail().value(),
                 "Authenticated user should have the expected email");
-        assertTrue(authenticatedUser.getRoles().contains(User.Role.PRODUCTION),
+        assertTrue(authenticatedUser.getRoles().contains(UserRole.PRODUCTION),
                 "Authenticated user should have the PRODUCTION role");
 
         logDebug("Login with valid credentials successful");
@@ -84,7 +86,7 @@ public class UserAuthenticationTest extends BaseAcceptanceTest {
         logDebug("Testing login with invalid password");
 
         // Attempt to log in with invalid password
-        Optional<User> authenticatedUserOpt = authService.authenticate(TEST_USERNAME, "wrongpassword");
+        Optional<UserAggregate> authenticatedUserOpt = authService.authenticate(TEST_USERNAME, "wrongpassword");
 
         // Verify that authentication failed
         assertTrue(authenticatedUserOpt.isEmpty(), "Authentication should fail with invalid password");
@@ -98,7 +100,7 @@ public class UserAuthenticationTest extends BaseAcceptanceTest {
         logDebug("Testing login with non-existent username");
 
         // Attempt to log in with non-existent username
-        Optional<User> authenticatedUserOpt = authService.authenticate("nonexistentuser", TEST_PASSWORD);
+        Optional<UserAggregate> authenticatedUserOpt = authService.authenticate("nonexistentuser", TEST_PASSWORD);
 
         // Verify that authentication failed
         assertTrue(authenticatedUserOpt.isEmpty(), "Authentication should fail with non-existent username");

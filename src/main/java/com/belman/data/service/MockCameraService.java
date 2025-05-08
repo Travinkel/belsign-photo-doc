@@ -2,6 +2,8 @@ package com.belman.data.service;
 
 import com.belman.business.core.BaseService;
 import com.belman.business.domain.services.CameraService;
+import com.belman.business.domain.services.LoggerFactory;
+import com.belman.data.logging.EmojiLoggerFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -25,6 +27,7 @@ public class MockCameraService extends BaseService implements CameraService {
      * @param stage the JavaFX stage to use for file chooser dialogs
      */
     public MockCameraService(Stage stage) {
+        super(EmojiLoggerFactory.getInstance());
         this.stage = stage;
         this.fileChooser = new FileChooser();
         this.fileChooser.getExtensionFilters().addAll(

@@ -39,7 +39,7 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
     private ProgressIndicator progressIndicator;
 
     @Override
-    public void initializeBinding() {
+    protected void setupBindings() {
         // Bind UI components to ViewModel properties
         welcomeLabel.textProperty().bind(getViewModel().welcomeMessageProperty());
         searchField.textProperty().bindBidirectional(getViewModel().searchTextProperty());
@@ -65,6 +65,12 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
 
         // Initialize data
         getViewModel().loadPendingOrders();
+    }
+
+    @Override
+    public void initializeBinding() {
+        // Call setupBindings to avoid duplication
+        setupBindings();
     }
 
     /**
@@ -104,8 +110,10 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
 
     /**
      * Shows an error message using a touch-friendly dialog.
+     * Overrides the method in BaseController.
      */
-    private void showError(String message) {
+    @Override
+    protected void showError(String message) {
         TouchFriendlyDialog.showError("Error", message);
     }
 

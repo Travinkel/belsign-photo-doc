@@ -1,18 +1,18 @@
 package com.belman.unit.infrastructure.service;
 
-import com.belman.domain.aggregates.User;
+import com.belman.business.domain.user.UserAggregate;
 import com.belman.business.domain.user.UserRepository;
-import com.belman.domain.services.AuthenticationService;
-import com.belman.domain.services.PasswordHasher;
-import com.belman.domain.valueobjects.EmailAddress;
-import com.belman.domain.valueobjects.HashedPassword;
-import com.belman.domain.valueobjects.PersonName;
-import com.belman.domain.valueobjects.UserId;
-import com.belman.domain.valueobjects.Username;
+import com.belman.business.domain.security.AuthenticationService;
+import com.belman.business.domain.security.PasswordHasher;
+import com.belman.business.domain.common.EmailAddress;
+import com.belman.business.domain.security.HashedPassword;
+import com.belman.business.domain.common.PersonName;
+import com.belman.business.domain.user.UserId;
+import com.belman.business.domain.user.Username;
 import com.belman.data.persistence.InMemoryUserRepository;
 import com.belman.data.security.BCryptPasswordHasher;
-import com.belman.data.service.DefaultAuthenticationService;
-import com.belman.data.service.SessionManager;
+import com.belman.data.security.DefaultAuthenticationService;
+import com.belman.business.core.SessionManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ public class SessionManagerTest {
     private UserRepository userRepository;
     private AuthenticationService authenticationService;
     private SessionManager sessionManager;
-    private User testUser;
+    private UserAggregate testUser;
     private PasswordHasher passwordHasher;
 
     @BeforeEach
@@ -49,13 +49,13 @@ public class SessionManagerTest {
         passwordHasher = new BCryptPasswordHasher();
 
         // Create a test user
-        testUser = new User(
-            UserId.newId(),
-            new Username("testuser"),
-            HashedPassword.fromPlainText("testpassword", passwordHasher),
-            new PersonName("Test", "User"),
-            new EmailAddress("test@example.com")
-        );
+        testUser = new UserAggregate.Builder()
+            .id(UserId.newId())
+            .username(new Username("testuser"))
+            .password(HashedPassword.fromPlainText("testpassword", passwordHasher))
+            .name(new PersonName("Test", "User"))
+            .email(new EmailAddress("test@example.com"))
+            .build();
 
         // Save the test user to the repository
         userRepository.save(testUser);
@@ -70,7 +70,7 @@ public class SessionManagerTest {
     @Test
     void login_withValidCredentials_shouldReturnUser() {
         // Act
-        Optional<User> result = sessionManager.login("testuser", "testpassword");
+        Optional<UserAggregate> result = sessionManager.login("testuser", "testpassword");
 
         // Assert
         assertTrue(result.isPresent(), "Login should succeed with valid credentials");
@@ -80,7 +80,7 @@ public class SessionManagerTest {
     @Test
     void login_withInvalidCredentials_shouldReturnEmpty() {
         // Act
-        Optional<User> result = sessionManager.login("testuser", "wrongpassword");
+        Optional<UserAggregate> result = sessionManager.login("testuser", "wrongpassword");
 
         // Assert
         assertFalse(result.isPresent(), "Login should fail with invalid credentials");
@@ -92,7 +92,7 @@ public class SessionManagerTest {
         sessionManager.login("testuser", "testpassword");
 
         // Act
-        Optional<User> result = sessionManager.getCurrentUser();
+        Optional<UserAggregate> result = sessionManager.getCurrentUser();
 
         // Assert
         assertTrue(result.isPresent(), "Current user should be present after successful login");
@@ -102,7 +102,7 @@ public class SessionManagerTest {
     @Test
     void getCurrentUser_beforeLogin_shouldReturnEmpty() {
         // Act
-        Optional<User> result = sessionManager.getCurrentUser();
+        Optional<UserAggregate> result = sessionManager.getCurrentUser();
 
         // Assert
         assertFalse(result.isPresent(), "Current user should not be present before login");
@@ -164,7 +164,7 @@ public class SessionManagerTest {
         assertNotNull(instance, "getInstance should return a non-null instance");
         // We can't directly test that it was initialized with the new auth service,
         // but we can test that it's functional
-        Optional<User> result = instance.login("testuser", "testpassword");
+        Optional<UserAggregate> result = instance.login("testuser", "testpassword");
         assertTrue(result.isPresent(), "Login should succeed with valid credentials");
     }
 }

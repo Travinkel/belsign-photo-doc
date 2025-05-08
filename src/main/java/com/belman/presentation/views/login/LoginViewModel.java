@@ -3,7 +3,8 @@ package com.belman.presentation.views.login;
 import com.belman.presentation.core.BaseViewModel;
 import com.belman.data.logging.EmojiLogger;
 import com.belman.presentation.navigation.Router;
-import com.belman.domain.aggregates.User;
+import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.domain.user.UserRole;
 import com.belman.data.service.SessionManager;
 import com.belman.presentation.views.photoupload.PhotoUploadView;
 import com.belman.presentation.views.qadashboard.QADashboardView;
@@ -85,11 +86,11 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
         try {
             // Attempt to log in
             logger.debug("Calling sessionManager.login for user: {}", username.get());
-            Optional<User> userOpt = sessionManager.login(username.get(), password.get());
+            Optional<UserAggregate> userOpt = sessionManager.login(username.get(), password.get());
 
             if (userOpt.isPresent()) {
                 // Login successful, navigate to role-specific view
-                User user = userOpt.get();
+                UserAggregate user = userOpt.get();
                 logger.success("Login successful for user: " + username.get());
 
                 // Save username and "Remember Me" preference if "Remember Me" is checked
@@ -106,15 +107,15 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
 
                 try {
                     // Determine which view to navigate to based on user role
-                    if (user.getRoles().contains(User.Role.ADMIN)) {
+                    if (user.getRoles().contains(UserRole.ADMIN)) {
                         logger.debug("Navigating to UserManagementView for ADMIN user");
                         Router.navigateTo(UserManagementView.class);
                         logger.debug("Navigation to UserManagementView completed");
-                    } else if (user.getRoles().contains(User.Role.QA)) {
+                    } else if (user.getRoles().contains(UserRole.QA)) {
                         logger.debug("Navigating to QADashboardView for QA user");
                         Router.navigateTo(QADashboardView.class);
                         logger.debug("Navigation to QADashboardView completed");
-                    } else if (user.getRoles().contains(User.Role.PRODUCTION)) {
+                    } else if (user.getRoles().contains(UserRole.PRODUCTION)) {
                         logger.debug("Navigating to PhotoUploadView for PRODUCTION user");
                         Router.navigateTo(PhotoUploadView.class);
                         logger.debug("Navigation to PhotoUploadView completed");
