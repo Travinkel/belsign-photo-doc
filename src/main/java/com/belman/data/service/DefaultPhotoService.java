@@ -1,15 +1,15 @@
 package com.belman.data.service;
 
-import com.belman.business.domain.common.Timestamp;
-import com.belman.business.domain.order.OrderAggregate;
-import com.belman.business.domain.order.OrderId;
-import com.belman.business.domain.order.OrderRepository;
-import com.belman.business.domain.order.photo.Photo;
-import com.belman.business.domain.order.photo.PhotoDocument;
-import com.belman.business.domain.order.photo.PhotoId;
-import com.belman.business.domain.order.photo.PhotoTemplate;
-import com.belman.business.domain.services.PhotoService;
-import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.richbe.common.Timestamp;
+import com.belman.business.richbe.order.OrderAggregate;
+import com.belman.business.richbe.order.OrderId;
+import com.belman.business.richbe.order.OrderRepository;
+import com.belman.business.richbe.order.photo.Photo;
+import com.belman.business.richbe.order.photo.PhotoDocument;
+import com.belman.business.richbe.order.photo.PhotoId;
+import com.belman.business.richbe.order.photo.PhotoTemplate;
+import com.belman.business.richbe.services.PhotoService;
+import com.belman.business.richbe.user.UserAggregate;
 import com.belman.data.platform.ErrorHandler;
 import com.belman.data.platform.PlatformUtils;
 import com.gluonhq.attach.storage.StorageService;

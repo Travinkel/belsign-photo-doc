@@ -1,6 +1,6 @@
 package com.belman.unit.domain.valueobjects;
 
-import com.belman.business.domain.common.PersonName;
+import com.belman.business.richbe.common.PersonName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;

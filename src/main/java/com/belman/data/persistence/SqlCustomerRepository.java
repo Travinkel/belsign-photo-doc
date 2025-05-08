@@ -1,14 +1,14 @@
 package com.belman.data.persistence;
 
-import com.belman.business.domain.customer.CustomerAggregate;
-import com.belman.business.domain.customer.CustomerType;
-import com.belman.business.domain.customer.CustomerRepository;
-import com.belman.business.domain.specification.Specification;
-import com.belman.business.domain.customer.Company;
-import com.belman.business.domain.customer.CustomerId;
-import com.belman.business.domain.common.EmailAddress;
-import com.belman.business.domain.common.PersonName;
-import com.belman.business.domain.common.PhoneNumber;
+import com.belman.business.richbe.customer.CustomerAggregate;
+import com.belman.business.richbe.customer.CustomerType;
+import com.belman.business.richbe.customer.CustomerRepository;
+import com.belman.business.richbe.specification.Specification;
+import com.belman.business.richbe.customer.Company;
+import com.belman.business.richbe.customer.CustomerId;
+import com.belman.business.richbe.common.EmailAddress;
+import com.belman.business.richbe.common.PersonName;
+import com.belman.business.richbe.common.PhoneNumber;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -17,7 +17,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

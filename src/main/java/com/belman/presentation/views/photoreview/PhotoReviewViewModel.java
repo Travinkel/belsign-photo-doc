@@ -1,16 +1,16 @@
 package com.belman.presentation.views.photoreview;
 
-import com.belman.business.domain.common.Timestamp;
-import com.belman.business.domain.order.OrderAggregate;
-import com.belman.business.domain.order.OrderId;
-import com.belman.business.domain.order.OrderNumber;
-import com.belman.business.domain.user.UserReference;
+import com.belman.business.richbe.common.Timestamp;
+import com.belman.business.richbe.order.OrderAggregate;
+import com.belman.business.richbe.order.OrderId;
+import com.belman.business.richbe.order.OrderNumber;
+import com.belman.business.richbe.user.UserReference;
 import com.belman.presentation.core.BaseViewModel;
 import com.belman.business.core.Inject;
 import com.belman.presentation.navigation.Router;
-import com.belman.business.domain.order.photo.PhotoDocument;
-import com.belman.business.domain.order.OrderRepository;
-import com.belman.business.domain.services.PhotoService;
+import com.belman.business.richbe.order.photo.PhotoDocument;
+import com.belman.business.richbe.order.OrderRepository;
+import com.belman.business.richbe.services.PhotoService;
 
 import com.belman.data.service.SessionManager;
 import com.belman.presentation.views.login.LoginView;

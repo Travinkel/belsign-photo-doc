@@ -1,11 +1,10 @@
 package com.belman.presentation.views.admin;
 
-import com.belman.business.domain.user.UserRole;
-import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.richbe.user.UserRole;
+import com.belman.business.richbe.user.UserAggregate;
 import com.belman.business.usecases.admin.service.AdminService;
 import com.belman.presentation.core.BaseViewModel;
-import com.belman.business.domain.user.UserId;
-import com.belman.business.domain.exceptions.AccessDeniedException;
+import com.belman.business.richbe.exceptions.AccessDeniedException;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;

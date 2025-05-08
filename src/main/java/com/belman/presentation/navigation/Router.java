@@ -1,7 +1,7 @@
 package com.belman.presentation.navigation;
 
 import com.belman.presentation.core.FadeViewTransition;
-import com.gluonhq.charm.glisten.application.MobileApplication;
+import com.belman.presentation.core.GluonFacade;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.belman.data.logging.EmojiLogger;
@@ -22,7 +22,7 @@ import java.util.function.Supplier;
  */
 public class Router {
     private static final EmojiLogger logger = EmojiLogger.getLogger(Router.class);
-    private static MobileApplication mobileApplication;
+    private static GluonFacade mobileApplication;
     private static final Router instance = new Router();
     private static View currentView;
     private static final Map<String, Object> routeParameters = new HashMap<>();
@@ -63,9 +63,9 @@ public class Router {
      * 
      * @param application the mobile application
      */
-    public static void setMobileApplication(MobileApplication application) {
+    public static void setMobileApplication(GluonFacade application) {
         mobileApplication = application;
-        logger.startup("Router initialized with MobileApplication");
+        logger.startup("Router initialized with GluonFacade");
     }
 
     /**
@@ -126,7 +126,7 @@ public class Router {
                 logger.warn("AppBar is null. Unable to update title.");
             }
         } else {
-            logger.warn("MobileApplication is null. Unable to update AppBar title.");
+            logger.warn("GluonFacade is null. Unable to update AppBar title.");
         }
     }
 
@@ -208,7 +208,7 @@ public class Router {
             navigationHistory.push(viewClass);
             logger.debug("Added {} to navigation history. History size: {}", viewId, navigationHistory.size());
 
-            // Switch to the view using MobileApplication
+            // Switch to the view using GluonFacade
             logger.debug("Switching to view: {}", viewId);
             try {
                 System.out.println("[DEBUG_LOG] About to call mobileApplication.switchView(" + viewId + ")");

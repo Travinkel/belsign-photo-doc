@@ -1,18 +1,18 @@
 package com.belman.data.persistence;
 
-import com.belman.business.domain.common.Timestamp;
-import com.belman.business.domain.customer.CustomerAggregate;
-import com.belman.business.domain.customer.CustomerId;
-import com.belman.business.domain.customer.CustomerRepository;
+import com.belman.business.richbe.common.Timestamp;
+import com.belman.business.richbe.customer.CustomerAggregate;
+import com.belman.business.richbe.customer.CustomerId;
+import com.belman.business.richbe.customer.CustomerRepository;
 import com.belman.business.core.ServiceLocator;
-import com.belman.business.domain.order.*;
-import com.belman.business.domain.order.photo.PhotoDocument;
-import com.belman.business.domain.order.photo.PhotoId;
-import com.belman.business.domain.order.photo.PhotoTemplate;
-import com.belman.business.domain.user.UserReference;
-import com.belman.business.domain.specification.Specification;
-import com.belman.business.domain.user.UserId;
-import com.belman.business.domain.user.UserRepository;
+import com.belman.business.richbe.order.*;
+import com.belman.business.richbe.order.photo.PhotoDocument;
+import com.belman.business.richbe.order.photo.PhotoId;
+import com.belman.business.richbe.order.photo.PhotoTemplate;
+import com.belman.business.richbe.user.UserReference;
+import com.belman.business.richbe.specification.Specification;
+import com.belman.business.richbe.user.UserId;
+import com.belman.business.richbe.user.UserRepository;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

@@ -1,13 +1,13 @@
 package com.belman.business.core;
 
 
-import com.belman.business.domain.common.EmailAddress;
-import com.belman.business.domain.security.AuthenticationService;
-import com.belman.business.domain.security.HashedPassword;
-import com.belman.business.domain.user.UserAggregate;
-import com.belman.business.domain.user.UserRepository;
-import com.belman.business.domain.user.UserRole;
-import com.belman.business.domain.user.Username;
+import com.belman.business.richbe.common.EmailAddress;
+import com.belman.business.richbe.security.AuthenticationService;
+import com.belman.business.richbe.security.HashedPassword;
+import com.belman.business.richbe.user.UserAggregate;
+import com.belman.business.richbe.user.UserRepository;
+import com.belman.business.richbe.user.UserRole;
+import com.belman.business.richbe.user.Username;
 import com.belman.data.security.DefaultAuthenticationService;
 import com.belman.data.service.SessionManager;
 

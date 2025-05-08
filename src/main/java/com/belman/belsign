@@ -1,0 +1,71 @@
+com.belman.belsign
+├── app                // Application entry point and configuration
+│   ├── Main.java      // Main class to launch the application
+│   ├── AppConfig.java // Configuration for dependency injection, database, etc.
+│   └── utils          // Utility classes (e.g., logging, validation)
+│       └── Logger.java
+├── presentation       // Presentation layer (JavaFX UI components)
+│   ├── controllers    // Controllers for handling UI logic
+│   │   ├── LoginController.java
+│   │   ├── UploadController.java
+│   │   ├── QAController.java
+│   │   ├── AdminController.java
+│   │   └── ReportController.java
+│   ├── views          // FXML files and UI resources
+│   │   ├── login.fxml
+│   │   ├── upload.fxml
+│   │   ├── qa.fxml
+│   │   ├── admin.fxml
+│   │   └── report.fxml
+│   └── viewmodels     // ViewModels for binding data between UI and business logic
+│       ├── LoginViewModel.java
+│       ├── UploadViewModel.java
+│       ├── QAViewModel.java
+│       ├── AdminViewModel.java
+│       └── ReportViewModel.java
+├── business           // Business layer (domain logic, services, use cases)
+│   ├── entities       // Domain entities (rich business objects)
+│   │   ├── User.java
+│   │   ├── Order.java
+│   │   ├── Photo.java
+│   │   └── Report.java
+│   ├── services       // Business services (application logic)
+│   │   ├── AuthService.java
+│   │   ├── PhotoService.java
+│   │   ├── QAService.java
+│   │   ├── AdminService.java
+│   │   └── ReportService.java
+│   └── exceptions     // Custom exceptions for business logic
+│       ├── UserNotFoundException.java
+│       ├── InvalidOrderException.java
+│       └── PhotoUploadException.java
+├── data               // Data layer (repositories, database access)
+│   ├── repositories   // Repository interfaces and implementations
+│   │   ├── UserRepository.java
+│   │   ├── OrderRepository.java
+│   │   ├── PhotoRepository.java
+│   │   └── ReportRepository.java
+│   ├── models         // Data models (DTOs, database entities)
+│   │   ├── UserModel.java
+│   │   ├── OrderModel.java
+│   │   ├── PhotoModel.java
+│   │   └── ReportModel.java
+│   └── db             // Database connection and utilities
+│       ├── DatabaseConnection.java
+│       ├── QueryUtils.java
+│       └── migrations // SQL scripts for database schema
+│           ├── V1__CreateTables.sql
+│           └── V2__AddConstraints.sql
+└── tests              // Unit and integration tests
+    ├── presentation   // Tests for the presentation layer
+    │   ├── LoginControllerTest.java
+    │   ├── UploadControllerTest.java
+    │   └── ...
+    ├── business       // Tests for the business layer
+    │   ├── AuthServiceTest.java
+    │   ├── PhotoServiceTest.java
+    │   └── ...
+    └── data           // Tests for the data layer
+        ├── UserRepositoryTest.java
+        ├── OrderRepositoryTest.java
+        └── ...

@@ -1,8 +1,8 @@
 package com.belman.presentation.views.admin;
 
 import com.belman.presentation.core.BaseController;
-import com.belman.business.domain.user.UserAggregate;
-import com.belman.business.domain.user.UserRole;
+import com.belman.business.richbe.user.UserAggregate;
+import com.belman.business.richbe.user.UserRole;
 
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;

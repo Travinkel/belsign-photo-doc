@@ -1,11 +1,10 @@
 package com.belman.data.persistence;
 
 import com.belman.business.core.BaseService;
-import com.belman.business.domain.customer.CustomerAggregate;
-import com.belman.business.domain.customer.CustomerId;
-import com.belman.business.domain.customer.CustomerRepository;
-import com.belman.business.domain.services.LoggerFactory;
-import com.belman.business.domain.specification.Specification;
+import com.belman.business.richbe.customer.CustomerAggregate;
+import com.belman.business.richbe.customer.CustomerId;
+import com.belman.business.richbe.customer.CustomerRepository;
+import com.belman.business.richbe.specification.Specification;
 import com.belman.data.logging.EmojiLoggerFactory;
 
 import java.util.ArrayList;

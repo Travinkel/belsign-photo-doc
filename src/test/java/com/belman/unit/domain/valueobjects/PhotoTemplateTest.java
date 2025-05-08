@@ -1,6 +1,6 @@
 package com.belman.unit.domain.valueobjects;
 
-import com.belman.business.domain.order.photo.PhotoTemplate;
+import com.belman.business.richbe.order.photo.PhotoTemplate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;

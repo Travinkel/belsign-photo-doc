@@ -2,8 +2,7 @@ package com.belman.data.camera;
 
 import com.belman.business.core.BaseService;
 import com.belman.data.platform.ErrorHandler;
-import com.belman.business.domain.services.CameraService;
-import com.belman.business.domain.services.LoggerFactory;
+import com.belman.business.richbe.services.CameraService;
 import com.belman.data.logging.EmojiLoggerFactory;
 import com.gluonhq.attach.pictures.PicturesService;
 import com.gluonhq.attach.storage.StorageService;

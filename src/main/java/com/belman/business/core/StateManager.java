@@ -1,7 +1,8 @@
 package com.belman.business.core;
 
-import com.belman.business.domain.common.validation.ValidationResult;
-import com.belman.business.domain.shared.*;
+import com.belman.business.richbe.common.validation.ValidationResult;
+import com.belman.business.richbe.shared.*;
+import com.belman.presentation.core.GluonFacade;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -253,17 +254,16 @@ public class StateManager {
         getInstance().listenToState("appBarTitle", StateManager.class, title -> {
             if (title != null) {
                 try {
-                    // Try to get the MobileApplication instance
-                    Class<?> mobileAppClass = Class.forName("com.gluonhq.charm.glisten.application.MobileApplication");
-                    Object mobileApp = mobileAppClass.getMethod("getInstance").invoke(null);
+                    // Try to get the GluonFacade instance
+                    GluonFacade gluonFacade = GluonFacade.getInstance();
 
-                    if (mobileApp != null) {
+                    if (gluonFacade != null) {
                         // Try to get the AppBar
-                        Object appBar = mobileAppClass.getMethod("getAppBar").invoke(mobileApp);
+                        var appBar = gluonFacade.getAppBar();
 
                         if (appBar != null) {
                             // Set the title text
-                            appBar.getClass().getMethod("setTitleText", String.class).invoke(appBar, title.toString());
+                            appBar.setTitleText(title.toString());
                         }
                     }
                 } catch (Exception e) {

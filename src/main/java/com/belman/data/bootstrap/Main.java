@@ -1,11 +1,11 @@
 package com.belman.data.bootstrap;
 
 import com.belman.business.core.LifecycleManager;
-import com.belman.business.domain.security.AuthenticationService;
-import com.belman.business.domain.services.LoggerFactory;
+import com.belman.business.richbe.security.AuthenticationService;
+import com.belman.business.richbe.services.LoggerFactory;
 import com.belman.business.core.ServiceLocator;
 import com.belman.business.core.ServiceRegistry;
-import com.belman.business.domain.services.Logger;
+import com.belman.business.richbe.services.Logger;
 import com.belman.data.platform.PlatformUtils;
 import com.belman.data.logging.EmojiLogger;
 import com.belman.data.logging.EmojiLoggerAdapter;
@@ -16,8 +16,10 @@ import com.belman.data.service.StorageServiceFactory;
 import com.belman.presentation.navigation.Router;
 import com.belman.presentation.navigation.RouteGuardImpl;
 import com.belman.presentation.views.splash.SplashView;
-import com.gluonhq.charm.glisten.application.MobileApplication;
+import com.belman.presentation.core.GluonFacade;
+import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.stage.Stage;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.net.URL;
@@ -28,9 +30,10 @@ import java.net.URL;
  * This class is used for desktop (JavaFX) platforms.
  * For mobile platforms, see GluonMain.
  */
-public class Main extends MobileApplication {
+public class Main extends Application {
 
     private static final EmojiLogger logger = EmojiLogger.getLogger(Main.class);
+    private GluonFacade app = GluonFacade.initialize();
 
     /**
      * Main entry point for the application.
@@ -55,6 +58,13 @@ public class Main extends MobileApplication {
     }
 
     public static final String SPLASH_VIEW = SplashView.class.getSimpleName();
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        init();
+        app.start(primaryStage);
+        postInit(app.getScene());
+    }
 
     @Override
     public void init() {
@@ -82,11 +92,11 @@ public class Main extends MobileApplication {
 
         // Register the splash view
         logger.debug("Registering splash view");
-        addViewFactory(SPLASH_VIEW, SplashView::new);
+        app.addViewFactory(SPLASH_VIEW, SplashView::new);
 
         // Register the login view
         logger.debug("Registering login view");
-        addViewFactory(com.belman.presentation.views.login.LoginView.class.getSimpleName(),
+        app.addViewFactory(com.belman.presentation.views.login.LoginView.class.getSimpleName(),
                 com.belman.presentation.views.login.LoginView::new);
 
         // Main view has been removed as it doesn't offer value
@@ -94,45 +104,45 @@ public class Main extends MobileApplication {
 
         // Register the admin view
         logger.debug("Registering admin view");
-        addViewFactory(com.belman.presentation.views.admin.AdminView.class.getSimpleName(),
+        app.addViewFactory(com.belman.presentation.views.admin.AdminView.class.getSimpleName(),
                 com.belman.presentation.views.admin.AdminView::new);
 
         // Register the order gallery view
         logger.debug("Registering order gallery view");
-        addViewFactory(com.belman.presentation.views.ordergallery.OrderGalleryView.class.getSimpleName(),
+        app.addViewFactory(com.belman.presentation.views.ordergallery.OrderGalleryView.class.getSimpleName(),
                 com.belman.presentation.views.ordergallery.OrderGalleryView::new);
 
         // Register the photo review view
         logger.debug("Registering photo review view");
-        addViewFactory(com.belman.presentation.views.photoreview.PhotoReviewView.class.getSimpleName(),
+        app.addViewFactory(com.belman.presentation.views.photoreview.PhotoReviewView.class.getSimpleName(),
                 com.belman.presentation.views.photoreview.PhotoReviewView::new);
 
         // Register the photo upload view
         logger.debug("Registering photo upload view");
-        addViewFactory(com.belman.presentation.views.photoupload.PhotoUploadView.class.getSimpleName(),
+        app.addViewFactory(com.belman.presentation.views.photoupload.PhotoUploadView.class.getSimpleName(),
                 com.belman.presentation.views.photoupload.PhotoUploadView::new);
 
         // Register the QA dashboard view
         logger.debug("Registering QA dashboard view");
-        addViewFactory(com.belman.presentation.views.qadashboard.QADashboardView.class.getSimpleName(),
+        app.addViewFactory(com.belman.presentation.views.qadashboard.QADashboardView.class.getSimpleName(),
                 com.belman.presentation.views.qadashboard.QADashboardView::new);
 
         // Register the report preview view
         logger.debug("Registering report preview view");
-        addViewFactory(com.belman.presentation.views.reportpreview.ReportPreviewView.class.getSimpleName(),
+        app.addViewFactory(com.belman.presentation.views.reportpreview.ReportPreviewView.class.getSimpleName(),
                 com.belman.presentation.views.reportpreview.ReportPreviewView::new);
 
         // Register the user management view
         logger.debug("Registering user management view");
-        addViewFactory(com.belman.presentation.views.usermanagement.UserManagementView.class.getSimpleName(),
+        app.addViewFactory(com.belman.presentation.views.usermanagement.UserManagementView.class.getSimpleName(),
                 com.belman.presentation.views.usermanagement.UserManagementView::new);
 
         // Set up the Router
         logger.debug("Setting up Router");
-        Router.setMobileApplication(this);
+        Router.setMobileApplication(app);
 
         // Initialize route guards for role-based access control
-        logger.debug("Initialmvn izing route guards");
+        logger.debug("Initializing route guards");
         AuthenticationService authService = ServiceLocator.getService(AuthenticationService.class);
         Logger domainLogger = EmojiLoggerAdapter.getLogger(Main.class);
         RouteGuardImpl routeGuard = new RouteGuardImpl(domainLogger);
@@ -146,7 +156,6 @@ public class Main extends MobileApplication {
         LifecycleManager.init(this, loggerFactory);
     }
 
-    @Override
     public void postInit(Scene scene) {
         // Apply platform-specific styling
         logger.debug("Applying platform-specific styling");
@@ -167,7 +176,7 @@ public class Main extends MobileApplication {
 
         // Show the splash view
         logger.info("Showing splash view");
-        switchView(SPLASH_VIEW);
+        app.switchView(SPLASH_VIEW);
     }
 
     private void applyPlatformStyling(Scene scene) {

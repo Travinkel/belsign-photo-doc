@@ -2,8 +2,8 @@ package com.belman.presentation.core;
 
 
 import com.belman.business.core.Inject;
-import com.belman.business.domain.events.DomainEvent;
-import com.belman.business.domain.events.DomainEventPublisher;
+import com.belman.business.richbe.events.DomainEvent;
+import com.belman.business.richbe.events.DomainEventPublisher;
 import com.belman.data.logging.EmojiLogger;
 
 /**

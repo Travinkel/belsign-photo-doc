@@ -1,6 +1,6 @@
 package com.belman.business.commands.data;
 
-import com.belman.business.domain.shared.Command;
+import com.belman.business.richbe.shared.Command;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;

@@ -1,13 +1,13 @@
 package com.belman.unit.infrastructure;
 
-import com.belman.business.domain.report.ReportAggregate;
-import com.belman.business.domain.order.OrderId;
-import com.belman.business.domain.order.photo.PhotoDocument;
-import com.belman.business.domain.common.Timestamp;
-import com.belman.business.domain.common.EmailAddress;
-import com.belman.business.domain.security.HashedPassword;
-import com.belman.business.domain.user.UserAggregate;
-import com.belman.business.domain.user.Username;
+import com.belman.business.richbe.report.ReportAggregate;
+import com.belman.business.richbe.order.OrderId;
+import com.belman.business.richbe.order.photo.PhotoDocument;
+import com.belman.business.richbe.common.Timestamp;
+import com.belman.business.richbe.common.EmailAddress;
+import com.belman.business.richbe.security.HashedPassword;
+import com.belman.business.richbe.user.UserAggregate;
+import com.belman.business.richbe.user.Username;
 import com.belman.data.email.SmtpEmailService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +48,7 @@ class SmtpEmailServiceTest {
         HashedPassword hashedPassword= new HashedPassword("test-password");
         EmailAddress email = new EmailAddress("test@localhost");
         UserAggregate qaUser = new UserAggregate.Builder()
-            .id(com.belman.business.domain.user.UserId.newId())
+            .id(com.belman.business.richbe.user.UserId.newId())
             .username(username)
             .password(hashedPassword)
             .email(email)

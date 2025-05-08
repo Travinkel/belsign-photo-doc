@@ -5,7 +5,7 @@ import com.belman.business.core.StateManager;
 import com.belman.presentation.core.BaseViewModel;
 import com.belman.data.logging.EmojiLogger;
 import com.belman.presentation.navigation.Router;
-import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.richbe.user.UserAggregate;
 import com.belman.data.service.SessionManager;
 import com.belman.presentation.views.login.LoginView;
 import javafx.beans.property.SimpleStringProperty;

@@ -1,12 +1,11 @@
 package com.belman.data.service;
 
 import com.belman.business.core.BaseService;
-import com.belman.business.domain.events.DomainEvents;
-import com.belman.business.domain.events.UserLoggedInEvent;
-import com.belman.business.domain.events.UserLoggedOutEvent;
-import com.belman.business.domain.security.AuthenticationService;
-import com.belman.business.domain.services.LoggerFactory;
-import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.richbe.events.DomainEvents;
+import com.belman.business.richbe.events.UserLoggedInEvent;
+import com.belman.business.richbe.events.UserLoggedOutEvent;
+import com.belman.business.richbe.security.AuthenticationService;
+import com.belman.business.richbe.user.UserAggregate;
 import com.belman.data.logging.EmojiLoggerFactory;
 
 import java.util.Optional;

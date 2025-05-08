@@ -1,15 +1,14 @@
 package com.belman.acceptance.authentication;
 
 import com.belman.acceptance.BaseAcceptanceTest;
-import com.belman.business.domain.user.UserAggregate;
-import com.belman.business.domain.security.AuthenticationService;
-import com.belman.business.domain.security.PasswordHasher;
-import com.belman.business.domain.common.EmailAddress;
-import com.belman.business.domain.security.HashedPassword;
-import com.belman.business.domain.common.PersonName;
-import com.belman.business.domain.user.UserId;
-import com.belman.business.domain.user.Username;
-import com.belman.business.domain.user.UserRole;
+import com.belman.business.richbe.user.UserAggregate;
+import com.belman.business.richbe.security.AuthenticationService;
+import com.belman.business.richbe.security.PasswordHasher;
+import com.belman.business.richbe.common.EmailAddress;
+import com.belman.business.richbe.security.HashedPassword;
+import com.belman.business.richbe.user.UserId;
+import com.belman.business.richbe.user.Username;
+import com.belman.business.richbe.user.UserRole;
 import com.belman.data.persistence.InMemoryUserRepository;
 import com.belman.data.security.BCryptPasswordHasher;
 import com.belman.data.security.DefaultAuthenticationService;

@@ -2,11 +2,11 @@ package com.belman.business.core;
 
 // Using the BaseService from the application.core package
 // This class is already in the application.core package, so no import needed
-import com.belman.business.domain.events.DomainEventPublisher;
-import com.belman.business.domain.events.UserLoggedInEvent;
-import com.belman.business.domain.events.UserLoggedOutEvent;
-import com.belman.business.domain.security.AuthenticationService;
-import com.belman.business.domain.user.UserAggregate;
+import com.belman.business.richbe.events.DomainEventPublisher;
+import com.belman.business.richbe.events.UserLoggedInEvent;
+import com.belman.business.richbe.events.UserLoggedOutEvent;
+import com.belman.business.richbe.security.AuthenticationService;
+import com.belman.business.richbe.user.UserAggregate;
 
 import java.util.Optional;
 

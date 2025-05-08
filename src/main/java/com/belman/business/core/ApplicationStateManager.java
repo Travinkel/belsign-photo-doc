@@ -1,14 +1,14 @@
 package com.belman.business.core;
 
-import com.belman.business.domain.events.ApplicationBackgroundedEvent;
-import com.belman.business.domain.events.ApplicationPausedEvent;
-import com.belman.business.domain.events.ApplicationResumedEvent;
-import com.belman.business.domain.events.ApplicationStartedEvent;
-import com.belman.business.domain.events.ApplicationStateEvent;
-import com.belman.business.domain.events.ApplicationStateEvent.ApplicationState;
-import com.belman.business.domain.events.ApplicationStoppedEvent;
-import com.belman.business.domain.services.Logger;
-import com.belman.business.domain.services.LoggerFactory;
+import com.belman.business.richbe.events.ApplicationBackgroundedEvent;
+import com.belman.business.richbe.events.ApplicationPausedEvent;
+import com.belman.business.richbe.events.ApplicationResumedEvent;
+import com.belman.business.richbe.events.ApplicationStartedEvent;
+import com.belman.business.richbe.events.ApplicationStateEvent;
+import com.belman.business.richbe.events.ApplicationStateEvent.ApplicationState;
+import com.belman.business.richbe.events.ApplicationStoppedEvent;
+import com.belman.business.richbe.services.Logger;
+import com.belman.business.richbe.services.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;

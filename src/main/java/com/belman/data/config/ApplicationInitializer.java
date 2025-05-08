@@ -1,14 +1,14 @@
 package com.belman.data.config;
 
 import com.belman.business.core.ServiceRegistry;
-import com.belman.business.domain.security.AuthenticationService;
+import com.belman.business.richbe.security.AuthenticationService;
 import com.belman.data.logging.EmojiLogger;
-import com.belman.business.domain.customer.CustomerRepository;
-import com.belman.business.domain.order.OrderRepository;
-import com.belman.business.domain.user.UserRepository;
-import com.belman.business.domain.user.rbac.AccessPolicyFactory;
-import com.belman.business.domain.user.rbac.RoleBasedAccessControlFactory;
-import com.belman.business.domain.services.PhotoService;
+import com.belman.business.richbe.customer.CustomerRepository;
+import com.belman.business.richbe.order.OrderRepository;
+import com.belman.business.richbe.user.UserRepository;
+import com.belman.business.richbe.user.rbac.AccessPolicyFactory;
+import com.belman.business.richbe.user.rbac.RoleBasedAccessControlFactory;
+import com.belman.business.richbe.services.PhotoService;
 import com.belman.data.persistence.InMemoryCustomerRepository;
 import com.belman.data.persistence.InMemoryOrderRepository;
 import com.belman.data.persistence.InMemoryUserRepository;

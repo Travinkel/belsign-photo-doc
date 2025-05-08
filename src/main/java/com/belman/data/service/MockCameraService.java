@@ -1,8 +1,7 @@
 package com.belman.data.service;
 
 import com.belman.business.core.BaseService;
-import com.belman.business.domain.services.CameraService;
-import com.belman.business.domain.services.LoggerFactory;
+import com.belman.business.richbe.services.CameraService;
 import com.belman.data.logging.EmojiLoggerFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;

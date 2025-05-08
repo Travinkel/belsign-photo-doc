@@ -1,16 +1,16 @@
 package com.belman.integration.infrastructure.persistence;
 
-import com.belman.business.domain.user.UserAggregate;
-import com.belman.business.domain.user.UserStatus;
-import com.belman.business.domain.user.UserRepository;
-import com.belman.business.domain.user.UserRole;
-import com.belman.business.domain.user.ApprovalState;
-import com.belman.business.domain.security.PasswordHasher;
-import com.belman.business.domain.common.EmailAddress;
-import com.belman.business.domain.security.HashedPassword;
-import com.belman.business.domain.common.PersonName;
-import com.belman.business.domain.user.UserId;
-import com.belman.business.domain.user.Username;
+import com.belman.business.richbe.user.UserAggregate;
+import com.belman.business.richbe.user.UserStatus;
+import com.belman.business.richbe.user.UserRepository;
+import com.belman.business.richbe.user.UserRole;
+import com.belman.business.richbe.user.ApprovalState;
+import com.belman.business.richbe.security.PasswordHasher;
+import com.belman.business.richbe.common.EmailAddress;
+import com.belman.business.richbe.security.HashedPassword;
+import com.belman.business.richbe.common.PersonName;
+import com.belman.business.richbe.user.UserId;
+import com.belman.business.richbe.user.Username;
 import com.belman.data.config.DatabaseConfig;
 import com.belman.data.persistence.SqlUserRepository;
 import com.belman.data.security.BCryptPasswordHasher;

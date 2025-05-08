@@ -1,9 +1,9 @@
 package com.belman.business.core;
 
-import com.belman.business.domain.events.DomainEvent;
-import com.belman.business.domain.services.Logger;
-import com.belman.business.domain.services.LoggerFactory;
-import com.belman.business.domain.events.DomainEventPublisher;
+import com.belman.business.richbe.events.DomainEvent;
+import com.belman.business.richbe.services.Logger;
+import com.belman.business.richbe.services.LoggerFactory;
+import com.belman.business.richbe.events.DomainEventPublisher;
 
 /**
  * Base class for all services.

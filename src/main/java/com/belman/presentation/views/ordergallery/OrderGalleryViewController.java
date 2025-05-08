@@ -2,9 +2,9 @@ package com.belman.presentation.views.ordergallery;
 
 import com.belman.presentation.core.BaseController;
 import com.belman.presentation.navigation.Router;
-import com.belman.business.domain.user.UserAggregate;
-import com.belman.business.domain.user.UserRole;
-import com.belman.business.domain.order.OrderAggregate;
+import com.belman.business.richbe.user.UserAggregate;
+import com.belman.business.richbe.user.UserRole;
+import com.belman.business.richbe.order.OrderAggregate;
 import com.belman.data.service.SessionManager;
 import com.belman.presentation.components.TouchFriendlyDialog;
 import com.belman.presentation.views.photoupload.PhotoUploadView;

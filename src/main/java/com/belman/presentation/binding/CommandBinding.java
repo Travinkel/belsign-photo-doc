@@ -1,6 +1,6 @@
 package com.belman.presentation.binding;
 
-import com.belman.business.domain.shared.Command;
+import com.belman.business.richbe.shared.Command;
 import com.belman.business.core.CommandManager;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;

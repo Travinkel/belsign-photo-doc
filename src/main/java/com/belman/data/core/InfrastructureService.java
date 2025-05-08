@@ -1,8 +1,8 @@
 package com.belman.data.core;
 
-import com.belman.business.domain.events.DomainEvent;
-import com.belman.business.domain.events.DomainEventPublisher;
-import com.belman.business.domain.services.Logger;
+import com.belman.business.richbe.events.DomainEvent;
+import com.belman.business.richbe.events.DomainEventPublisher;
+import com.belman.business.richbe.services.Logger;
 import com.belman.data.logging.EmojiLoggerFactory;
 
 /**

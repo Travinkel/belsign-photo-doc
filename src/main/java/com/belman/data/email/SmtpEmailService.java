@@ -2,9 +2,9 @@ package com.belman.data.email;
 
 
 
-import com.belman.business.domain.common.EmailAddress;
-import com.belman.business.domain.report.ReportAggregate;
-import com.belman.business.domain.services.EmailService;
+import com.belman.business.richbe.common.EmailAddress;
+import com.belman.business.richbe.report.ReportAggregate;
+import com.belman.business.richbe.services.EmailService;
 
 import java.io.File;
 import java.util.Collections;

@@ -1,8 +1,8 @@
 package com.belman.presentation.views.usermanagement;
 
 import com.belman.presentation.core.BaseController;
-import com.belman.business.domain.user.UserAggregate;
-import com.belman.business.domain.user.UserStatus;
+import com.belman.business.richbe.user.UserAggregate;
+import com.belman.business.richbe.user.UserStatus;
 import com.belman.presentation.components.TouchFriendlyDialog;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;

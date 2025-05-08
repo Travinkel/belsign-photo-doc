@@ -1,17 +1,15 @@
 package com.belman.data.security;
 
 import com.belman.business.core.BaseService;
-import com.belman.business.domain.user.UserAggregate;
-import com.belman.business.domain.events.UserLoggedInEvent;
-import com.belman.business.domain.events.UserLoggedOutEvent;
-import com.belman.business.domain.user.UserRepository;
-import com.belman.business.domain.security.AuthenticationService;
-import com.belman.business.domain.security.HashedPassword;
-import com.belman.business.domain.security.PasswordHasher;
-import com.belman.business.domain.services.LoggerFactory;
-import com.belman.business.domain.user.Username;
-import com.belman.business.domain.user.ApprovalState;
-import com.belman.business.domain.user.ApprovalStatus;
+import com.belman.business.richbe.user.UserAggregate;
+import com.belman.business.richbe.events.UserLoggedInEvent;
+import com.belman.business.richbe.events.UserLoggedOutEvent;
+import com.belman.business.richbe.user.UserRepository;
+import com.belman.business.richbe.security.AuthenticationService;
+import com.belman.business.richbe.security.HashedPassword;
+import com.belman.business.richbe.security.PasswordHasher;
+import com.belman.business.richbe.user.Username;
+import com.belman.business.richbe.user.ApprovalState;
 import com.belman.data.logging.EmojiLoggerFactory;
 
 import java.util.Optional;

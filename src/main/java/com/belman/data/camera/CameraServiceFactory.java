@@ -1,7 +1,7 @@
 package com.belman.data.camera;
 
 import com.belman.data.platform.PlatformUtils;
-import com.belman.business.domain.services.CameraService;
+import com.belman.business.richbe.services.CameraService;
 import com.belman.data.service.MockCameraService;
 
 /**

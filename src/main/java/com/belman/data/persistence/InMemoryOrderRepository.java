@@ -1,10 +1,10 @@
 package com.belman.data.persistence;
 
-import com.belman.business.domain.order.OrderAggregate;
-import com.belman.business.domain.order.OrderId;
-import com.belman.business.domain.order.OrderNumber;
-import com.belman.business.domain.order.OrderRepository;
-import com.belman.business.domain.specification.Specification;
+import com.belman.business.richbe.order.OrderAggregate;
+import com.belman.business.richbe.order.OrderId;
+import com.belman.business.richbe.order.OrderNumber;
+import com.belman.business.richbe.order.OrderRepository;
+import com.belman.business.richbe.specification.Specification;
 
 import java.util.*;
 import java.util.stream.Collectors;

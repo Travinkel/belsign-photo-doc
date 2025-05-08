@@ -1,7 +1,7 @@
 package com.belman.business.commands.validation;
 
-import com.belman.business.domain.common.validation.ValidationResult;
-import com.belman.business.domain.shared.Command;
+import com.belman.business.richbe.common.validation.ValidationResult;
+import com.belman.business.richbe.shared.Command;
 
 import java.util.ArrayList;
 import java.util.List;

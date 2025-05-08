@@ -1,6 +1,6 @@
 package com.belman.data.config;
 
-import com.belman.business.domain.services.Logger;
+import com.belman.business.richbe.services.Logger;
 import com.belman.data.logging.EmojiLoggerFactory;
 import com.belman.data.security.SecureConfigStorage;
 import com.zaxxer.hikari.HikariConfig;

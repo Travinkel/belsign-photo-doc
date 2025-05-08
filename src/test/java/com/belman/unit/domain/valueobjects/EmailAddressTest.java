@@ -1,6 +1,6 @@
 package com.belman.unit.domain.valueobjects;
 
-import com.belman.business.domain.common.EmailAddress;
+import com.belman.business.richbe.common.EmailAddress;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;

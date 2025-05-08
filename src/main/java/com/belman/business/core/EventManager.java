@@ -1,8 +1,8 @@
 package com.belman.business.core;
 
-import com.belman.business.domain.events.DomainEvent;
-import com.belman.business.domain.events.DomainEventHandler;
-import com.belman.business.domain.events.DomainEventPublisher;
+import com.belman.business.richbe.events.DomainEvent;
+import com.belman.business.richbe.events.DomainEventHandler;
+import com.belman.business.richbe.events.DomainEventPublisher;
 
 /**
  * Manager for domain events.

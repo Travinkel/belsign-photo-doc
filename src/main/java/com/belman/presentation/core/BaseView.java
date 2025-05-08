@@ -1,7 +1,6 @@
 package com.belman.presentation.core;
 
 import com.belman.business.core.LifecycleManager;
-import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.control.ProgressIndicator;
 import com.gluonhq.charm.glisten.mvc.View;
@@ -217,7 +216,7 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View implemen
 
     /**
      * Updates the AppBar with the current properties.
-     * This method gracefully handles cases where MobileApplication.getInstance() returns null,
+     * This method gracefully handles cases where GluonFacade.getInstance() returns null,
      * which can happen in unit tests or when running outside of a Gluon Mobile environment.
      */
     protected void updateAppBar() {
@@ -227,9 +226,9 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View implemen
                 return;
             }
 
-            MobileApplication app = MobileApplication.getInstance();
+            GluonFacade app = GluonFacade.getInstance();
             if (app == null) {
-                // In unit tests or non-Gluon environments, MobileApplication.getInstance() may return null
+                // In unit tests or non-Gluon environments, GluonFacade.getInstance() may return null
                 return;
             }
 

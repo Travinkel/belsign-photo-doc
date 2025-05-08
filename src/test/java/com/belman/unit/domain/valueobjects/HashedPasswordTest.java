@@ -1,7 +1,7 @@
 package com.belman.unit.domain.valueobjects;
 
-import com.belman.business.domain.security.PasswordHasher;
-import com.belman.business.domain.security.HashedPassword;
+import com.belman.business.richbe.security.PasswordHasher;
+import com.belman.business.richbe.security.HashedPassword;
 import com.belman.data.security.BCryptPasswordHasher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
