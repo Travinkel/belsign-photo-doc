@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.belman.ui.views.usermanagement.UserManagementViewController"
+            prefHeight="600.0" prefWidth="800.0"
+            style="-fx-background-color: #f2f2f2;">
+
+    <BorderPane AnchorPane.topAnchor="0.0" 
+                AnchorPane.rightAnchor="0.0" 
+                AnchorPane.bottomAnchor="0.0" 
+                AnchorPane.leftAnchor="0.0">
+
+        <!-- No custom header needed - using Gluon's AppBar instead -->
+
+        <!-- Main content -->
+        <center>
+            <SplitPane dividerPositions="0.3" prefHeight="160.0" prefWidth="200.0">
+                <!-- Left side: User list -->
+                <VBox spacing="10" style="-fx-padding: 10;">
+                    <HBox spacing="10" alignment="CENTER">
+                        <TextField fx:id="searchField" promptText="Search users..." HBox.hgrow="ALWAYS" />
+                        <Button fx:id="createUserButton" text="Create User" 
+                                style="-fx-background-color: #2ecc71; -fx-text-fill: white;"/>
+                    </HBox>
+                    <ListView fx:id="userListView" VBox.vgrow="ALWAYS" />
+                </VBox>
+
+                <!-- Right side: User details form -->
+                <ScrollPane fitToWidth="true">
+                    <VBox spacing="15" style="-fx-padding: 20;">
+                        <Label text="User Details" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+                        <GridPane hgap="10" vgap="10">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="NEVER" minWidth="100" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                            </columnConstraints>
+
+                            <!-- Username -->
+                            <Label text="Username:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                            <TextField fx:id="usernameField" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                            <!-- First Name -->
+                            <Label text="First Name:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                            <TextField fx:id="firstNameField" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+                            <!-- Last Name -->
+                            <Label text="Last Name:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                            <TextField fx:id="lastNameField" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+                            <!-- Email -->
+                            <Label text="Email:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                            <TextField fx:id="emailField" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+                            <!-- Status -->
+                            <Label text="Status:" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                            <ComboBox fx:id="statusComboBox" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+
+                            <!-- Roles -->
+                            <Label text="Roles:" GridPane.rowIndex="5" GridPane.columnIndex="0" />
+                            <VBox spacing="5" GridPane.rowIndex="5" GridPane.columnIndex="1">
+                                <CheckBox fx:id="adminRoleCheckBox" text="Administrator" />
+                                <CheckBox fx:id="qaRoleCheckBox" text="Quality Assurance" />
+                                <CheckBox fx:id="productionRoleCheckBox" text="Production Worker" />
+                            </VBox>
+
+                            <!-- Password -->
+                            <Label text="Password:" GridPane.rowIndex="6" GridPane.columnIndex="0" />
+                            <HBox spacing="10" GridPane.rowIndex="6" GridPane.columnIndex="1">
+                                <PasswordField fx:id="passwordField" HBox.hgrow="ALWAYS" />
+                                <Button fx:id="resetPasswordButton" text="Generate Password" />
+                            </HBox>
+                        </GridPane>
+
+                        <!-- Error message -->
+                        <Label fx:id="errorMessageLabel" textFill="RED" wrapText="true" />
+
+                        <!-- Buttons -->
+                        <HBox spacing="10" alignment="CENTER_RIGHT">
+                            <Button fx:id="cancelButton" text="Cancel" />
+                            <Button fx:id="saveButton" text="Save" 
+                                    style="-fx-background-color: #2ecc71; -fx-text-fill: white;"/>
+                        </HBox>
+                    </VBox>
+                </ScrollPane>
+            </SplitPane>
+        </center>
+    </BorderPane>
+</AnchorPane>

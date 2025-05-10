@@ -1,13 +1,13 @@
 package com.belman.unit.business.audit;
 
-import com.belman.business.audit.AuditFacade;
-import com.belman.business.audit.AuditRepository;
-import com.belman.business.audit.DefaultAuditFacade;
-import com.belman.business.richbe.events.AuditEvent;
-import com.belman.business.richbe.events.BaseAuditEvent;
-import com.belman.business.richbe.order.photo.PhotoId;
-import com.belman.business.richbe.services.Logger;
-import com.belman.business.richbe.user.UserId;
+import com.belman.domain.audit.AuditFacade;
+import com.belman.domain.audit.AuditRepository;
+import com.belman.domain.audit.DefaultAuditFacade;
+import com.belman.domain.audit.event.AuditEvent;
+import com.belman.domain.audit.event.BaseAuditEvent;
+import com.belman.domain.order.photo.PhotoId;
+import com.belman.domain.services.Logger;
+import com.belman.domain.user.UserId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -92,7 +92,7 @@ class DefaultAuditFacadeTest {
         // Assert
         ArgumentCaptor<AuditEvent> eventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
         verify(auditRepository).store(eventCaptor.capture());
-        
+
         AuditEvent capturedEvent = eventCaptor.getValue();
         assertEquals("PhotoApproved", capturedEvent.getEventType());
         assertNotNull(capturedEvent.getEventId());
@@ -112,7 +112,7 @@ class DefaultAuditFacadeTest {
         // Assert
         ArgumentCaptor<AuditEvent> eventCaptor = ArgumentCaptor.forClass(AuditEvent.class);
         verify(auditRepository).store(eventCaptor.capture());
-        
+
         AuditEvent capturedEvent = eventCaptor.getValue();
         assertEquals("PhotoRejected", capturedEvent.getEventType());
         assertNotNull(capturedEvent.getEventId());

@@ -25,49 +25,62 @@ public class ThreeLayerArchitectureTest {
     // which violates the layered architecture rule. This is expected because test
     // classes need to access the classes they're testing, regardless of which layer
     // they're in.
-    /*
     @Test
     public void layeredArchitectureShouldBeRespected() {
         // This test checks that the production code follows the layered architecture
         ArchRule rule = layeredArchitecture()
                 .consideringAllDependencies()
-                .layer("Presentation").definedBy("com.belman.presentation..")
-                .layer("Business").definedBy("com.belman.business..")
-                .layer("Data").definedBy("com.belman.data..")
-                .whereLayer("Presentation").mayNotBeAccessedByAnyLayer()
-                .whereLayer("Business").mayOnlyBeAccessedByLayers("Presentation", "Data") // Allow Data to access Business for repositories
-                .whereLayer("Data").mayOnlyBeAccessedByLayers("Business", "Presentation"); // Allow Presentation to access Data for services
+                .layer("UI").definedBy("com.belman.ui..")
+                .layer("Service").definedBy("com.belman.service..")
+                .layer("Repository").definedBy("com.belman.repository..")
+                .layer("Domain").definedBy("com.belman.domain..")
+                .layer("Common").definedBy("com.belman.common..")
+                .layer("Bootstrap").definedBy("com.belman.repository.bootstrap..")
+
+                // Normal forward flow
+                .whereLayer("UI").mayOnlyAccessLayers("Service", "Domain", "Common")
+
+                // Bidirectional flow between Service and Repository
+                .whereLayer("Service").mayOnlyAccessLayers("UI", "Repository", "Domain", "Common")
+                .whereLayer("Repository").mayOnlyAccessLayers("Service", "Domain", "Common")
+
+                // Shared domain layer and common
+                .whereLayer("Domain").mayOnlyAccessLayers("Common")
+
+                // Bootstrap layer can access all other layers
+                .whereLayer("Bootstrap").mayOnlyAccessLayers("UI", "Service", "Repository", "Domain", "Common");
 
         rule.check(importedClasses);
     }
-    */
 
     @Test
-    public void presentationLayerShouldNotDependOnInternalDataImplementations() {
-        // Allow presentation layer to depend on data layer services and utilities,
-        // but not on internal data implementations like repositories
-        ArchRule rule = noClasses().that().resideInAPackage("com.belman.presentation..")
+    public void uiLayerShouldNotDependOnInternalRepositoryImplementations() {
+        // Allow UI layer to depend on repository layer services and utilities,
+        // but not on internal repository implementations
+        ArchRule rule = noClasses().that().resideInAPackage("com.belman.ui..")
             .should().dependOnClassesThat().resideInAnyPackage(
-                "com.belman.data.persistence..",
-                "com.belman.data.implementation..");
+                "com.belman.repository.persistence..",
+                "com.belman.repository.implementation..");
 
         rule.check(importedClasses);
     }
 
     @Test
-    public void businessLayerShouldNotDependOnPresentationLayer() {
-        ArchRule rule = noClasses().that().resideInAPackage("com.belman.business..")
-            .should().dependOnClassesThat().resideInAPackage("com.belman.presentation..");
+    public void serviceLayerShouldNotDependOnUiLayer() {
+        // Service layer should not depend on UI layer except through interfaces
+        ArchRule rule = noClasses().that().resideInAPackage("com.belman.service..")
+            .and().areNotInterfaces()
+            .should().dependOnClassesThat().resideInAPackage("com.belman.ui..");
 
         rule.check(importedClasses);
     }
 
     @Test
-    public void dataLayerShouldNotDependOnPresentationLayer() {
-        // Allow data layer to depend on business layer interfaces,
-        // but not on presentation layer, except for the Main class
+    public void repositoryLayerShouldNotDependOnUiLayer() {
+        // Allow repository layer to depend on service layer interfaces,
+        // but not on UI layer, except for the Main class
         // which needs to initialize the application
-        ArchRule rule = noClasses().that().resideInAPackage("com.belman.data..")
+        ArchRule rule = noClasses().that().resideInAPackage("com.belman.repository..")
             .and(new DescribedPredicate<JavaClass>("are not bootstrap classes") {
                 @Override
                 public boolean test(JavaClass javaClass) {
@@ -75,15 +88,15 @@ public class ThreeLayerArchitectureTest {
                            !javaClass.getPackageName().contains("bootstrap");
                 }
             })
-            .should().dependOnClassesThat().resideInAnyPackage("com.belman.presentation..");
+            .should().dependOnClassesThat().resideInAnyPackage("com.belman.ui..");
 
         rule.check(importedClasses);
     }
 
     @Test
     public void concreteViewModelsInViewsPackage() {
-        // Allow base view models in the presentation.core package,
-        // but require concrete view models to be in the presentation.views package
+        // Allow base view models in the ui.core package,
+        // but require concrete view models to be in the ui.views package
         ArchRule rule = classes().that().haveNameMatching(".*ViewModel")
             .and(new DescribedPredicate<JavaClass>("are not base view models") {
                 @Override
@@ -91,49 +104,49 @@ public class ThreeLayerArchitectureTest {
                     return !javaClass.getSimpleName().equals("BaseViewModel");
                 }
             })
-            .should().resideInAPackage("com.belman.presentation.views..");
+            .should().resideInAPackage("com.belman.ui.views..");
 
         rule.check(importedClasses);
     }
 
     @Test
     public void viewControllersInViewsPackage() {
-        // Allow base controllers in the presentation.core package,
-        // but require view controllers to be in the presentation.views package
+        // Allow base controllers in the ui.core package,
+        // but require view controllers to be in the ui.views package
         ArchRule rule = classes().that().haveNameMatching(".*Controller")
-            .and().resideInAPackage("com.belman.presentation.views..")
-            .should().resideInAPackage("com.belman.presentation.views..");
+            .and().resideInAPackage("com.belman.ui.views..")
+            .should().resideInAPackage("com.belman.ui.views..");
 
         rule.check(importedClasses);
     }
 
     @Test
-    public void domainClassesShouldResideInBusinessLayer() {
-        // Allow service implementations in the data layer,
-        // but require domain classes to be in the business layer
-        ArchRule rule = classes().that().haveSimpleNameEndingWith("Aggregate")
-            .or().haveSimpleNameEndingWith("Entity")
-            .or().haveSimpleNameEndingWith("ValueObject")
-            .should().resideInAPackage("com.belman.business..");
+    public void domainClassesShouldResideInDomainLayer() {
+        // Allow service implementations in the repository layer,
+        // but require domain classes to be in the domain layer
+        ArchRule rule = classes().that().haveSimpleNameEndingWith("Business")
+            .or().haveSimpleNameEndingWith("Component")
+            .or().resideInAPackage("com.belman.domain..common..")
+            .should().resideInAPackage("com.belman.domain..");
 
         rule.check(importedClasses);
     }
 
     @Test
-    public void repositoryImplementationsShouldResideInDataLayer() {
-        // Allow repository interfaces in the business layer,
-        // but require implementations to be in the data.persistence package or its subpackages
+    public void dataAccessImplementationsShouldResideInRepositoryLayer() {
+        // Allow data access interfaces in the domain layer,
+        // but require implementations to be in the repository.persistence package or its subpackages
         ArchRule rule = classes().that().haveNameMatching(".*Repository")
             .and().areNotInterfaces()
-            .should().resideInAPackage("com.belman.data.persistence..");
+            .should().resideInAPackage("com.belman.repository.persistence..");
 
         rule.check(importedClasses);
     }
 
     @Test
-    public void useCasesInBusinessLayer() {
-        // Allow base UseCase class in the business.core package,
-        // but require concrete use cases to be in the business.usecases package
+    public void useCasesInServiceLayer() {
+        // Allow base UseCase class in the service.infrastructure package,
+        // but require concrete use cases to be in the service.usecase package
         ArchRule rule = classes().that().haveNameMatching(".*UseCase")
             .and(new DescribedPredicate<JavaClass>("are not base use case classes") {
                 @Override
@@ -141,15 +154,15 @@ public class ThreeLayerArchitectureTest {
                     return !javaClass.getSimpleName().equals("UseCase");
                 }
             })
-            .should().resideInAPackage("com.belman.business.usecases..");
+            .should().resideInAPackage("com.belman.service.usecase..");
 
         rule.check(importedClasses);
     }
 
     @Test
     public void concreteViewsInViewsPackage() {
-        // Allow base views in the presentation.core package,
-        // but require concrete views to be in the presentation.views package
+        // Allow base views in the ui.core package,
+        // but require concrete views to be in the ui.views package
         ArchRule rule = classes().that().haveNameMatching(".*View")
             .and().areNotInterfaces()
             .and(new DescribedPredicate<JavaClass>("are not base views") {
@@ -158,7 +171,7 @@ public class ThreeLayerArchitectureTest {
                     return !javaClass.getSimpleName().equals("BaseView");
                 }
             })
-            .should().resideInAPackage("com.belman.presentation.views..");
+            .should().resideInAPackage("com.belman.ui.views..");
 
         rule.check(importedClasses);
     }

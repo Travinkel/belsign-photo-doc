@@ -1,12 +1,12 @@
 package com.belman.unit.application.core;
 
-import com.belman.business.core.ApplicationStateManager;
-import com.belman.business.richbe.events.ApplicationBackgroundedEvent;
-import com.belman.business.richbe.events.ApplicationPausedEvent;
-import com.belman.business.richbe.events.ApplicationResumedEvent;
-import com.belman.business.richbe.events.ApplicationStateEvent;
-import com.belman.business.richbe.events.ApplicationStateEvent.ApplicationState;
-import com.belman.business.richbe.events.ApplicationStoppedEvent;
+import com.belman.bootstrap.lifecycle.ApplicationStateManager;
+import com.belman.domain.events.ApplicationBackgroundedEvent;
+import com.belman.domain.events.ApplicationPausedEvent;
+import com.belman.domain.events.ApplicationResumedEvent;
+import com.belman.domain.events.ApplicationStateEvent;
+import com.belman.domain.events.ApplicationStateEvent.ApplicationState;
+import com.belman.domain.events.ApplicationStoppedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

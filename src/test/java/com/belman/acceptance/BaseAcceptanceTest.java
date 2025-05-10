@@ -1,6 +1,6 @@
 package com.belman.acceptance;
 
-import com.belman.data.config.DatabaseConfig;
+import com.belman.bootstrap.persistence.DatabaseConfig;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;

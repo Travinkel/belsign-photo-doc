@@ -31,7 +31,7 @@
 //public class InMemoryOrderAggregateRepositoryTest {
 //
 //    private OrderRepository orderRepository;
-//    private OrderAggregate testOrderAggregate;
+//    private OrderBusiness testOrderAggregate;
 //    private User testUser;
 //    private OrderId orderId;
 //    private OrderNumber orderNumber;
@@ -63,7 +63,7 @@
 //        orderNumber = OrderNumber.of(1, 23, 123456, 12345678);
 //        Timestamp createdAt = new Timestamp(Instant.now());
 //
-//        testOrderAggregate = new OrderAggregate(orderId, orderNumber, testUser, createdAt);
+//        testOrderAggregate = new OrderBusiness(orderId, orderNumber, testUser, createdAt);
 //        System.out.println("[DEBUG_LOG] Created test order with ID: " + orderId.id() + " and number: " + orderNumber.value());
 //    }
 //
@@ -78,11 +78,11 @@
 //
 //            // Then
 //            System.out.println("[DEBUG_LOG] Finding order by ID");
-//            OrderAggregate retrievedOrderAggregate = orderRepository.findById(orderId);
+//            OrderBusiness retrievedOrderAggregate = orderRepository.findById(orderId);
 //
-//            assertNotNull(retrievedOrderAggregate, "OrderAggregate should be found after saving");
-//            assertEquals(orderId.id(), retrievedOrderAggregate.getId().id(), "OrderAggregate ID should match");
-//            assertEquals(orderNumber.value(), retrievedOrderAggregate.getOrderNumber().value(), "OrderAggregate number should match");
+//            assertNotNull(retrievedOrderAggregate, "OrderBusiness should be found after saving");
+//            assertEquals(orderId.id(), retrievedOrderAggregate.getId().id(), "OrderBusiness ID should match");
+//            assertEquals(orderNumber.value(), retrievedOrderAggregate.getOrderNumber().value(), "OrderBusiness number should match");
 //
 //            System.out.println("[DEBUG_LOG] Test passed successfully");
 //        } catch (Exception e) {
@@ -103,11 +103,11 @@
 //
 //            // When
 //            System.out.println("[DEBUG_LOG] Finding order by ID");
-//            OrderAggregate retrievedOrderAggregate = orderRepository.findById(orderId);
+//            OrderBusiness retrievedOrderAggregate = orderRepository.findById(orderId);
 //
 //            // Then
-//            assertNotNull(retrievedOrderAggregate, "OrderAggregate should be found");
-//            assertEquals(orderId.id(), retrievedOrderAggregate.getId().id(), "OrderAggregate ID should match");
+//            assertNotNull(retrievedOrderAggregate, "OrderBusiness should be found");
+//            assertEquals(orderId.id(), retrievedOrderAggregate.getId().id(), "OrderBusiness ID should match");
 //
 //            System.out.println("[DEBUG_LOG] Test passed successfully");
 //        } catch (Exception e) {
@@ -124,7 +124,7 @@
 //        try {
 //            // When
 //            System.out.println("[DEBUG_LOG] Finding non-existent order by ID");
-//            OrderAggregate retrievedOrderAggregate = orderRepository.findById(new OrderId(UUID.randomUUID()));
+//            OrderBusiness retrievedOrderAggregate = orderRepository.findById(new OrderId(UUID.randomUUID()));
 //
 //            // Then
 //            assertNull(retrievedOrderAggregate, "Non-existent order should not be found");
@@ -150,13 +150,13 @@
 //            OrderId secondOrderId = new OrderId(UUID.randomUUID());
 //            OrderNumber secondOrderNumber = OrderNumber.of(1, 23, 654321, 87654321);
 //            Timestamp createdAt = new Timestamp(Instant.now());
-//            OrderAggregate secondOrderAggregate = new OrderAggregate(secondOrderId, secondOrderNumber, testUser, createdAt);
+//            OrderBusiness secondOrderAggregate = new OrderBusiness(secondOrderId, secondOrderNumber, testUser, createdAt);
 //            System.out.println("[DEBUG_LOG] Created second test order with ID: " + secondOrderId.id());
 //            orderRepository.save(secondOrderAggregate);
 //
 //            // When
 //            System.out.println("[DEBUG_LOG] Finding all orders");
-//            List<OrderAggregate> allOrderAggregates = orderRepository.findAll();
+//            List<OrderBusiness> allOrderAggregates = orderRepository.findAll();
 //
 //            // Then
 //            assertEquals(2, allOrderAggregates.size(), "Should find 2 orders");
@@ -184,22 +184,22 @@
 //            OrderId secondOrderId = new OrderId(UUID.randomUUID());
 //            OrderNumber secondOrderNumber = OrderNumber.of(1, 23, 654321, 87654321);
 //            Timestamp createdAt = new Timestamp(Instant.now());
-//            OrderAggregate secondOrderAggregate = new OrderAggregate(secondOrderId, secondOrderNumber, testUser, createdAt);
+//            OrderBusiness secondOrderAggregate = new OrderBusiness(secondOrderId, secondOrderNumber, testUser, createdAt);
 //            secondOrderAggregate.setStatus(OrderStatus.COMPLETED);
 //            System.out.println("[DEBUG_LOG] Created second test order with ID: " + secondOrderId.id() + " and status: " + secondOrderAggregate.getStatus());
 //            orderRepository.save(secondOrderAggregate);
 //
 //            // Use MinPhotosSpecification with min=0 to get all orders
 //            // We'll filter for COMPLETED orders in the test
-//            Specification<OrderAggregate> allOrdersSpec = new MinPhotosSpecification(0);
+//            Specification<OrderBusiness> allOrdersSpec = new MinPhotosSpecification(0);
 //
 //            // When
 //            System.out.println("[DEBUG_LOG] Finding orders by specification (all orders)");
-//            List<OrderAggregate> allOrderAggregates = orderRepository.findBySpecification(allOrdersSpec);
+//            List<OrderBusiness> allOrderAggregates = orderRepository.findBySpecification(allOrdersSpec);
 //
 //            // Filter for COMPLETED orders
 //            System.out.println("[DEBUG_LOG] Filtering for COMPLETED orders");
-//            List<OrderAggregate> completedOrderAggregates = allOrderAggregates.stream()
+//            List<OrderBusiness> completedOrderAggregates = allOrderAggregates.stream()
 //                .filter(order -> order.getStatus() == OrderStatus.COMPLETED)
 //                .toList();
 //
@@ -226,11 +226,11 @@
 //
 //            // When
 //            System.out.println("[DEBUG_LOG] Finding order by order number");
-//            Optional<OrderAggregate> result = orderRepository.findByOrderNumber(orderNumber);
+//            Optional<OrderBusiness> result = orderRepository.findByOrderNumber(orderNumber);
 //
 //            // Then
-//            assertTrue(result.isPresent(), "OrderAggregate should be found by order number");
-//            assertEquals(orderId.id(), result.get().getId().id(), "OrderAggregate ID should match");
+//            assertTrue(result.isPresent(), "OrderBusiness should be found by order number");
+//            assertEquals(orderId.id(), result.get().getId().id(), "OrderBusiness ID should match");
 //
 //            System.out.println("[DEBUG_LOG] Test passed successfully");
 //        } catch (Exception e) {
@@ -247,7 +247,7 @@
 //        try {
 //            // When
 //            System.out.println("[DEBUG_LOG] Finding non-existent order by order number");
-//            Optional<OrderAggregate> result = orderRepository.findByOrderNumber(OrderNumber.of(1, 23, 999999, 12345678));
+//            Optional<OrderBusiness> result = orderRepository.findByOrderNumber(OrderNumber.of(1, 23, 999999, 12345678));
 //
 //            // Then
 //            assertTrue(result.isEmpty(), "Non-existent order should not be found by order number");
@@ -276,10 +276,10 @@
 //
 //            // Then
 //            System.out.println("[DEBUG_LOG] Finding updated order by ID");
-//            OrderAggregate retrievedOrderAggregate = orderRepository.findById(orderId);
+//            OrderBusiness retrievedOrderAggregate = orderRepository.findById(orderId);
 //
 //            assertNotNull(retrievedOrderAggregate, "Updated order should be found");
-//            assertEquals(OrderStatus.IN_PROGRESS, retrievedOrderAggregate.getStatus(), "OrderAggregate status should be updated");
+//            assertEquals(OrderStatus.IN_PROGRESS, retrievedOrderAggregate.getStatus(), "OrderBusiness status should be updated");
 //
 //            System.out.println("[DEBUG_LOG] Test passed successfully");
 //        } catch (Exception e) {

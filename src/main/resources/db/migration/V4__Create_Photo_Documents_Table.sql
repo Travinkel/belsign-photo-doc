@@ -19,7 +19,7 @@ CREATE TABLE photo_documents (
     FOREIGN KEY (reviewed_by) REFERENCES users(id)
 );
 
--- Create Index on OrderAggregate ID
+-- Create Index on OrderBusiness ID
 CREATE INDEX idx_photo_documents_order_id ON photo_documents(order_id);
 
 -- Create Index on Status

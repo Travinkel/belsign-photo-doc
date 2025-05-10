@@ -10,7 +10,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.belman.presentation.views.main.MainViewController"
+            fx:controller="com.belman.ui.views.main.MainViewController"
             styleClass="responsive-container"
             stylesheets="@../styles/app.css">
 

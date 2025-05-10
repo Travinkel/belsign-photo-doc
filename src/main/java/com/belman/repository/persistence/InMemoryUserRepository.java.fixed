@@ -1,0 +1,146 @@
+package com.belman.repository.persistence;
+
+import com.belman.service.module.common.EmailAddress;
+import com.belman.service.module.common.PersonName;
+import com.belman.service.module.user.UserAggregate;
+import com.belman.service.module.user.UserId;
+import com.belman.service.module.user.Username;
+import com.belman.service.module.user.UserRepository;
+import com.belman.service.module.security.HashedPassword;
+import com.belman.service.module.security.PasswordHasher;
+
+import com.belman.repository.security.BCryptPasswordHasher;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+/**
+ * In-memory implementation of the UserRepository interface.
+ * This implementation stores users in memory and is suitable for development and testing.
+ * In a production environment, this would be replaced with a database-backed implementation.
+ */
+public class InMemoryUserRepository implements UserRepository {
+    private final Map<Username, UserAggregate> usersByUsername = new HashMap<>();
+    private final Map<EmailAddress, UserAggregate> usersByEmail = new HashMap<>();
+    private final Map<UserId, UserAggregate> usersById = new HashMap<>();
+
+    /**
+     * Creates a new InMemoryUserRepository with default users.
+     */
+    public InMemoryUserRepository() {
+        // Create default admin user
+        createDefaultUsers();
+    }
+
+    private void createDefaultUsers() {
+        // Create password hasher
+        PasswordHasher passwordHasher = new BCryptPasswordHasher();
+
+        // Create admin user with both old and new credentials
+        UserAggregate adminUser = new UserAggregate(
+                UserId.newId(),
+                new Username("admin"),
+                HashedPassword.fromPlainText("admin", passwordHasher),
+                new PersonName("Admin", "User"),
+                new EmailAddress("admin@belman.com")
+        );
+        adminUser.addRole(UserAggregate.Role.ADMIN);
+
+        // Create admin user with password123 (for Android compatibility)
+        UserAggregate adminUser2 = new UserAggregate(
+                UserId.newId(),
+                new Username("admin"),
+                HashedPassword.fromPlainText("password123", passwordHasher),
+                new PersonName("Admin", "User"),
+                new EmailAddress("admin@belman.com")
+        );
+        adminUser2.addRole(UserAggregate.Role.ADMIN);
+
+        // Create production user
+        UserAggregate productionUser = new UserAggregate(
+                UserId.newId(),
+                new Username("production"),
+                HashedPassword.fromPlainText("production", passwordHasher),
+                new PersonName("Production", "User"),
+                new EmailAddress("production@belman.com")
+        );
+        productionUser.addRole(UserAggregate.Role.PRODUCTION);
+
+        // Create QA user with both usernames
+        UserAggregate qaUser = new UserAggregate(
+                UserId.newId(),
+                new Username("qa"),
+                HashedPassword.fromPlainText("qa", passwordHasher),
+                new PersonName("QA", "User"),
+                new EmailAddress("qa@belman.com")
+        );
+        qaUser.addRole(UserAggregate.Role.QA);
+
+        // Create QA user with qa_user username (for Android compatibility)
+        UserAggregate qaUser2 = new UserAggregate(
+                UserId.newId(),
+                new Username("qa_user"),
+                HashedPassword.fromPlainText("qa", passwordHasher),
+                new PersonName("QA", "User"),
+                new EmailAddress("qa_user@belman.com")
+        );
+        qaUser2.addRole(UserAggregate.Role.QA);
+
+        // Save users
+        save(adminUser);
+        save(adminUser2);
+        save(productionUser);
+        save(qaUser);
+        save(qaUser2);
+    }
+
+    @Override
+    public Optional<UserAggregate> findByUsername(Username username) {
+        return Optional.ofNullable(usersByUsername.get(username));
+    }
+
+    @Override
+    public Optional<UserAggregate> findByEmail(EmailAddress email) {
+        return Optional.ofNullable(usersByEmail.get(email));
+    }
+
+    @Override
+    public void save(UserAggregate user) {
+        usersByUsername.put(user.getUsername(), user);
+        usersByEmail.put(user.getEmail(), user);
+        usersById.put(user.getId(), user);
+    }
+
+    @Override
+    public Optional<UserAggregate> findById(UserId id) {
+        return Optional.ofNullable(usersById.get(id));
+    }
+
+    @Override
+    public List<UserAggregate> findAll() {
+        return new ArrayList<>(usersById.values());
+    }
+
+    @Override
+    public List<UserAggregate> findByRole(UserAggregate.Role role) {
+        return usersById.values().stream()
+                .filter(user -> user.getRoles().contains(role))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean delete(UserId id) {
+        UserAggregate user = usersById.get(id);
+        if (user != null) {
+            usersById.remove(id);
+            usersByUsername.remove(user.getUsername());
+            usersByEmail.remove(user.getEmail());
+            return true;
+        }
+        return false;
+    }
+}

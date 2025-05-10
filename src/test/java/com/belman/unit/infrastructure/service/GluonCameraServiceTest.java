@@ -1,7 +1,7 @@
 package com.belman.unit.infrastructure.service;
 
-import com.belman.business.richbe.services.CameraService;
-import com.belman.data.camera.GluonCameraService;
+import com.belman.domain.services.CameraService;
+import com.belman.repository.camera.GluonCameraService;
 import com.gluonhq.attach.storage.StorageService;
 import com.gluonhq.attach.util.Services;
 import javafx.scene.image.Image;

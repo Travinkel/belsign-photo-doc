@@ -13,7 +13,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.belman.presentation.views.photoupload.PhotoUploadViewController"
+            fx:controller="com.belman.ui.views.photoupload.PhotoUploadViewController"
             styleClass="responsive-container, photo-upload-container"
             stylesheets="@../styles/app.css">
 
@@ -36,7 +36,7 @@
 
         <Label text="Upload Photos" styleClass="title"/>
 
-        <!-- OrderAggregate Number Section -->
+        <!-- OrderBusiness Number Section -->
         <HBox spacing="10" alignment="CENTER_LEFT" styleClass="form-row">
             <Label text="Order Number:" styleClass="form-label"/>
             <TextField fx:id="orderNumberField" promptText="Enter orderAggregate number" HBox.hgrow="ALWAYS"/>

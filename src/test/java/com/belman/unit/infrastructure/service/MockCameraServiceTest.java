@@ -1,7 +1,7 @@
 package com.belman.unit.infrastructure.service;
 
-import com.belman.business.richbe.services.CameraService;
-import com.belman.data.service.MockCameraService;
+import com.belman.domain.services.CameraService;
+import com.belman.repository.service.MockCameraService;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeEach;

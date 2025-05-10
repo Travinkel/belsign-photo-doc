@@ -16,7 +16,7 @@ CREATE TABLE orderAggregates
     FOREIGN KEY (created_by) REFERENCES users (id)
 );
 
--- Create Index on OrderAggregate Number
+-- Create Index on OrderBusiness Number
 CREATE INDEX idx_orders_order_number ON orderAggregates (order_number);
 
 -- Create Index on Customer ID

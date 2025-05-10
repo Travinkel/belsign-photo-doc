@@ -1,19 +1,19 @@
 package com.belman.integration.infrastructure.persistence;
 
-import com.belman.business.richbe.user.UserAggregate;
-import com.belman.business.richbe.user.UserStatus;
-import com.belman.business.richbe.user.UserRepository;
-import com.belman.business.richbe.user.UserRole;
-import com.belman.business.richbe.user.ApprovalState;
-import com.belman.business.richbe.security.PasswordHasher;
-import com.belman.business.richbe.common.EmailAddress;
-import com.belman.business.richbe.security.HashedPassword;
-import com.belman.business.richbe.common.PersonName;
-import com.belman.business.richbe.user.UserId;
-import com.belman.business.richbe.user.Username;
-import com.belman.data.config.DatabaseConfig;
-import com.belman.data.persistence.SqlUserRepository;
-import com.belman.data.security.BCryptPasswordHasher;
+import com.belman.domain.user.UserBusiness;
+import com.belman.domain.user.UserStatus;
+import com.belman.domain.user.UserRepository;
+import com.belman.domain.user.UserRole;
+import com.belman.domain.user.ApprovalState;
+import com.belman.domain.security.PasswordHasher;
+import com.belman.domain.common.EmailAddress;
+import com.belman.domain.security.HashedPassword;
+import com.belman.domain.common.PersonName;
+import com.belman.domain.user.UserId;
+import com.belman.domain.user.Username;
+import com.belman.bootstrap.persistence.DatabaseConfig;
+import com.belman.repository.persistence.SqlUserRepository;
+import com.belman.repository.security.BCryptPasswordHasher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SqlUserRepositoryTest {
 
     private UserRepository userRepository;
-    private UserAggregate testUser;
+    private UserBusiness testUser;
     private PasswordHasher passwordHasher;
 
     @BeforeEach
@@ -67,7 +67,7 @@ public class SqlUserRepositoryTest {
         PersonName name = new PersonName("Test", "User");
         EmailAddress email = new EmailAddress("testuser_" + uniqueId + "@example.com");
 
-        testUser = new UserAggregate.Builder()
+        testUser = new UserBusiness.Builder()
             .id(userId)
             .username(username)
             .password(password)
@@ -97,7 +97,7 @@ public class SqlUserRepositoryTest {
 
             // Then
             System.out.println("[DEBUG_LOG] Finding user by username");
-            Optional<UserAggregate> retrievedUser = userRepository.findByUsername(testUser.getUsername());
+            Optional<UserBusiness> retrievedUser = userRepository.findByUsername(testUser.getUsername());
 
             assertTrue(retrievedUser.isPresent(), "User should be found after saving");
             assertEquals(testUser.getId().id(), retrievedUser.get().getId().id(), "User ID should match");
@@ -131,7 +131,7 @@ public class SqlUserRepositoryTest {
 
             // When
             System.out.println("[DEBUG_LOG] Finding user by username");
-            Optional<UserAggregate> result = userRepository.findByUsername(testUser.getUsername());
+            Optional<UserBusiness> result = userRepository.findByUsername(testUser.getUsername());
 
             // Then
             assertTrue(result.isPresent(), "User should be found");
@@ -158,7 +158,7 @@ public class SqlUserRepositoryTest {
         try {
             // When
             System.out.println("[DEBUG_LOG] Finding non-existent user by username");
-            Optional<UserAggregate> result = userRepository.findByUsername(new Username("nonexistent"));
+            Optional<UserBusiness> result = userRepository.findByUsername(new Username("nonexistent"));
 
             // Then
             assertTrue(result.isEmpty(), "Non-existent user should not be found");
@@ -188,7 +188,7 @@ public class SqlUserRepositoryTest {
 
             // When
             System.out.println("[DEBUG_LOG] Finding user by email");
-            Optional<UserAggregate> result = userRepository.findByEmail(testUser.getEmail());
+            Optional<UserBusiness> result = userRepository.findByEmail(testUser.getEmail());
 
             // Then
             assertTrue(result.isPresent(), "User should be found by email");
@@ -215,7 +215,7 @@ public class SqlUserRepositoryTest {
         try {
             // When
             System.out.println("[DEBUG_LOG] Finding non-existent user by email");
-            Optional<UserAggregate> result = userRepository.findByEmail(new EmailAddress("nonexistent@example.com"));
+            Optional<UserBusiness> result = userRepository.findByEmail(new EmailAddress("nonexistent@example.com"));
 
             // Then
             assertTrue(result.isEmpty(), "Non-existent user should not be found by email");
@@ -246,17 +246,17 @@ public class SqlUserRepositoryTest {
             // When
             System.out.println("[DEBUG_LOG] Updating test user");
             testUser.addRole(UserRole.QA);
-            // Note: UserAggregate doesn't have a setStatus method, it always returns ACTIVE
+            // Note: UserBusiness doesn't have a setStatus method, it always returns ACTIVE
             // We'll set the approval state instead
             testUser.setApprovalState(ApprovalState.createRejected("Test rejection"));
             userRepository.save(testUser);
 
             // Then
             System.out.println("[DEBUG_LOG] Finding updated user by username");
-            Optional<UserAggregate> retrievedUser = userRepository.findByUsername(testUser.getUsername());
+            Optional<UserBusiness> retrievedUser = userRepository.findByUsername(testUser.getUsername());
 
             assertTrue(retrievedUser.isPresent(), "Updated user should be found");
-            // Note: UserAggregate always returns ACTIVE for getStatus()
+            // Note: UserBusiness always returns ACTIVE for getStatus()
             assertEquals(UserStatus.ACTIVE, retrievedUser.get().getStatus(), "User status should be ACTIVE");
             assertTrue(retrievedUser.get().getRoles().contains(UserRole.PRODUCTION), "User should retain PRODUCTION role");
             assertTrue(retrievedUser.get().getRoles().contains(UserRole.QA), "User should have new QA role");

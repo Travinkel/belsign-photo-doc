@@ -138,7 +138,7 @@ This architecture is a requirement from the curriculum and must be strictly foll
 #### Package Structure
 The project follows a specific package structure for each layer:
 
-##### Presentation Layer (com.belman.presentation)
+##### Presentation Layer (com.belman.ui)
 - **views**: Contains all view classes, organized by feature
   - Each feature has its own package (e.g., login, admin, photoupload)
   - Each view package contains the View, ViewModel, and Controller classes for that feature
@@ -149,7 +149,7 @@ The project follows a specific package structure for each layer:
   - Base classes for views, view models, and controllers
   - Common UI components and utilities
 
-##### Business Layer (com.belman.business)
+##### Business Layer (com.belman.service)
 - **domain**: Contains rich business entities, organized by bounded contexts
   - **photo**: Photo-related domain classes
   - **order**: Order-related domain classes
@@ -165,7 +165,7 @@ The project follows a specific package structure for each layer:
   - Service registry and locator
   - Lifecycle management
 
-##### Data Layer (com.belman.data)
+##### Data Layer (com.belman.repository)
 - **persistence**: Contains repository implementations, organized by feature
   - **customer**: Customer-related repository implementations
   - **order**: Order-related repository implementations
@@ -189,7 +189,7 @@ The project follows a specific package structure for each layer:
   - Main entry point
 
 #### Bootstrap Package
-The bootstrap package (com.belman.data.bootstrap) is part of the data layer, not a separate layer. It contains code that initializes the application, including:
+The bootstrap package (com.belman.repository.bootstrap) is part of the data layer, not a separate layer. It contains code that initializes the application, including:
 - The main entry point (Main.java)
 - Application bootstrapping logic (ApplicationBootstrapper.java)
 

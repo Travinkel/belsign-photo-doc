@@ -1,14 +1,15 @@
 package com.belman.unit.infrastructure;
 
-import com.belman.business.richbe.report.ReportAggregate;
-import com.belman.business.richbe.order.OrderId;
-import com.belman.business.richbe.order.photo.PhotoDocument;
-import com.belman.business.richbe.common.Timestamp;
-import com.belman.business.richbe.common.EmailAddress;
-import com.belman.business.richbe.security.HashedPassword;
-import com.belman.business.richbe.user.UserAggregate;
-import com.belman.business.richbe.user.Username;
-import com.belman.data.email.SmtpEmailService;
+import com.belman.domain.report.ReportAggregate;
+import com.belman.domain.order.OrderId;
+import com.belman.domain.order.photo.PhotoDocument;
+import com.belman.domain.common.Timestamp;
+import com.belman.domain.common.EmailAddress;
+import com.belman.domain.security.HashedPassword;
+import com.belman.domain.user.UserBusiness;
+import com.belman.domain.user.UserId;
+import com.belman.domain.user.Username;
+import com.belman.repository.email.SmtpEmailService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,8 +48,8 @@ class SmtpEmailServiceTest {
         Username username = new Username("test-user");
         HashedPassword hashedPassword= new HashedPassword("test-password");
         EmailAddress email = new EmailAddress("test@localhost");
-        UserAggregate qaUser = new UserAggregate.Builder()
-            .id(com.belman.business.richbe.user.UserId.newId())
+        UserBusiness qaUser = new UserBusiness.Builder()
+            .id(UserId.newId())
             .username(username)
             .password(hashedPassword)
             .email(email)
@@ -67,7 +68,7 @@ class SmtpEmailServiceTest {
         boolean result = emailService.sendReport(
                 reportAggregate,
             recipient,
-                "QC ReportAggregate for OrderAggregate " + reportAggregate.getOrderId(),
+                "QC ReportAggregate for OrderBusiness " + reportAggregate.getOrderId(),
             "Please find attached the QC reportAggregate for your order.",
             Collections.emptyList()
         );
@@ -84,7 +85,7 @@ class SmtpEmailServiceTest {
         boolean result = emailService.sendReport(
                 reportAggregate,
             recipients,
-                "QC ReportAggregate for OrderAggregate " + reportAggregate.getOrderId(),
+                "QC ReportAggregate for OrderBusiness " + reportAggregate.getOrderId(),
             "Please find attached the QC reportAggregate for your order.",
             Collections.emptyList()
         );
@@ -121,7 +122,7 @@ class SmtpEmailServiceTest {
         boolean result = emailService.sendReport(
                 reportAggregate,
             recipient,
-                "QC ReportAggregate for OrderAggregate " + reportAggregate.getOrderId(),
+                "QC ReportAggregate for OrderBusiness " + reportAggregate.getOrderId(),
             "Please find attached the QC reportAggregate for your order.",
             attachments
         );
