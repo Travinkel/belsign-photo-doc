@@ -1,12 +1,12 @@
 package com.belman.domain.common;
 
-import com.belman.domain.common.base.DataObject;
+import com.belman.domain.common.base.ValueObject;
 
 /**
  * Value object representing a person's name.
  * This is in the common package as it's used across multiple bounded contexts.
  */
-public record PersonName(String firstName, String lastName) implements DataObject {
+public record PersonName(String firstName, String lastName) implements ValueObject {
 
     /**
      * Creates a new PersonName with the specified first and last name.

@@ -1,5 +1,6 @@
 package com.belman.domain.order.events;
 
+import com.belman.domain.audit.event.BaseAuditEvent;
 import com.belman.domain.order.OrderId;
 import com.belman.domain.order.OrderNumber;
 
@@ -8,12 +9,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Domain event that is published when an order is created.
+ * Audit event that is published when an order is created.
  * This is part of the order bounded context.
  */
-public final class OrderCreatedEvent {
-    private final String eventId;
-    private final Instant timestamp;
+public final class OrderCreatedEvent extends BaseAuditEvent {
     private final OrderId orderId;
     private final OrderNumber orderNumber;
 
@@ -24,28 +23,23 @@ public final class OrderCreatedEvent {
      * @param orderNumber the order number of the order that was created
      */
     public OrderCreatedEvent(OrderId orderId, OrderNumber orderNumber) {
-        this.eventId = UUID.randomUUID().toString();
-        this.timestamp = Instant.now();
+        super();
         this.orderId = Objects.requireNonNull(orderId, "orderId must not be null");
         this.orderNumber = Objects.requireNonNull(orderNumber, "orderNumber must not be null");
     }
 
     /**
-     * Gets the unique identifier of this event.
+     * Constructor for event deserialization/reconstitution.
      *
-     * @return the event ID
+     * @param eventId     the ID of the event
+     * @param occurredOn  the timestamp when the event occurred
+     * @param orderId     the ID of the order that was created
+     * @param orderNumber the order number of the order that was created
      */
-    public String getEventId() {
-        return eventId;
-    }
-
-    /**
-     * Gets the timestamp when this event occurred.
-     *
-     * @return the timestamp
-     */
-    public Instant getTimestamp() {
-        return timestamp;
+    public OrderCreatedEvent(UUID eventId, Instant occurredOn, OrderId orderId, OrderNumber orderNumber) {
+        super(eventId, occurredOn);
+        this.orderId = Objects.requireNonNull(orderId, "orderId must not be null");
+        this.orderNumber = Objects.requireNonNull(orderNumber, "orderNumber must not be null");
     }
 
     /**

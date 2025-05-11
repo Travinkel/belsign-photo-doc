@@ -35,26 +35,6 @@ public abstract class BaseViewModel<T> implements ViewModelLifecycle {
     }
 
     /**
-     * Gets the class name of the view model.
-     * 
-     * @return the simple class name of the view model
-     */
-    @Override
-    public String getViewModelName() {
-        return this.getClass().getSimpleName();
-    }
-
-    /**
-     * Initializes the view model.
-     * This method is called once when the view model is created.
-     * Override to perform custom initialization.
-     */
-    @Override
-    public void initialize() {
-        // Default implementation does nothing
-    }
-
-    /**
      * Called when the ViewModel is about to be shown.
      * Override to update the view model when it becomes visible.
      */
@@ -70,6 +50,26 @@ public abstract class BaseViewModel<T> implements ViewModelLifecycle {
     @Override
     public void onHide() {
         // Optional to override
+    }
+
+    /**
+     * Gets the class name of the view model.
+     *
+     * @return the simple class name of the view model
+     */
+    @Override
+    public String getViewModelName() {
+        return this.getClass().getSimpleName();
+    }
+
+    /**
+     * Initializes the view model.
+     * This method is called once when the view model is created.
+     * Override to perform custom initialization.
+     */
+    @Override
+    public void initialize() {
+        // Default implementation does nothing
     }
 
     /**
@@ -127,15 +127,6 @@ public abstract class BaseViewModel<T> implements ViewModelLifecycle {
     }
 
     /**
-     * Sets the error state.
-     *
-     * @param error true if an error has occurred, false otherwise
-     */
-    protected void setError(boolean error) {
-        this.error.set(error);
-    }
-
-    /**
      * Contains the error message if an error has occurred.
      *
      * @return the error message property
@@ -163,21 +154,20 @@ public abstract class BaseViewModel<T> implements ViewModelLifecycle {
     }
 
     /**
-     * Sets an error state with the given message.
-     *
-     * @param message the error message
-     */
-    protected void setError(String message) {
-        setError(true);
-        setErrorMessage(message);
-    }
-
-    /**
      * Clears any error state.
      */
     protected void clearError() {
         setError(false);
         setErrorMessage(null);
+    }
+
+    /**
+     * Sets the error state.
+     *
+     * @param error true if an error has occurred, false otherwise
+     */
+    protected void setError(boolean error) {
+        this.error.set(error);
     }
 
     /**
@@ -187,5 +177,15 @@ public abstract class BaseViewModel<T> implements ViewModelLifecycle {
      */
     protected void handleException(Exception e) {
         setError(e.getMessage());
+    }
+
+    /**
+     * Sets an error state with the given message.
+     *
+     * @param message the error message
+     */
+    protected void setError(String message) {
+        setError(true);
+        setErrorMessage(message);
     }
 }

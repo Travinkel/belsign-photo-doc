@@ -17,9 +17,9 @@ import java.util.function.Supplier;
 public class LoadDataCommand<T> implements Command<T> {
     private final Supplier<T> loadOperation;
     private final Consumer<T> dataConsumer;
+    private final String description;
     private T previousData;
     private T loadedData;
-    private final String description;
 
     /**
      * Creates a new LoadDataCommand with the specified operations.
@@ -35,7 +35,7 @@ public class LoadDataCommand<T> implements Command<T> {
         if (dataConsumer == null) {
             throw new IllegalArgumentException("Data consumer cannot be null");
         }
-        
+
         this.loadOperation = loadOperation;
         this.dataConsumer = dataConsumer;
         this.description = description != null ? description : "Load data";
@@ -46,13 +46,13 @@ public class LoadDataCommand<T> implements Command<T> {
         return CompletableFuture.supplyAsync(() -> {
             // Store the current data for undo
             previousData = loadOperation.get();
-            
+
             // Load the new data
             loadedData = loadOperation.get();
-            
+
             // Provide the loaded data to the consumer
             dataConsumer.accept(loadedData);
-            
+
             return loadedData;
         });
     }
@@ -79,7 +79,7 @@ public class LoadDataCommand<T> implements Command<T> {
     public String getDescription() {
         return description;
     }
-    
+
     /**
      * Gets the loaded data.
      *

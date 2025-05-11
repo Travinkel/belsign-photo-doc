@@ -11,6 +11,7 @@ public class SplashViewModel extends BaseViewModel<SplashViewModel> {
 
     /**
      * Get the message property.
+     *
      * @return The message property.
      */
     public StringProperty messageProperty() {
@@ -19,6 +20,7 @@ public class SplashViewModel extends BaseViewModel<SplashViewModel> {
 
     /**
      * Get the message value.
+     *
      * @return The message value.
      */
     public String getMessage() {
@@ -27,6 +29,7 @@ public class SplashViewModel extends BaseViewModel<SplashViewModel> {
 
     /**
      * Set the message value.
+     *
      * @param message The new message value.
      */
     public void setMessage(String message) {

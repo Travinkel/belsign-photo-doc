@@ -2,11 +2,9 @@ package com.belman.cleancode;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
-import com.tngtech.archunit.lang.ArchRule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CodeComplexityTest {
@@ -25,6 +23,12 @@ public class CodeComplexityTest {
         assertTrue(cyclomaticComplexity <= 10, "Cyclomatic complexity should not exceed 10");
     }
 
+    // Mock methods for demonstration purposes
+    private int calculateCyclomaticComplexity(String methodName) {
+        // ...logic to calculate cyclomatic complexity...
+        return 5; // Example value
+    }
+
     @Test
     public void classesShouldHaveAcceptableNumberOfMethods() {
         // This is a placeholder test that always passes
@@ -37,12 +41,6 @@ public class CodeComplexityTest {
         // Example: Replace with actual method length analysis logic
         int methodLength = calculateMethodLength("exampleMethod");
         assertTrue(methodLength <= 50, "Method length should not exceed 50 lines");
-    }
-
-    // Mock methods for demonstration purposes
-    private int calculateCyclomaticComplexity(String methodName) {
-        // ...logic to calculate cyclomatic complexity...
-        return 5; // Example value
     }
 
     private int calculateMethodLength(String methodName) {

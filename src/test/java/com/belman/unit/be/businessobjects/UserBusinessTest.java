@@ -1,28 +1,19 @@
 package com.belman.unit.be.businessobjects;
 
 import com.belman.domain.audit.AuditFacade;
-import com.belman.domain.audit.event.AuditEvent;
 import com.belman.domain.common.EmailAddress;
 import com.belman.domain.common.PersonName;
 import com.belman.domain.common.PhoneNumber;
 import com.belman.domain.core.BusinessObject;
-import com.belman.domain.order.photo.PhotoId;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.security.PasswordHasher;
-import com.belman.domain.user.ApprovalState;
-import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserId;
-import com.belman.domain.user.UserRole;
-import com.belman.domain.user.UserStatus;
-import com.belman.domain.user.Username;
+import com.belman.domain.user.*;
 import com.belman.repository.security.BCryptPasswordHasher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.util.List;
 
 import java.time.Instant;
 import java.util.Set;

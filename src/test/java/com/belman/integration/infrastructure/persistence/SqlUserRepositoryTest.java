@@ -1,18 +1,12 @@
 package com.belman.integration.infrastructure.persistence;
 
-import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserStatus;
-import com.belman.domain.user.UserRepository;
-import com.belman.domain.user.UserRole;
-import com.belman.domain.user.ApprovalState;
-import com.belman.domain.security.PasswordHasher;
-import com.belman.domain.common.EmailAddress;
-import com.belman.domain.security.HashedPassword;
-import com.belman.domain.common.PersonName;
-import com.belman.domain.user.UserId;
-import com.belman.domain.user.Username;
 import com.belman.bootstrap.persistence.DatabaseConfig;
-import com.belman.repository.persistence.SqlUserRepository;
+import com.belman.domain.common.EmailAddress;
+import com.belman.domain.common.PersonName;
+import com.belman.domain.security.HashedPassword;
+import com.belman.domain.security.PasswordHasher;
+import com.belman.domain.user.*;
+import com.belman.repository.persistence.sql.SqlUserRepository;
 import com.belman.repository.security.BCryptPasswordHasher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Integration tests for SqlUserRepository.
  * These tests require a running SQL Server instance with the BelSign database.
- * 
+ * <p>
  * Note: These tests will be skipped if the database is not available.
  */
 public class SqlUserRepositoryTest {
@@ -68,12 +62,12 @@ public class SqlUserRepositoryTest {
         EmailAddress email = new EmailAddress("testuser_" + uniqueId + "@example.com");
 
         testUser = new UserBusiness.Builder()
-            .id(userId)
-            .username(username)
-            .password(password)
-            .name(name)
-            .email(email)
-            .build();
+                .id(userId)
+                .username(username)
+                .password(password)
+                .name(name)
+                .email(email)
+                .build();
 
         // Add role - note: API might have changed, adjust as needed
         testUser.addRole(UserRole.PRODUCTION);
@@ -101,10 +95,12 @@ public class SqlUserRepositoryTest {
 
             assertTrue(retrievedUser.isPresent(), "User should be found after saving");
             assertEquals(testUser.getId().id(), retrievedUser.get().getId().id(), "User ID should match");
-            assertEquals(testUser.getUsername().value(), retrievedUser.get().getUsername().value(), "Username should match");
+            assertEquals(testUser.getUsername().value(), retrievedUser.get().getUsername().value(),
+                    "Username should match");
             assertEquals(testUser.getEmail().value(), retrievedUser.get().getEmail().value(), "Email should match");
             assertEquals(testUser.getStatus(), retrievedUser.get().getStatus(), "Status should match");
-            assertTrue(retrievedUser.get().getRoles().contains(UserRole.PRODUCTION), "User should have PRODUCTION role");
+            assertTrue(retrievedUser.get().getRoles().contains(UserRole.PRODUCTION),
+                    "User should have PRODUCTION role");
 
             System.out.println("[DEBUG_LOG] Test passed successfully");
         } catch (Exception e) {
@@ -258,7 +254,8 @@ public class SqlUserRepositoryTest {
             assertTrue(retrievedUser.isPresent(), "Updated user should be found");
             // Note: UserBusiness always returns ACTIVE for getStatus()
             assertEquals(UserStatus.ACTIVE, retrievedUser.get().getStatus(), "User status should be ACTIVE");
-            assertTrue(retrievedUser.get().getRoles().contains(UserRole.PRODUCTION), "User should retain PRODUCTION role");
+            assertTrue(retrievedUser.get().getRoles().contains(UserRole.PRODUCTION),
+                    "User should retain PRODUCTION role");
             assertTrue(retrievedUser.get().getRoles().contains(UserRole.QA), "User should have new QA role");
 
             System.out.println("[DEBUG_LOG] Test passed successfully");

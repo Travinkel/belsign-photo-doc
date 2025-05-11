@@ -32,7 +32,7 @@ public abstract class BaseAcceptanceTest {
 
     /**
      * Helper method to log debug information during tests.
-     * 
+     *
      * @param message The message to log
      */
     protected void logDebug(String message) {

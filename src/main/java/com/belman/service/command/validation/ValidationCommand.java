@@ -31,7 +31,7 @@ public class ValidationCommand<T> implements Command<ValidationResult> {
         if (data == null) {
             throw new IllegalArgumentException("Data cannot be null");
         }
-        
+
         this.data = data;
         this.validationRules = new ArrayList<>();
         this.description = description != null ? description : "Validate data";
@@ -40,7 +40,7 @@ public class ValidationCommand<T> implements Command<ValidationResult> {
     /**
      * Adds a validation rule to this command.
      *
-     * @param rule      the validation rule predicate
+     * @param rule         the validation rule predicate
      * @param errorMessage the error message to display if validation fails
      * @return this command for method chaining
      */
@@ -51,7 +51,7 @@ public class ValidationCommand<T> implements Command<ValidationResult> {
         if (errorMessage == null || errorMessage.isEmpty()) {
             throw new IllegalArgumentException("Error message cannot be null or empty");
         }
-        
+
         validationRules.add(new ValidationRule<>(rule, errorMessage));
         return this;
     }
@@ -60,14 +60,14 @@ public class ValidationCommand<T> implements Command<ValidationResult> {
     public CompletableFuture<ValidationResult> execute() {
         return CompletableFuture.supplyAsync(() -> {
             List<String> errors = new ArrayList<>();
-            
+
             // Apply each validation rule
             for (ValidationRule<T> rule : validationRules) {
                 if (!rule.test(data)) {
                     errors.add(rule.getErrorMessage());
                 }
             }
-            
+
             return new ValidationResult(errors.isEmpty(), errors);
         });
     }

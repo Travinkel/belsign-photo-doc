@@ -1,8 +1,8 @@
 package com.belman.bootstrap.persistence.secure;
 
+import com.belman.common.config.SecureConfigStorage;
 import com.belman.domain.services.Logger;
 import com.belman.repository.logging.EmojiLoggerFactory;
-import com.belman.repository.security.SecureConfigStorage;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -17,8 +17,6 @@ import javax.sql.DataSource;
 public class SecureDatabaseConfig {
     private static final Logger LOGGER = EmojiLoggerFactory.getInstance().getLogger(SecureDatabaseConfig.class);
     private static final String DB_PROPERTIES_FILE = "database.properties";
-    private static HikariDataSource dataSource;
-
     // Configuration keys
     private static final String DB_URL_KEY = "db.url";
     private static final String DB_USERNAME_KEY = "db.username";
@@ -28,12 +26,88 @@ public class SecureDatabaseConfig {
     private static final String DB_POOL_MIN_IDLE_KEY = "db.pool.minIdle";
     private static final String DB_POOL_IDLE_TIMEOUT_KEY = "db.pool.idleTimeout";
     private static final String DB_POOL_CONNECTION_TIMEOUT_KEY = "db.pool.connectionTimeout";
+    private static HikariDataSource dataSource;
 
     /**
      * Private constructor to prevent instantiation.
      */
     private SecureDatabaseConfig() {
         // Utility class should not be instantiated
+    }
+
+    /**
+     * Gets the DataSource for database connections.
+     *
+     * @return the DataSource, or null if the DataSource has not been initialized or failed to initialize
+     */
+    public static DataSource getDataSource() {
+        return dataSource;
+    }
+
+    /**
+     * Updates a database configuration value in secure storage.
+     *
+     * @param key   the configuration key
+     * @param value the configuration value
+     * @return true if the value was updated successfully, false otherwise
+     */
+    public static boolean updateConfigValue(String key, String value) {
+        try {
+            SecureConfigStorage secureStorage = SecureConfigStorage.getInstance();
+            boolean stored = secureStorage.storeValue(key, value);
+
+            if (stored) {
+                LOGGER.info("Database configuration value updated: " + key);
+                return true;
+            } else {
+                LOGGER.warn("Failed to update database configuration value: " + key);
+                return false;
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error updating database configuration value: " + key, e);
+            return false;
+        }
+    }
+
+    /**
+     * Reinitializes the database connection pool with updated configuration.
+     * This method should be called after updating configuration values.
+     *
+     * @return true if reinitialization was successful, false otherwise
+     */
+    public static boolean reinitialize() {
+        try {
+            // Close existing connection pool if it exists
+            shutdown();
+
+            // Reset dataSource to null to force reinitialization
+            dataSource = null;
+
+            // Initialize with updated configuration
+            initialize();
+
+            return dataSource != null;
+        } catch (Exception e) {
+            LOGGER.error("Failed to reinitialize secure database connection pool", e);
+            return false;
+        }
+    }
+
+    /**
+     * Closes the database connection pool.
+     * This method should be called during application shutdown.
+     */
+    public static void shutdown() {
+        if (dataSource != null) {
+            try {
+                if (!dataSource.isClosed()) {
+                    dataSource.close();
+                    LOGGER.info("Secure database connection pool closed");
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Error closing secure database connection pool", e);
+            }
+        }
     }
 
     /**
@@ -69,7 +143,8 @@ public class SecureDatabaseConfig {
                 config.setMaximumPoolSize(Integer.parseInt(secureStorage.getValue(DB_POOL_MAX_SIZE_KEY, "10")));
                 config.setMinimumIdle(Integer.parseInt(secureStorage.getValue(DB_POOL_MIN_IDLE_KEY, "5")));
                 config.setIdleTimeout(Long.parseLong(secureStorage.getValue(DB_POOL_IDLE_TIMEOUT_KEY, "30000")));
-                config.setConnectionTimeout(Long.parseLong(secureStorage.getValue(DB_POOL_CONNECTION_TIMEOUT_KEY, "30000")));
+                config.setConnectionTimeout(
+                        Long.parseLong(secureStorage.getValue(DB_POOL_CONNECTION_TIMEOUT_KEY, "30000")));
 
                 // Set pool name for easier debugging
                 config.setPoolName("BelSignSecureHikariPool");
@@ -81,81 +156,6 @@ public class SecureDatabaseConfig {
                 // Don't throw an exception, just log it and return
                 // The application will fall back to using in-memory repositories
             }
-        }
-    }
-
-    /**
-     * Gets the DataSource for database connections.
-     * 
-     * @return the DataSource, or null if the DataSource has not been initialized or failed to initialize
-     */
-    public static DataSource getDataSource() {
-        return dataSource;
-    }
-
-    /**
-     * Closes the database connection pool.
-     * This method should be called during application shutdown.
-     */
-    public static void shutdown() {
-        if (dataSource != null) {
-            try {
-                if (!dataSource.isClosed()) {
-                    dataSource.close();
-                    LOGGER.info("Secure database connection pool closed");
-                }
-            } catch (Exception e) {
-                LOGGER.warn("Error closing secure database connection pool", e);
-            }
-        }
-    }
-
-    /**
-     * Updates a database configuration value in secure storage.
-     * 
-     * @param key the configuration key
-     * @param value the configuration value
-     * @return true if the value was updated successfully, false otherwise
-     */
-    public static boolean updateConfigValue(String key, String value) {
-        try {
-            SecureConfigStorage secureStorage = SecureConfigStorage.getInstance();
-            boolean stored = secureStorage.storeValue(key, value);
-
-            if (stored) {
-                LOGGER.info("Database configuration value updated: " + key);
-                return true;
-            } else {
-                LOGGER.warn("Failed to update database configuration value: " + key);
-                return false;
-            }
-        } catch (Exception e) {
-            LOGGER.error("Error updating database configuration value: " + key, e);
-            return false;
-        }
-    }
-
-    /**
-     * Reinitializes the database connection pool with updated configuration.
-     * This method should be called after updating configuration values.
-     * 
-     * @return true if reinitialization was successful, false otherwise
-     */
-    public static boolean reinitialize() {
-        try {
-            // Close existing connection pool if it exists
-            shutdown();
-
-            // Reset dataSource to null to force reinitialization
-            dataSource = null;
-
-            // Initialize with updated configuration
-            initialize();
-
-            return dataSource != null;
-        } catch (Exception e) {
-            LOGGER.error("Failed to reinitialize secure database connection pool", e);
-            return false;
         }
     }
 }

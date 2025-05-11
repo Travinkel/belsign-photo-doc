@@ -3,29 +3,27 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import com.gluonhq.charm.glisten.control.ProgressIndicator?>
-
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            xmlns="http://javafx.com/javafx"
             fx:controller="com.belman.ui.views.main.MainViewController"
             prefHeight="600.0" prefWidth="800.0"
             style="-fx-background-color: #f2f2f2;">
 
-    <BorderPane AnchorPane.topAnchor="0.0" 
-                AnchorPane.rightAnchor="0.0" 
-                AnchorPane.bottomAnchor="0.0" 
+    <BorderPane AnchorPane.topAnchor="0.0"
+                AnchorPane.rightAnchor="0.0"
+                AnchorPane.bottomAnchor="0.0"
                 AnchorPane.leftAnchor="0.0">
 
         <!-- Top section with welcome message and logout button -->
         <top>
             <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-background-color: #004b88; -fx-padding: 10;">
-                <Label fx:id="welcomeLabel" text="Welcome to BelSign!" 
+                <Label fx:id="welcomeLabel" text="Welcome to BelSign!"
                        style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;"/>
-                <Region HBox.hgrow="ALWAYS" />
-                <Button fx:id="logoutButton" text="Logout" 
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="logoutButton" text="Logout"
                         style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
                 <padding>
-                    <Insets top="10" right="20" bottom="10" left="20" />
+                    <Insets top="10" right="20" bottom="10" left="20"/>
                 </padding>
             </HBox>
         </top>
@@ -34,10 +32,10 @@
         <center>
             <VBox alignment="CENTER" spacing="20">
                 <padding>
-                    <Insets top="20" right="20" bottom="20" left="20" />
+                    <Insets top="20" right="20" bottom="20" left="20"/>
                 </padding>
 
-                <Label text="BelSign - Photo Documentation System" 
+                <Label text="BelSign - Photo Documentation System"
                        style="-fx-text-fill: #004b88; -fx-font-weight: bold; -fx-font-size: 24px;"/>
 
                 <Label text="Main Application View"
@@ -45,14 +43,14 @@
 
                 <!-- Add your main content here -->
                 <VBox alignment="CENTER" spacing="15" style="-fx-padding: 20;">
-                    <Label text="Welcome to the BelSign Photo Documentation System" 
+                    <Label text="Welcome to the BelSign Photo Documentation System"
                            style="-fx-font-size: 18px;"/>
-                    <Label text="This system allows you to:" 
+                    <Label text="This system allows you to:"
                            style="-fx-font-size: 14px;"/>
                     <VBox alignment="CENTER_LEFT" spacing="5" style="-fx-padding: 10 0 0 50;">
-                        <Label text="• Attach images to orderAggregate numbers" />
-                        <Label text="• Generate QC reports automatically" />
-                        <Label text="• Send documentation directly to customers" />
+                        <Label text="• Attach images to orderAggregate numbers"/>
+                        <Label text="• Generate QC reports automatically"/>
+                        <Label text="• Send documentation directly to customers"/>
                     </VBox>
                 </VBox>
             </VBox>
@@ -61,7 +59,7 @@
         <!-- Footer -->
         <bottom>
             <HBox alignment="CENTER" style="-fx-background-color: #f8f9fa; -fx-padding: 10;">
-                <Label text="© 2023 Belman A/S - All Rights Reserved" 
+                <Label text="© 2023 Belman A/S - All Rights Reserved"
                        style="-fx-text-fill: #6c757d;"/>
             </HBox>
         </bottom>

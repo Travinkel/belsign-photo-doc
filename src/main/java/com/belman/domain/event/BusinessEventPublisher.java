@@ -44,6 +44,19 @@ public class BusinessEventPublisher {
     }
 
     /**
+     * Publishes multiple business events.
+     *
+     * @param events the business events to publish
+     */
+    public void publishAll(Iterable<BusinessEvent> events) {
+        if (events == null) return;
+
+        for (BusinessEvent event : events) {
+            publish(event);
+        }
+    }
+
+    /**
      * Publishes a business event to all registered handlers for its type.
      *
      * @param event the business event to publish
@@ -56,19 +69,6 @@ public class BusinessEventPublisher {
             for (BusinessEventHandler handler : eventHandlers) {
                 handler.handle(event);
             }
-        }
-    }
-
-    /**
-     * Publishes multiple business events.
-     *
-     * @param events the business events to publish
-     */
-    public void publishAll(Iterable<BusinessEvent> events) {
-        if (events == null) return;
-
-        for (BusinessEvent event : events) {
-            publish(event);
         }
     }
 

@@ -18,8 +18,8 @@ public class SaveDataCommand<T> implements Command<T> {
     private final T data;
     private final Consumer<T> saveOperation;
     private final Supplier<T> loadOperation;
-    private T previousData;
     private final String description;
+    private T previousData;
 
     /**
      * Creates a new SaveDataCommand with the specified data and operations.
@@ -39,7 +39,7 @@ public class SaveDataCommand<T> implements Command<T> {
         if (loadOperation == null) {
             throw new IllegalArgumentException("Load operation cannot be null");
         }
-        
+
         this.data = data;
         this.saveOperation = saveOperation;
         this.loadOperation = loadOperation;
@@ -51,10 +51,10 @@ public class SaveDataCommand<T> implements Command<T> {
         return CompletableFuture.supplyAsync(() -> {
             // Load the current data for undo
             previousData = loadOperation.get();
-            
+
             // Save the new data
             saveOperation.accept(data);
-            
+
             return data;
         });
     }

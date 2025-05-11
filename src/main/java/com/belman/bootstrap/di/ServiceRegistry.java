@@ -1,10 +1,9 @@
 package com.belman.bootstrap.di;
 
 
-import com.belman.service.base.BaseService;
 import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
-import com.belman.service.infrastructure.service.ServiceLocator;
+import com.belman.service.base.BaseService;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,7 +18,7 @@ public class ServiceRegistry {
     /**
      * Sets the logger for this class.
      * This method should be called before using any methods in this class.
-     * 
+     *
      * @param loggerFactory the factory to create loggers
      */
     public static void setLogger(LoggerFactory loggerFactory) {
@@ -30,18 +29,8 @@ public class ServiceRegistry {
     }
 
     /**
-     * Checks if the logger has been initialized.
-     * If not, logs a warning to System.err.
-     */
-    private static void checkLogger() {
-        if (logger == null) {
-            System.err.println("Warning: ServiceRegistry logger not initialized. Call setLogger() first.");
-        }
-    }
-
-    /**
      * Registers all the specified services with the ServiceLocator.
-     * 
+     *
      * @param services the services to register
      */
     public static void registerAll(Object... services) {
@@ -57,8 +46,18 @@ public class ServiceRegistry {
     }
 
     /**
+     * Checks if the logger has been initialized.
+     * If not, logs a warning to System.err.
+     */
+    private static void checkLogger() {
+        if (logger == null) {
+            System.err.println("Warning: ServiceRegistry logger not initialized. Call setLogger() first.");
+        }
+    }
+
+    /**
      * Registers all the specified services with the ServiceLocator.
-     * 
+     *
      * @param services the services to register
      */
     public static void registerAll(Collection<?> services) {
@@ -82,7 +81,7 @@ public class ServiceRegistry {
     /**
      * Registers a service with the ServiceLocator.
      * The service is registered under its class and all interfaces it implements.
-     * 
+     *
      * @param service the service to register
      */
     @SuppressWarnings("unchecked")

@@ -41,6 +41,19 @@ public abstract class BusinessObject<ID> implements Serializable {
     }
 
     /**
+     * Registers an audit event to be dispatched immediately.
+     * This method is provided for backward compatibility.
+     *
+     * @param event the audit event to register
+     * @throws NullPointerException if the event is null
+     * @deprecated Use {@link #registerBusinessEvent(BusinessEvent)} instead
+     */
+    @Deprecated
+    protected void registerAuditEvent(AuditEvent event) {
+        registerBusinessEvent(event);
+    }
+
+    /**
      * Registers a business event to be dispatched immediately.
      * If the event is an audit event, it is also logged through the AuditFacade.
      *
@@ -60,6 +73,26 @@ public abstract class BusinessObject<ID> implements Serializable {
         }
 
         updateLastModifiedAt();
+    }
+
+    /**
+     * Updates the last modified timestamp of the business object.
+     */
+    protected void updateLastModifiedAt() {
+        this.lastModifiedAt = Instant.now();
+    }
+
+    /**
+     * Registers multiple audit events to be dispatched immediately.
+     * This method is provided for backward compatibility.
+     *
+     * @param events the collection of audit events to register
+     * @throws NullPointerException if the events collection is null or contains null elements
+     * @deprecated Use {@link #registerBusinessEvents(Collection)} instead
+     */
+    @Deprecated
+    protected void registerAuditEvents(Collection<AuditEvent> events) {
+        registerBusinessEvents(new ArrayList<>(events));
     }
 
     /**
@@ -85,39 +118,6 @@ public abstract class BusinessObject<ID> implements Serializable {
         }
 
         updateLastModifiedAt();
-    }
-
-    /**
-     * Updates the last modified timestamp of the business object.
-     */
-    protected void updateLastModifiedAt() {
-        this.lastModifiedAt = Instant.now();
-    }
-
-    /**
-     * Registers an audit event to be dispatched immediately.
-     * This method is provided for backward compatibility.
-     *
-     * @param event the audit event to register
-     * @throws NullPointerException if the event is null
-     * @deprecated Use {@link #registerBusinessEvent(BusinessEvent)} instead
-     */
-    @Deprecated
-    protected void registerAuditEvent(AuditEvent event) {
-        registerBusinessEvent(event);
-    }
-
-    /**
-     * Registers multiple audit events to be dispatched immediately.
-     * This method is provided for backward compatibility.
-     *
-     * @param events the collection of audit events to register
-     * @throws NullPointerException if the events collection is null or contains null elements
-     * @deprecated Use {@link #registerBusinessEvents(Collection)} instead
-     */
-    @Deprecated
-    protected void registerAuditEvents(Collection<AuditEvent> events) {
-        registerBusinessEvents(new ArrayList<>(events));
     }
 
     /**

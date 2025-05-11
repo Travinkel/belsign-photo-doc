@@ -1,6 +1,6 @@
 package com.belman.domain.user.events;
 
-import com.belman.domain.events.BaseAuditEvent;
+import com.belman.domain.audit.event.BaseAuditEvent;
 import com.belman.domain.user.UserId;
 
 import java.time.Instant;

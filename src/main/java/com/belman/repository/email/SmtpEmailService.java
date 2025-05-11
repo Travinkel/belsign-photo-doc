@@ -1,7 +1,6 @@
 package com.belman.repository.email;
 
 
-
 import com.belman.domain.common.EmailAddress;
 import com.belman.domain.report.ReportAggregate;
 import com.belman.domain.services.EmailService;
@@ -17,20 +16,20 @@ import java.util.logging.Logger;
  */
 public class SmtpEmailService implements EmailService {
     private static final Logger LOGGER = Logger.getLogger(SmtpEmailService.class.getName());
-    
+
     private final String smtpHost;
     private final int smtpPort;
     private final String username;
     private final String password;
     private final String fromAddress;
-    
+
     /**
      * Creates a new SmtpEmailService with the specified SMTP configuration.
-     * 
-     * @param smtpHost the SMTP server host
-     * @param smtpPort the SMTP server port
-     * @param username the SMTP server username
-     * @param password the SMTP server password
+     *
+     * @param smtpHost    the SMTP server host
+     * @param smtpPort    the SMTP server port
+     * @param username    the SMTP server username
+     * @param password    the SMTP server password
      * @param fromAddress the email address to send from
      */
     public SmtpEmailService(String smtpHost, int smtpPort, String username, String password, String fromAddress) {
@@ -40,18 +39,20 @@ public class SmtpEmailService implements EmailService {
         this.password = password;
         this.fromAddress = fromAddress;
     }
-    
+
     @Override
-    public boolean sendReport(ReportAggregate reportAggregate, List<EmailAddress> recipients, String subject, String message, List<File> attachments) {
+    public boolean sendReport(ReportAggregate reportAggregate, List<EmailAddress> recipients, String subject,
+                              String message, List<File> attachments) {
         try {
             // In a real implementation, this would use JavaMail API to send the email
-            LOGGER.info("Sending reportAggregate " + reportAggregate.getOrderId() + " to " + recipients.size() + " recipients");
-            
+            LOGGER.info("Sending reportAggregate " + reportAggregate.getOrderId() + " to " + recipients.size() +
+                        " recipients");
+
             // Log the email details for debugging
             LOGGER.info("Subject: " + subject);
             LOGGER.info("Message: " + message);
             LOGGER.info("Attachments: " + (attachments != null ? attachments.size() : 0));
-            
+
             // Simulate sending the email
             return true;
         } catch (Exception e) {
@@ -59,9 +60,10 @@ public class SmtpEmailService implements EmailService {
             return false;
         }
     }
-    
+
     @Override
-    public boolean sendReport(ReportAggregate reportAggregate, EmailAddress recipient, String subject, String message, List<File> attachments) {
+    public boolean sendReport(ReportAggregate reportAggregate, EmailAddress recipient, String subject, String message,
+                              List<File> attachments) {
         return sendReport(reportAggregate, Collections.singletonList(recipient), subject, message, attachments);
     }
 }

@@ -313,6 +313,7 @@ public class UserBusiness extends BusinessObject<UserId> {
 
     // Builder
     public static class Builder {
+        private final Set<UserRole> roles = new HashSet<>();
         private UserId id;
         private Username username;
         private HashedPassword password;
@@ -320,7 +321,6 @@ public class UserBusiness extends BusinessObject<UserId> {
         private EmailAddress email;
         private PhoneNumber phoneNumber;
         private ApprovalState approvalState;
-        private final Set<UserRole> roles = new HashSet<>();
 
         public Builder id(UserId id) {
             this.id = id;

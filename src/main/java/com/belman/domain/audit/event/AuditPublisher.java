@@ -1,5 +1,7 @@
 package com.belman.domain.audit.event;
 
+import com.belman.domain.event.BusinessEventPublisher;
+import com.belman.domain.event.adapter.AuditEventAdapter;
 import com.belman.domain.services.Logger;
 
 import java.util.ArrayList;
@@ -13,6 +15,8 @@ import java.util.concurrent.Executors;
  * Publisher for audit events.
  * This class is responsible for publishing audit events and notifying registered handlers.
  * It follows the publisher-subscriber pattern.
+ * 
+ * This implementation uses BusinessEventPublisher internally to leverage the common event publishing infrastructure.
  */
 public class AuditPublisher implements IAuditPublisher {
     private static AuditPublisher instance = new AuditPublisher();
@@ -21,12 +25,15 @@ public class AuditPublisher implements IAuditPublisher {
     // Executor for asynchronous event handling
     private final ExecutorService executor;
     private Logger logger;
+    // BusinessEventPublisher for delegating event publishing
+    private final BusinessEventPublisher businessEventPublisher;
 
     // Private constructor for singleton
     private AuditPublisher() {
         this.handlers = new ConcurrentHashMap<>();
         this.executor = Executors.newCachedThreadPool();
         this.logger = null; // Will be set by setLogger method
+        this.businessEventPublisher = BusinessEventPublisher.getInstance();
     }
 
     /**
@@ -86,17 +93,6 @@ public class AuditPublisher implements IAuditPublisher {
         if (logger != null) {
             logger.debug(message, args);
         }
-    }    /**
-     * Safely logs a message at the trace level.
-     * If the logger is not set, this method does nothing.
-     *
-     * @param message the message to log
-     * @param args    the arguments to the message
-     */
-    private void logTrace(String message, Object... args) {
-        if (logger != null) {
-            logger.trace(message, args);
-        }
     }
 
     /**
@@ -136,6 +132,17 @@ public class AuditPublisher implements IAuditPublisher {
         } else {
             logWarn("Executor service is already shut down");
         }
+    }    /**
+     * Safely logs a message at the trace level.
+     * If the logger is not set, this method does nothing.
+     *
+     * @param message the message to log
+     * @param args    the arguments to the message
+     */
+    private void logTrace(String message, Object... args) {
+        if (logger != null) {
+            logger.trace(message, args);
+        }
     }
 
     /**
@@ -164,24 +171,33 @@ public class AuditPublisher implements IAuditPublisher {
         }
     }
 
+
+
+
     @Override
     public void publish(AuditEvent event) {
         logDebug("Publishing event: {} (ID: {})", event.getEventType(), event.getEventId());
 
+        // First, handle with audit-specific handlers
         if (handlers.containsKey(event.getClass())) {
             List<AuditHandler<? extends AuditEvent>> eventHandlers = handlers.get(event.getClass());
-            logDebug("Found {} handlers for event type: {}", eventHandlers.size(), event.getEventType());
+            logDebug("Found {} audit handlers for event type: {}", eventHandlers.size(), event.getEventType());
 
             for (AuditHandler<? extends AuditEvent> handler : eventHandlers) {
                 // Cast is safe because we only register handlers for the correct event type
                 @SuppressWarnings("unchecked")
                 AuditHandler<AuditEvent> typedHandler = (AuditHandler<AuditEvent>) handler;
-                logTrace("Handling event with: {}", typedHandler.getClass().getName());
+                logTrace("Handling event with audit handler: {}", typedHandler.getClass().getName());
                 typedHandler.handle(event);
             }
         } else {
-            logDebug("No handlers found for event type: {}", event.getEventType());
+            logDebug("No audit handlers found for event type: {}", event.getEventType());
         }
+
+        // Then, delegate to BusinessEventPublisher using the adapter
+        logDebug("Delegating to BusinessEventPublisher using AuditEventAdapter");
+        AuditEventAdapter adapter = new AuditEventAdapter(event);
+        businessEventPublisher.publish(adapter);
     }
 
     @Override

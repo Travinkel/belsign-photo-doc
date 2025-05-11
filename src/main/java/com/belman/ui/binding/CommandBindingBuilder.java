@@ -107,27 +107,6 @@ public class CommandBindingBuilder<T> {
     }
 
     /**
-     * Builds a command binding.
-     *
-     * @return a new CommandBinding
-     */
-    public CommandBinding<T> build() {
-        CommandBinding<T> binding = new CommandBinding<>(commandFactory, commandManager);
-        
-        if (resultHandler != null) {
-            binding.onResult(resultHandler);
-        }
-        
-        if (errorHandler != null) {
-            binding.onError(errorHandler);
-        }
-        
-        binding.setEnabled(enabled);
-        
-        return binding;
-    }
-
-    /**
      * Builds a command binding and binds it to a button.
      *
      * @param button the button to bind to
@@ -135,6 +114,27 @@ public class CommandBindingBuilder<T> {
      */
     public CommandBinding<T> bindToButton(ButtonBase button) {
         return build().bindToButton(button);
+    }
+
+    /**
+     * Builds a command binding.
+     *
+     * @return a new CommandBinding
+     */
+    public CommandBinding<T> build() {
+        CommandBinding<T> binding = new CommandBinding<>(commandFactory, commandManager);
+
+        if (resultHandler != null) {
+            binding.onResult(resultHandler);
+        }
+
+        if (errorHandler != null) {
+            binding.onError(errorHandler);
+        }
+
+        binding.setEnabled(enabled);
+
+        return binding;
     }
 
     /**

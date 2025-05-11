@@ -8,7 +8,8 @@ import com.tngtech.archunit.lang.ArchRule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
 public class ThreeLayerArchitectureTest {
@@ -35,7 +36,7 @@ public class ThreeLayerArchitectureTest {
                 .layer("Repository").definedBy("com.belman.repository..")
                 .layer("Domain").definedBy("com.belman.domain..")
                 .layer("Common").definedBy("com.belman.common..")
-                .layer("Bootstrap").definedBy("com.belman.repository.bootstrap..")
+                .layer("Bootstrap").definedBy("com.belman.bootstrap..")
 
                 // Normal forward flow
                 .whereLayer("UI").mayOnlyAccessLayers("Service", "Domain", "Common")
@@ -58,9 +59,9 @@ public class ThreeLayerArchitectureTest {
         // Allow UI layer to depend on repository layer services and utilities,
         // but not on internal repository implementations
         ArchRule rule = noClasses().that().resideInAPackage("com.belman.ui..")
-            .should().dependOnClassesThat().resideInAnyPackage(
-                "com.belman.repository.persistence..",
-                "com.belman.repository.implementation..");
+                .should().dependOnClassesThat().resideInAnyPackage(
+                        "com.belman.repository.persistence..",
+                        "com.belman.repository.implementation..");
 
         rule.check(importedClasses);
     }
@@ -69,8 +70,8 @@ public class ThreeLayerArchitectureTest {
     public void serviceLayerShouldNotDependOnUiLayer() {
         // Service layer should not depend on UI layer except through interfaces
         ArchRule rule = noClasses().that().resideInAPackage("com.belman.service..")
-            .and().areNotInterfaces()
-            .should().dependOnClassesThat().resideInAPackage("com.belman.ui..");
+                .and().areNotInterfaces()
+                .should().dependOnClassesThat().resideInAPackage("com.belman.ui..");
 
         rule.check(importedClasses);
     }
@@ -81,14 +82,14 @@ public class ThreeLayerArchitectureTest {
         // but not on UI layer, except for the Main class
         // which needs to initialize the application
         ArchRule rule = noClasses().that().resideInAPackage("com.belman.repository..")
-            .and(new DescribedPredicate<JavaClass>("are not bootstrap classes") {
-                @Override
-                public boolean test(JavaClass javaClass) {
-                    return !javaClass.getSimpleName().equals("Main") &&
-                           !javaClass.getPackageName().contains("bootstrap");
-                }
-            })
-            .should().dependOnClassesThat().resideInAnyPackage("com.belman.ui..");
+                .and(new DescribedPredicate<JavaClass>("are not bootstrap classes") {
+                    @Override
+                    public boolean test(JavaClass javaClass) {
+                        return !javaClass.getSimpleName().equals("Main") &&
+                               !javaClass.getPackageName().contains("bootstrap");
+                    }
+                })
+                .should().dependOnClassesThat().resideInAnyPackage("com.belman.ui..");
 
         rule.check(importedClasses);
     }
@@ -98,13 +99,13 @@ public class ThreeLayerArchitectureTest {
         // Allow base view models in the ui.core package,
         // but require concrete view models to be in the ui.views package
         ArchRule rule = classes().that().haveNameMatching(".*ViewModel")
-            .and(new DescribedPredicate<JavaClass>("are not base view models") {
-                @Override
-                public boolean test(JavaClass javaClass) {
-                    return !javaClass.getSimpleName().equals("BaseViewModel");
-                }
-            })
-            .should().resideInAPackage("com.belman.ui.views..");
+                .and(new DescribedPredicate<JavaClass>("are not base view models") {
+                    @Override
+                    public boolean test(JavaClass javaClass) {
+                        return !javaClass.getSimpleName().equals("BaseViewModel");
+                    }
+                })
+                .should().resideInAPackage("com.belman.ui.views..");
 
         rule.check(importedClasses);
     }
@@ -114,8 +115,8 @@ public class ThreeLayerArchitectureTest {
         // Allow base controllers in the ui.core package,
         // but require view controllers to be in the ui.views package
         ArchRule rule = classes().that().haveNameMatching(".*Controller")
-            .and().resideInAPackage("com.belman.ui.views..")
-            .should().resideInAPackage("com.belman.ui.views..");
+                .and().resideInAPackage("com.belman.ui.views..")
+                .should().resideInAPackage("com.belman.ui.views..");
 
         rule.check(importedClasses);
     }
@@ -125,9 +126,8 @@ public class ThreeLayerArchitectureTest {
         // Allow service implementations in the repository layer,
         // but require domain classes to be in the domain layer
         ArchRule rule = classes().that().haveSimpleNameEndingWith("Business")
-            .or().haveSimpleNameEndingWith("Component")
-            .or().resideInAPackage("com.belman.domain..common..")
-            .should().resideInAPackage("com.belman.domain..");
+                .or().haveSimpleNameEndingWith("Component")
+                .should().resideInAPackage("com.belman.domain..");
 
         rule.check(importedClasses);
     }
@@ -137,8 +137,8 @@ public class ThreeLayerArchitectureTest {
         // Allow data access interfaces in the domain layer,
         // but require implementations to be in the repository.persistence package or its subpackages
         ArchRule rule = classes().that().haveNameMatching(".*Repository")
-            .and().areNotInterfaces()
-            .should().resideInAPackage("com.belman.repository.persistence..");
+                .and().areNotInterfaces()
+                .should().resideInAPackage("com.belman.repository.persistence..");
 
         rule.check(importedClasses);
     }
@@ -148,13 +148,13 @@ public class ThreeLayerArchitectureTest {
         // Allow base UseCase class in the service.infrastructure package,
         // but require concrete use cases to be in the service.usecase package
         ArchRule rule = classes().that().haveNameMatching(".*UseCase")
-            .and(new DescribedPredicate<JavaClass>("are not base use case classes") {
-                @Override
-                public boolean test(JavaClass javaClass) {
-                    return !javaClass.getSimpleName().equals("UseCase");
-                }
-            })
-            .should().resideInAPackage("com.belman.service.usecase..");
+                .and(new DescribedPredicate<JavaClass>("are not base use case classes") {
+                    @Override
+                    public boolean test(JavaClass javaClass) {
+                        return !javaClass.getSimpleName().equals("UseCase");
+                    }
+                })
+                .should().resideInAPackage("com.belman.service.usecase..");
 
         rule.check(importedClasses);
     }
@@ -164,14 +164,14 @@ public class ThreeLayerArchitectureTest {
         // Allow base views in the ui.core package,
         // but require concrete views to be in the ui.views package
         ArchRule rule = classes().that().haveNameMatching(".*View")
-            .and().areNotInterfaces()
-            .and(new DescribedPredicate<JavaClass>("are not base views") {
-                @Override
-                public boolean test(JavaClass javaClass) {
-                    return !javaClass.getSimpleName().equals("BaseView");
-                }
-            })
-            .should().resideInAPackage("com.belman.ui.views..");
+                .and().areNotInterfaces()
+                .and(new DescribedPredicate<JavaClass>("are not base views") {
+                    @Override
+                    public boolean test(JavaClass javaClass) {
+                        return !javaClass.getSimpleName().equals("BaseView");
+                    }
+                })
+                .should().resideInAPackage("com.belman.ui.views..");
 
         rule.check(importedClasses);
     }

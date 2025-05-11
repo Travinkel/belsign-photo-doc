@@ -14,11 +14,11 @@ public class EmailAddressTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-        "test@example.com",
-        "user.name@example.com",
-        "user+tag@example.com",
-        "user@subdomain.example.com",
-        "user@example.co.uk"
+            "test@example.com",
+            "user.name@example.com",
+            "user+tag@example.com",
+            "user@subdomain.example.com",
+            "user@example.co.uk"
     })
     void constructor_withValidEmail_shouldCreateEmailAddress(String email) {
         // Act
@@ -30,15 +30,14 @@ public class EmailAddressTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-        "",
-        "invalid",
-        "invalid@",
-        "@example.com",
-        "user@.com",
-        "user@example.",
-        "user@example",
-        "user name@example.com",
-        "user@example com"
+            "invalid",
+            "invalid@",
+            "@example.com",
+            "user@.com",
+            "user@example.",
+            "user@example",
+            "user name@example.com",
+            "user@example com"
     })
     void constructor_withInvalidEmail_shouldThrowException(String email) {
         // Act & Assert
@@ -46,7 +45,23 @@ public class EmailAddressTest {
             new EmailAddress(email);
         });
 
-        assertEquals("Invalid email address", exception.getMessage());
+        assertTrue(exception.getMessage().startsWith("Invalid email address format:"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "",
+            " ",
+            "\t",
+            "\n"
+    })
+    void constructor_withBlankEmail_shouldThrowException(String email) {
+        // Act & Assert
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new EmailAddress(email);
+        });
+
+        assertEquals("Email address must not be null or blank", exception.getMessage());
     }
 
     @Test
@@ -56,7 +71,31 @@ public class EmailAddressTest {
             new EmailAddress(null);
         });
 
-        assertEquals("Invalid email address", exception.getMessage());
+        assertEquals("Email address must not be null or blank", exception.getMessage());
+    }
+
+    @Test
+    void getDomain_shouldReturnDomainPart() {
+        // Arrange
+        EmailAddress emailAddress = new EmailAddress("user@example.com");
+
+        // Act
+        String domain = emailAddress.getDomain();
+
+        // Assert
+        assertEquals("example.com", domain);
+    }
+
+    @Test
+    void getLocalPart_shouldReturnLocalPart() {
+        // Arrange
+        EmailAddress emailAddress = new EmailAddress("user@example.com");
+
+        // Act
+        String localPart = emailAddress.getLocalPart();
+
+        // Assert
+        assertEquals("user", localPart);
     }
 
     @Test

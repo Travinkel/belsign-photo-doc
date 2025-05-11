@@ -36,9 +36,9 @@ public interface HelpService {
     /**
      * Submits feedback.
      *
-     * @param feedback the feedback to submit
+     * @param feedback    the feedback to submit
      * @param submittedBy the user who submitted the feedback
-     * @param context the context in which the feedback was submitted
+     * @param context     the context in which the feedback was submitted
      * @return true if the feedback was submitted successfully, false otherwise
      */
     boolean submitFeedback(String feedback, UserBusiness submittedBy, String context);
@@ -46,10 +46,10 @@ public interface HelpService {
     /**
      * Submits feedback with a screenshot.
      *
-     * @param feedback the feedback to submit
-     * @param screenshot the screenshot to attach
+     * @param feedback    the feedback to submit
+     * @param screenshot  the screenshot to attach
      * @param submittedBy the user who submitted the feedback
-     * @param context the context in which the feedback was submitted
+     * @param context     the context in which the feedback was submitted
      * @return true if the feedback was submitted successfully, false otherwise
      */
     boolean submitFeedbackWithScreenshot(String feedback, byte[] screenshot, UserBusiness submittedBy, String context);
@@ -73,7 +73,7 @@ public interface HelpService {
      * Marks a tutorial as completed for a user.
      *
      * @param context the context of the tutorial
-     * @param user the user who completed the tutorial
+     * @param user    the user who completed the tutorial
      * @return true if the tutorial was marked as completed successfully, false otherwise
      */
     boolean markTutorialCompleted(String context, UserBusiness user);
@@ -82,7 +82,7 @@ public interface HelpService {
      * Checks if a tutorial has been completed by a user.
      *
      * @param context the context of the tutorial
-     * @param user the user to check
+     * @param user    the user to check
      * @return true if the tutorial has been completed by the user, false otherwise
      */
     boolean isTutorialCompleted(String context, UserBusiness user);

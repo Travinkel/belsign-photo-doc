@@ -1,12 +1,12 @@
 package com.belman.domain.order;
 
-import com.belman.domain.common.base.DataObject;
+import com.belman.domain.common.base.ValueObject;
 
 /**
  * Value object representing a description of a product in an order.
  * This is specific to the order bounded context.
  */
-public record ProductDescription(String name, String specifications, String notes) implements DataObject {
+public record ProductDescription(String name, String specifications, String notes) implements ValueObject {
 
     /**
      * Creates a new ProductDescription with the specified name, specifications, and notes.

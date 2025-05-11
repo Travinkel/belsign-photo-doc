@@ -1,7 +1,7 @@
 package com.belman.domain.order;
 
 import com.belman.domain.common.EmailAddress;
-import com.belman.domain.common.base.DataObject;
+import com.belman.domain.common.base.ValueObject;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -11,7 +11,7 @@ import java.util.Objects;
  * This is specific to the order bounded context.
  */
 public record DeliveryInformation(String address, LocalDate estimatedDeliveryDate, String contactName,
-                                  EmailAddress contactEmail, String specialInstructions) implements DataObject {
+                                  EmailAddress contactEmail, String specialInstructions) implements ValueObject {
 
     /**
      * Creates a new DeliveryInformation with the specified details.

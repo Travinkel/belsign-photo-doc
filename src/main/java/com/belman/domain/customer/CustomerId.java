@@ -1,6 +1,6 @@
 package com.belman.domain.customer;
 
-import com.belman.domain.common.base.DataObject;
+import com.belman.domain.common.base.ValueObject;
 
 import java.util.UUID;
 
@@ -8,7 +8,7 @@ import java.util.UUID;
  * Value object representing a unique identifier for a customer.
  * This is specific to the customer bounded context.
  */
-public record CustomerId(String id) implements DataObject {
+public record CustomerId(String id) implements ValueObject {
 
     /**
      * Creates a new CustomerId with the specified ID.

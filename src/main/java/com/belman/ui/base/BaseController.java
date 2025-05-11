@@ -31,16 +31,6 @@ public abstract class BaseController<T extends BaseViewModel<?>> implements Init
     protected T viewModel;
 
     /**
-     * Sets the ViewModel for this controller.
-     * This method should be called before the controller is initialized.
-     *
-     * @param viewModel the ViewModel to set
-     */
-    public void setViewModel(T viewModel) {
-        this.viewModel = viewModel;
-    }
-
-    /**
      * Gets the ViewModel for this controller.
      *
      * @return the ViewModel
@@ -50,13 +40,13 @@ public abstract class BaseController<T extends BaseViewModel<?>> implements Init
     }
 
     /**
-     * Gets the class name of the controller.
-     * 
-     * @return the simple class name of the controller
+     * Sets the ViewModel for this controller.
+     * This method should be called before the controller is initialized.
+     *
+     * @param viewModel the ViewModel to set
      */
-    @Override
-    public String getControllerName() {
-        return this.getClass().getSimpleName();
+    public void setViewModel(T viewModel) {
+        this.viewModel = viewModel;
     }
 
     /**
@@ -70,8 +60,8 @@ public abstract class BaseController<T extends BaseViewModel<?>> implements Init
      *     <li>Initialize the UI state</li>
      * </ul>
      *
-     * @param location   the location used to resolve relative paths for the root object
-     * @param resources  the resources used to localize the root object
+     * @param location  the location used to resolve relative paths for the root object
+     * @param resources the resources used to localize the root object
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -125,24 +115,6 @@ public abstract class BaseController<T extends BaseViewModel<?>> implements Init
     }
 
     /**
-     * Initializes the controller.
-     * This method is called once when the controller is created.
-     */
-    @Override
-    public void initialize() {
-        // Default implementation initializes bindings
-        Platform.runLater(this::initializeBinding);
-    }
-
-    /**
-     * Initializes the binding between the view model and the view.
-     * Override this method in subclasses to set up bindings.
-     */
-    public void initializeBinding() {
-        // Optional: Override in subclasses to bind ViewModel to the view
-    }
-
-    /**
      * Called when the associated view is shown.
      * Override this method to perform initialization when the view becomes visible.
      */
@@ -158,5 +130,33 @@ public abstract class BaseController<T extends BaseViewModel<?>> implements Init
     @Override
     public void onHide() {
         // Default implementation does nothing
+    }
+
+    /**
+     * Gets the class name of the controller.
+     *
+     * @return the simple class name of the controller
+     */
+    @Override
+    public String getControllerName() {
+        return this.getClass().getSimpleName();
+    }
+
+    /**
+     * Initializes the controller.
+     * This method is called once when the controller is created.
+     */
+    @Override
+    public void initialize() {
+        // Default implementation initializes bindings
+        Platform.runLater(this::initializeBinding);
+    }
+
+    /**
+     * Initializes the binding between the view model and the view.
+     * Override this method in subclasses to set up bindings.
+     */
+    public void initializeBinding() {
+        // Optional: Override in subclasses to bind ViewModel to the view
     }
 }

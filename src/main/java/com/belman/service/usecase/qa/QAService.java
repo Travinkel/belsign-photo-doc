@@ -60,7 +60,7 @@ public interface QAService {
     /**
      * Approves a photo.
      *
-     * @param photoId the ID of the photo to approve
+     * @param photoId    the ID of the photo to approve
      * @param approvedBy the user who approved the photo
      * @return true if the photo was approved, false if the photo was not found
      */
@@ -69,7 +69,7 @@ public interface QAService {
     /**
      * Approves multiple photos.
      *
-     * @param photoIds the IDs of the photos to approve
+     * @param photoIds   the IDs of the photos to approve
      * @param approvedBy the user who approved the photos
      * @return the number of photos that were approved
      */
@@ -78,9 +78,9 @@ public interface QAService {
     /**
      * Rejects a photo.
      *
-     * @param photoId the ID of the photo to reject
+     * @param photoId    the ID of the photo to reject
      * @param rejectedBy the user who rejected the photo
-     * @param reason the reason for rejection
+     * @param reason     the reason for rejection
      * @return true if the photo was rejected, false if the photo was not found
      */
     boolean rejectPhoto(PhotoId photoId, UserBusiness rejectedBy, String reason);
@@ -88,9 +88,9 @@ public interface QAService {
     /**
      * Rejects multiple photos.
      *
-     * @param photoIds the IDs of the photos to reject
+     * @param photoIds   the IDs of the photos to reject
      * @param rejectedBy the user who rejected the photos
-     * @param reason the reason for rejection
+     * @param reason     the reason for rejection
      * @return the number of photos that were rejected
      */
     int rejectPhotos(List<PhotoId> photoIds, UserBusiness rejectedBy, String reason);
@@ -98,8 +98,8 @@ public interface QAService {
     /**
      * Adds a comment to a photo.
      *
-     * @param photoId the ID of the photo to comment on
-     * @param comment the comment to add
+     * @param photoId     the ID of the photo to comment on
+     * @param comment     the comment to add
      * @param commentedBy the user who added the comment
      * @return true if the comment was added, false if the photo was not found
      */

@@ -1,6 +1,6 @@
 package com.belman.domain.order;
 
-import com.belman.domain.common.base.DataObject;
+import com.belman.domain.common.base.ValueObject;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -16,7 +16,7 @@ import java.util.Random;
  * <p>
  * This is specific to the order bounded context.
  */
-public record OrderNumber(String value) implements DataObject {
+public record OrderNumber(String value) implements ValueObject {
 
     /**
      * Creates a new OrderNumber with the specified value.

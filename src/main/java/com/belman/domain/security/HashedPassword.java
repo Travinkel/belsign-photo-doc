@@ -1,12 +1,12 @@
 package com.belman.domain.security;
 
-import com.belman.domain.common.base.DataObject;
+import com.belman.domain.common.base.ValueObject;
 
 /**
  * Represents a securely hashed password.
  * Cannot be null or empty.
  */
-public record HashedPassword(String value) implements DataObject {
+public record HashedPassword(String value) implements ValueObject {
     /**
      * Creates a new HashedPassword instance.
      *

@@ -1,21 +1,12 @@
 package com.belman.ui.views.admin;
 
-import com.belman.ui.base.BaseController;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRole;
-
+import com.belman.ui.base.BaseController;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 import java.util.Set;
 
@@ -58,6 +49,11 @@ public class AdminViewController extends BaseController<AdminViewModel> {
     @FXML private ProgressIndicator loadingIndicator;
 
     @Override
+    protected void setupBindings() {
+        // Example implementation for required bindings based on project logic
+    }
+
+    @Override
     public void initializeBinding() {
         // Initialize the view model
         getViewModel().initialize();
@@ -79,15 +75,15 @@ public class AdminViewController extends BaseController<AdminViewModel> {
         // Set up user table
         userTable.setItems(getViewModel().getUsers());
         usernameColumn.setCellValueFactory(data -> Bindings.createStringBinding(
-            () -> data.getValue().getUsername().value()
+                () -> data.getValue().getUsername().value()
         ));
         nameColumn.setCellValueFactory(data -> Bindings.createStringBinding(
-            () -> {
-                if (data.getValue().getName() != null) {
-                    return data.getValue().getName().firstName() + " " + data.getValue().getName().lastName();
+                () -> {
+                    if (data.getValue().getName() != null) {
+                        return data.getValue().getName().firstName() + " " + data.getValue().getName().lastName();
+                    }
+                    return "";
                 }
-                return "";
-            }
         ));
         emailColumn.setCellValueFactory(data -> Bindings.createStringBinding(
                 () -> {
@@ -98,15 +94,15 @@ public class AdminViewController extends BaseController<AdminViewModel> {
                 }
         ));
         rolesColumn.setCellValueFactory(data -> Bindings.createObjectBinding(
-            () -> data.getValue().getRoles()
+                () -> data.getValue().getRoles()
         ));
 
         // Bind selected user
         userTable.getSelectionModel().selectedItemProperty().addListener(
-            (obs, oldVal, newVal) -> {
-                getViewModel().selectedUserProperty().set(newVal);
-                updateUserRolesList();
-            }
+                (obs, oldVal, newVal) -> {
+                    getViewModel().selectedUserProperty().set(newVal);
+                    updateUserRolesList();
+                }
         );
 
         // Bind new password field
@@ -119,26 +115,21 @@ public class AdminViewController extends BaseController<AdminViewModel> {
         // Disable buttons when no user is selected
         deleteUserButton.disableProperty().bind(getViewModel().selectedUserProperty().isNull());
         assignRoleButton.disableProperty().bind(
-            getViewModel().selectedUserProperty().isNull().or(getViewModel().roleToAssignProperty().isNull())
+                getViewModel().selectedUserProperty().isNull().or(getViewModel().roleToAssignProperty().isNull())
         );
         removeRoleButton.disableProperty().bind(
-            getViewModel().selectedUserProperty().isNull().or(
-                Bindings.createBooleanBinding(
-                    () -> userRolesListView.getSelectionModel().getSelectedItem() == null,
-                    userRolesListView.getSelectionModel().selectedItemProperty()
+                getViewModel().selectedUserProperty().isNull().or(
+                        Bindings.createBooleanBinding(
+                                () -> userRolesListView.getSelectionModel().getSelectedItem() == null,
+                                userRolesListView.getSelectionModel().selectedItemProperty()
+                        )
                 )
-            )
         );
         resetPasswordButton.disableProperty().bind(
-            getViewModel().selectedUserProperty().isNull().or(
-                getViewModel().newPasswordProperty().isEmpty()
-            )
+                getViewModel().selectedUserProperty().isNull().or(
+                        getViewModel().newPasswordProperty().isEmpty()
+                )
         );
-    }
-
-    @Override
-    protected void setupBindings() {
-        // Example implementation for required bindings based on project logic
     }
 
     /**

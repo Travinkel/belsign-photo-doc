@@ -1,11 +1,11 @@
 package com.belman.ui.views.qadashboard;
 
-import com.belman.domain.order.OrderBusiness;
-import com.belman.ui.base.BaseViewModel;
 import com.belman.common.di.Inject;
-import com.belman.ui.navigation.Router;
+import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.order.OrderRepository;
 import com.belman.repository.service.SessionManager;
+import com.belman.ui.base.BaseViewModel;
+import com.belman.ui.navigation.Router;
 import com.belman.ui.views.login.LoginView;
 import com.belman.ui.views.photoreview.PhotoReviewView;
 import javafx.beans.property.SimpleStringProperty;
@@ -24,18 +24,14 @@ import java.util.stream.Collectors;
  * Provides data and operations for QA-specific functionality.
  */
 public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
-    @Inject
-    private OrderRepository orderRepository;
-
     private final SessionManager sessionManager = SessionManager.getInstance();
-
     private final StringProperty welcomeMessage = new SimpleStringProperty("Welcome to QA Dashboard");
     private final StringProperty searchText = new SimpleStringProperty("");
     private final StringProperty errorMessage = new SimpleStringProperty("");
-
     private final ObservableList<String> pendingOrders = FXCollections.observableArrayList();
     private final FilteredList<String> filteredOrders = new FilteredList<>(pendingOrders);
-
+    @Inject
+    private OrderRepository orderRepository;
     private String selectedOrder;
 
     @Override
@@ -60,8 +56,8 @@ public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
 
             // Convert to order numbers for display
             List<String> orderNumbers = orderBusinesses.stream()
-                .map(order -> order.getOrderNumber().toString())
-                .collect(Collectors.toList());
+                    .map(order -> order.getOrderNumber().toString())
+                    .collect(Collectors.toList());
 
             pendingOrders.setAll(orderNumbers);
 
@@ -73,13 +69,6 @@ public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
     }
 
     /**
-     * Filters orders based on the search text.
-     */
-    public void searchOrders() {
-        filterOrders();
-    }
-
-    /**
      * Filters the orders list based on the search text.
      */
     private void filterOrders() {
@@ -88,15 +77,31 @@ public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
         if (filter == null || filter.isEmpty()) {
             filteredOrders.setPredicate(order -> true);
         } else {
-            filteredOrders.setPredicate(order -> 
-                order.toLowerCase().contains(filter)
+            filteredOrders.setPredicate(order ->
+                    order.toLowerCase().contains(filter)
             );
         }
     }
 
     /**
+     * Gets the error message property.
+     *
+     * @return the error message property
+     */
+    public StringProperty errorMessageProperty() {
+        return errorMessage;
+    }
+
+    /**
+     * Filters orders based on the search text.
+     */
+    public void searchOrders() {
+        filterOrders();
+    }
+
+    /**
      * Selects an order for further operations.
-     * 
+     *
      * @param orderNumber the order number to select
      */
     public void selectOrder(String orderNumber) {
@@ -105,7 +110,7 @@ public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
 
     /**
      * Navigates to the photo review view for the selected order.
-     * 
+     *
      * @param orderNumber the order number to review
      */
     public void navigateToPhotoReview(String orderNumber) {
@@ -123,7 +128,7 @@ public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
 
     /**
      * Generates a report for the selected order.
-     * 
+     *
      * @param orderNumber the order number to generate a report for
      * @return true if the report was generated successfully, false otherwise
      */
@@ -140,7 +145,7 @@ public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
 
     /**
      * Gets the welcome message property.
-     * 
+     *
      * @return the welcome message property
      */
     public StringProperty welcomeMessageProperty() {
@@ -149,7 +154,7 @@ public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
 
     /**
      * Gets the search text property.
-     * 
+     *
      * @return the search text property
      */
     public StringProperty searchTextProperty() {
@@ -157,17 +162,8 @@ public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
     }
 
     /**
-     * Gets the error message property.
-     * 
-     * @return the error message property
-     */
-    public StringProperty errorMessageProperty() {
-        return errorMessage;
-    }
-
-    /**
      * Gets the pending orders list.
-     * 
+     *
      * @return the pending orders list
      */
     public ObservableList<String> getPendingOrders() {

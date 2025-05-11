@@ -1,25 +1,18 @@
 package com.belman.ui.views.ordergallery;
 
-import com.belman.domain.order.OrderBusiness;
-import com.belman.ui.base.BaseViewModel;
 import com.belman.common.di.Inject;
-import com.belman.ui.navigation.Router;
-import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserReference;
-import com.belman.domain.order.OrderRepository;
+import com.belman.domain.common.Timestamp;
+import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.order.OrderId;
 import com.belman.domain.order.OrderNumber;
-import com.belman.domain.common.Timestamp;
+import com.belman.domain.order.OrderRepository;
+import com.belman.domain.user.UserBusiness;
+import com.belman.domain.user.UserReference;
 import com.belman.repository.service.SessionManager;
+import com.belman.ui.base.BaseViewModel;
+import com.belman.ui.navigation.Router;
 import com.belman.ui.views.login.LoginView;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -32,24 +25,21 @@ import java.util.stream.Collectors;
  */
 public class OrderGalleryViewModel extends BaseViewModel<OrderGalleryViewModel> {
 
-    @Inject
-    private OrderRepository orderRepository;
-
     private final SessionManager sessionManager = SessionManager.getInstance();
-
     private final StringProperty searchText = new SimpleStringProperty("");
     private final StringProperty errorMessage = new SimpleStringProperty("");
     private final StringProperty orderDetails = new SimpleStringProperty("");
-
     private final BooleanProperty orderSelected = new SimpleBooleanProperty(false);
     private final BooleanProperty isLoading = new SimpleBooleanProperty(false);
-
     private final ObjectProperty<OrderBusiness> selectedOrder = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDate> fromDate = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDate> toDate = new SimpleObjectProperty<>();
-
-    private final ListProperty<OrderBusiness> orderBusinesses = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ListProperty<OrderBusiness> filteredOrderBusinesses = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<OrderBusiness> orderBusinesses = new SimpleListProperty<>(
+            FXCollections.observableArrayList());
+    private final ListProperty<OrderBusiness> filteredOrderBusinesses = new SimpleListProperty<>(
+            FXCollections.observableArrayList());
+    @Inject
+    private OrderRepository orderRepository;
 
     @Override
     public void onShow() {
@@ -75,6 +65,10 @@ public class OrderGalleryViewModel extends BaseViewModel<OrderGalleryViewModel> 
         }
     }
 
+    public StringProperty errorMessageProperty() {
+        return errorMessage;
+    }
+
     /**
      * Searches for orderBusinesses based on the search text.
      * The search text can be an order number, customer name, or other order property.
@@ -89,24 +83,20 @@ public class OrderGalleryViewModel extends BaseViewModel<OrderGalleryViewModel> 
 
         // Filter orderBusinesses based on search text
         List<OrderBusiness> filtered = orderBusinesses.stream()
-            .filter(order -> {
-                // Check if order number contains search text
-                if (order.getOrderNumber() != null && 
-                    order.getOrderNumber().toString().toLowerCase().contains(search.toLowerCase())) {
-                    return true;
-                }
+                .filter(order -> {
+                    // Check if order number contains search text
+                    if (order.getOrderNumber() != null &&
+                        order.getOrderNumber().toString().toLowerCase().contains(search.toLowerCase())) {
+                        return true;
+                    }
 
-                // Check if customer ID contains search text
-                if (order.getCustomerId() != null && 
-                    order.getCustomerId().id().toLowerCase().contains(search.toLowerCase())) {
-                    return true;
-                }
+                    // Check if customer ID contains search text
+                    return order.getCustomerId() != null &&
+                           order.getCustomerId().id().toLowerCase().contains(search.toLowerCase());
 
-                // Add more search criteria as needed
-
-                return false;
-            })
-            .collect(Collectors.toList());
+                    // Add more search criteria as needed
+                })
+                .collect(Collectors.toList());
 
         filteredOrderBusinesses.setAll(filtered);
     }
@@ -126,25 +116,78 @@ public class OrderGalleryViewModel extends BaseViewModel<OrderGalleryViewModel> 
 
         // Filter orderBusinesses based on date range
         List<OrderBusiness> filtered = orderBusinesses.stream()
-            .filter(order -> {
-                LocalDate orderDate = order.getCreatedAt().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+                .filter(order -> {
+                    LocalDate orderDate = order.getCreatedAt().toInstant().atZone(java.time.ZoneId.systemDefault())
+                            .toLocalDate();
 
-                if (from != null && to != null) {
-                    return !orderDate.isBefore(from) && !orderDate.isAfter(to);
-                } else if (from != null) {
-                    return !orderDate.isBefore(from);
-                } else {
-                    return !orderDate.isAfter(to);
-                }
-            })
-            .collect(Collectors.toList());
+                    if (from != null && to != null) {
+                        return !orderDate.isBefore(from) && !orderDate.isAfter(to);
+                    } else if (from != null) {
+                        return !orderDate.isBefore(from);
+                    } else {
+                        return !orderDate.isAfter(to);
+                    }
+                })
+                .collect(Collectors.toList());
 
         filteredOrderBusinesses.setAll(filtered);
     }
 
     /**
+     * Creates a new order with the specified order number.
+     *
+     * @param orderNumberStr the order number for the new order
+     * @return true if the order was created successfully, false otherwise
+     */
+    public boolean createOrder(String orderNumberStr) {
+        if (orderNumberStr == null || orderNumberStr.isBlank()) {
+            errorMessage.set("Please enter an order number");
+            return false;
+        }
+
+        try {
+            OrderNumber orderNum = new OrderNumber(orderNumberStr);
+
+            // Check if order already exists
+            boolean exists = orderBusinesses.stream()
+                    .anyMatch(order -> order.getOrderNumber() != null && order.getOrderNumber().equals(orderNum));
+
+            if (exists) {
+                errorMessage.set("OrderBusiness with this number already exists");
+                return false;
+            }
+
+            // Create new order
+            OrderId orderId = OrderId.newId();
+            UserBusiness currentUser = SessionManager.getInstance().getCurrentUser()
+                    .orElseThrow(() -> new IllegalStateException("User not logged in"));
+            UserReference userRef = UserReference.from(currentUser);
+            OrderBusiness newOrderBusiness = new OrderBusiness(orderId, orderNum, userRef, Timestamp.now());
+
+            // Save the new order
+            orderRepository.save(newOrderBusiness);
+
+            // Refresh the orderBusinesses list
+            loadAllOrders();
+
+            // Select the new order
+            selectOrder(newOrderBusiness);
+
+            return true;
+        } catch (IllegalArgumentException e) {
+            errorMessage.set("Invalid order number format");
+            return false;
+        } catch (Exception e) {
+            errorMessage.set("Error creating order: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Getters for properties
+
+    /**
      * Sets the selected orderBusiness and updates the orderBusiness details.
-     * 
+     *
      * @param orderBusiness the selected orderBusiness
      */
     public void selectOrder(OrderBusiness orderBusiness) {
@@ -173,64 +216,8 @@ public class OrderGalleryViewModel extends BaseViewModel<OrderGalleryViewModel> 
         }
     }
 
-    /**
-     * Creates a new order with the specified order number.
-     * 
-     * @param orderNumberStr the order number for the new order
-     * @return true if the order was created successfully, false otherwise
-     */
-    public boolean createOrder(String orderNumberStr) {
-        if (orderNumberStr == null || orderNumberStr.isBlank()) {
-            errorMessage.set("Please enter an order number");
-            return false;
-        }
-
-        try {
-            OrderNumber orderNum = new OrderNumber(orderNumberStr);
-
-            // Check if order already exists
-            boolean exists = orderBusinesses.stream()
-                .anyMatch(order -> order.getOrderNumber() != null && order.getOrderNumber().equals(orderNum));
-
-            if (exists) {
-                errorMessage.set("OrderBusiness with this number already exists");
-                return false;
-            }
-
-            // Create new order
-            OrderId orderId = OrderId.newId();
-            UserBusiness currentUser = SessionManager.getInstance().getCurrentUser()
-                .orElseThrow(() -> new IllegalStateException("User not logged in"));
-            UserReference userRef = UserReference.from(currentUser);
-            OrderBusiness newOrderBusiness = new OrderBusiness(orderId, orderNum, userRef, Timestamp.now());
-
-            // Save the new order
-            orderRepository.save(newOrderBusiness);
-
-            // Refresh the orderBusinesses list
-            loadAllOrders();
-
-            // Select the new order
-            selectOrder(newOrderBusiness);
-
-            return true;
-        } catch (IllegalArgumentException e) {
-            errorMessage.set("Invalid order number format");
-            return false;
-        } catch (Exception e) {
-            errorMessage.set("Error creating order: " + e.getMessage());
-            return false;
-        }
-    }
-
-    // Getters for properties
-
     public StringProperty searchTextProperty() {
         return searchText;
-    }
-
-    public StringProperty errorMessageProperty() {
-        return errorMessage;
     }
 
     public StringProperty orderDetailsProperty() {

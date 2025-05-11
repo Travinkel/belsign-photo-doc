@@ -16,7 +16,8 @@ import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -43,12 +44,12 @@ class GluonCameraServiceTest {
     @Test
     void isCameraAvailable_whenPicturesServiceNotAvailable_returnsFalse() {
         // Mock the Services.get method to return an empty Optional
-        try (MockedStatic<com.gluonhq.attach.util.Services> mockedServices = 
-                Mockito.mockStatic(com.gluonhq.attach.util.Services.class)) {
+        try (MockedStatic<com.gluonhq.attach.util.Services> mockedServices =
+                     Mockito.mockStatic(com.gluonhq.attach.util.Services.class)) {
 
-            mockedServices.when(() -> 
-                com.gluonhq.attach.util.Services.get(com.gluonhq.attach.pictures.PicturesService.class))
-                .thenReturn(Optional.empty());
+            mockedServices.when(() ->
+                            com.gluonhq.attach.util.Services.get(com.gluonhq.attach.pictures.PicturesService.class))
+                    .thenReturn(Optional.empty());
 
             // Test that isCameraAvailable returns false
             assertFalse(cameraService.isCameraAvailable());
@@ -61,12 +62,12 @@ class GluonCameraServiceTest {
     @Test
     void isGalleryAvailable_whenPicturesServiceNotAvailable_returnsFalse() {
         // Mock the Services.get method to return an empty Optional
-        try (MockedStatic<com.gluonhq.attach.util.Services> mockedServices = 
-                Mockito.mockStatic(com.gluonhq.attach.util.Services.class)) {
+        try (MockedStatic<com.gluonhq.attach.util.Services> mockedServices =
+                     Mockito.mockStatic(com.gluonhq.attach.util.Services.class)) {
 
-            mockedServices.when(() -> 
-                com.gluonhq.attach.util.Services.get(com.gluonhq.attach.pictures.PicturesService.class))
-                .thenReturn(Optional.empty());
+            mockedServices.when(() ->
+                            com.gluonhq.attach.util.Services.get(com.gluonhq.attach.pictures.PicturesService.class))
+                    .thenReturn(Optional.empty());
 
             // Test that isGalleryAvailable returns false
             assertFalse(cameraService.isGalleryAvailable());
@@ -79,12 +80,12 @@ class GluonCameraServiceTest {
     @Test
     void takePhoto_whenPicturesServiceNotAvailable_returnsEmptyOptional() {
         // Mock the Services.get method to return an empty Optional
-        try (MockedStatic<com.gluonhq.attach.util.Services> mockedServices = 
-                Mockito.mockStatic(com.gluonhq.attach.util.Services.class)) {
+        try (MockedStatic<com.gluonhq.attach.util.Services> mockedServices =
+                     Mockito.mockStatic(com.gluonhq.attach.util.Services.class)) {
 
-            mockedServices.when(() -> 
-                com.gluonhq.attach.util.Services.get(com.gluonhq.attach.pictures.PicturesService.class))
-                .thenReturn(Optional.empty());
+            mockedServices.when(() ->
+                            com.gluonhq.attach.util.Services.get(com.gluonhq.attach.pictures.PicturesService.class))
+                    .thenReturn(Optional.empty());
 
             // Test that takePhoto returns an empty Optional
             Optional<File> result = cameraService.takePhoto();
@@ -98,12 +99,12 @@ class GluonCameraServiceTest {
     @Test
     void selectPhoto_whenPicturesServiceNotAvailable_returnsEmptyOptional() {
         // Mock the Services.get method to return an empty Optional
-        try (MockedStatic<com.gluonhq.attach.util.Services> mockedServices = 
-                Mockito.mockStatic(com.gluonhq.attach.util.Services.class)) {
+        try (MockedStatic<com.gluonhq.attach.util.Services> mockedServices =
+                     Mockito.mockStatic(com.gluonhq.attach.util.Services.class)) {
 
-            mockedServices.when(() -> 
-                com.gluonhq.attach.util.Services.get(com.gluonhq.attach.pictures.PicturesService.class))
-                .thenReturn(Optional.empty());
+            mockedServices.when(() ->
+                            com.gluonhq.attach.util.Services.get(com.gluonhq.attach.pictures.PicturesService.class))
+                    .thenReturn(Optional.empty());
 
             // Test that selectPhoto returns an empty Optional
             Optional<File> result = cameraService.selectPhoto();
@@ -137,11 +138,11 @@ class GluonCameraServiceTest {
         // Mock the Services.get method to return our mock StorageService
         try (MockedStatic<Services> mockedServices = mockStatic(Services.class)) {
             mockedServices.when(() -> Services.get(StorageService.class))
-                .thenReturn(Optional.of(mockStorageService));
+                    .thenReturn(Optional.of(mockStorageService));
 
             // Access the private saveImageToFile method using reflection
             Method saveImageToFileMethod = GluonCameraService.class.getDeclaredMethod(
-                "saveImageToFile", Image.class, File.class);
+                    "saveImageToFile", Image.class, File.class);
             saveImageToFileMethod.setAccessible(true);
 
             try {
@@ -175,11 +176,11 @@ class GluonCameraServiceTest {
         // Mock the Services.get method to return an empty Optional
         try (MockedStatic<Services> mockedServices = mockStatic(Services.class)) {
             mockedServices.when(() -> Services.get(StorageService.class))
-                .thenReturn(Optional.empty());
+                    .thenReturn(Optional.empty());
 
             // Access the private saveImageToFile method using reflection
             Method saveImageToFileMethod = GluonCameraService.class.getDeclaredMethod(
-                "saveImageToFile", Image.class, File.class);
+                    "saveImageToFile", Image.class, File.class);
             saveImageToFileMethod.setAccessible(true);
 
             try {

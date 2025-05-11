@@ -1,12 +1,12 @@
 package com.belman.ui.views.main;
 
 
-import com.belman.ui.core.StateManager;
-import com.belman.ui.base.BaseViewModel;
-import com.belman.repository.logging.EmojiLogger;
-import com.belman.ui.navigation.Router;
 import com.belman.domain.user.UserBusiness;
+import com.belman.repository.logging.EmojiLogger;
 import com.belman.repository.service.SessionManager;
+import com.belman.ui.base.BaseViewModel;
+import com.belman.ui.core.StateManager;
+import com.belman.ui.navigation.Router;
 import com.belman.ui.views.login.LoginView;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -107,7 +107,7 @@ public class MainViewModel extends BaseViewModel<MainViewModel> {
 
     /**
      * Gets the welcome message property.
-     * 
+     *
      * @return the welcome message property
      */
     public StringProperty welcomeMessageProperty() {
@@ -116,7 +116,7 @@ public class MainViewModel extends BaseViewModel<MainViewModel> {
 
     /**
      * Gets the welcome message.
-     * 
+     *
      * @return the welcome message
      */
     public String getWelcomeMessage() {
@@ -125,7 +125,7 @@ public class MainViewModel extends BaseViewModel<MainViewModel> {
 
     /**
      * Gets the username property.
-     * 
+     *
      * @return the username property
      */
     public StringProperty usernameProperty() {
@@ -134,7 +134,7 @@ public class MainViewModel extends BaseViewModel<MainViewModel> {
 
     /**
      * Gets the username.
-     * 
+     *
      * @return the username
      */
     public String getUsername() {

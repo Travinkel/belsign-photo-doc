@@ -1,5 +1,7 @@
 package com.belman.domain.events;
 
+import com.belman.domain.event.BusinessEventPublisher;
+import com.belman.domain.event.adapter.DomainEventAdapter;
 import com.belman.domain.services.Logger;
 
 import java.util.ArrayList;
@@ -13,6 +15,8 @@ import java.util.concurrent.Executors;
  * Publisher for domain events.
  * This class is responsible for publishing domain events and notifying registered handlers.
  * It follows the publisher-subscriber pattern.
+ * 
+ * This implementation uses BusinessEventPublisher internally to leverage the common event publishing infrastructure.
  */
 public class DomainEventPublisher implements IDomainEventPublisher {
     private static DomainEventPublisher instance = new DomainEventPublisher();
@@ -21,12 +25,15 @@ public class DomainEventPublisher implements IDomainEventPublisher {
     // Executor for asynchronous event handling
     private final ExecutorService executor;
     private Logger logger;
+    // BusinessEventPublisher for delegating event publishing
+    private final BusinessEventPublisher businessEventPublisher;
 
     // Private constructor for singleton
     private DomainEventPublisher() {
         this.handlers = new ConcurrentHashMap<>();
         this.executor = Executors.newCachedThreadPool();
         this.logger = null; // Will be set by setLogger method
+        this.businessEventPublisher = BusinessEventPublisher.getInstance();
     }
 
     /**
@@ -86,17 +93,6 @@ public class DomainEventPublisher implements IDomainEventPublisher {
         if (logger != null) {
             logger.debug(message, args);
         }
-    }    /**
-     * Safely logs a message at the trace level.
-     * If the logger is not set, this method does nothing.
-     *
-     * @param message the message to log
-     * @param args    the arguments to the message
-     */
-    private void logTrace(String message, Object... args) {
-        if (logger != null) {
-            logger.trace(message, args);
-        }
     }
 
     /**
@@ -136,6 +132,17 @@ public class DomainEventPublisher implements IDomainEventPublisher {
         } else {
             logWarn("Executor service is already shut down");
         }
+    }    /**
+     * Safely logs a message at the trace level.
+     * If the logger is not set, this method does nothing.
+     *
+     * @param message the message to log
+     * @param args    the arguments to the message
+     */
+    private void logTrace(String message, Object... args) {
+        if (logger != null) {
+            logger.trace(message, args);
+        }
     }
 
     /**
@@ -164,24 +171,33 @@ public class DomainEventPublisher implements IDomainEventPublisher {
         }
     }
 
+
+
+
     @Override
     public void publish(DomainEvent event) {
         logDebug("Publishing event: {} (ID: {})", event.getEventType(), event.getEventId());
 
+        // First, handle with domain-specific handlers
         if (handlers.containsKey(event.getClass())) {
             List<DomainEventHandler<? extends DomainEvent>> eventHandlers = handlers.get(event.getClass());
-            logDebug("Found {} handlers for event type: {}", eventHandlers.size(), event.getEventType());
+            logDebug("Found {} domain handlers for event type: {}", eventHandlers.size(), event.getEventType());
 
             for (DomainEventHandler<? extends DomainEvent> handler : eventHandlers) {
                 // Cast is safe because we only register handlers for the correct event type
                 @SuppressWarnings("unchecked")
                 DomainEventHandler<DomainEvent> typedHandler = (DomainEventHandler<DomainEvent>) handler;
-                logTrace("Handling event with: {}", typedHandler.getClass().getName());
+                logTrace("Handling event with domain handler: {}", typedHandler.getClass().getName());
                 typedHandler.handle(event);
             }
         } else {
-            logDebug("No handlers found for event type: {}", event.getEventType());
+            logDebug("No domain handlers found for event type: {}", event.getEventType());
         }
+
+        // Then, delegate to BusinessEventPublisher using the adapter
+        logDebug("Delegating to BusinessEventPublisher using DomainEventAdapter");
+        DomainEventAdapter adapter = new DomainEventAdapter(event);
+        businessEventPublisher.publish(adapter);
     }
 
     @Override

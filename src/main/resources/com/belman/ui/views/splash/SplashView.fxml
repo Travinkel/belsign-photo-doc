@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.control.Label?>
 <?import com.gluonhq.charm.glisten.control.ProgressBar?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.layout.Region?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.Color?>
-
-<StackPane xmlns:fx="http://javafx.com/fxml" 
+<?import javafx.scene.text.Font?>
+<StackPane xmlns:fx="http://javafx.com/fxml"
            fx:controller="com.belman.ui.views.splash.SplashViewController"
            styleClass="splash-container, responsive-container"
            stylesheets="@../../../styles/app.css">
@@ -22,7 +19,7 @@
 
     <VBox styleClass="splash-content" alignment="CENTER" spacing="20">
         <padding>
-            <Insets top="30" right="30" bottom="30" left="30" />
+            <Insets top="30" right="30" bottom="30" left="30"/>
         </padding>
 
         <!-- Logo with subtle shadow effect -->

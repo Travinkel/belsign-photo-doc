@@ -1,4 +1,5 @@
 package com.belman.ui.views.splash;
+
 import com.belman.ui.base.BaseView;
 import com.gluonhq.charm.glisten.control.AppBar;
 

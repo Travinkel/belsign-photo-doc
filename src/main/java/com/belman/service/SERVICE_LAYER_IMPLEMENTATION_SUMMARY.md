@@ -4,7 +4,9 @@ This document summarizes the implementation of the service layer for the Belsign
 
 ## Overview
 
-The service layer is responsible for implementing the business logic of the application. It sits between the UI layer and the repository layer, orchestrating the flow of data and enforcing business rules. The service layer is organized into use cases, each representing a specific business operation.
+The service layer is responsible for implementing the business logic of the application. It sits between the UI layer
+and the repository layer, orchestrating the flow of data and enforcing business rules. The service layer is organized
+into use cases, each representing a specific business operation.
 
 ## Service Interfaces
 
@@ -81,9 +83,12 @@ The `ReportService` interface provides methods for report generation and managem
 - `getReportById(ReportId reportId)`: Gets a report by ID.
 - `getReportsByOrderId(OrderId orderId)`: Gets all reports for an order.
 - `getReportsByType(ReportType type)`: Gets all reports of a specific type.
-- `generateReport(OrderId orderId, ReportType type, ReportFormat format, UserBusiness generatedBy)`: Generates a report for an order.
-- `previewReport(OrderId orderId, ReportType type, ReportFormat format)`: Previews a report for an order without saving it.
-- `sendReport(ReportId reportId, String recipientEmail, String subject, String message, UserBusiness sentBy)`: Sends a report to a recipient.
+- `generateReport(OrderId orderId, ReportType type, ReportFormat format, UserBusiness generatedBy)`: Generates a report
+  for an order.
+- `previewReport(OrderId orderId, ReportType type, ReportFormat format)`: Previews a report for an order without saving
+  it.
+- `sendReport(ReportId reportId, String recipientEmail, String subject, String message, UserBusiness sentBy)`: Sends a
+  report to a recipient.
 - `deleteReport(ReportId reportId, UserBusiness deletedBy)`: Deletes a report.
 
 ### Email Service
@@ -92,17 +97,33 @@ The `EmailService` interface provides methods for sending emails:
 
 - `sendEmail(EmailAddress to, String subject, String body)`: Sends an email to a single recipient.
 - `sendEmail(List<EmailAddress> to, String subject, String body)`: Sends an email to multiple recipients.
-- `sendEmailWithAttachment(EmailAddress to, String subject, String body, String attachmentName, byte[] attachmentData, String attachmentMimeType)`: Sends an email with an attachment to a single recipient.
-- `sendEmailWithAttachment(List<EmailAddress> to, String subject, String body, String attachmentName, byte[] attachmentData, String attachmentMimeType)`: Sends an email with an attachment to multiple recipients.
-- `sendEmailWithAttachments(EmailAddress to, String subject, String body, List<String> attachmentNames, List<byte[]> attachmentData, List<String> attachmentMimeTypes)`: Sends an email with multiple attachments to a single recipient.
-- `sendEmailWithAttachments(List<EmailAddress> to, String subject, String body, List<String> attachmentNames, List<byte[]> attachmentData, List<String> attachmentMimeTypes)`: Sends an email with multiple attachments to multiple recipients.
+-
+
+`sendEmailWithAttachment(EmailAddress to, String subject, String body, String attachmentName, byte[] attachmentData, String attachmentMimeType)`:
+Sends an email with an attachment to a single recipient.
+
+-
+
+`sendEmailWithAttachment(List<EmailAddress> to, String subject, String body, String attachmentName, byte[] attachmentData, String attachmentMimeType)`:
+Sends an email with an attachment to multiple recipients.
+
+-
+
+`sendEmailWithAttachments(EmailAddress to, String subject, String body, List<String> attachmentNames, List<byte[]> attachmentData, List<String> attachmentMimeTypes)`:
+Sends an email with multiple attachments to a single recipient.
+
+-
+
+`sendEmailWithAttachments(List<EmailAddress> to, String subject, String body, List<String> attachmentNames, List<byte[]> attachmentData, List<String> attachmentMimeTypes)`:
+Sends an email with multiple attachments to multiple recipients.
 
 ### Admin Service
 
 The `AdminService` interface provides methods for system administration:
 
 - `getAllUsers()`: Gets all users in the system.
-- `createUser(String username, String password, String firstName, String lastName, String email, UserRole[] roles)`: Creates a new user.
+- `createUser(String username, String password, String firstName, String lastName, String email, UserRole[] roles)`:
+  Creates a new user.
 - `deleteUser(UserId userId)`: Deletes a user.
 - `assignRole(UserId userId, UserRole role)`: Assigns a role to a user.
 - `removeRole(UserId userId, UserRole role)`: Removes a role from a user.
@@ -116,7 +137,8 @@ The `HelpService` interface provides methods for help and support:
 - `getAvailableContexts()`: Gets all available help contexts.
 - `searchDocumentation(String searchTerm)`: Searches the documentation for a specific term.
 - `submitFeedback(String feedback, UserBusiness submittedBy, String context)`: Submits feedback.
-- `submitFeedbackWithScreenshot(String feedback, byte[] screenshot, UserBusiness submittedBy, String context)`: Submits feedback with a screenshot.
+- `submitFeedbackWithScreenshot(String feedback, byte[] screenshot, UserBusiness submittedBy, String context)`: Submits
+  feedback with a screenshot.
 - `getTutorial(String context)`: Gets the tutorial for a specific context.
 - `getAvailableTutorialContexts()`: Gets all available tutorial contexts.
 - `markTutorialCompleted(String context, UserBusiness user)`: Marks a tutorial as completed for a user.
@@ -126,9 +148,11 @@ The `HelpService` interface provides methods for help and support:
 
 The service layer follows these architectural patterns:
 
-1. **Interface-based design**: Each service is defined by an interface, allowing for multiple implementations and easier testing.
+1. **Interface-based design**: Each service is defined by an interface, allowing for multiple implementations and easier
+   testing.
 2. **Dependency injection**: Services depend on interfaces, not implementations, allowing for loose coupling.
-3. **Single Responsibility Principle**: Each service has a single responsibility and is focused on a specific domain area.
+3. **Single Responsibility Principle**: Each service has a single responsibility and is focused on a specific domain
+   area.
 4. **Use case organization**: Services are organized by use cases, each representing a specific business operation.
 5. **Domain-driven design**: Services operate on domain objects and enforce business rules.
 

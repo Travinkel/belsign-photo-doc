@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for the PhotoTemplate value object.
- * 
+ * <p>
  * Note: This class was previously testing PhotoAngle, but has been updated to test PhotoTemplate
  * as PhotoAngle has been replaced by PhotoTemplate in the system. This change was made because
  * production workers will get a list of pictures that need to be taken, such that taking a picture
@@ -58,6 +58,10 @@ public class PhotoTemplateTest {
         assertEquals("TOP_VIEW_OF_JOINT", PhotoTemplate.TOP_VIEW_OF_JOINT.name());
         assertTrue(PhotoTemplate.TOP_VIEW_OF_JOINT.description().contains("above"));
 
+        // Assert for SIDE_VIEW_OF_WELD
+        assertEquals("SIDE_VIEW_OF_WELD", PhotoTemplate.SIDE_VIEW_OF_WELD.name());
+        assertTrue(PhotoTemplate.SIDE_VIEW_OF_WELD.description().contains("side"));
+
         // Assert for FRONT_VIEW_OF_ASSEMBLY
         assertEquals("FRONT_VIEW_OF_ASSEMBLY", PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY.name());
         assertTrue(PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY.description().contains("front"));
@@ -73,6 +77,26 @@ public class PhotoTemplateTest {
         // Assert for RIGHT_VIEW_OF_ASSEMBLY
         assertEquals("RIGHT_VIEW_OF_ASSEMBLY", PhotoTemplate.RIGHT_VIEW_OF_ASSEMBLY.name());
         assertTrue(PhotoTemplate.RIGHT_VIEW_OF_ASSEMBLY.description().contains("right"));
+
+        // Assert for BOTTOM_VIEW_OF_ASSEMBLY
+        assertEquals("BOTTOM_VIEW_OF_ASSEMBLY", PhotoTemplate.BOTTOM_VIEW_OF_ASSEMBLY.name());
+        assertTrue(PhotoTemplate.BOTTOM_VIEW_OF_ASSEMBLY.description().contains("below"));
+
+        // Assert for CLOSE_UP_OF_WELD
+        assertEquals("CLOSE_UP_OF_WELD", PhotoTemplate.CLOSE_UP_OF_WELD.name());
+        assertTrue(PhotoTemplate.CLOSE_UP_OF_WELD.description().contains("close-up"));
+
+        // Assert for ANGLED_VIEW_OF_JOINT
+        assertEquals("ANGLED_VIEW_OF_JOINT", PhotoTemplate.ANGLED_VIEW_OF_JOINT.name());
+        assertTrue(PhotoTemplate.ANGLED_VIEW_OF_JOINT.description().contains("angled"));
+
+        // Assert for OVERVIEW_OF_ASSEMBLY
+        assertEquals("OVERVIEW_OF_ASSEMBLY", PhotoTemplate.OVERVIEW_OF_ASSEMBLY.name());
+        assertTrue(PhotoTemplate.OVERVIEW_OF_ASSEMBLY.description().contains("overview"));
+
+        // Assert for CUSTOM
+        assertEquals("CUSTOM", PhotoTemplate.CUSTOM.name());
+        assertTrue(PhotoTemplate.CUSTOM.description().contains("specific instructions"));
     }
 
     @Test

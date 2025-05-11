@@ -1,24 +1,23 @@
 package com.belman.acceptance.order;
 
 import com.belman.acceptance.BaseAcceptanceTest;
-import com.belman.domain.order.*;
-import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserReference;
-import com.belman.domain.customer.CustomerAggregate;
-import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.order.photo.PhotoId;
-import com.belman.domain.order.photo.Photo;
-import com.belman.domain.order.photo.PhotoTemplate;
-import com.belman.domain.customer.CustomerType;
-import com.belman.domain.order.OrderBusiness;
-import com.belman.domain.common.Timestamp;
 import com.belman.domain.common.EmailAddress;
 import com.belman.domain.common.PhoneNumber;
+import com.belman.domain.common.Timestamp;
 import com.belman.domain.customer.Company;
+import com.belman.domain.customer.CustomerAggregate;
 import com.belman.domain.customer.CustomerId;
+import com.belman.domain.customer.CustomerType;
+import com.belman.domain.order.*;
+import com.belman.domain.order.photo.Photo;
+import com.belman.domain.order.photo.PhotoDocument;
+import com.belman.domain.order.photo.PhotoId;
+import com.belman.domain.order.photo.PhotoTemplate;
+import com.belman.domain.user.UserBusiness;
+import com.belman.domain.user.UserReference;
 import com.belman.domain.user.Username;
-import com.belman.repository.persistence.InMemoryOrderRepository;
-import com.belman.repository.persistence.InMemoryUserRepository;
+import com.belman.repository.persistence.memory.InMemoryOrderRepository;
+import com.belman.repository.persistence.memory.InMemoryUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,8 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Acceptance tests for order photo management.
@@ -36,10 +36,10 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
 
+    private static final String TEST_ORDER_NUMBER = "ORD-12345";
     private OrderRepository orderRepository;
     private UserBusiness productionUser;
     private OrderBusiness testOrderBusiness;
-    private static final String TEST_ORDER_NUMBER = "ORD-12345";
 
     @BeforeEach
     void setup() {
@@ -64,18 +64,18 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
 
         // Add customer and product details
         CustomerAggregate customer = new CustomerAggregate.Builder()
-            .withId(CustomerId.newId())
-            .withType(CustomerType.COMPANY)
-            .withCompany(new Company("Belman Test Customer", "123 Test Street", "REG-12345"))
-            .withEmail(new EmailAddress("customer@example.com"))
-            .withPhoneNumber(new PhoneNumber("+123456789"))
-            .build();
+                .withId(CustomerId.newId())
+                .withType(CustomerType.COMPANY)
+                .withCompany(new Company("Belman Test Customer", "123 Test Street", "REG-12345"))
+                .withEmail(new EmailAddress("customer@example.com"))
+                .withPhoneNumber(new PhoneNumber("+123456789"))
+                .build();
 
         testOrderBusiness.setCustomerId(customer.getId());
         testOrderBusiness.setProductDescription(new ProductDescription(
-            "Test expansion joint",
-            "High-quality expansion joint for industrial use",
-            "Material: Steel, Size: 100x100"
+                "Test expansion joint",
+                "High-quality expansion joint for industrial use",
+                "Material: Steel, Size: 100x100"
         ));
 
         // Save the order
@@ -96,12 +96,12 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
         UserReference userRef = new UserReference(productionUser.getId(), productionUser.getUsername());
 
         PhotoDocument photoDoc = PhotoDocument.builder()
-            .photoId(photoId)
-            .template(template)
-            .imagePath(photo)
-            .uploadedBy(productionUser)
-            .uploadedAt(uploadedAt)
-            .build();
+                .photoId(photoId)
+                .template(template)
+                .imagePath(photo)
+                .uploadedBy(productionUser)
+                .uploadedAt(uploadedAt)
+                .build();
 
         // Add the photo to the order
         testOrderBusiness.addPhoto(photoDoc);
@@ -110,7 +110,8 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
         orderRepository.save(testOrderBusiness);
 
         // Retrieve the order from the repository
-        Optional<OrderBusiness> retrievedOrderOpt = orderRepository.findByOrderNumber(new OrderNumber(TEST_ORDER_NUMBER));
+        Optional<OrderBusiness> retrievedOrderOpt = orderRepository.findByOrderNumber(
+                new OrderNumber(TEST_ORDER_NUMBER));
         assertTrue(retrievedOrderOpt.isPresent(), "OrderBusiness should exist in repository");
 
         OrderBusiness retrievedOrderBusiness = retrievedOrderOpt.get();
@@ -138,12 +139,12 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
         Timestamp uploadedAt = new Timestamp(LocalDateTime.now().toInstant(ZoneOffset.UTC));
 
         PhotoDocument photoDoc = PhotoDocument.builder()
-            .photoId(photoId)
-            .template(template)
-            .imagePath(photo)
-            .uploadedBy(productionUser)
-            .uploadedAt(uploadedAt)
-            .build();
+                .photoId(photoId)
+                .template(template)
+                .imagePath(photo)
+                .uploadedBy(productionUser)
+                .uploadedAt(uploadedAt)
+                .build();
 
         testOrderBusiness.addPhoto(photoDoc);
 
@@ -154,13 +155,15 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
         orderRepository.save(testOrderBusiness);
 
         // Retrieve the order from the repository
-        Optional<OrderBusiness> retrievedOrderOpt = orderRepository.findByOrderNumber(new OrderNumber(TEST_ORDER_NUMBER));
+        Optional<OrderBusiness> retrievedOrderOpt = orderRepository.findByOrderNumber(
+                new OrderNumber(TEST_ORDER_NUMBER));
         assertTrue(retrievedOrderOpt.isPresent(), "OrderBusiness should exist in repository");
 
         OrderBusiness retrievedOrderBusiness = retrievedOrderOpt.get();
 
         // Verify that the order status was updated
-        assertEquals(OrderStatus.COMPLETED, retrievedOrderBusiness.getStatus(), "OrderBusiness status should be COMPLETED");
+        assertEquals(OrderStatus.COMPLETED, retrievedOrderBusiness.getStatus(),
+                "OrderBusiness status should be COMPLETED");
         assertTrue(retrievedOrderBusiness.isReadyForQaReview(), "OrderBusiness should be ready for QA review");
 
         logDebug("OrderBusiness status successfully updated to COMPLETED");
@@ -178,12 +181,12 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
         Timestamp uploadedAt1 = new Timestamp(LocalDateTime.now().toInstant(ZoneOffset.UTC));
 
         PhotoDocument photoDoc1 = PhotoDocument.builder()
-            .photoId(photoId1)
-            .template(template1)
-            .imagePath(photo1)
-            .uploadedBy(productionUser)
-            .uploadedAt(uploadedAt1)
-            .build();
+                .photoId(photoId1)
+                .template(template1)
+                .imagePath(photo1)
+                .uploadedBy(productionUser)
+                .uploadedAt(uploadedAt1)
+                .build();
 
         // Side view from the right
         PhotoId photoId2 = PhotoId.newId();
@@ -192,12 +195,12 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
         Timestamp uploadedAt2 = new Timestamp(LocalDateTime.now().toInstant(ZoneOffset.UTC));
 
         PhotoDocument photoDoc2 = PhotoDocument.builder()
-            .photoId(photoId2)
-            .template(template2)
-            .imagePath(photo2)
-            .uploadedBy(productionUser)
-            .uploadedAt(uploadedAt2)
-            .build();
+                .photoId(photoId2)
+                .template(template2)
+                .imagePath(photo2)
+                .uploadedBy(productionUser)
+                .uploadedAt(uploadedAt2)
+                .build();
 
         // Side view from the left
         PhotoId photoId3 = PhotoId.newId();
@@ -206,12 +209,12 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
         Timestamp uploadedAt3 = new Timestamp(LocalDateTime.now().toInstant(ZoneOffset.UTC));
 
         PhotoDocument photoDoc3 = PhotoDocument.builder()
-            .photoId(photoId3)
-            .template(template3)
-            .imagePath(photo3)
-            .uploadedBy(productionUser)
-            .uploadedAt(uploadedAt3)
-            .build();
+                .photoId(photoId3)
+                .template(template3)
+                .imagePath(photo3)
+                .uploadedBy(productionUser)
+                .uploadedAt(uploadedAt3)
+                .build();
 
         testOrderBusiness.addPhoto(photoDoc1);
         testOrderBusiness.addPhoto(photoDoc2);
@@ -221,7 +224,8 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
         orderRepository.save(testOrderBusiness);
 
         // Retrieve the order from the repository
-        Optional<OrderBusiness> retrievedOrderOpt = orderRepository.findByOrderNumber(new OrderNumber(TEST_ORDER_NUMBER));
+        Optional<OrderBusiness> retrievedOrderOpt = orderRepository.findByOrderNumber(
+                new OrderNumber(TEST_ORDER_NUMBER));
         assertTrue(retrievedOrderOpt.isPresent(), "OrderBusiness should exist in repository");
 
         OrderBusiness retrievedOrderBusiness = retrievedOrderOpt.get();

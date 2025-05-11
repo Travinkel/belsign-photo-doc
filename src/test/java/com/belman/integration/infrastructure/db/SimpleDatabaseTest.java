@@ -2,7 +2,7 @@ package com.belman.integration.infrastructure.db;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Simple test to verify that the test runner is working correctly.

@@ -1,25 +1,20 @@
 package com.belman.unit.be.businessobjects;
 
-import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserReference;
+import com.belman.domain.common.EmailAddress;
+import com.belman.domain.common.Timestamp;
+import com.belman.domain.customer.Company;
 import com.belman.domain.customer.CustomerBusiness;
+import com.belman.domain.customer.CustomerId;
 import com.belman.domain.customer.CustomerType;
-import com.belman.domain.order.OrderBusiness;
-import com.belman.domain.order.OrderId;
-import com.belman.domain.order.OrderNumber;
-import com.belman.domain.order.OrderStatus;
-import com.belman.domain.order.ProductDescription;
-import com.belman.domain.order.DeliveryInformation;
+import com.belman.domain.order.*;
+import com.belman.domain.order.photo.Photo;
 import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.order.photo.PhotoId;
-import com.belman.domain.order.photo.Photo;
 import com.belman.domain.order.photo.PhotoTemplate;
-import com.belman.domain.common.Timestamp;
-import com.belman.domain.common.EmailAddress;
 import com.belman.domain.security.HashedPassword;
-import com.belman.domain.customer.CustomerId;
-import com.belman.domain.customer.Company;
+import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserId;
+import com.belman.domain.user.UserReference;
 import com.belman.domain.user.Username;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,11 +52,11 @@ class OrderBusinessTest {
         EmailAddress userEmail = new EmailAddress("user@example.com");
 
         createdBy = new UserBusiness.Builder()
-            .id(userId)
-            .username(username)
-            .password(password)
-            .email(userEmail)
-            .build();
+                .id(userId)
+                .username(username)
+                .password(password)
+                .email(userEmail)
+                .build();
 
         userRef = new UserReference(userId, username);
 
@@ -74,22 +69,22 @@ class OrderBusinessTest {
         Company company = new Company("Test Company", "123 Test St", "REG-12345");
 
         customer = new CustomerBusiness.Builder()
-            .withId(customerId)
-            .withType(CustomerType.COMPANY)
-            .withCompany(company)
-            .withEmail(customerEmail)
-            .build();
+                .withId(customerId)
+                .withType(CustomerType.COMPANY)
+                .withCompany(company)
+                .withEmail(customerEmail)
+                .build();
 
         // Create a product description
         productDescription = new ProductDescription("Test Product", "A test product", "Test specifications");
 
         // Create delivery information
         deliveryInformation = new DeliveryInformation(
-            "123 Test St", 
-            java.time.LocalDate.now().plusDays(1), 
-            "Handle with care",
-            new EmailAddress("delivery@example.com"),
-            "+1234567890"
+                "123 Test St",
+                java.time.LocalDate.now().plusDays(1),
+                "Handle with care",
+                new EmailAddress("delivery@example.com"),
+                "+1234567890"
         );
 
         // Create a photo document
@@ -98,12 +93,12 @@ class OrderBusinessTest {
         Photo photo = new Photo("/path/to/image.jpg");
 
         photoDocument = PhotoDocument.builder()
-            .photoId(photoId)
-            .template(template)
-            .imagePath(photo)
-            .uploadedBy(createdBy)
-            .uploadedAt(createdAt)
-            .build();
+                .photoId(photoId)
+                .template(template)
+                .imagePath(photo)
+                .uploadedBy(createdBy)
+                .uploadedAt(createdAt)
+                .build();
     }
 
     @Test
@@ -284,12 +279,12 @@ class OrderBusinessTest {
         Photo photo = new Photo("/path/to/approved.jpg");
 
         PhotoDocument approvedPhoto = PhotoDocument.builder()
-            .photoId(photoId)
-            .template(template)
-            .imagePath(photo)
-            .uploadedBy(createdBy)
-            .uploadedAt(createdAt)
-            .build();
+                .photoId(photoId)
+                .template(template)
+                .imagePath(photo)
+                .uploadedBy(createdBy)
+                .uploadedAt(createdAt)
+                .build();
 
         approvedPhoto.approve(userRef, createdAt);
 
@@ -317,12 +312,12 @@ class OrderBusinessTest {
         Photo photo = new Photo("/path/to/approved.jpg");
 
         PhotoDocument approvedPhoto = PhotoDocument.builder()
-            .photoId(photoId)
-            .template(template)
-            .imagePath(photo)
-            .uploadedBy(createdBy)
-            .uploadedAt(createdAt)
-            .build();
+                .photoId(photoId)
+                .template(template)
+                .imagePath(photo)
+                .uploadedBy(createdBy)
+                .uploadedAt(createdAt)
+                .build();
 
         approvedPhoto.approve(userRef, createdAt);
 

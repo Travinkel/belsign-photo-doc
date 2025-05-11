@@ -6,7 +6,7 @@ import com.tngtech.archunit.lang.ArchRule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
 /**
  * Tests to verify that the common package follows the correct patterns.
@@ -23,7 +23,7 @@ public class CommonPackageTest {
 
     @Test
     public void commonValueObjectsShouldBeInCommonPackage() {
-        // Common value objects should be in the domain.common package
+        // Common value objects should be in the common.value package
         ArchRule rule = classes()
                 .that().haveSimpleNameEndingWith("Address")
                 .or().haveSimpleNameEndingWith("Name")
@@ -31,8 +31,8 @@ public class CommonPackageTest {
                 .or().haveSimpleNameEndingWith("Money")
                 .and().areNotEnums()
                 .and().haveSimpleNameNotEndingWith("Test")
-                .should().resideInAPackage("com.belman.domain.common..")
-                .because("Common value objects should be in the domain.common package");
+                .should().resideInAPackage("com.belman.common.value..")
+                .because("Common value objects should be in the common.value package");
 
         rule.check(importedClasses);
     }
@@ -41,7 +41,7 @@ public class CommonPackageTest {
     public void commonPackageShouldOnlyContainValueObjects() {
         // The common package should only contain value objects and utilities
         ArchRule rule = classes()
-                .that().resideInAPackage("com.belman.domain.common..")
+                .that().resideInAPackage("com.belman.common.value..")
                 .and().areNotInterfaces()
                 .and().areNotEnums()
                 .and().haveSimpleNameNotContaining("ValidationResult")
@@ -56,7 +56,7 @@ public class CommonPackageTest {
     public void commonValueObjectsShouldBeImmutable() {
         // Common value objects should be immutable
         ArchRule rule = classes()
-                .that().resideInAPackage("com.belman.domain.common..")
+                .that().resideInAPackage("com.belman.common.value..")
                 .and().areNotInterfaces()
                 .and().areNotEnums()
                 .and().haveSimpleNameNotContaining("ValidationResult")
@@ -84,11 +84,11 @@ public class CommonPackageTest {
     public void commonValueObjectsShouldImplementDataObject() {
         // Common value objects should implement DataObject
         ArchRule rule = classes()
-                .that().resideInAPackage("com.belman.domain.common..")
+                .that().resideInAPackage("com.belman.common.value..")
                 .and().areNotInterfaces()
                 .and().areNotEnums()
                 .and().haveSimpleNameNotContaining("ValidationResult")
-                .should().implement("com.belman.domain.common.base.DataObject")
+                .should().implement("com.belman.common.value.base.DataObject")
                 .because("Common value objects should implement DataObject");
 
         rule.check(importedClasses);
@@ -98,7 +98,7 @@ public class CommonPackageTest {
     public void commonValueObjectsShouldHaveJavadoc() {
         // Common value objects should have Javadoc
         ArchRule rule = classes()
-                .that().resideInAPackage("com.belman.domain.common..")
+                .that().resideInAPackage("com.belman.common.value..")
                 .and().areNotInterfaces()
                 .and().areNotEnums()
                 .should().haveSimpleNameStartingWith("") // This is a workaround to select all classes

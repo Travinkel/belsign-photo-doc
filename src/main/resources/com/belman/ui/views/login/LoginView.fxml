@@ -1,23 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.ProgressIndicator?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.Color?>
-
-<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+<?import javafx.scene.text.Font?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17"
            fx:controller="com.belman.ui.views.login.LoginViewController"
            styleClass="login-background-container">
 
@@ -61,17 +52,40 @@
             </Label>
 
             <VBox spacing="12.0" alignment="CENTER" styleClass="login-form" fillWidth="true">
-                <TextField fx:id="usernameField" promptText="Username" styleClass="login-field" maxWidth="Infinity"/>
-
-                <PasswordField fx:id="passwordField" promptText="Password" styleClass="login-field"
-                               maxWidth="Infinity"/>
-
-                <HBox alignment="CENTER_LEFT" spacing="5.0">
-                    <CheckBox fx:id="rememberMeCheckBox" text="Remember Me" styleClass="login-remember-me"/>
-                    <HBox.margin>
-                        <Insets top="5.0" bottom="5.0"/>
-                    </HBox.margin>
+                <!-- Authentication Method Selection -->
+                <HBox spacing="10.0" alignment="CENTER" styleClass="auth-method-container">
+                    <Button fx:id="scanButton" text="Scan Keychain" styleClass="auth-method-button" 
+                            minWidth="150" minHeight="60"/>
+                    <Button fx:id="pinButton" text="Use PIN Code" styleClass="auth-method-button" 
+                            minWidth="150" minHeight="60"/>
                 </HBox>
+
+                <!-- Username/Password Login Form (initially visible) -->
+                <VBox fx:id="usernamePasswordForm" spacing="10.0" alignment="CENTER" fillWidth="true">
+                    <TextField fx:id="usernameField" promptText="Username" styleClass="login-field" maxWidth="Infinity"/>
+                    <PasswordField fx:id="passwordField" promptText="Password" styleClass="login-field"
+                                   maxWidth="Infinity"/>
+                    <HBox alignment="CENTER_LEFT" spacing="5.0">
+                        <CheckBox fx:id="rememberMeCheckBox" text="Remember Me" styleClass="login-remember-me"/>
+                        <HBox.margin>
+                            <Insets top="5.0" bottom="5.0"/>
+                        </HBox.margin>
+                    </HBox>
+                </VBox>
+
+                <!-- PIN Code Login Form (initially hidden) -->
+                <VBox fx:id="pinCodeForm" spacing="10.0" alignment="CENTER" fillWidth="true" visible="false" managed="false">
+                    <Label text="Enter PIN Code" styleClass="pin-label"/>
+                    <TextField fx:id="pinCodeField" promptText="PIN Code" styleClass="pin-field" maxWidth="200"
+                               alignment="CENTER"/>
+                </VBox>
+
+                <!-- Camera Scan Form (initially hidden) -->
+                <VBox fx:id="cameraScanForm" spacing="10.0" alignment="CENTER" fillWidth="true" visible="false" managed="false">
+                    <Label text="Scan your keychain barcode" styleClass="scan-label"/>
+                    <Button fx:id="startScanButton" text="Start Camera" styleClass="start-scan-button" 
+                            minWidth="150" minHeight="40"/>
+                </VBox>
 
                 <Region VBox.vgrow="ALWAYS" minHeight="15" maxHeight="15"/>
 

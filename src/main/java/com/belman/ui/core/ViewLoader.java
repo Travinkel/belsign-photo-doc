@@ -1,7 +1,7 @@
 package com.belman.ui.core;
 
-import com.belman.service.infrastructure.service.ServiceLocator;
 import com.belman.repository.platform.NamingConventions;
+import com.belman.service.infrastructure.service.ServiceLocator;
 import com.belman.ui.base.BaseController;
 import com.belman.ui.base.BaseViewModel;
 import javafx.fxml.FXMLLoader;
@@ -18,12 +18,84 @@ import java.util.List;
 public class ViewLoader {
 
     /**
-     * Record containing the loaded components: parent, controller and view model.
+     * Loads a view and its associated controller and view model.
+     * This method works with both standard JavaFX and Gluon Mobile applications.
      *
-     * @param <T> the view model type
-     * @param <P> the parent type (e.g., Parent in JavaFX)
+     * @param viewClass the view class to load
+     * @param <T>       the view model type
+     * @param <P>       the parent type (e.g., Parent in JavaFX)
+     * @return a record containing the loaded components
      */
-    public record LoadedComponents<T extends BaseViewModel<?>, P>(P parent, BaseController<T> controller, T viewModel) {
+    @SuppressWarnings("unchecked")
+    public static <T extends BaseViewModel<?>, P> LoadedComponents<T, P> load(Class<?> viewClass) {
+        try {
+            System.out.println("Loading view: " + viewClass.getSimpleName());
+
+            // Load the FXML file
+            String path = "/" + viewClass.getPackageName().replace('.', '/') + "/" + viewClass.getSimpleName() +
+                          ".fxml";
+            URL fxmlUrl = viewClass.getResource(viewClass.getSimpleName() + ".fxml");
+            System.out.println("Looking for FXML at: " + path);
+
+            // If the FXML file is not found in the same package as the view class, try to load it from the constructed path
+            if (fxmlUrl == null) {
+                System.out.println("FXML not found in view class package, trying constructed path: " + path);
+                fxmlUrl = ViewLoader.class.getResource(path);
+
+                // If still null, try another approach
+                if (fxmlUrl == null) {
+                    path = "/com/belman/ui/views/" + viewClass.getSimpleName().toLowerCase() + "/" +
+                           viewClass.getSimpleName() + ".fxml";
+                    System.out.println("Still not found, trying convention-based path: " + path);
+                    fxmlUrl = ViewLoader.class.getResource(path);
+                }
+            }
+
+            if (fxmlUrl == null) {
+                throw new FileNotFoundException("FXML file not found: " + path);
+            }
+
+            System.out.println("Found FXML at: " + fxmlUrl);
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+
+            P root = loader.load();
+            System.out.println("FXML loaded successfully");
+
+            // Get the controller
+            BaseController<T> controller = loader.getController();
+            if (controller == null) {
+                System.err.println("Warning: No controller found in FXML");
+            } else {
+                System.out.println("Controller loaded: " + controller.getClass().getSimpleName());
+            }
+
+            // Create the view model
+            T viewModel = createViewModel(viewClass);
+            if (viewModel == null) {
+                System.err.println("Error: Failed to create view model for: " + viewClass.getSimpleName());
+            } else {
+                System.out.println("ViewModel created: " + viewModel.getClass().getSimpleName());
+            }
+
+            // Inject services into the controller and view model
+            if (controller != null) {
+                ServiceLocator.injectServices(controller);
+            }
+
+            if (viewModel != null) {
+                ServiceLocator.injectServices(viewModel);
+            }
+
+            // Set up the view model
+            setupViewModel(controller, viewModel);
+
+            return new LoadedComponents<>(root, controller, viewModel);
+        } catch (Exception e) {
+            System.err.println("Failed to load view: " + viewClass.getSimpleName() + " - Error: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to load view: " + viewClass.getSimpleName(), e);
+        }
     }
 
     /**
@@ -90,82 +162,11 @@ public class ViewLoader {
     }
 
     /**
-     * Loads a view and its associated controller and view model.
-     * This method works with both standard JavaFX and Gluon Mobile applications.
-     * 
-     * @param viewClass the view class to load
+     * Record containing the loaded components: parent, controller and view model.
+     *
      * @param <T> the view model type
      * @param <P> the parent type (e.g., Parent in JavaFX)
-     * @return a record containing the loaded components
      */
-    @SuppressWarnings("unchecked")
-    public static <T extends BaseViewModel<?>, P> LoadedComponents<T, P> load(Class<?> viewClass) {
-        try {
-            System.out.println("Loading view: " + viewClass.getSimpleName());
-
-            // Load the FXML file
-            String path = "/" + viewClass.getPackageName().replace('.', '/') + "/" + viewClass.getSimpleName() + ".fxml";
-            URL fxmlUrl = viewClass.getResource(viewClass.getSimpleName() + ".fxml");
-            System.out.println("Looking for FXML at: " + path);
-
-            // If the FXML file is not found in the same package as the view class, try to load it from the constructed path
-            if (fxmlUrl == null) {
-                System.out.println("FXML not found in view class package, trying constructed path: " + path);
-                fxmlUrl = ViewLoader.class.getResource(path);
-
-                // If still null, try another approach
-                if (fxmlUrl == null) {
-                    path = "/com/belman/ui/views/" + viewClass.getSimpleName().toLowerCase() + "/" +
-                           viewClass.getSimpleName() + ".fxml";
-                    System.out.println("Still not found, trying convention-based path: " + path);
-                    fxmlUrl = ViewLoader.class.getResource(path);
-                }
-            }
-
-            if (fxmlUrl == null) {
-                throw new FileNotFoundException("FXML file not found: " + path);
-            }
-
-            System.out.println("Found FXML at: " + fxmlUrl);
-
-            FXMLLoader loader = new FXMLLoader(fxmlUrl);
-
-            P root = (P) loader.load();
-            System.out.println("FXML loaded successfully");
-
-            // Get the controller
-            BaseController<T> controller = loader.getController();
-            if (controller == null) {
-                System.err.println("Warning: No controller found in FXML");
-            } else {
-                System.out.println("Controller loaded: " + controller.getClass().getSimpleName());
-            }
-
-            // Create the view model
-            T viewModel = createViewModel(viewClass);
-            if (viewModel == null) {
-                System.err.println("Error: Failed to create view model for: " + viewClass.getSimpleName());
-            } else {
-                System.out.println("ViewModel created: " + viewModel.getClass().getSimpleName());
-            }
-
-            // Inject services into the controller and view model
-            if (controller != null) {
-                ServiceLocator.injectServices(controller);
-            }
-
-            if (viewModel != null) {
-                ServiceLocator.injectServices(viewModel);
-            }
-
-            // Set up the view model
-            setupViewModel(controller, viewModel);
-
-            return new LoadedComponents<>(root, controller, viewModel);
-        } catch (Exception e) {
-            System.err.println("Failed to load view: " + viewClass.getSimpleName() + " - Error: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Failed to load view: " + viewClass.getSimpleName(), e);
-        }
+    public record LoadedComponents<T extends BaseViewModel<?>, P>(P parent, BaseController<T> controller, T viewModel) {
     }
 }

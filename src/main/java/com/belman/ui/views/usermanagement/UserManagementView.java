@@ -1,8 +1,9 @@
 package com.belman.ui.views.usermanagement;
+
 import com.belman.ui.base.BaseView;
+import com.belman.ui.navigation.Router;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
-import com.belman.ui.navigation.Router;
 
 public class UserManagementView extends BaseView<UserManagementViewModel> {
 

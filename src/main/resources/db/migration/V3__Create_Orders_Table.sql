@@ -1,4 +1,5 @@
-USE BelSign;
+USE
+BelSign;
 
 -- Create Orders Table
 CREATE TABLE orderAggregates
@@ -10,8 +11,8 @@ CREATE TABLE orderAggregates
     delivery_information TEXT,
     status               VARCHAR(20) NOT NULL,
     created_by           VARCHAR(36) NOT NULL,
-    created_at DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
-    updated_at DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    created_at           DATETIME2   NOT NULL DEFAULT SYSDATETIME(),
+    updated_at           DATETIME2   NOT NULL DEFAULT SYSDATETIME(),
     FOREIGN KEY (customer_id) REFERENCES customers (id),
     FOREIGN KEY (created_by) REFERENCES users (id)
 );

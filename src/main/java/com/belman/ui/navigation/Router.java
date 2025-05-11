@@ -1,15 +1,10 @@
 package com.belman.ui.navigation;
 
-import com.belman.ui.core.FadeViewTransition;
-import com.belman.ui.core.GluonFacade;
+import com.belman.repository.logging.EmojiLogger;
+import com.belman.repository.platform.PlatformUtils;
+import com.belman.ui.core.*;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
-import com.belman.repository.logging.EmojiLogger;
-import com.belman.ui.core.StateManager;
-import com.belman.ui.core.SlideDirection;
-import com.belman.ui.core.SlideViewTransition;
-import com.belman.ui.core.ViewTransition;
-import com.belman.repository.platform.PlatformUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,13 +17,12 @@ import java.util.function.Supplier;
  */
 public class Router {
     private static final EmojiLogger logger = EmojiLogger.getLogger(Router.class);
-    private static GluonFacade mobileApplication;
     private static final Router instance = new Router();
-    private static View currentView;
     private static final Map<String, Object> routeParameters = new HashMap<>();
     private static final Map<Class<? extends View>, Supplier<Boolean>> routeGuards = new HashMap<>();
     private static final Stack<Class<? extends View>> navigationHistory = new Stack<>();
-
+    private static GluonFacade mobileApplication;
+    private static View currentView;
     // Default transitions
     private static ViewTransition defaultForwardTransition;
     private static ViewTransition defaultBackwardTransition;
@@ -50,7 +44,7 @@ public class Router {
 
     /**
      * Gets the singleton instance of the Router.
-     * 
+     *
      * @return the Router instance
      */
     public static Router getInstance() {
@@ -60,7 +54,7 @@ public class Router {
     /**
      * Sets the mobile application for the router.
      * This method should be called once during application startup.
-     * 
+     *
      * @param application the mobile application
      */
     public static void setMobileApplication(GluonFacade application) {
@@ -69,9 +63,18 @@ public class Router {
     }
 
     /**
+     * Gets the default forward transition.
+     *
+     * @return the default forward transition
+     */
+    public static ViewTransition getDefaultForwardTransition() {
+        return defaultForwardTransition;
+    }
+
+    /**
      * Sets the default forward transition.
      * This transition is used when navigating to a new view.
-     * 
+     *
      * @param transition the transition to use
      */
     public static void setDefaultForwardTransition(ViewTransition transition) {
@@ -82,30 +85,8 @@ public class Router {
     }
 
     /**
-     * Gets the default forward transition.
-     * 
-     * @return the default forward transition
-     */
-    public static ViewTransition getDefaultForwardTransition() {
-        return defaultForwardTransition;
-    }
-
-    /**
-     * Sets the default backward transition.
-     * This transition is used when navigating back to a previous view.
-     * 
-     * @param transition the transition to use
-     */
-    public static void setDefaultBackwardTransition(ViewTransition transition) {
-        if (transition == null) {
-            throw new IllegalArgumentException("Transition cannot be null");
-        }
-        defaultBackwardTransition = transition;
-    }
-
-    /**
      * Gets the default backward transition.
-     * 
+     *
      * @return the default backward transition
      */
     public static ViewTransition getDefaultBackwardTransition() {
@@ -113,21 +94,16 @@ public class Router {
     }
 
     /**
-     * Updates the app bar title.
+     * Sets the default backward transition.
+     * This transition is used when navigating back to a previous view.
      *
-     * @param title the new title to set
+     * @param transition the transition to use
      */
-    public static void updateAppBar(String title) {
-        if (mobileApplication != null) {
-            AppBar appBar = mobileApplication.getAppBar();
-            if (appBar != null) {
-                appBar.setTitleText(title);
-            } else {
-                logger.warn("AppBar is null. Unable to update title.");
-            }
-        } else {
-            logger.warn("GluonFacade is null. Unable to update AppBar title.");
+    public static void setDefaultBackwardTransition(ViewTransition transition) {
+        if (transition == null) {
+            throw new IllegalArgumentException("Transition cannot be null");
         }
+        defaultBackwardTransition = transition;
     }
 
     /**
@@ -140,33 +116,14 @@ public class Router {
     }
 
     /**
-     * Navigates to the specified view with the specified parameters using the default forward transition.
-     *
-     * @param viewClass  the class of the view to navigate to
-     * @param parameters the parameters to pass to the view
-     */
-    public static void navigateTo(Class<? extends View> viewClass, Map<String, Object> parameters) {
-        navigateTo(viewClass, parameters, defaultForwardTransition);
-    }
-
-    /**
-     * Navigates to the specified view with the specified transition.
-     *
-     * @param viewClass  the class of the view to navigate to
-     * @param transition the transition to use
-     */
-    public static void navigateTo(Class<? extends View> viewClass, ViewTransition transition) {
-        navigateTo(viewClass, new HashMap<>(), transition);
-    }
-
-    /**
      * Navigates to the specified view with the specified parameters and transition.
      *
      * @param viewClass  the class of the view to navigate to
      * @param parameters the parameters to pass to the view
      * @param transition the transition to use
      */
-    public static void navigateTo(Class<? extends View> viewClass, Map<String, Object> parameters, ViewTransition transition) {
+    public static void navigateTo(Class<? extends View> viewClass, Map<String, Object> parameters,
+                                  ViewTransition transition) {
         if (viewClass == null) {
             logger.error("View class is null");
             throw new IllegalArgumentException("View class cannot be null");
@@ -220,7 +177,8 @@ public class Router {
 
                 logger.success("Navigated to: " + viewClass.getSimpleName());
             } catch (Exception e) {
-                System.err.println("[DEBUG_LOG] Error calling mobileApplication.switchView(" + viewId + "): " + e.getMessage());
+                System.err.println(
+                        "[DEBUG_LOG] Error calling mobileApplication.switchView(" + viewId + "): " + e.getMessage());
                 e.printStackTrace();
                 throw new RuntimeException("Failed to switch to view: " + viewId, e);
             }
@@ -232,8 +190,36 @@ public class Router {
     }
 
     /**
+     * Updates the app bar title.
+     *
+     * @param title the new title to set
+     */
+    public static void updateAppBar(String title) {
+        if (mobileApplication != null) {
+            AppBar appBar = mobileApplication.getAppBar();
+            if (appBar != null) {
+                appBar.setTitleText(title);
+            } else {
+                logger.warn("AppBar is null. Unable to update title.");
+            }
+        } else {
+            logger.warn("GluonFacade is null. Unable to update AppBar title.");
+        }
+    }
+
+    /**
+     * Navigates to the specified view with the specified parameters using the default forward transition.
+     *
+     * @param viewClass  the class of the view to navigate to
+     * @param parameters the parameters to pass to the view
+     */
+    public static void navigateTo(Class<? extends View> viewClass, Map<String, Object> parameters) {
+        navigateTo(viewClass, parameters, defaultForwardTransition);
+    }
+
+    /**
      * Navigates back to the previous view using the default backward transition.
-     * 
+     *
      * @return true if navigation was successful, false if there is no previous view
      */
     public static boolean navigateBack() {
@@ -242,7 +228,7 @@ public class Router {
 
     /**
      * Navigates back to the previous view using the specified transition.
-     * 
+     *
      * @param transition the transition to use
      * @return true if navigation was successful, false if there is no previous view
      */
@@ -268,10 +254,20 @@ public class Router {
     }
 
     /**
+     * Navigates to the specified view with the specified transition.
+     *
+     * @param viewClass  the class of the view to navigate to
+     * @param transition the transition to use
+     */
+    public static void navigateTo(Class<? extends View> viewClass, ViewTransition transition) {
+        navigateTo(viewClass, new HashMap<>(), transition);
+    }
+
+    /**
      * Adds a route guard for the specified view.
-     * 
+     *
      * @param viewClass the view class to add the guard for
-     * @param guard the guard function that determines if navigation is allowed
+     * @param guard     the guard function that determines if navigation is allowed
      */
     public static void addGuard(Class<? extends View> viewClass, Supplier<Boolean> guard) {
         if (viewClass == null || guard == null) {
@@ -286,7 +282,7 @@ public class Router {
 
     /**
      * Removes a route guard for the specified view.
-     * 
+     *
      * @param viewClass the view class to remove the guard for
      */
     public static void removeGuard(Class<? extends View> viewClass) {
@@ -307,7 +303,7 @@ public class Router {
 
     /**
      * Gets a route parameter.
-     * 
+     *
      * @param key the parameter key
      * @param <T> the parameter type
      * @return the parameter value, or null if not found

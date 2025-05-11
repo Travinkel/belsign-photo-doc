@@ -1,12 +1,8 @@
 package com.belman.unit.application.core;
 
 import com.belman.bootstrap.lifecycle.ApplicationStateManager;
-import com.belman.domain.events.ApplicationBackgroundedEvent;
-import com.belman.domain.events.ApplicationPausedEvent;
-import com.belman.domain.events.ApplicationResumedEvent;
-import com.belman.domain.events.ApplicationStateEvent;
+import com.belman.domain.events.*;
 import com.belman.domain.events.ApplicationStateEvent.ApplicationState;
-import com.belman.domain.events.ApplicationStoppedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -69,7 +65,7 @@ public class ApplicationStateManagerTest {
 
         // Then
         assertEquals(1, receivedEvents.size());
-        assertTrue(receivedEvents.get(0) instanceof ApplicationResumedEvent);
+        assertInstanceOf(ApplicationResumedEvent.class, receivedEvents.get(0));
     }
 
     @Test
@@ -123,10 +119,10 @@ public class ApplicationStateManagerTest {
 
         // Then
         assertEquals(5, receivedEvents.size());
-        assertTrue(receivedEvents.get(0) instanceof ApplicationResumedEvent);
-        assertTrue(receivedEvents.get(1) instanceof ApplicationPausedEvent);
-        assertTrue(receivedEvents.get(2) instanceof ApplicationBackgroundedEvent);
-        assertTrue(receivedEvents.get(3) instanceof ApplicationResumedEvent);
-        assertTrue(receivedEvents.get(4) instanceof ApplicationStoppedEvent);
+        assertInstanceOf(ApplicationResumedEvent.class, receivedEvents.get(0));
+        assertInstanceOf(ApplicationPausedEvent.class, receivedEvents.get(1));
+        assertInstanceOf(ApplicationBackgroundedEvent.class, receivedEvents.get(2));
+        assertInstanceOf(ApplicationResumedEvent.class, receivedEvents.get(3));
+        assertInstanceOf(ApplicationStoppedEvent.class, receivedEvents.get(4));
     }
 }

@@ -49,7 +49,7 @@ public interface OrderService {
      * Creates a new order with the specified order number.
      *
      * @param orderNumber the order number
-     * @param createdBy the user who created the order
+     * @param createdBy   the user who created the order
      * @return the created order
      */
     OrderBusiness createOrder(OrderNumber orderNumber, UserBusiness createdBy);
@@ -57,8 +57,8 @@ public interface OrderService {
     /**
      * Updates an order's status.
      *
-     * @param orderId the ID of the order to update
-     * @param status the new status
+     * @param orderId   the ID of the order to update
+     * @param status    the new status
      * @param updatedBy the user who updated the order
      * @return true if the order was updated, false if the order was not found
      */
@@ -67,7 +67,7 @@ public interface OrderService {
     /**
      * Cancels an order.
      *
-     * @param orderId the ID of the order to cancel
+     * @param orderId     the ID of the order to cancel
      * @param cancelledBy the user who cancelled the order
      * @return true if the order was cancelled, false if the order was not found
      */
@@ -76,7 +76,7 @@ public interface OrderService {
     /**
      * Completes an order.
      *
-     * @param orderId the ID of the order to complete
+     * @param orderId     the ID of the order to complete
      * @param completedBy the user who completed the order
      * @return true if the order was completed, false if the order was not found or cannot be completed
      */

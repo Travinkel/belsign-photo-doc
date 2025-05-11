@@ -1,19 +1,14 @@
 package com.belman.ui.views.usermanagement;
 
-import com.belman.ui.base.BaseViewModel;
 import com.belman.common.di.Inject;
-import com.belman.ui.navigation.Router;
-import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserRole;
-import com.belman.domain.user.UserStatus;
-import com.belman.domain.user.UserRepository;
-import com.belman.domain.user.ApprovalStatus;
 import com.belman.domain.common.EmailAddress;
-import com.belman.domain.security.HashedPassword;
 import com.belman.domain.common.PersonName;
-import com.belman.domain.user.UserId;
-import com.belman.domain.user.Username;
-import com.belman.repository.service.SessionManager;
+import com.belman.domain.security.HashedPassword;
+import com.belman.domain.user.*;
+import com.belman.bootstrap.di.ServiceLocator;
+import com.belman.domain.security.AuthenticationService;
+import com.belman.ui.base.BaseViewModel;
+import com.belman.ui.navigation.Router;
 import com.belman.ui.views.login.LoginView;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -31,20 +26,14 @@ import java.util.UUID;
  */
 public class UserManagementViewModel extends BaseViewModel<UserManagementViewModel> {
 
-    @Inject
-    private UserRepository userRepository;
-
     // Properties for the user list
     private final ObservableList<UserBusiness> users = FXCollections.observableArrayList();
     private final FilteredList<UserBusiness> filteredUsers = new FilteredList<>(users);
-
     // Properties for the search filter
     private final StringProperty searchFilter = new SimpleStringProperty("");
-
     // Properties for the selected user
     private final ObjectProperty<UserBusiness> selectedUser = new SimpleObjectProperty<>();
     private final BooleanProperty userSelected = new SimpleBooleanProperty(false);
-
     // Properties for the user form
     private final StringProperty username = new SimpleStringProperty("");
     private final StringProperty firstName = new SimpleStringProperty("");
@@ -55,10 +44,10 @@ public class UserManagementViewModel extends BaseViewModel<UserManagementViewMod
     private final BooleanProperty qaRole = new SimpleBooleanProperty(false);
     private final BooleanProperty productionRole = new SimpleBooleanProperty(false);
     private final StringProperty password = new SimpleStringProperty("");
-
     // Property for error messages
     private final StringProperty errorMessage = new SimpleStringProperty("");
-
+    @Inject
+    private UserRepository userRepository;
     // Flag for new user creation
     private boolean isNewUser = false;
 
@@ -107,18 +96,149 @@ public class UserManagementViewModel extends BaseViewModel<UserManagementViewMod
                 }
 
                 // Check if email contains filter
-                if (user.getEmail() != null && user.getEmail().value().toLowerCase().contains(filter)) {
-                    return true;
+                return user.getEmail() != null && user.getEmail().value().toLowerCase().contains(filter);
+            });
+        }
+    }
+
+    public StringProperty errorMessageProperty() {
+        return errorMessage;
+    }
+
+    /**
+     * Creates a new user and prepares the form for input.
+     */
+    public void createNewUser() {
+        // Clear the selection
+        selectedUser.set(null);
+        userSelected.set(true);
+        isNewUser = true;
+
+        // Clear form fields
+        username.set("");
+        firstName.set("");
+        lastName.set("");
+        email.set("");
+        status.set(UserStatus.ACTIVE);
+        adminRole.set(false);
+        qaRole.set(false);
+        productionRole.set(false);
+        password.set("");
+
+        // Clear error message
+        errorMessage.set("");
+    }
+
+    /**
+     * Saves the current user.
+     *
+     * @return true if the user was saved successfully, false otherwise
+     */
+    public boolean saveUser() {
+        try {
+            // Validate input
+            if (username.get() == null || username.get().isEmpty()) {
+                errorMessage.set("Username is required");
+                return false;
+            }
+
+            if (email.get() == null || email.get().isEmpty()) {
+                errorMessage.set("Email is required");
+                return false;
+            }
+
+            if (isNewUser && (password.get() == null || password.get().isEmpty())) {
+                errorMessage.set("Password is required for new users");
+                return false;
+            }
+
+            // Create or update user
+            UserBusiness user;
+            if (isNewUser) {
+                // Create new user
+                Username usernameObj = new Username(username.get());
+                EmailAddress emailObj = new EmailAddress(email.get());
+                HashedPassword passwordObj = new HashedPassword(password.get());
+
+                // Create a set of roles
+                Set<UserRole> roles = new HashSet<>();
+                if (adminRole.get()) roles.add(UserRole.ADMIN);
+                if (qaRole.get()) roles.add(UserRole.QA);
+                if (productionRole.get()) roles.add(UserRole.PRODUCTION);
+
+                // Create the user
+                UserId userId = new UserId(UUID.randomUUID().toString());
+                PersonName personName = new PersonName(firstName.get(), lastName.get());
+
+                // Use the builder pattern to create the user
+                UserBusiness.Builder builder = new UserBusiness.Builder()
+                        .id(userId)
+                        .username(usernameObj)
+                        .password(passwordObj)
+                        .name(personName)
+                        .email(emailObj);
+
+                // Add roles
+                for (UserRole role : roles) {
+                    builder.addRole(role);
                 }
 
-                return false;
-            });
+                user = builder.build();
+            } else {
+                // Since UserBusiness doesn't have setter methods for most properties,
+                // we need to create a new UserBusiness with the updated values
+                UserId userId = selectedUser.get().getId();
+                Username usernameObj = new Username(username.get());
+                HashedPassword passwordObj = selectedUser.get().getPassword(); // Keep the existing password
+                PersonName personName = new PersonName(firstName.get(), lastName.get());
+                EmailAddress emailObj = new EmailAddress(email.get());
+
+                // Create a set of roles
+                Set<UserRole> roles = new HashSet<>();
+                if (adminRole.get()) roles.add(UserRole.ADMIN);
+                if (qaRole.get()) roles.add(UserRole.QA);
+                if (productionRole.get()) roles.add(UserRole.PRODUCTION);
+
+                // Use the builder pattern to create the user
+                UserBusiness.Builder builder = new UserBusiness.Builder()
+                        .id(userId)
+                        .username(usernameObj)
+                        .password(passwordObj)
+                        .name(personName)
+                        .email(emailObj);
+
+                // Add roles
+                for (UserRole role : roles) {
+                    builder.addRole(role);
+                }
+
+                // Build the updated user
+                user = builder.build();
+
+                // Note: We can't update the password directly as there's no setPassword method
+                // In a real application, we would need to create a new User object or use a
+                // specialized service to update the password
+            }
+
+            // Save the user
+            userRepository.save(user);
+
+            // Reload users
+            loadUsers();
+
+            // Select the saved user
+            selectUser(user);
+
+            return true;
+        } catch (Exception e) {
+            errorMessage.set("Error saving user: " + e.getMessage());
+            return false;
         }
     }
 
     /**
      * Selects a user and populates the form fields.
-     * 
+     *
      * @param user the user to select
      */
     public void selectUser(UserBusiness user) {
@@ -161,137 +281,6 @@ public class UserManagementViewModel extends BaseViewModel<UserManagementViewMod
     }
 
     /**
-     * Creates a new user and prepares the form for input.
-     */
-    public void createNewUser() {
-        // Clear the selection
-        selectedUser.set(null);
-        userSelected.set(true);
-        isNewUser = true;
-
-        // Clear form fields
-        username.set("");
-        firstName.set("");
-        lastName.set("");
-        email.set("");
-        status.set(UserStatus.ACTIVE);
-        adminRole.set(false);
-        qaRole.set(false);
-        productionRole.set(false);
-        password.set("");
-
-        // Clear error message
-        errorMessage.set("");
-    }
-
-    /**
-     * Saves the current user.
-     * 
-     * @return true if the user was saved successfully, false otherwise
-     */
-    public boolean saveUser() {
-        try {
-            // Validate input
-            if (username.get() == null || username.get().isEmpty()) {
-                errorMessage.set("Username is required");
-                return false;
-            }
-
-            if (email.get() == null || email.get().isEmpty()) {
-                errorMessage.set("Email is required");
-                return false;
-            }
-
-            if (isNewUser && (password.get() == null || password.get().isEmpty())) {
-                errorMessage.set("Password is required for new users");
-                return false;
-            }
-
-            // Create or update user
-            UserBusiness user;
-            if (isNewUser) {
-                // Create new user
-                Username usernameObj = new Username(username.get());
-                EmailAddress emailObj = new EmailAddress(email.get());
-                HashedPassword passwordObj = new HashedPassword(password.get());
-
-                // Create a set of roles
-                Set<UserRole> roles = new HashSet<>();
-                if (adminRole.get()) roles.add(UserRole.ADMIN);
-                if (qaRole.get()) roles.add(UserRole.QA);
-                if (productionRole.get()) roles.add(UserRole.PRODUCTION);
-
-                // Create the user
-                UserId userId = new UserId(UUID.randomUUID().toString());
-                PersonName personName = new PersonName(firstName.get(), lastName.get());
-
-                // Use the builder pattern to create the user
-                UserBusiness.Builder builder = new UserBusiness.Builder()
-                    .id(userId)
-                    .username(usernameObj)
-                    .password(passwordObj)
-                    .name(personName)
-                    .email(emailObj);
-
-                // Add roles
-                for (UserRole role : roles) {
-                    builder.addRole(role);
-                }
-
-                user = builder.build();
-            } else {
-                // Since UserBusiness doesn't have setter methods for most properties,
-                // we need to create a new UserBusiness with the updated values
-                UserId userId = selectedUser.get().getId();
-                Username usernameObj = new Username(username.get());
-                HashedPassword passwordObj = selectedUser.get().getPassword(); // Keep the existing password
-                PersonName personName = new PersonName(firstName.get(), lastName.get());
-                EmailAddress emailObj = new EmailAddress(email.get());
-
-                // Create a set of roles
-                Set<UserRole> roles = new HashSet<>();
-                if (adminRole.get()) roles.add(UserRole.ADMIN);
-                if (qaRole.get()) roles.add(UserRole.QA);
-                if (productionRole.get()) roles.add(UserRole.PRODUCTION);
-
-                // Use the builder pattern to create the user
-                UserBusiness.Builder builder = new UserBusiness.Builder()
-                    .id(userId)
-                    .username(usernameObj)
-                    .password(passwordObj)
-                    .name(personName)
-                    .email(emailObj);
-
-                // Add roles
-                for (UserRole role : roles) {
-                    builder.addRole(role);
-                }
-
-                // Build the updated user
-                user = builder.build();
-
-                // Note: We can't update the password directly as there's no setPassword method
-                // In a real application, we would need to create a new User object or use a
-                // specialized service to update the password
-            }
-
-            // Save the user
-            userRepository.save(user);
-
-            // Reload users
-            loadUsers();
-
-            // Select the saved user
-            selectUser(user);
-
-            return true;
-        } catch (Exception e) {
-            errorMessage.set("Error saving user: " + e.getMessage());
-            return false;
-        }
-    }
-
-    /**
      * Resets the password for the selected user.
      */
     public void resetPassword() {
@@ -312,7 +301,7 @@ public class UserManagementViewModel extends BaseViewModel<UserManagementViewMod
 
     /**
      * Generates a random password.
-     * 
+     *
      * @return a random password
      */
     private String generateRandomPassword() {
@@ -325,6 +314,8 @@ public class UserManagementViewModel extends BaseViewModel<UserManagementViewMod
         }
         return sb.toString();
     }
+
+    // Getters for properties
 
     /**
      * Cancels the current edit operation.
@@ -353,8 +344,6 @@ public class UserManagementViewModel extends BaseViewModel<UserManagementViewMod
             errorMessage.set("");
         }
     }
-
-    // Getters for properties
 
     public ObservableList<UserBusiness> getUsersProperty() {
         return filteredUsers;
@@ -404,21 +393,17 @@ public class UserManagementViewModel extends BaseViewModel<UserManagementViewMod
         return userSelected;
     }
 
-    public StringProperty errorMessageProperty() {
-        return errorMessage;
-    }
-
     /**
      * Logs out the current user and navigates to the login view.
      */
     public void logout() {
         try {
-            // Get the SessionManager instance
-            SessionManager sessionManager = SessionManager.getInstance();
+            // Get the AuthenticationService instance
+            AuthenticationService authService = ServiceLocator.getService(AuthenticationService.class);
 
             // Log out the user
-            if (sessionManager != null) {
-                sessionManager.logout();
+            if (authService != null) {
+                authService.logout();
             }
 
             // Navigate to the login view

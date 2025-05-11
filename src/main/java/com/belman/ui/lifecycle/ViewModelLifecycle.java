@@ -21,7 +21,7 @@ public interface ViewModelLifecycle {
 
     /**
      * Gets the class name of the view model.
-     * 
+     *
      * @return the simple class name of the view model
      */
     String getViewModelName();

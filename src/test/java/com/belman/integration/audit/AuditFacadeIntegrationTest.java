@@ -11,7 +11,7 @@ import com.belman.domain.customer.events.CustomerCreatedEvent;
 import com.belman.domain.customer.events.CustomerUpdatedEvent;
 import com.belman.domain.services.Logger;
 import com.belman.domain.user.UserId;
-import com.belman.repository.persistence.InMemoryAuditRepository;
+import com.belman.repository.persistence.memory.InMemoryAuditRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**

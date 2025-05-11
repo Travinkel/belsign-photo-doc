@@ -1,4 +1,5 @@
-USE BelSign;
+USE
+BelSign;
 
 -- Create Customers Table
 CREATE TABLE customers
@@ -10,8 +11,8 @@ CREATE TABLE customers
     company_name VARCHAR(100),
     email        VARCHAR(100) NOT NULL,
     phone_number VARCHAR(20),
-    created_at   DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
-    updated_at      DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+    created_at   DATETIME2    NOT NULL DEFAULT SYSDATETIME(),
+    updated_at   DATETIME2    NOT NULL DEFAULT SYSDATETIME()
 );
 
 -- Create Index on Email

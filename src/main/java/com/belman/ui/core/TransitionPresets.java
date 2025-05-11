@@ -20,15 +20,6 @@ public class TransitionPresets {
     }
 
     /**
-     * Creates a fade transition with the default duration.
-     *
-     * @return a fade transition
-     */
-    public static ViewTransition fade() {
-        return new FadeViewTransition();
-    }
-
-    /**
      * Creates a fade transition with the specified duration.
      *
      * @param duration the duration of the transition
@@ -54,42 +45,6 @@ public class TransitionPresets {
      */
     public static ViewTransition slowFade() {
         return new FadeViewTransition(SLOW_DURATION);
-    }
-
-    /**
-     * Creates a slide transition from left to right with the default duration.
-     *
-     * @return a slide transition from left to right
-     */
-    public static ViewTransition slideLeftToRight() {
-        return new SlideViewTransition(SlideDirection.LEFT_TO_RIGHT);
-    }
-
-    /**
-     * Creates a slide transition from right to left with the default duration.
-     *
-     * @return a slide transition from right to left
-     */
-    public static ViewTransition slideRightToLeft() {
-        return new SlideViewTransition(SlideDirection.RIGHT_TO_LEFT);
-    }
-
-    /**
-     * Creates a slide transition from top to bottom with the default duration.
-     *
-     * @return a slide transition from top to bottom
-     */
-    public static ViewTransition slideTopToBottom() {
-        return new SlideViewTransition(SlideDirection.TOP_TO_BOTTOM);
-    }
-
-    /**
-     * Creates a slide transition from bottom to top with the default duration.
-     *
-     * @return a slide transition from bottom to top
-     */
-    public static ViewTransition slideBottomToTop() {
-        return new SlideViewTransition(SlideDirection.BOTTOM_TO_TOP);
     }
 
     /**
@@ -140,6 +95,24 @@ public class TransitionPresets {
     }
 
     /**
+     * Creates a slide transition from right to left with the default duration.
+     *
+     * @return a slide transition from right to left
+     */
+    public static ViewTransition slideRightToLeft() {
+        return new SlideViewTransition(SlideDirection.RIGHT_TO_LEFT);
+    }
+
+    /**
+     * Creates a fade transition with the default duration.
+     *
+     * @return a fade transition
+     */
+    public static ViewTransition fade() {
+        return new FadeViewTransition();
+    }
+
+    /**
      * Creates a transition preset appropriate for backward navigation.
      * <p>
      * On mobile platforms, this is typically a slide from left to right.
@@ -153,6 +126,15 @@ public class TransitionPresets {
         } else {
             return fade();
         }
+    }
+
+    /**
+     * Creates a slide transition from left to right with the default duration.
+     *
+     * @return a slide transition from left to right
+     */
+    public static ViewTransition slideLeftToRight() {
+        return new SlideViewTransition(SlideDirection.LEFT_TO_RIGHT);
     }
 
     /**
@@ -172,6 +154,15 @@ public class TransitionPresets {
     }
 
     /**
+     * Creates a slide transition from bottom to top with the default duration.
+     *
+     * @return a slide transition from bottom to top
+     */
+    public static ViewTransition slideBottomToTop() {
+        return new SlideViewTransition(SlideDirection.BOTTOM_TO_TOP);
+    }
+
+    /**
      * Creates a transition preset appropriate for downward navigation (e.g., to a child view).
      * <p>
      * On mobile platforms, this is typically a slide from top to bottom.
@@ -185,5 +176,14 @@ public class TransitionPresets {
         } else {
             return fade();
         }
+    }
+
+    /**
+     * Creates a slide transition from top to bottom with the default duration.
+     *
+     * @return a slide transition from top to bottom
+     */
+    public static ViewTransition slideTopToBottom() {
+        return new SlideViewTransition(SlideDirection.TOP_TO_BOTTOM);
     }
 }

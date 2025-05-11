@@ -1,7 +1,7 @@
 package com.belman.ui.core;
 
-import com.gluonhq.charm.glisten.mvc.View;
 import com.belman.repository.logging.EmojiLogger;
+import com.gluonhq.charm.glisten.mvc.View;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +17,7 @@ public class ViewFactory {
     /**
      * Registers a view with a supplier.
      *
-     * @param viewId the unique ID of the view
+     * @param viewId   the unique ID of the view
      * @param supplier the supplier that creates the view
      */
     public static void registerView(String viewId, Supplier<View> supplier) {

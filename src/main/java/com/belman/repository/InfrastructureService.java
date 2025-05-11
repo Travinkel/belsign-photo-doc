@@ -26,7 +26,7 @@ public abstract class InfrastructureService {
 
     /**
      * Publishes a domain event.
-     * 
+     *
      * @param event the event to publish
      * @throws IllegalArgumentException if the event is null
      */
@@ -42,7 +42,7 @@ public abstract class InfrastructureService {
 
     /**
      * Publishes a domain event asynchronously.
-     * 
+     *
      * @param event the event to publish
      * @throws IllegalArgumentException if the event is null
      */
@@ -58,7 +58,7 @@ public abstract class InfrastructureService {
 
     /**
      * Logs a message at the INFO level.
-     * 
+     *
      * @param message the message to log
      */
     protected void logInfo(String message) {
@@ -67,9 +67,9 @@ public abstract class InfrastructureService {
 
     /**
      * Logs a message with parameters at the INFO level.
-     * 
+     *
      * @param message the message to log
-     * @param args the parameters to the message
+     * @param args    the parameters to the message
      */
     protected void logInfo(String message, Object... args) {
         logger.info(message, args);
@@ -77,7 +77,7 @@ public abstract class InfrastructureService {
 
     /**
      * Logs a message at the DEBUG level.
-     * 
+     *
      * @param message the message to log
      */
     protected void logDebug(String message) {
@@ -86,9 +86,9 @@ public abstract class InfrastructureService {
 
     /**
      * Logs a message with parameters at the DEBUG level.
-     * 
+     *
      * @param message the message to log
-     * @param args the parameters to the message
+     * @param args    the parameters to the message
      */
     protected void logDebug(String message, Object... args) {
         logger.debug(message, args);
@@ -96,7 +96,7 @@ public abstract class InfrastructureService {
 
     /**
      * Logs a message at the WARN level.
-     * 
+     *
      * @param message the message to log
      */
     protected void logWarn(String message) {
@@ -105,9 +105,9 @@ public abstract class InfrastructureService {
 
     /**
      * Logs a message with parameters at the WARN level.
-     * 
+     *
      * @param message the message to log
-     * @param args the parameters to the message
+     * @param args    the parameters to the message
      */
     protected void logWarn(String message, Object... args) {
         logger.warn(message, args);
@@ -115,7 +115,7 @@ public abstract class InfrastructureService {
 
     /**
      * Logs a message at the ERROR level.
-     * 
+     *
      * @param message the message to log
      */
     protected void logError(String message) {
@@ -124,9 +124,9 @@ public abstract class InfrastructureService {
 
     /**
      * Logs a message with parameters at the ERROR level.
-     * 
+     *
      * @param message the message to log
-     * @param args the parameters to the message
+     * @param args    the parameters to the message
      */
     protected void logError(String message, Object... args) {
         logger.error(message, args);
@@ -134,8 +134,8 @@ public abstract class InfrastructureService {
 
     /**
      * Logs a message with an exception at the ERROR level.
-     * 
-     * @param message the message to log
+     *
+     * @param message   the message to log
      * @param throwable the exception to log
      */
     protected void logError(String message, Throwable throwable) {

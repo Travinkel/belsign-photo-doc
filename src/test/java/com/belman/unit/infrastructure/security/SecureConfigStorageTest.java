@@ -19,13 +19,12 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class SecureConfigStorageTest {
 
-    private SecureConfigStorage secureStorage;
     private static final String TEST_KEY = "test.key";
     private static final String TEST_VALUE = "test.value";
     private static final String TEST_PROPERTIES_FILE = "test-config.properties";
-
     @TempDir
     Path tempDir;
+    private SecureConfigStorage secureStorage;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -40,12 +39,6 @@ class SecureConfigStorageTest {
 
         // Clear any existing data
         secureStorage.clearAll();
-    }
-
-    @AfterEach
-    void tearDown() throws Exception {
-        // Reset the config directory to the default
-        SecureConfigStorage.setConfigDirForTesting(System.getProperty("user.home") + File.separator + ".belsign");
     }
 
     /**
@@ -64,8 +57,14 @@ class SecureConfigStorageTest {
         }
 
         // Add the temp directory to the classpath
-        System.setProperty("java.class.path", 
-            System.getProperty("java.class.path") + File.pathSeparator + tempDir.toFile().getAbsolutePath());
+        System.setProperty("java.class.path",
+                System.getProperty("java.class.path") + File.pathSeparator + tempDir.toFile().getAbsolutePath());
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        // Reset the config directory to the default
+        SecureConfigStorage.setConfigDirForTesting(System.getProperty("user.home") + File.separator + ".belsign");
     }
 
     @Test

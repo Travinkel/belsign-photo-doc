@@ -2,7 +2,7 @@ package com.belman.bootstrap.di;
 
 
 import com.belman.common.di.Inject;
-import com.belman.repository.platform.ServiceInjectionException;
+import com.belman.common.di.ServiceInjectionException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

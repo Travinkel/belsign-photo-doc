@@ -1,23 +1,23 @@
 package com.belman.bootstrap;
 
 import com.belman.bootstrap.config.ApplicationBootstrapper;
+import com.belman.bootstrap.di.ServiceLocator;
+import com.belman.bootstrap.di.ServiceRegistry;
+import com.belman.bootstrap.hacks.GluonInternalClassesFix;
 import com.belman.bootstrap.lifecycle.LifecycleManager;
+import com.belman.bootstrap.platform.DisplayServiceFactory;
+import com.belman.bootstrap.platform.StorageServiceFactory;
 import com.belman.bootstrap.security.RouteGuardInitializer;
+import com.belman.common.logging.EmojiLogger;
+import com.belman.common.platform.PlatformUtils;
 import com.belman.domain.security.AuthenticationService;
-import com.belman.domain.services.LoggerFactory;
-import com.belman.service.infrastructure.service.ServiceLocator;
-import com.belman.service.infrastructure.service.ServiceRegistry;
 import com.belman.domain.services.Logger;
-import com.belman.repository.platform.PlatformUtils;
-import com.belman.repository.logging.EmojiLogger;
+import com.belman.domain.services.LoggerFactory;
 import com.belman.repository.logging.EmojiLoggerAdapter;
-import com.belman.repository.service.DisplayServiceFactory;
-import com.belman.repository.service.GluonInternalClassesFix;
-import com.belman.repository.service.StorageServiceFactory;
-import com.belman.ui.navigation.Router;
-import com.belman.ui.navigation.RouteGuardImpl;
-import com.belman.ui.views.splash.SplashView;
 import com.belman.ui.core.GluonFacade;
+import com.belman.ui.navigation.RouteGuardImpl;
+import com.belman.ui.navigation.Router;
+import com.belman.ui.views.splash.SplashView;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -30,8 +30,8 @@ import javafx.stage.Stage;
  */
 public class Main extends Application {
 
+    public static final String SPLASH_VIEW = SplashView.class.getSimpleName();
     private static final EmojiLogger logger = EmojiLogger.getLogger(Main.class);
-    private GluonFacade app = GluonFacade.initialize();
 
     /**
      * Static initializer to set system properties.
@@ -48,16 +48,17 @@ public class Main extends Application {
         }
     }
 
+    private final GluonFacade app = GluonFacade.initialize();
+
     /**
      * Main entry point for the application.
+     *
      * @param args command line arguments
      */
     public static void main(String[] args) {
         System.setProperty("com.gluonhq.license.disable", "true");
         launch(args);
     }
-
-    public static final String SPLASH_VIEW = SplashView.class.getSimpleName();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -169,6 +170,7 @@ public class Main extends Application {
 
     /**
      * Performs post-initialization tasks.
+     *
      * @param scene the JavaFX scene
      */
     public void postInit(Scene scene) {
@@ -186,12 +188,13 @@ public class Main extends Application {
 
     /**
      * Loads CSS for the application.
+     *
      * @param scene the JavaFX scene
      */
     private void loadCss(Scene scene) {
         var css = getClass().getResource("/com/belman/styles/app.css");
         logger.debug("Loading app.css from: " + css);
-        
+
         if (css != null) {
             scene.getStylesheets().add(css.toExternalForm());
             logger.info("✅ Loaded app.css from: " + css);
@@ -202,6 +205,7 @@ public class Main extends Application {
 
     /**
      * Applies platform-specific styling to the scene.
+     *
      * @param scene the JavaFX scene
      */
     private void applyPlatformStyling(Scene scene) {

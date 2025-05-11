@@ -49,7 +49,7 @@ public class CommandBinding<T> {
         if (commandManager == null) {
             throw new IllegalArgumentException("Command manager cannot be null");
         }
-        
+
         this.commandFactory = commandFactory;
         this.commandManager = commandManager;
     }
@@ -64,14 +64,79 @@ public class CommandBinding<T> {
         if (button == null) {
             throw new IllegalArgumentException("Button cannot be null");
         }
-        
+
         // Bind the button's disabled property to the negation of the enabled property
         button.disableProperty().bind(enabledProperty.not());
-        
+
         // Set the button's action to execute the command
         button.setOnAction(this::handleAction);
-        
+
         return this;
+    }
+
+    /**
+     * Handles the action event from a UI control.
+     *
+     * @param event the action event
+     */
+    private void handleAction(ActionEvent event) {
+        execute();
+    }
+
+    /**
+     * Executes the command.
+     */
+    public void execute() {
+        if (!isEnabled()) {
+            return;
+        }
+
+        try {
+            Command<T> command = commandFactory.get();
+
+            if (command == null) {
+                throw new IllegalStateException("Command factory returned null");
+            }
+
+            if (!command.canExecute()) {
+                return;
+            }
+
+            commandManager.execute(command)
+                    .thenAccept(result -> {
+                        if (resultHandler != null) {
+                            resultHandler.accept(result);
+                        }
+                    })
+                    .exceptionally(ex -> {
+                        if (errorHandler != null) {
+                            errorHandler.accept(ex);
+                        }
+                        return null;
+                    });
+        } catch (Exception ex) {
+            if (errorHandler != null) {
+                errorHandler.accept(ex);
+            }
+        }
+    }
+
+    /**
+     * Checks if this binding is enabled.
+     *
+     * @return true if this binding is enabled, false otherwise
+     */
+    public boolean isEnabled() {
+        return enabledProperty.get();
+    }
+
+    /**
+     * Sets whether this binding is enabled.
+     *
+     * @param enabled whether this binding is enabled
+     */
+    public void setEnabled(boolean enabled) {
+        enabledProperty.set(enabled);
     }
 
     /**
@@ -84,13 +149,13 @@ public class CommandBinding<T> {
         if (menuItem == null) {
             throw new IllegalArgumentException("Menu item cannot be null");
         }
-        
+
         // Bind the menu item's disabled property to the negation of the enabled property
         menuItem.disableProperty().bind(enabledProperty.not());
-        
+
         // Set the menu item's action to execute the command
         menuItem.setOnAction(this::handleAction);
-        
+
         return this;
     }
 
@@ -123,70 +188,5 @@ public class CommandBinding<T> {
      */
     public BooleanProperty enabledProperty() {
         return enabledProperty;
-    }
-
-    /**
-     * Sets whether this binding is enabled.
-     *
-     * @param enabled whether this binding is enabled
-     */
-    public void setEnabled(boolean enabled) {
-        enabledProperty.set(enabled);
-    }
-
-    /**
-     * Checks if this binding is enabled.
-     *
-     * @return true if this binding is enabled, false otherwise
-     */
-    public boolean isEnabled() {
-        return enabledProperty.get();
-    }
-
-    /**
-     * Executes the command.
-     */
-    public void execute() {
-        if (!isEnabled()) {
-            return;
-        }
-        
-        try {
-            Command<T> command = commandFactory.get();
-            
-            if (command == null) {
-                throw new IllegalStateException("Command factory returned null");
-            }
-            
-            if (!command.canExecute()) {
-                return;
-            }
-            
-            commandManager.execute(command)
-                .thenAccept(result -> {
-                    if (resultHandler != null) {
-                        resultHandler.accept(result);
-                    }
-                })
-                .exceptionally(ex -> {
-                    if (errorHandler != null) {
-                        errorHandler.accept(ex);
-                    }
-                    return null;
-                });
-        } catch (Exception ex) {
-            if (errorHandler != null) {
-                errorHandler.accept(ex);
-            }
-        }
-    }
-
-    /**
-     * Handles the action event from a UI control.
-     *
-     * @param event the action event
-     */
-    private void handleAction(ActionEvent event) {
-        execute();
     }
 }

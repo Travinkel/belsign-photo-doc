@@ -1,25 +1,19 @@
 package com.belman.ui.views.ordergallery;
 
-import com.belman.ui.base.BaseController;
-import com.belman.ui.navigation.Router;
+import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRole;
-import com.belman.domain.order.OrderBusiness;
 import com.belman.repository.service.SessionManager;
+import com.belman.ui.base.BaseController;
 import com.belman.ui.components.TouchFriendlyDialog;
+import com.belman.ui.navigation.Router;
 import com.belman.ui.views.photoupload.PhotoUploadView;
 import com.belman.ui.views.qadashboard.QADashboardView;
 import com.belman.ui.views.usermanagement.UserManagementView;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 /**
  * Controller for the order gallery view.
@@ -88,8 +82,16 @@ public class OrderGalleryViewController extends BaseController<OrderGalleryViewM
 
         // Bind create order button to non-empty order number
         createOrderButton.disableProperty().bind(
-            Bindings.isEmpty(newOrderNumberField.textProperty())
+                Bindings.isEmpty(newOrderNumberField.textProperty())
         );
+    }
+
+    /**
+     * Shows an error message using a touch-friendly dialog.
+     */
+    @Override
+    protected void showError(String message) {
+        TouchFriendlyDialog.showError("Error", message);
     }
 
     /**
@@ -125,6 +127,13 @@ public class OrderGalleryViewController extends BaseController<OrderGalleryViewM
     }
 
     /**
+     * Shows an information message using a touch-friendly dialog.
+     */
+    private void showInfo(String message) {
+        TouchFriendlyDialog.showInformation("Information", message);
+    }
+
+    /**
      * Handles the back button action.
      * Navigates to the appropriate view based on the user's role.
      */
@@ -152,20 +161,5 @@ public class OrderGalleryViewController extends BaseController<OrderGalleryViewM
 
         // Fallback to PhotoUploadView if no user is logged in or if an error occurs
         Router.navigateTo(PhotoUploadView.class);
-    }
-
-    /**
-     * Shows an error message using a touch-friendly dialog.
-     */
-    @Override
-    protected void showError(String message) {
-        TouchFriendlyDialog.showError("Error", message);
-    }
-
-    /**
-     * Shows an information message using a touch-friendly dialog.
-     */
-    private void showInfo(String message) {
-        TouchFriendlyDialog.showInformation("Information", message);
     }
 }

@@ -185,15 +185,6 @@ public class SlideViewTransition extends AbstractViewTransition {
     }
 
     /**
-     * Gets the slide direction.
-     *
-     * @return the slide direction
-     */
-    public SlideDirection getDirection() {
-        return direction;
-    }
-
-    /**
      * Gets the container for the views.
      *
      * @param currentView the current view
@@ -212,5 +203,14 @@ public class SlideViewTransition extends AbstractViewTransition {
         }
 
         return null;
+    }
+
+    /**
+     * Gets the slide direction.
+     *
+     * @return the slide direction
+     */
+    public SlideDirection getDirection() {
+        return direction;
     }
 }

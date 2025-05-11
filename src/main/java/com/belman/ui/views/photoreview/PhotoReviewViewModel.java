@@ -1,27 +1,19 @@
 package com.belman.ui.views.photoreview;
 
+import com.belman.common.di.Inject;
 import com.belman.domain.common.Timestamp;
 import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.order.OrderId;
 import com.belman.domain.order.OrderNumber;
-import com.belman.domain.user.UserReference;
-import com.belman.ui.base.BaseViewModel;
-import com.belman.common.di.Inject;
-import com.belman.ui.navigation.Router;
-import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.order.OrderRepository;
+import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.services.PhotoService;
-
+import com.belman.domain.user.UserReference;
 import com.belman.repository.service.SessionManager;
+import com.belman.ui.base.BaseViewModel;
+import com.belman.ui.navigation.Router;
 import com.belman.ui.views.login.LoginView;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -32,35 +24,49 @@ import java.util.List;
  */
 public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
 
-    @Inject
-    private PhotoService photoService;
-
-    @Inject
-    private OrderRepository orderRepository;
-
     private final SessionManager sessionManager = SessionManager.getInstance();
-
     private final StringProperty orderNumber = new SimpleStringProperty("");
     private final StringProperty orderInfo = new SimpleStringProperty("No order selected");
     private final StringProperty commentText = new SimpleStringProperty("");
     private final StringProperty errorMessage = new SimpleStringProperty("");
-
     private final BooleanProperty orderSelected = new SimpleBooleanProperty(false);
     private final BooleanProperty photoSelected = new SimpleBooleanProperty(false);
-
     private final ObjectProperty<OrderBusiness> selectedOrder = new SimpleObjectProperty<>();
     private final ObjectProperty<PhotoDocument> selectedPhoto = new SimpleObjectProperty<>();
-
     private final ListProperty<PhotoDocument> photos = new SimpleListProperty<>(FXCollections.observableArrayList());
+    @Inject
+    private PhotoService photoService;
+    @Inject
+    private OrderRepository orderRepository;
 
     @Override
     public void onShow() {
         clearForm();
     }
 
+    public void clearForm() {
+        orderNumber.set("");
+        orderInfo.set("No order selected");
+        commentText.set("");
+        errorMessage.set("");
+        orderSelected.set(false);
+        photoSelected.set(false);
+        selectedOrder.set(null);
+        selectedPhoto.set(null);
+        photos.clear();
+    }
+
+    public StringProperty errorMessageProperty() {
+        return errorMessage;
+    }
+
+    protected void setErrorMessage(String message) {
+        errorMessage.set(message);
+    }
+
     /**
      * Searches for an order by its number.
-     * 
+     *
      * @param orderNumberStr the order number to search for
      * @return true if the order was found, false otherwise
      */
@@ -75,17 +81,21 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
             List<OrderBusiness> orderBusinesses = orderRepository.findAll();
 
             return orderBusinesses.stream()
-                .filter(order -> order.getOrderNumber() != null && order.getOrderNumber().equals(orderNum))
-                .findFirst()
-                .map(this::handleOrderFound)
-                .orElseGet(() -> {
-                    setErrorMessage("Order not found: " + orderNumberStr);
-                    return false;
-                });
+                    .filter(order -> order.getOrderNumber() != null && order.getOrderNumber().equals(orderNum))
+                    .findFirst()
+                    .map(this::handleOrderFound)
+                    .orElseGet(() -> {
+                        setErrorMessage("Order not found: " + orderNumberStr);
+                        return false;
+                    });
         } catch (IllegalArgumentException e) {
             setErrorMessage("Invalid order number format");
             return false;
         }
+    }
+
+    private boolean isNullOrEmpty(String str) {
+        return str == null || str.isBlank();
     }
 
     private boolean handleOrderFound(OrderBusiness orderBusiness) {
@@ -130,27 +140,6 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
         }
     }
 
-    public boolean rejectPhoto() {
-        if (!validatePhotoSelection()) return false;
-
-        if (isNullOrEmpty(commentText.get())) {
-            setErrorMessage("Please provide a reason for rejection");
-            return false;
-        }
-
-        try {
-            PhotoDocument photo = selectedPhoto.get();
-            UserReference currentUser = getCurrentUser();
-            photo.reject(currentUser, Timestamp.now(), commentText.get());
-            refreshPhotos();
-            clearPhotoSelection();
-            return true;
-        } catch (Exception e) {
-            setErrorMessage("Error rejecting photo: " + e.getMessage());
-            return false;
-        }
-    }
-
     private boolean validatePhotoSelection() {
         if (!photoSelected.get()) {
             setErrorMessage("Please select a photo first");
@@ -175,27 +164,28 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
         commentText.set("");
     }
 
-    public void clearForm() {
-        orderNumber.set("");
-        orderInfo.set("No order selected");
-        commentText.set("");
-        errorMessage.set("");
-        orderSelected.set(false);
-        photoSelected.set(false);
-        selectedOrder.set(null);
-        selectedPhoto.set(null);
-        photos.clear();
-    }
-
-    protected void setErrorMessage(String message) {
-        errorMessage.set(message);
-    }
-
-    private boolean isNullOrEmpty(String str) {
-        return str == null || str.isBlank();
-    }
-
     // Getters for properties
+
+    public boolean rejectPhoto() {
+        if (!validatePhotoSelection()) return false;
+
+        if (isNullOrEmpty(commentText.get())) {
+            setErrorMessage("Please provide a reason for rejection");
+            return false;
+        }
+
+        try {
+            PhotoDocument photo = selectedPhoto.get();
+            UserReference currentUser = getCurrentUser();
+            photo.reject(currentUser, Timestamp.now(), commentText.get());
+            refreshPhotos();
+            clearPhotoSelection();
+            return true;
+        } catch (Exception e) {
+            setErrorMessage("Error rejecting photo: " + e.getMessage());
+            return false;
+        }
+    }
 
     public StringProperty orderNumberProperty() {
         return orderNumber;
@@ -207,10 +197,6 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
 
     public StringProperty commentTextProperty() {
         return commentText;
-    }
-
-    public StringProperty errorMessageProperty() {
-        return errorMessage;
     }
 
     public BooleanProperty orderSelectedProperty() {

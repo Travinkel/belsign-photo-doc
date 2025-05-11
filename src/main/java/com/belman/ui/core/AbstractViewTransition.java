@@ -12,10 +12,10 @@ import java.util.function.Consumer;
  * such as duration management and callback handling.
  */
 public abstract class AbstractViewTransition implements ViewTransition {
+    private final String name;
     private Duration duration = Duration.millis(300);
     private Consumer<View> onStart;
     private Consumer<View> onComplete;
-    private final String name;
 
     /**
      * Creates a new AbstractViewTransition with the specified name.
@@ -27,6 +27,33 @@ public abstract class AbstractViewTransition implements ViewTransition {
             throw new IllegalArgumentException("Transition name cannot be null or empty");
         }
         this.name = name;
+    }
+
+    /**
+     * Invokes the onStart callback if it exists.
+     *
+     * @param view the view being transitioned to
+     */
+    protected void fireOnStart(View view) {
+        if (onStart != null && view != null) {
+            onStart.accept(view);
+        }
+    }
+
+    /**
+     * Invokes the onComplete callback if it exists.
+     *
+     * @param view the view that was transitioned to
+     */
+    protected void fireOnComplete(View view) {
+        if (onComplete != null && view != null) {
+            onComplete.accept(view);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return getName() + " (" + getDuration().toMillis() + "ms)";
     }
 
     @Override
@@ -61,32 +88,5 @@ public abstract class AbstractViewTransition implements ViewTransition {
     @Override
     public String getName() {
         return name;
-    }
-
-    /**
-     * Invokes the onStart callback if it exists.
-     *
-     * @param view the view being transitioned to
-     */
-    protected void fireOnStart(View view) {
-        if (onStart != null && view != null) {
-            onStart.accept(view);
-        }
-    }
-
-    /**
-     * Invokes the onComplete callback if it exists.
-     *
-     * @param view the view that was transitioned to
-     */
-    protected void fireOnComplete(View view) {
-        if (onComplete != null && view != null) {
-            onComplete.accept(view);
-        }
-    }
-
-    @Override
-    public String toString() {
-        return getName() + " (" + getDuration().toMillis() + "ms)";
     }
 }

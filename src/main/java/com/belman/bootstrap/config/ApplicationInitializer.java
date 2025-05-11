@@ -1,35 +1,27 @@
 package com.belman.bootstrap.config;
 
+import com.belman.bootstrap.di.ServiceRegistry;
 import com.belman.bootstrap.persistence.DatabaseConfig;
-import com.belman.service.infrastructure.service.ServiceRegistry;
-import com.belman.domain.security.AuthenticationService;
-import com.belman.repository.logging.EmojiLogger;
-import com.belman.domain.customer.CustomerRepository;
-import com.belman.domain.order.OrderRepository;
-import com.belman.domain.order.OrderDataAccess;
+import com.belman.common.logging.EmojiLogger;
 import com.belman.domain.customer.CustomerDataAccess;
+import com.belman.domain.customer.CustomerRepository;
+import com.belman.domain.order.OrderDataAccess;
+import com.belman.domain.order.OrderRepository;
 import com.belman.domain.order.photo.PhotoDataAccess;
 import com.belman.domain.order.photo.PhotoRepository;
 import com.belman.domain.report.ReportDataAccess;
 import com.belman.domain.report.ReportRepository;
+import com.belman.domain.security.AuthenticationService;
+import com.belman.domain.services.PhotoService;
 import com.belman.domain.user.UserDataAccess;
 import com.belman.domain.user.UserRepository;
 import com.belman.domain.user.rbac.AccessPolicyFactory;
 import com.belman.domain.user.rbac.RoleBasedAccessControlFactory;
-import com.belman.domain.services.PhotoService;
-import com.belman.repository.persistence.CustomerDataAccessAdapter;
-import com.belman.repository.persistence.InMemoryCustomerRepository;
-import com.belman.repository.persistence.InMemoryOrderRepository;
-import com.belman.repository.persistence.InMemoryPhotoRepository;
-import com.belman.repository.persistence.InMemoryReportRepository;
-import com.belman.repository.persistence.InMemoryUserRepository;
-import com.belman.repository.persistence.OrderDataAccessAdapter;
-import com.belman.repository.persistence.PhotoDataAccessAdapter;
-import com.belman.repository.persistence.ReportDataAccessAdapter;
-import com.belman.repository.persistence.UserDataAccessAdapter;
-import com.belman.repository.security.DefaultAuthenticationService;
-import com.belman.repository.service.DefaultPhotoService;
-import com.belman.repository.service.SessionManager;
+import com.belman.repository.persistence.adapter.*;
+import com.belman.repository.persistence.memory.*;
+import com.belman.service.session.SessionManager;
+import com.belman.service.usecase.photo.DefaultPhotoService;
+import com.belman.service.usecase.security.DefaultAuthenticationService;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Constructor;
@@ -42,10 +34,9 @@ import java.lang.reflect.Constructor;
 public class ApplicationInitializer {
 
     private static final EmojiLogger logger = EmojiLogger.getLogger(ApplicationInitializer.class);
-    private static boolean initialized = false;
-
     // Photo storage directory
     private static final String PHOTO_STORAGE_DIRECTORY = "photos";
+    private static boolean initialized = false;
 
     /**
      * Initializes the application's services and repositories.
@@ -78,49 +69,57 @@ public class ApplicationInitializer {
             if (dataSource != null) {
                 try {
                     // Initialize UserRepository - try SQL implementation first
-                    userRepository = createRepository(UserRepository.class, "SqlUserRepository", dataSource, InMemoryUserRepository.class);
+                    userRepository = createRepository(UserRepository.class, "SqlUserRepository", dataSource,
+                            InMemoryUserRepository.class);
                     ServiceRegistry.registerService(userRepository);
 
                     // Create and register UserDataAccessAdapter
                     if (userRepository instanceof InMemoryUserRepository) {
                         logger.database("Creating UserDataAccessAdapter");
-                        UserDataAccess userDataAccess = new UserDataAccessAdapter((InMemoryUserRepository) userRepository);
+                        UserDataAccess userDataAccess = new UserDataAccessAdapter(
+                                (InMemoryUserRepository) userRepository);
                         ServiceRegistry.registerService(userDataAccess);
                         logger.success("UserDataAccessAdapter created successfully");
                     }
 
                     // Initialize OrderRepository - try SQL implementation first
-                    orderRepository = createRepository(OrderRepository.class, "SqlOrderRepository", dataSource, InMemoryOrderRepository.class);
+                    orderRepository = createRepository(OrderRepository.class, "SqlOrderRepository", dataSource,
+                            InMemoryOrderRepository.class);
                     ServiceRegistry.registerService(orderRepository);
 
                     // Create and register OrderDataAccessAdapter
                     if (orderRepository instanceof InMemoryOrderRepository) {
                         logger.database("Creating OrderDataAccessAdapter");
-                        OrderDataAccess orderDataAccess = new OrderDataAccessAdapter((InMemoryOrderRepository) orderRepository);
+                        OrderDataAccess orderDataAccess = new OrderDataAccessAdapter(
+                                (InMemoryOrderRepository) orderRepository);
                         ServiceRegistry.registerService(orderDataAccess);
                         logger.success("OrderDataAccessAdapter created successfully");
                     }
 
                     // Initialize CustomerRepository - try SQL implementation first
-                    customerRepository = createRepository(CustomerRepository.class, "SqlCustomerRepository", dataSource, InMemoryCustomerRepository.class);
+                    customerRepository = createRepository(CustomerRepository.class, "SqlCustomerRepository", dataSource,
+                            InMemoryCustomerRepository.class);
                     ServiceRegistry.registerService(customerRepository);
 
                     // Create and register CustomerDataAccessAdapter
                     if (customerRepository instanceof InMemoryCustomerRepository) {
                         logger.database("Creating CustomerDataAccessAdapter");
-                        CustomerDataAccess customerDataAccess = new CustomerDataAccessAdapter((InMemoryCustomerRepository) customerRepository);
+                        CustomerDataAccess customerDataAccess = new CustomerDataAccessAdapter(
+                                (InMemoryCustomerRepository) customerRepository);
                         ServiceRegistry.registerService(customerDataAccess);
                         logger.success("CustomerDataAccessAdapter created successfully");
                     }
 
                     // Initialize ReportRepository - try SQL implementation first
-                    reportRepository = createRepository(ReportRepository.class, "SqlReportRepository", dataSource, InMemoryReportRepository.class);
+                    reportRepository = createRepository(ReportRepository.class, "SqlReportRepository", dataSource,
+                            InMemoryReportRepository.class);
                     ServiceRegistry.registerService(reportRepository);
 
                     // Create and register ReportDataAccessAdapter
                     if (reportRepository instanceof InMemoryReportRepository) {
                         logger.database("Creating ReportDataAccessAdapter");
-                        ReportDataAccess reportDataAccess = new ReportDataAccessAdapter((InMemoryReportRepository) reportRepository);
+                        ReportDataAccess reportDataAccess = new ReportDataAccessAdapter(
+                                (InMemoryReportRepository) reportRepository);
                         ServiceRegistry.registerService(reportDataAccess);
                         logger.success("ReportDataAccessAdapter created successfully");
                     }
@@ -166,7 +165,8 @@ public class ApplicationInitializer {
 
                     // Create and register OrderDataAccessAdapter
                     logger.database("Creating OrderDataAccessAdapter");
-                    OrderDataAccess orderDataAccess = new OrderDataAccessAdapter((InMemoryOrderRepository) orderRepository);
+                    OrderDataAccess orderDataAccess = new OrderDataAccessAdapter(
+                            (InMemoryOrderRepository) orderRepository);
                     ServiceRegistry.registerService(orderDataAccess);
                     logger.success("OrderDataAccessAdapter created successfully");
 
@@ -178,7 +178,8 @@ public class ApplicationInitializer {
 
                     // Create and register CustomerDataAccessAdapter
                     logger.database("Creating CustomerDataAccessAdapter");
-                    CustomerDataAccess customerDataAccess = new CustomerDataAccessAdapter((InMemoryCustomerRepository) customerRepository);
+                    CustomerDataAccess customerDataAccess = new CustomerDataAccessAdapter(
+                            (InMemoryCustomerRepository) customerRepository);
                     ServiceRegistry.registerService(customerDataAccess);
                     logger.success("CustomerDataAccessAdapter created successfully");
 
@@ -190,7 +191,8 @@ public class ApplicationInitializer {
 
                     // Create and register ReportDataAccessAdapter
                     logger.database("Creating ReportDataAccessAdapter");
-                    ReportDataAccess reportDataAccess = new ReportDataAccessAdapter((InMemoryReportRepository) reportRepository);
+                    ReportDataAccess reportDataAccess = new ReportDataAccessAdapter(
+                            (InMemoryReportRepository) reportRepository);
                     ServiceRegistry.registerService(reportDataAccess);
                     logger.success("ReportDataAccessAdapter created successfully");
 
@@ -248,7 +250,8 @@ public class ApplicationInitializer {
 
                 // Create and register CustomerDataAccessAdapter
                 logger.database("Creating CustomerDataAccessAdapter");
-                CustomerDataAccess customerDataAccess = new CustomerDataAccessAdapter((InMemoryCustomerRepository) customerRepository);
+                CustomerDataAccess customerDataAccess = new CustomerDataAccessAdapter(
+                        (InMemoryCustomerRepository) customerRepository);
                 ServiceRegistry.registerService(customerDataAccess);
                 logger.success("CustomerDataAccessAdapter created successfully");
 
@@ -260,7 +263,8 @@ public class ApplicationInitializer {
 
                 // Create and register ReportDataAccessAdapter
                 logger.database("Creating ReportDataAccessAdapter");
-                ReportDataAccess reportDataAccess = new ReportDataAccessAdapter((InMemoryReportRepository) reportRepository);
+                ReportDataAccess reportDataAccess = new ReportDataAccessAdapter(
+                        (InMemoryReportRepository) reportRepository);
                 ServiceRegistry.registerService(reportDataAccess);
                 logger.success("ReportDataAccessAdapter created successfully");
 
@@ -307,7 +311,7 @@ public class ApplicationInitializer {
             // Initialize RoleBasedAccessControlFactory
             logger.debug("Initializing RoleBasedAccessControlFactory");
             RoleBasedAccessControlFactory rbacFactory = new RoleBasedAccessControlFactory(
-                authenticationService, accessPolicyFactory);
+                    authenticationService, accessPolicyFactory);
             // Register the RoleBasedAccessControlFactory with the ServiceRegistry
             ServiceRegistry.registerService(rbacFactory);
             logger.success("RoleBasedAccessControlFactory initialized successfully");
@@ -322,46 +326,20 @@ public class ApplicationInitializer {
     }
 
     /**
-     * Shuts down the application's services and resources.
-     * This method should be called once during application shutdown.
-     */
-    public static synchronized void shutdown() {
-        if (!initialized) {
-            logger.debug("Application not initialized, skipping shutdown");
-            return;
-        }
-
-        logger.shutdown("Starting application shutdown");
-
-        try {
-            // Shutdown database connection pool
-            logger.database("Shutting down database connection pool");
-            DatabaseConfig.shutdown();
-            logger.success("Database connection pool shut down successfully");
-
-            initialized = false;
-            logger.shutdown("Application shut down successfully 👋");
-        } catch (Exception e) {
-            logger.failure("Failed to shut down application properly");
-            logger.error("Shutdown error details", e);
-        }
-    }
-
-    /**
      * Creates a repository instance, trying to use a SQL implementation first if available,
      * and falling back to an in-memory implementation if the SQL implementation is not available.
      *
-     * @param <T> the repository interface type
+     * @param <T>                 the repository interface type
      * @param repositoryInterface the repository interface class
-     * @param sqlImplName the name of the SQL implementation class
-     * @param dataSource the DataSource to pass to the SQL implementation constructor
-     * @param inMemoryImplClass the in-memory implementation class to use as fallback
+     * @param sqlImplName         the name of the SQL implementation class
+     * @param dataSource          the DataSource to pass to the SQL implementation constructor
+     * @param inMemoryImplClass   the in-memory implementation class to use as fallback
      * @return a repository instance
      * @throws Exception if an error occurs while creating the repository
      */
     @SuppressWarnings("unchecked")
     private static <T> T createRepository(Class<T> repositoryInterface, String sqlImplName, DataSource dataSource,
-                                         Class<? extends T> inMemoryImplClass) throws Exception {
+                                          Class<? extends T> inMemoryImplClass) throws Exception {
         // Try to create SQL implementation first
         try {
             // Construct the full class name for the SQL implementation
@@ -390,7 +368,8 @@ public class ApplicationInitializer {
             logger.info("SQL implementation " + sqlImplName + " not found, using in-memory implementation");
         } catch (Exception e) {
             // Other error occurred while trying to create SQL implementation
-            logger.warn("Failed to create SQL-based " + repositoryInterface.getSimpleName() + ", falling back to in-memory implementation", e);
+            logger.warn("Failed to create SQL-based " + repositoryInterface.getSimpleName() +
+                        ", falling back to in-memory implementation", e);
         }
 
         // Fall back to in-memory implementation
@@ -398,5 +377,31 @@ public class ApplicationInitializer {
         T repository = inMemoryImplClass.getDeclaredConstructor().newInstance();
         logger.info("Using in-memory " + repositoryInterface.getSimpleName());
         return repository;
+    }
+
+    /**
+     * Shuts down the application's services and resources.
+     * This method should be called once during application shutdown.
+     */
+    public static synchronized void shutdown() {
+        if (!initialized) {
+            logger.debug("Application not initialized, skipping shutdown");
+            return;
+        }
+
+        logger.shutdown("Starting application shutdown");
+
+        try {
+            // Shutdown database connection pool
+            logger.database("Shutting down database connection pool");
+            DatabaseConfig.shutdown();
+            logger.success("Database connection pool shut down successfully");
+
+            initialized = false;
+            logger.shutdown("Application shut down successfully 👋");
+        } catch (Exception e) {
+            logger.failure("Failed to shut down application properly");
+            logger.error("Shutdown error details", e);
+        }
     }
 }

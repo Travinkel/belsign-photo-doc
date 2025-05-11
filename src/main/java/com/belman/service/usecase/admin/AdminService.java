@@ -1,8 +1,8 @@
 package com.belman.service.usecase.admin;
 
 import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserRole;
 import com.belman.domain.user.UserId;
+import com.belman.domain.user.UserRole;
 
 import java.util.List;
 
@@ -25,7 +25,8 @@ public interface AdminService {
      * @param roles     the roles to assign to the user
      * @return the created user
      */
-    UserBusiness createUser(String username, String password, String firstName, String lastName, String email, UserRole[] roles);
+    UserBusiness createUser(String username, String password, String firstName, String lastName, String email,
+                            UserRole[] roles);
 
     /**
      * Deletes a user with the specified ID.

@@ -34,7 +34,7 @@ public class UserBusinessFactory {
 
     // Create User with full properties including PersonName
     public static UserBusiness createUserWithName(Username username, HashedPassword password,
-                                                   PersonName name, EmailAddress email) {
+                                                  PersonName name, EmailAddress email) {
         validateRequiredFields(username, password, email);
         validateName(name);
         return new UserBusiness.Builder()

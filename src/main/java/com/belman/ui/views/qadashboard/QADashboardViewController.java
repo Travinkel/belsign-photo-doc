@@ -5,11 +5,7 @@ import com.belman.ui.components.TouchFriendlyDialog;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 /**
  * Controller for the QA dashboard view.
@@ -38,41 +34,6 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
     @FXML
     private ProgressIndicator progressIndicator;
 
-    @Override
-    protected void setupBindings() {
-        // Bind UI components to ViewModel properties
-        welcomeLabel.textProperty().bind(getViewModel().welcomeMessageProperty());
-        searchField.textProperty().bindBidirectional(getViewModel().searchTextProperty());
-
-        // Bind button states
-        reviewPhotosButton.disableProperty().bind(
-            Bindings.isNull(pendingOrdersListView.getSelectionModel().selectedItemProperty())
-        );
-
-        generateReportButton.disableProperty().bind(
-            Bindings.isNull(pendingOrdersListView.getSelectionModel().selectedItemProperty())
-        );
-
-        // Bind list view to pending orders
-        pendingOrdersListView.setItems(getViewModel().getPendingOrders());
-
-        // Set selection listener
-        pendingOrdersListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                getViewModel().selectOrder(newVal);
-            }
-        });
-
-        // Initialize data
-        getViewModel().loadPendingOrders();
-    }
-
-    @Override
-    public void initializeBinding() {
-        // Call setupBindings to avoid duplication
-        setupBindings();
-    }
-
     /**
      * Handles the search button action.
      */
@@ -90,6 +51,33 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
         if (selectedOrder != null) {
             getViewModel().navigateToPhotoReview(selectedOrder);
         }
+    }    @Override
+    protected void setupBindings() {
+        // Bind UI components to ViewModel properties
+        welcomeLabel.textProperty().bind(getViewModel().welcomeMessageProperty());
+        searchField.textProperty().bindBidirectional(getViewModel().searchTextProperty());
+
+        // Bind button states
+        reviewPhotosButton.disableProperty().bind(
+                Bindings.isNull(pendingOrdersListView.getSelectionModel().selectedItemProperty())
+        );
+
+        generateReportButton.disableProperty().bind(
+                Bindings.isNull(pendingOrdersListView.getSelectionModel().selectedItemProperty())
+        );
+
+        // Bind list view to pending orders
+        pendingOrdersListView.setItems(getViewModel().getPendingOrders());
+
+        // Set selection listener
+        pendingOrdersListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                getViewModel().selectOrder(newVal);
+            }
+        });
+
+        // Initialize data
+        getViewModel().loadPendingOrders();
     }
 
     /**
@@ -109,6 +97,22 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
     }
 
     /**
+     * Shows an information message using a touch-friendly dialog.
+     */
+    private void showInfo(String message) {
+        TouchFriendlyDialog.showInformation("Information", message);
+    }    @Override
+    public void initializeBinding() {
+        // Call setupBindings to avoid duplication
+        setupBindings();
+    }
+
+
+
+
+
+
+    /**
      * Shows an error message using a touch-friendly dialog.
      * Overrides the method in BaseController.
      */
@@ -117,10 +121,5 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
         TouchFriendlyDialog.showError("Error", message);
     }
 
-    /**
-     * Shows an information message using a touch-friendly dialog.
-     */
-    private void showInfo(String message) {
-        TouchFriendlyDialog.showInformation("Information", message);
-    }
+
 }

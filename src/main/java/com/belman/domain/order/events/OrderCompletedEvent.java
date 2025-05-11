@@ -1,6 +1,6 @@
 package com.belman.domain.order.events;
 
-import com.belman.domain.events.BaseAuditEvent;
+import com.belman.domain.audit.event.BaseAuditEvent;
 import com.belman.domain.order.OrderId;
 import com.belman.domain.order.OrderNumber;
 

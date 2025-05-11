@@ -1,8 +1,8 @@
 package com.belman.repository.service;
 
-import com.belman.service.base.BaseService;
 import com.belman.domain.services.CameraService;
 import com.belman.repository.logging.EmojiLoggerFactory;
+import com.belman.service.base.BaseService;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -18,21 +18,7 @@ public class MockCameraService extends BaseService implements CameraService {
 
     private final Stage stage;
     // Make fileChooser a field so it can be mocked in tests
-    private FileChooser fileChooser;
-
-    /**
-     * Creates a new MockCameraService with the specified stage.
-     * 
-     * @param stage the JavaFX stage to use for file chooser dialogs
-     */
-    public MockCameraService(Stage stage) {
-        super(EmojiLoggerFactory.getInstance());
-        this.stage = stage;
-        this.fileChooser = new FileChooser();
-        this.fileChooser.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
-        );
-    }
+    private final FileChooser fileChooser;
 
     /**
      * Creates a new MockCameraService with a null stage.
@@ -40,6 +26,20 @@ public class MockCameraService extends BaseService implements CameraService {
      */
     public MockCameraService() {
         this(null);
+    }
+
+    /**
+     * Creates a new MockCameraService with the specified stage.
+     *
+     * @param stage the JavaFX stage to use for file chooser dialogs
+     */
+    public MockCameraService(Stage stage) {
+        super(EmojiLoggerFactory.getInstance());
+        this.stage = stage;
+        this.fileChooser = new FileChooser();
+        this.fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+        );
     }
 
     @Override
@@ -68,7 +68,7 @@ public class MockCameraService extends BaseService implements CameraService {
 
     /**
      * Uses a file chooser to select a photo from the file system.
-     * 
+     *
      * @param title the title for the file chooser dialog
      * @return an Optional containing the selected file, or empty if no file was selected
      */

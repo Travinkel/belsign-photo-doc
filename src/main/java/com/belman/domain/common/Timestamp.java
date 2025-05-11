@@ -1,6 +1,6 @@
 package com.belman.domain.common;
 
-import com.belman.domain.common.base.DataObject;
+import com.belman.domain.common.base.ValueObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -12,7 +12,7 @@ import java.util.Objects;
  * Value object representing a point in time.
  * This is in the common package as it's used across multiple bounded contexts.
  */
-public record Timestamp(Instant value) implements DataObject {
+public record Timestamp(Instant value) implements ValueObject {
 
     /**
      * Creates a new Timestamp with the specified Instant.

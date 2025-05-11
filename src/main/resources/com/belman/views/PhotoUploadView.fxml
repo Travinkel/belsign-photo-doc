@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.ProgressIndicator?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.StackPane?>
-
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            xmlns="http://javafx.com/javafx"
             fx:controller="com.belman.ui.views.photoupload.PhotoUploadViewController"
             styleClass="responsive-container, photo-upload-container"
             stylesheets="@../styles/app.css">
@@ -23,60 +15,60 @@
     other mobile-specific functionality.
     -->
 
-    <StackPane AnchorPane.topAnchor="0.0" AnchorPane.rightAnchor="0.0" 
+    <StackPane AnchorPane.topAnchor="0.0" AnchorPane.rightAnchor="0.0"
                AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
 
         <!-- Main Content -->
-        <VBox spacing="20" styleClass="vbox" 
+        <VBox spacing="20" styleClass="vbox"
               maxWidth="Infinity" maxHeight="Infinity">
 
-        <padding>
-            <Insets top="20" right="20" bottom="20" left="20"/>
-        </padding>
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
 
-        <Label text="Upload Photos" styleClass="title"/>
+            <Label text="Upload Photos" styleClass="title"/>
 
-        <!-- OrderBusiness Number Section -->
-        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="form-row">
-            <Label text="Order Number:" styleClass="form-label"/>
-            <TextField fx:id="orderNumberField" promptText="Enter orderAggregate number" HBox.hgrow="ALWAYS"/>
-            <Button fx:id="searchOrderButton" text="Search" onAction="#handleSearchOrder"/>
-        </HBox>
+            <!-- OrderBusiness Number Section -->
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="form-row">
+                <Label text="Order Number:" styleClass="form-label"/>
+                <TextField fx:id="orderNumberField" promptText="Enter orderAggregate number" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="searchOrderButton" text="Search" onAction="#handleSearchOrder"/>
+            </HBox>
 
-        <Label fx:id="orderInfoLabel" text="No orderAggregate selected" styleClass="body-text"/>
+            <Label fx:id="orderInfoLabel" text="No orderAggregate selected" styleClass="body-text"/>
 
-        <!-- Photo Angle Section -->
-        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="form-row">
-            <Label text="Photo Angle:" styleClass="form-label"/>
-            <TextField fx:id="angleField" promptText="Enter angle (degrees)" HBox.hgrow="ALWAYS"/>
-        </HBox>
+            <!-- Photo Angle Section -->
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="form-row">
+                <Label text="Photo Angle:" styleClass="form-label"/>
+                <TextField fx:id="angleField" promptText="Enter angle (degrees)" HBox.hgrow="ALWAYS"/>
+            </HBox>
 
-        <!-- Photo Actions Section -->
-        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="form-row">
-            <Button fx:id="takePhotoButton" text="Take Photo" onAction="#handleTakePhoto" 
-                    styleClass="button-primary"/>
-            <Button fx:id="selectPhotoButton" text="Select Photo" onAction="#handleSelectPhoto" 
-                    styleClass="button-secondary"/>
-            <Button fx:id="uploadButton" text="Upload" onAction="#handleUpload" 
-                    disable="true" styleClass="button"/>
-        </HBox>
+            <!-- Photo Actions Section -->
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="form-row">
+                <Button fx:id="takePhotoButton" text="Take Photo" onAction="#handleTakePhoto"
+                        styleClass="button-primary"/>
+                <Button fx:id="selectPhotoButton" text="Select Photo" onAction="#handleSelectPhoto"
+                        styleClass="button-secondary"/>
+                <Button fx:id="uploadButton" text="Upload" onAction="#handleUpload"
+                        disable="true" styleClass="button"/>
+            </HBox>
 
-        <Label text="Selected Photos:" styleClass="subtitle"/>
+            <Label text="Selected Photos:" styleClass="subtitle"/>
 
-        <!-- Photo List Section - Grows to fill available space -->
-        <ListView fx:id="photoListView" VBox.vgrow="ALWAYS" styleClass="photo-list"/>
+            <!-- Photo List Section - Grows to fill available space -->
+            <ListView fx:id="photoListView" VBox.vgrow="ALWAYS" styleClass="photo-list"/>
 
-        <!-- Bottom Actions Section -->
-        <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="form-row">
-            <Button fx:id="deleteButton" text="Delete Selected" onAction="#handleDeletePhoto" 
-                    disable="true" styleClass="button"/>
-            <Button fx:id="backButton" text="Back to Main" onAction="#handleBack" 
-                    styleClass="button-secondary"/>
-        </HBox>
-    </VBox>
+            <!-- Bottom Actions Section -->
+            <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="form-row">
+                <Button fx:id="deleteButton" text="Delete Selected" onAction="#handleDeletePhoto"
+                        disable="true" styleClass="button"/>
+                <Button fx:id="backButton" text="Back to Main" onAction="#handleBack"
+                        styleClass="button-secondary"/>
+            </HBox>
+        </VBox>
 
         <!-- Progress Indicator (initially invisible) -->
-        <ProgressIndicator fx:id="progressIndicator" visible="false" progress="-1" 
-                          maxWidth="100" maxHeight="100" styleClass="progress-indicator"/>
+        <ProgressIndicator fx:id="progressIndicator" visible="false" progress="-1"
+                           maxWidth="100" maxHeight="100" styleClass="progress-indicator"/>
     </StackPane>
 </AnchorPane>

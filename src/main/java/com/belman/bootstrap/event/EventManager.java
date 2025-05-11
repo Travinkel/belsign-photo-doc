@@ -18,7 +18,7 @@ public class EventManager {
 
     /**
      * Gets the singleton instance of the EventManager.
-     * 
+     *
      * @return the EventManager instance
      */
     public static EventManager getInstance() {
@@ -27,10 +27,10 @@ public class EventManager {
 
     /**
      * Registers a handler for a specific event type.
-     * 
+     *
      * @param eventType the class of the event type
-     * @param handler the handler to register
-     * @param <T> the type of event
+     * @param handler   the handler to register
+     * @param <T>       the type of event
      */
     public <T extends DomainEvent> void registerEventHandler(Class<T> eventType, DomainEventHandler<T> handler) {
         DomainEventPublisher.getInstance().register(eventType, handler);
@@ -38,10 +38,10 @@ public class EventManager {
 
     /**
      * Unregisters a handler for a specific event type.
-     * 
+     *
      * @param eventType the class of the event type
-     * @param handler the handler to unregister
-     * @param <T> the type of event
+     * @param handler   the handler to unregister
+     * @param <T>       the type of event
      */
     public <T extends DomainEvent> void unregisterEventHandler(Class<T> eventType, DomainEventHandler<T> handler) {
         DomainEventPublisher.getInstance().unregister(eventType, handler);
@@ -49,9 +49,9 @@ public class EventManager {
 
     /**
      * Publishes an event to all registered handlers.
-     * 
+     *
      * @param event the event to publish
-     * @param <T> the type of event
+     * @param <T>   the type of event
      */
     public <T extends DomainEvent> void publishEvent(T event) {
         DomainEventPublisher.getInstance().publish(event);
@@ -59,9 +59,9 @@ public class EventManager {
 
     /**
      * Publishes an event asynchronously to all registered handlers.
-     * 
+     *
      * @param event the event to publish
-     * @param <T> the type of event
+     * @param <T>   the type of event
      */
     public <T extends DomainEvent> void publishEventAsync(T event) {
         DomainEventPublisher.getInstance().publishAsync(event);

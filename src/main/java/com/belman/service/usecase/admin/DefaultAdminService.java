@@ -3,11 +3,7 @@ package com.belman.service.usecase.admin;
 import com.belman.domain.common.EmailAddress;
 import com.belman.domain.common.PersonName;
 import com.belman.domain.security.HashedPassword;
-import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserRepository;
-import com.belman.domain.user.UserRole;
-import com.belman.domain.user.UserId;
-import com.belman.domain.user.Username;
+import com.belman.domain.user.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +19,7 @@ public class DefaultAdminService implements AdminService {
 
     /**
      * Creates a new DefaultAdminService with the specified UserRepository.
-     * 
+     *
      * @param userRepository the user repository
      */
     public DefaultAdminService(UserRepository userRepository) {
@@ -40,7 +36,8 @@ public class DefaultAdminService implements AdminService {
     }
 
     @Override
-    public UserBusiness createUser(String username, String password, String firstName, String lastName, String email, UserRole[] roles) {
+    public UserBusiness createUser(String username, String password, String firstName, String lastName, String email,
+                                   UserRole[] roles) {
         try {
             // Create the user objects
             Username usernameObj = new Username(username);
@@ -50,11 +47,11 @@ public class DefaultAdminService implements AdminService {
 
             // Create the user
             UserBusiness.Builder builder = new UserBusiness.Builder()
-                .id(UserId.newId())
-                .username(usernameObj)
-                .password(passwordObj)
-                .name(nameObj)
-                .email(emailObj);
+                    .id(UserId.newId())
+                    .username(usernameObj)
+                    .password(passwordObj)
+                    .name(nameObj)
+                    .email(emailObj);
 
             // Add roles
             for (UserRole role : roles) {
@@ -143,12 +140,12 @@ public class DefaultAdminService implements AdminService {
 
                 // Create a new user with the updated password
                 UserBusiness.Builder builder = new UserBusiness.Builder()
-                    .id(user.getId())
-                    .username(user.getUsername())
-                    .password(passwordObj)
-                    .name(user.getName())
-                    .email(user.getEmail())
-                    .approvalState(user.getApprovalState());
+                        .id(user.getId())
+                        .username(user.getUsername())
+                        .password(passwordObj)
+                        .name(user.getName())
+                        .email(user.getEmail())
+                        .approvalState(user.getApprovalState());
 
                 // Add roles
                 for (UserRole role : user.getRoles()) {

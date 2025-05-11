@@ -20,7 +20,7 @@ public class DesktopDisplayServiceFallback {
 
     /**
      * Creates a new DisplayService proxy that provides default values for desktop platforms.
-     * 
+     *
      * @return a proxy that implements the DisplayService interface
      */
     public static Object createDisplayServiceProxy() {
@@ -30,9 +30,9 @@ public class DesktopDisplayServiceFallback {
 
             // Create a proxy that implements the DisplayService interface
             return Proxy.newProxyInstance(
-                DesktopDisplayServiceFallback.class.getClassLoader(),
-                new Class<?>[] { displayServiceClass },
-                new DisplayServiceInvocationHandler()
+                    DesktopDisplayServiceFallback.class.getClassLoader(),
+                    new Class<?>[]{displayServiceClass},
+                    new DisplayServiceInvocationHandler()
             );
         } catch (ClassNotFoundException e) {
             LOGGER.log(Level.SEVERE, "Failed to load DisplayService class", e);

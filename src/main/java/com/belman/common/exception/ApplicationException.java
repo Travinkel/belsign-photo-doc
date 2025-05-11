@@ -35,6 +35,15 @@ public class ApplicationException extends Exception {
     }
 
     /**
+     * Creates a new ApplicationException with the specified cause.
+     *
+     * @param cause the cause of this exception
+     */
+    public ApplicationException(Throwable cause) {
+        this(cause.getMessage(), cause, "GENERIC_ERROR");
+    }
+
+    /**
      * Creates a new ApplicationException with the specified message, cause and error code.
      *
      * @param message   the detail message
@@ -44,15 +53,6 @@ public class ApplicationException extends Exception {
     public ApplicationException(String message, Throwable cause, String errorCode) {
         super(message, cause);
         this.errorCode = errorCode;
-    }
-
-    /**
-     * Creates a new ApplicationException with the specified cause.
-     *
-     * @param cause the cause of this exception
-     */
-    public ApplicationException(Throwable cause) {
-        this(cause.getMessage(), cause, "GENERIC_ERROR");
     }
 
     /**

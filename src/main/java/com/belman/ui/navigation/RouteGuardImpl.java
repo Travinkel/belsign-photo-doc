@@ -1,5 +1,6 @@
 package com.belman.ui.navigation;
 
+import com.belman.domain.services.Logger;
 import com.belman.service.infrastructure.routing.RouteGuard;
 import com.belman.ui.views.admin.AdminView;
 import com.belman.ui.views.ordergallery.OrderGalleryView;
@@ -8,7 +9,6 @@ import com.belman.ui.views.photoupload.PhotoUploadView;
 import com.belman.ui.views.qadashboard.QADashboardView;
 import com.belman.ui.views.reportpreview.ReportPreviewView;
 import com.belman.ui.views.usermanagement.UserManagementView;
-import com.belman.domain.services.Logger;
 import com.gluonhq.charm.glisten.mvc.View;
 
 import java.util.HashMap;
@@ -22,7 +22,6 @@ import java.util.function.Supplier;
 public class RouteGuardImpl implements RouteGuard {
 
     private static final Map<String, Class<? extends View>> ROUTE_MAP = new HashMap<>();
-    private final Logger logger;
 
     static {
         // Initialize the route map
@@ -35,9 +34,11 @@ public class RouteGuardImpl implements RouteGuard {
         ROUTE_MAP.put("reportPreview", ReportPreviewView.class);
     }
 
+    private final Logger logger;
+
     /**
      * Constructs a new RouteGuardImpl with the specified logger.
-     * 
+     *
      * @param logger the logger to use
      */
     public RouteGuardImpl(Logger logger) {

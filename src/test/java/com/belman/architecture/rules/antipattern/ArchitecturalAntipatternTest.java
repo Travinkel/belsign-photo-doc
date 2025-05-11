@@ -16,7 +16,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
 /**
@@ -56,7 +57,8 @@ public class ArchitecturalAntipatternTest {
         ArchRule rule = noClasses()
                 .that().resideInAPackage("com.belman.ui..")
                 .should().dependOnClassesThat().resideInAPackage("com.belman.repository..")
-                .because("UI classes should not directly access repositories, they should go through the service layer");
+                .because(
+                        "UI classes should not directly access repositories, they should go through the service layer");
 
         rule.check(importedClasses);
     }
@@ -174,11 +176,11 @@ public class ArchitecturalAntipatternTest {
                 // Check if there's at least one method that is not a getter, setter, or standard Object method
                 boolean hasBehavior = methods.stream().anyMatch(method -> {
                     String methodName = method.getName();
-                    return !methodName.equals("equals") && 
-                           !methodName.equals("hashCode") && 
-                           !methodName.equals("toString") && 
-                           !methodName.startsWith("get") && 
-                           !methodName.startsWith("set") && 
+                    return !methodName.equals("equals") &&
+                           !methodName.equals("hashCode") &&
+                           !methodName.equals("toString") &&
+                           !methodName.startsWith("get") &&
+                           !methodName.startsWith("set") &&
                            !methodName.startsWith("is");
                 });
 
@@ -213,13 +215,14 @@ public class ArchitecturalAntipatternTest {
     @Test
     public void noInappropriateIntimacy() {
         // Define a condition to detect inappropriate intimacy
-        ArchCondition<JavaClass> notHaveInappropriateIntimacy = new ArchCondition<JavaClass>("not have inappropriate intimacy") {
+        ArchCondition<JavaClass> notHaveInappropriateIntimacy = new ArchCondition<JavaClass>(
+                "not have inappropriate intimacy") {
             @Override
             public void check(JavaClass javaClass, ConditionEvents events) {
                 // For each field in the class
                 for (JavaField field : javaClass.getFields()) {
                     // Skip primitive fields and fields from standard libraries
-                    if (field.getRawType().isPrimitive() || 
+                    if (field.getRawType().isPrimitive() ||
                         field.getRawType().getPackageName().startsWith("java.") ||
                         field.getRawType().getPackageName().startsWith("javafx.")) {
                         continue;
@@ -268,8 +271,8 @@ public class ArchitecturalAntipatternTest {
         DescribedPredicate<JavaClass> isServiceClass = new DescribedPredicate<JavaClass>("is a service class") {
             @Override
             public boolean test(JavaClass javaClass) {
-                return javaClass.getSimpleName().endsWith("Service") && 
-                       !javaClass.isInterface() && 
+                return javaClass.getSimpleName().endsWith("Service") &&
+                       !javaClass.isInterface() &&
                        javaClass.getPackageName().contains("service");
             }
         };
@@ -281,15 +284,15 @@ public class ArchitecturalAntipatternTest {
                 // For each field in the class
                 for (JavaField field : javaClass.getFields()) {
                     // Skip primitive fields and fields from standard libraries
-                    if (field.getRawType().isPrimitive() || 
+                    if (field.getRawType().isPrimitive() ||
                         field.getRawType().getPackageName().startsWith("java.") ||
                         field.getRawType().getPackageName().startsWith("javafx.")) {
                         continue;
                     }
 
                     // Check if the field is of a concrete type that should be an interface
-                    if (!field.getRawType().isInterface() && 
-                        (field.getRawType().getSimpleName().endsWith("Repository") || 
+                    if (!field.getRawType().isInterface() &&
+                        (field.getRawType().getSimpleName().endsWith("Repository") ||
                          field.getRawType().getSimpleName().endsWith("Service"))) {
                         String message = String.format(
                                 "Service class %s depends on concrete implementation %s instead of an interface",
@@ -311,7 +314,7 @@ public class ArchitecturalAntipatternTest {
     /**
      * Detects classes that violate the Law of Demeter (principle of least knowledge).
      * This is an antipattern because it creates tight coupling and makes the code harder to maintain.
-     * 
+     * <p>
      * This simplified implementation looks for methods that make calls to methods of objects
      * that are not directly related to the class (not parameters, not fields, not created within the method).
      */
@@ -325,8 +328,8 @@ public class ArchitecturalAntipatternTest {
                 for (JavaMethod method : javaClass.getMethods()) {
                     // Count method chains (calls to methods on objects returned from other methods)
                     long methodChainCount = method.getCallsFromSelf().stream()
-                            .filter(call -> call.getTarget().getName().startsWith("get") || 
-                                           call.getTarget().getName().startsWith("find"))
+                            .filter(call -> call.getTarget().getName().startsWith("get") ||
+                                            call.getTarget().getName().startsWith("find"))
                             .count();
 
                     // If there are too many method chains, it might violate Law of Demeter

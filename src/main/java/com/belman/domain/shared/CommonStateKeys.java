@@ -2,7 +2,6 @@ package com.belman.domain.shared;
 
 
 import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserBusiness;
 
 /**
  * Predefined state keys for common application state.

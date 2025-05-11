@@ -26,48 +26,21 @@ import java.util.function.Consumer;
  * Integrates Gluon's lifecycle events with the core framework's event system.
  * Also manages view lifecycle events and ensures proper synchronization between
  * View, ViewModel, and Controller lifecycle methods.
- * 
+ * <p>
  * This class is a clean architecture-friendly replacement for GluonLifecycleManager,
  * using interfaces instead of concrete presentation layer classes.
  */
 public class LifecycleManager {
-    private static Logger logger;
     private static final Map<LifecycleEvent, DomainEvent> eventMappings = new HashMap<>();
-
     // Use WeakHashMap to avoid memory leaks - views can be garbage collected when no longer needed
     private static final Map<View, ChangeListener<Boolean>> viewListeners = new WeakHashMap<>();
-
-    /**
-     * Initializes the LifecycleManager with a logger.
-     * This method should be called before using any other methods in this class.
-     * 
-     * @param loggerFactory the factory to create loggers
-     */
-    public static void initialize(LoggerFactory loggerFactory) {
-        if (loggerFactory == null) {
-            throw new IllegalArgumentException("LoggerFactory cannot be null");
-        }
-        logger = loggerFactory.getLogger(LifecycleManager.class);
-        logger.info("LifecycleManager initialized");
-    }
-
-    /**
-     * Registers a handler for a specific lifecycle event.
-     *
-     * @param event the lifecycle event
-     * @param handler the handler to execute
-     */
-    public static void registerLifecycleHandler(LifecycleEvent event, Runnable handler) {
-        checkLogger();
-        logger.debug("Registering lifecycle handler for event: {}", event);
-        LifecycleService.create().ifPresent(service -> service.addListener(event, handler));
-    }
+    private static Logger logger;
 
     /**
      * Registers a handler for a specific lifecycle event that publishes a domain event.
      *
      * @param lifecycleEvent the lifecycle event
-     * @param domainEvent the domain event to publish
+     * @param domainEvent    the domain event to publish
      */
     public static void mapLifecycleEventToDomainEvent(LifecycleEvent lifecycleEvent, DomainEvent domainEvent) {
         checkLogger();
@@ -78,23 +51,46 @@ public class LifecycleManager {
         eventMappings.put(lifecycleEvent, domainEvent);
 
         registerLifecycleHandler(lifecycleEvent, () -> {
-            logger.debug("Lifecycle event triggered: {}, publishing domain event: {}", 
-                lifecycleEvent, domainEvent.getEventType());
+            logger.debug("Lifecycle event triggered: {}, publishing domain event: {}",
+                    lifecycleEvent, domainEvent.getEventType());
             EventManager.getInstance().publishEvent(domainEvent); // Publish event using EventManager
         });
     }
 
     /**
+     * Checks if the logger has been initialized.
+     * Throws an IllegalStateException if the logger is null.
+     */
+    private static void checkLogger() {
+        if (logger == null) {
+            throw new IllegalStateException("LifecycleManager has not been initialized. Call initialize() first.");
+        }
+    }
+
+    /**
+     * Registers a handler for a specific lifecycle event.
+     *
+     * @param event   the lifecycle event
+     * @param handler the handler to execute
+     */
+    public static void registerLifecycleHandler(LifecycleEvent event, Runnable handler) {
+        checkLogger();
+        logger.debug("Registering lifecycle handler for event: {}", event);
+        LifecycleService.create().ifPresent(service -> service.addListener(event, handler));
+    }
+
+    /**
      * Registers a handler for a specific domain event that is triggered by a lifecycle event.
      *
-     * @param <T> the type of the domain event
+     * @param <T>       the type of the domain event
      * @param eventType the class of the domain event
-     * @param handler the handler to execute
+     * @param handler   the handler to execute
      */
     public static <T extends DomainEvent> void registerDomainEventHandler(Class<T> eventType, Consumer<T> handler) {
         checkLogger();
         logger.debug("Registering domain event handler for event type: {}", eventType.getSimpleName());
-        EventManager.getInstance().registerEventHandler(eventType, handler::accept); // Register event handler using EventManager
+        EventManager.getInstance().registerEventHandler(eventType,
+                handler::accept); // Register event handler using EventManager
     }
 
     /**
@@ -138,40 +134,6 @@ public class LifecycleManager {
         viewListeners.put(gluonView, showingListener);
 
         logger.debug("View registered successfully: {}", view.getViewName());
-    }
-
-    /**
-     * Unregisters a view from lifecycle management.
-     * This method removes the listeners for the view's showing property.
-     *
-     * @param view the view to unregister
-     */
-    public static void unregisterView(ViewLifecycle<?, ?> view) {
-        checkLogger();
-        if (view == null) {
-            logger.warn("Attempted to unregister null view");
-            return;
-        }
-
-        // Get the underlying View object
-        View gluonView = view.getView();
-
-        logger.debug("Unregistering view from lifecycle management: {}", view.getViewName());
-
-        // Get the listener for this view
-        ChangeListener<Boolean> listener = viewListeners.get(gluonView);
-
-        if (listener != null) {
-            // Remove the listener from the view's showing property
-            gluonView.showingProperty().removeListener(listener);
-
-            // Remove the view from our map
-            viewListeners.remove(gluonView);
-
-            logger.debug("View unregistered successfully: {}", view.getViewName());
-        } else {
-            logger.debug("View was not registered: {}", view.getViewName());
-        }
     }
 
     /**
@@ -293,13 +255,89 @@ public class LifecycleManager {
     }
 
     /**
-     * Checks if the logger has been initialized.
-     * Throws an IllegalStateException if the logger is null.
+     * Unregisters a view from lifecycle management.
+     * This method removes the listeners for the view's showing property.
+     *
+     * @param view the view to unregister
      */
-    private static void checkLogger() {
-        if (logger == null) {
-            throw new IllegalStateException("LifecycleManager has not been initialized. Call initialize() first.");
+    public static void unregisterView(ViewLifecycle<?, ?> view) {
+        checkLogger();
+        if (view == null) {
+            logger.warn("Attempted to unregister null view");
+            return;
         }
+
+        // Get the underlying View object
+        View gluonView = view.getView();
+
+        logger.debug("Unregistering view from lifecycle management: {}", view.getViewName());
+
+        // Get the listener for this view
+        ChangeListener<Boolean> listener = viewListeners.get(gluonView);
+
+        if (listener != null) {
+            // Remove the listener from the view's showing property
+            gluonView.showingProperty().removeListener(listener);
+
+            // Remove the view from our map
+            viewListeners.remove(gluonView);
+
+            logger.debug("View unregistered successfully: {}", view.getViewName());
+        } else {
+            logger.debug("View was not registered: {}", view.getViewName());
+        }
+    }
+
+    /**
+     * Initializes the lifecycle manager with the given application.
+     * This method sets up the lifecycle manager to work with the application.
+     *
+     * @param app           the Application instance (can be a MobileApplication or any other JavaFX Application)
+     * @param loggerFactory the factory to create loggers
+     */
+    public static void init(Application app, LoggerFactory loggerFactory) {
+        // Initialize the logger first
+        initialize(loggerFactory);
+
+        if (app == null) {
+            logger.warn("Cannot initialize LifecycleManager with null application");
+            return;
+        }
+
+        logger.info("Initializing LifecycleManager with application: {}", app.getClass().getSimpleName());
+
+        // Initialize the ApplicationStateManager with a logger
+        ApplicationStateManager.setLogger(loggerFactory);
+        ApplicationStateManager.initialize();
+
+        // Initialize basic lifecycle handlers
+        initializeLifecycleHandlers();
+
+        // Transition the application to the ACTIVE state
+        ApplicationStateManager.transitionTo(ApplicationState.ACTIVE);
+
+        // Register a shutdown hook to handle application termination
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            logger.info("Application shutdown hook triggered");
+            ApplicationStateManager.transitionTo(ApplicationState.STOPPING);
+        }));
+
+        // Note: Views will register themselves with LifecycleManager during construction
+        logger.info("LifecycleManager initialized. Views will register themselves when created.");
+    }
+
+    /**
+     * Initializes the LifecycleManager with a logger.
+     * This method should be called before using any other methods in this class.
+     *
+     * @param loggerFactory the factory to create loggers
+     */
+    public static void initialize(LoggerFactory loggerFactory) {
+        if (loggerFactory == null) {
+            throw new IllegalArgumentException("LoggerFactory cannot be null");
+        }
+        logger = loggerFactory.getLogger(LifecycleManager.class);
+        logger.info("LifecycleManager initialized");
     }
 
     /**
@@ -341,43 +379,5 @@ public class LifecycleManager {
             logger.debug("Performing shutdown cleanup");
             // Release all resources when shutting down
         });
-    }
-
-    /**
-     * Initializes the lifecycle manager with the given application.
-     * This method sets up the lifecycle manager to work with the application.
-     * 
-     * @param app the Application instance (can be a MobileApplication or any other JavaFX Application)
-     * @param loggerFactory the factory to create loggers
-     */
-    public static void init(Application app, LoggerFactory loggerFactory) {
-        // Initialize the logger first
-        initialize(loggerFactory);
-
-        if (app == null) {
-            logger.warn("Cannot initialize LifecycleManager with null application");
-            return;
-        }
-
-        logger.info("Initializing LifecycleManager with application: {}", app.getClass().getSimpleName());
-
-        // Initialize the ApplicationStateManager with a logger
-        ApplicationStateManager.setLogger(loggerFactory);
-        ApplicationStateManager.initialize();
-
-        // Initialize basic lifecycle handlers
-        initializeLifecycleHandlers();
-
-        // Transition the application to the ACTIVE state
-        ApplicationStateManager.transitionTo(ApplicationState.ACTIVE);
-
-        // Register a shutdown hook to handle application termination
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            logger.info("Application shutdown hook triggered");
-            ApplicationStateManager.transitionTo(ApplicationState.STOPPING);
-        }));
-
-        // Note: Views will register themselves with LifecycleManager during construction
-        logger.info("LifecycleManager initialized. Views will register themselves when created.");
     }
 }

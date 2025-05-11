@@ -54,8 +54,25 @@ public class DatabaseConfig {
     }
 
     /**
+     * Loads database properties from the properties file.
+     *
+     * @return the database properties
+     * @throws IOException if the properties file cannot be loaded
+     */
+    private static Properties loadDatabaseProperties() throws IOException {
+        Properties props = new Properties();
+        try (InputStream input = DatabaseConfig.class.getClassLoader().getResourceAsStream(DB_PROPERTIES_FILE)) {
+            if (input == null) {
+                throw new IOException("Unable to find " + DB_PROPERTIES_FILE);
+            }
+            props.load(input);
+        }
+        return props;
+    }
+
+    /**
      * Gets the DataSource for database connections.
-     * 
+     *
      * @return the DataSource, or null if the DataSource has not been initialized or failed to initialize
      */
     public static DataSource getDataSource() {
@@ -77,22 +94,5 @@ public class DatabaseConfig {
                 LOGGER.log(Level.WARNING, "Error closing database connection pool", e);
             }
         }
-    }
-
-    /**
-     * Loads database properties from the properties file.
-     * 
-     * @return the database properties
-     * @throws IOException if the properties file cannot be loaded
-     */
-    private static Properties loadDatabaseProperties() throws IOException {
-        Properties props = new Properties();
-        try (InputStream input = DatabaseConfig.class.getClassLoader().getResourceAsStream(DB_PROPERTIES_FILE)) {
-            if (input == null) {
-                throw new IOException("Unable to find " + DB_PROPERTIES_FILE);
-            }
-            props.load(input);
-        }
-        return props;
     }
 }

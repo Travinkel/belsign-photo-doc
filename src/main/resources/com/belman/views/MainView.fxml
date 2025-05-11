@@ -1,33 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<?import javafx.geometry.Insets?>
-
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            xmlns="http://javafx.com/javafx"
             fx:controller="com.belman.ui.views.main.MainViewController"
             styleClass="responsive-container"
             stylesheets="@../styles/app.css">
 
-    <VBox alignment="CENTER" spacing="20" styleClass="vbox" 
-          AnchorPane.topAnchor="0.0" AnchorPane.rightAnchor="0.0" 
+    <VBox alignment="CENTER" spacing="20" styleClass="vbox"
+          AnchorPane.topAnchor="0.0" AnchorPane.rightAnchor="0.0"
           AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
           maxWidth="Infinity" maxHeight="Infinity">
 
         <padding>
-            <Insets top="20" right="20" bottom="20" left="20" />
+            <Insets top="20" right="20" bottom="20" left="20"/>
         </padding>
 
         <Label text="BelSign - Photo Documentation System" styleClass="title"/>
         <Label text="Main Application View" styleClass="subtitle"/>
 
         <!-- Placeholder for main content -->
-        <VBox VBox.vgrow="ALWAYS" styleClass="responsive-container" 
+        <VBox VBox.vgrow="ALWAYS" styleClass="responsive-container"
               alignment="CENTER" spacing="20">
             <Label text="Welcome to BelSign" styleClass="body-text"/>
             <HBox alignment="CENTER" spacing="20">

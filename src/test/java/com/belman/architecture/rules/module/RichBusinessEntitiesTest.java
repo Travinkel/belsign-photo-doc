@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
 /**
  * Tests to enforce the rich business entities concept as specified in the guidelines.md.
@@ -23,10 +23,9 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
  */
 public class RichBusinessEntitiesTest {
 
-    private static JavaClasses importedClasses;
-
     // Custom condition to check if a class has business behavior methods (not just getters/setters)
-    private static final ArchCondition<JavaClass> HAVE_BUSINESS_BEHAVIOR = new ArchCondition<JavaClass>("have business behavior") {
+    private static final ArchCondition<JavaClass> HAVE_BUSINESS_BEHAVIOR = new ArchCondition<JavaClass>(
+            "have business behavior") {
         @Override
         public void check(JavaClass javaClass, ConditionEvents events) {
             // Get all methods defined in the class (not inherited)
@@ -37,22 +36,23 @@ public class RichBusinessEntitiesTest {
             // Check if there's at least one method that is not a getter, setter, or standard Object method
             boolean hasBusinessBehavior = methods.stream().anyMatch(method -> {
                 String methodName = method.getName();
-                return !methodName.equals("equals") && 
-                       !methodName.equals("hashCode") && 
-                       !methodName.equals("toString") && 
-                       !methodName.startsWith("get") && 
-                       !methodName.startsWith("set") && 
+                return !methodName.equals("equals") &&
+                       !methodName.equals("hashCode") &&
+                       !methodName.equals("toString") &&
+                       !methodName.startsWith("get") &&
+                       !methodName.startsWith("set") &&
                        !methodName.startsWith("is");
             });
 
             // Report the result
             boolean satisfied = hasBusinessBehavior;
-            String message = String.format("Class %s %s business behavior methods", 
-                    javaClass.getSimpleName(), 
+            String message = String.format("Class %s %s business behavior methods",
+                    javaClass.getSimpleName(),
                     satisfied ? "has" : "does not have");
             events.add(new SimpleConditionEvent(javaClass, satisfied, message));
         }
     };
+    private static JavaClasses importedClasses;
 
     @BeforeAll
     public static void setup() {
@@ -141,8 +141,8 @@ public class RichBusinessEntitiesTest {
                     @Override
                     public boolean test(JavaClass javaClass) {
                         String name = javaClass.getSimpleName();
-                        return !name.endsWith("Event") && 
-                               !name.endsWith("Exception") && 
+                        return !name.endsWith("Event") &&
+                               !name.endsWith("Exception") &&
                                !name.endsWith("Specification") &&
                                !name.equals("BusinessObject") &&
                                !name.equals("AbstractDomainEvent") &&

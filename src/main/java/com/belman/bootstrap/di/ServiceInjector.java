@@ -8,8 +8,8 @@ import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRepository;
 import com.belman.domain.user.UserRole;
 import com.belman.domain.user.Username;
-import com.belman.repository.security.DefaultAuthenticationService;
-import com.belman.repository.service.SessionManager;
+import com.belman.service.session.SessionManager;
+import com.belman.service.usecase.security.DefaultAuthenticationService;
 
 import java.util.Optional;
 
@@ -32,11 +32,12 @@ public final class ServiceInjector {
         UserRepository userRepository = com.belman.bootstrap.di.ServiceLocator.getService(UserRepository.class);
 
         // Register the DefaultAuthenticationService
-        com.belman.bootstrap.di.ServiceLocator.registerService(AuthenticationService.class, new DefaultAuthenticationService(userRepository));
+        com.belman.bootstrap.di.ServiceLocator.registerService(AuthenticationService.class,
+                new DefaultAuthenticationService(userRepository));
 
         // Initialize SessionManager with the registered AuthenticationService
         SessionManager sessionManager = SessionManager.getInstance(
-            com.belman.bootstrap.di.ServiceLocator.getService(AuthenticationService.class)
+                com.belman.bootstrap.di.ServiceLocator.getService(AuthenticationService.class)
         );
 
         // Register other services as needed
@@ -90,14 +91,14 @@ public final class ServiceInjector {
         }
 
         @Override
-        public boolean isLoggedIn() {
-            return currentUser != null;
-        }
-
-        @Override
         public void logout() {
             currentUser = null;
             System.out.println("Mock AuthenticationService: User logged out");
+        }
+
+        @Override
+        public boolean isLoggedIn() {
+            return currentUser != null;
         }
     }
 }

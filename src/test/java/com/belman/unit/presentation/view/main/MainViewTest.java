@@ -23,7 +23,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import static org.mockito.Mockito.eq;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -32,19 +31,21 @@ public class MainViewTest {
 
     @BeforeAll
     static void initJfx() {
-        Platform.startup(() -> {});
+        Platform.startup(() -> {
+        });
     }
+
     // Verify MainView extends BaseView with MainViewModel type parameter
     @Test
     public void test_main_view_extends_base_view_with_main_view_model() {
         MainView mainView = new MainView();
 
         assertNotNull(mainView);
-        assertTrue(mainView instanceof BaseView);
+        assertInstanceOf(BaseView.class, mainView);
 
         // Verify the generic type parameter using reflection
         Type genericSuperclass = mainView.getClass().getGenericSuperclass();
-        assertTrue(genericSuperclass instanceof ParameterizedType);
+        assertInstanceOf(ParameterizedType.class, genericSuperclass);
 
         ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
         Type[] typeArguments = parameterizedType.getActualTypeArguments();
@@ -60,11 +61,11 @@ public class MainViewTest {
 
         // Verify the view model is properly initialized
         assertNotNull(mainView.getViewModel());
-        assertTrue(mainView.getViewModel() instanceof MainViewModel);
+        assertInstanceOf(MainViewModel.class, mainView.getViewModel());
 
         // Verify the controller is properly initialized
         assertNotNull(mainView.getController());
-        assertTrue(mainView.getController() instanceof BaseController);
+        assertInstanceOf(BaseController.class, mainView.getController());
 
         // Verify the view has a center node (loaded from FXML)
         assertNotNull(mainView.getCenter());
@@ -123,7 +124,8 @@ public class MainViewTest {
         // Use the getViewModel method instead of accessing the field directly
         Object controllerViewModel = controller.getViewModel();
         assertNotNull(controllerViewModel, "Controller's getViewModel() should not return null");
-        assertSame(viewModel, controllerViewModel, "Controller's viewModel should be the same instance as the view's viewModel");
+        assertSame(viewModel, controllerViewModel,
+                "Controller's viewModel should be the same instance as the view's viewModel");
     }
 
     // Verify lifecycle methods (onShow, onHide) are properly called
@@ -144,7 +146,7 @@ public class MainViewTest {
 
         // Disable LifecycleManager registration for this test
         try (MockedStatic<LifecycleManager> lifecycleMock =
-                mockStatic(LifecycleManager.class)) {
+                     mockStatic(LifecycleManager.class)) {
 
             // Mock the registerView method to do nothing
             lifecycleMock.when(() -> LifecycleManager.registerView(any())).then(invocation -> null);
@@ -156,7 +158,7 @@ public class MainViewTest {
                 onViewShownMethod.invoke(mainView);
             } catch (Exception e) {
                 e.printStackTrace(); // Print the stack trace for debugging
-                fail("Failed to call onViewShown method: " + e.getMessage() + ", cause: " + 
+                fail("Failed to call onViewShown method: " + e.getMessage() + ", cause: " +
                      (e.getCause() != null ? e.getCause().getMessage() : "null"));
             }
 
@@ -195,8 +197,8 @@ public class MainViewTest {
 
             // Verify the exception message
             assertTrue(exception.getMessage().contains("Failed to load view"));
-            assertTrue(exception.getCause() instanceof RuntimeException);
-            assertTrue(exception.getCause().getCause() instanceof IOException);
+            assertInstanceOf(RuntimeException.class, exception.getCause());
+            assertInstanceOf(IOException.class, exception.getCause().getCause());
         }
     }
 
@@ -287,8 +289,9 @@ public class MainViewTest {
 
             RuntimeException exception1 = assertThrows(RuntimeException.class, MainView::new);
             assertEquals("Failed to load view: MainView", exception1.getMessage());
-            assertTrue(exception1.getCause() instanceof RuntimeException, "Cause should be RuntimeException");
-            assertTrue(exception1.getCause().getCause() instanceof FileNotFoundException, "Cause of cause should be FileNotFoundException");
+            assertInstanceOf(RuntimeException.class, exception1.getCause(), "Cause should be RuntimeException");
+            assertInstanceOf(FileNotFoundException.class, exception1.getCause().getCause(),
+                    "Cause of cause should be FileNotFoundException");
 
             // 2. Invalid FXML content
             IOException invalidContent = new IOException("Invalid FXML content");
@@ -297,8 +300,9 @@ public class MainViewTest {
 
             RuntimeException exception2 = assertThrows(RuntimeException.class, MainView::new);
             assertEquals("Failed to load view: MainView", exception2.getMessage());
-            assertTrue(exception2.getCause() instanceof RuntimeException, "Cause should be RuntimeException");
-            assertTrue(exception2.getCause().getCause() instanceof IOException, "Cause of cause should be IOException");
+            assertInstanceOf(RuntimeException.class, exception2.getCause(), "Cause should be RuntimeException");
+            assertInstanceOf(IOException.class, exception2.getCause().getCause(),
+                    "Cause of cause should be IOException");
         }
     }
 

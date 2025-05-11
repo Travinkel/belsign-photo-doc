@@ -1,7 +1,7 @@
 package com.belman.bootstrap.config;
 
 import com.belman.bootstrap.di.ServiceRegistry;
-import com.belman.repository.logging.EmojiLogger;
+import com.belman.common.logging.EmojiLogger;
 
 /**
  * Bootstraps the application by initializing all required services and components.

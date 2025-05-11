@@ -9,7 +9,7 @@ import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserId;
 import com.belman.domain.user.UserRole;
 import com.belman.domain.user.Username;
-import com.belman.repository.persistence.InMemoryUserRepository;
+import com.belman.repository.persistence.memory.InMemoryUserRepository;
 import com.belman.repository.security.BCryptPasswordHasher;
 import com.belman.repository.security.DefaultAuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,12 +27,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class UserAuthenticationTest extends BaseAcceptanceTest {
 
-    private AuthenticationService authService;
-    private UserBusiness testUser;
-    private PasswordHasher passwordHasher;
     private static final String TEST_USERNAME = "testuser";
     private static final String TEST_PASSWORD = "password123";
     private static final String TEST_EMAIL = "test@example.com";
+    private AuthenticationService authService;
+    private UserBusiness testUser;
+    private PasswordHasher passwordHasher;
 
     @BeforeEach
     void setup() {

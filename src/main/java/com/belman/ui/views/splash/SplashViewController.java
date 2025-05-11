@@ -65,17 +65,17 @@ public class SplashViewController extends BaseController<SplashViewModel> {
 
         // Create a flickering animation for the logo
         Timeline flickerTimeline = new Timeline(
-            new KeyFrame(Duration.ZERO, new KeyValue(logoImage.opacityProperty(), 1.0)),
-            new KeyFrame(Duration.seconds(0.7), new KeyValue(logoImage.opacityProperty(), 0.5)),
-            new KeyFrame(Duration.seconds(1.4), new KeyValue(logoImage.opacityProperty(), 1.0))
+                new KeyFrame(Duration.ZERO, new KeyValue(logoImage.opacityProperty(), 1.0)),
+                new KeyFrame(Duration.seconds(0.7), new KeyValue(logoImage.opacityProperty(), 0.5)),
+                new KeyFrame(Duration.seconds(1.4), new KeyValue(logoImage.opacityProperty(), 1.0))
         );
         flickerTimeline.setCycleCount(Timeline.INDEFINITE);
         flickerTimeline.play();
 
         // Simulate loading with a timeline animation
         loadingTimeline = new Timeline(
-            new KeyFrame(Duration.ZERO, new KeyValue(loadingProgress.progressProperty(), 0)),
-            new KeyFrame(Duration.seconds(2.5), new KeyValue(loadingProgress.progressProperty(), 1))
+                new KeyFrame(Duration.ZERO, new KeyValue(loadingProgress.progressProperty(), 0)),
+                new KeyFrame(Duration.seconds(2.5), new KeyValue(loadingProgress.progressProperty(), 1))
         );
 
         loadingTimeline.setOnFinished(event -> {
@@ -118,11 +118,12 @@ public class SplashViewController extends BaseController<SplashViewModel> {
 
     /**
      * Detects if the application is running on a mobile device.
+     *
      * @return true if running on Android or iOS, false otherwise
      */
     private boolean isRunningOnMobile() {
         try {
-            return com.gluonhq.attach.util.Platform.isAndroid() || 
+            return com.gluonhq.attach.util.Platform.isAndroid() ||
                    com.gluonhq.attach.util.Platform.isIOS();
         } catch (Exception e) {
             // If Gluon Attach is not available, assume desktop
@@ -132,6 +133,7 @@ public class SplashViewController extends BaseController<SplashViewModel> {
 
     /**
      * Detects if the application is running on a smartphone (as opposed to a tablet).
+     *
      * @return true if running on a smartphone, false otherwise
      */
     private boolean isRunningOnSmartphone() {
@@ -145,6 +147,7 @@ public class SplashViewController extends BaseController<SplashViewModel> {
 
     /**
      * Handles errors that occur during initialization.
+     *
      * @param e the exception that occurred
      */
     private void handleInitializationError(Exception e) {
@@ -162,6 +165,7 @@ public class SplashViewController extends BaseController<SplashViewModel> {
 
     /**
      * Handles errors that occur during navigation.
+     *
      * @param e the exception that occurred
      */
     private void handleNavigationError(Exception e) {

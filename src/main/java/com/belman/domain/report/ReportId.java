@@ -1,13 +1,13 @@
 package com.belman.domain.report;
 
-import com.belman.domain.common.base.DataObject;
+import com.belman.domain.common.base.ValueObject;
 
 import java.util.Objects;
 
 /**
  * Value object representing a unique identifier for a report.
  */
-public final class ReportId implements DataObject {
+public final class ReportId implements ValueObject {
 
     private final String value;
 

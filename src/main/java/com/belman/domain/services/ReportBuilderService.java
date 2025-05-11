@@ -13,7 +13,7 @@ public interface ReportBuilderService {
      * Builds and returns a ReportAggregate for the specified orderBusiness using its approved photos.
      *
      * @param orderBusiness the orderBusiness to generate a report for
-     * @param generatedBy    the user generating the report
+     * @param generatedBy   the user generating the report
      * @return the constructed ReportAggregate
      */
     ReportAggregate buildReport(OrderBusiness orderBusiness, UserBusiness generatedBy);

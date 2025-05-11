@@ -8,11 +8,11 @@ import java.util.function.Supplier;
  * without directly depending on the presentation layer.
  */
 public interface RouteGuard {
-    
+
     /**
      * Registers a guard for a specific route.
-     * 
-     * @param routeName the name of the route to guard
+     *
+     * @param routeName      the name of the route to guard
      * @param guardCondition a supplier that returns true if access is allowed, false otherwise
      */
     void registerGuard(String routeName, Supplier<Boolean> guardCondition);

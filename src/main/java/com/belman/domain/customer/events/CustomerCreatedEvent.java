@@ -1,8 +1,8 @@
 package com.belman.domain.customer.events;
 
+import com.belman.domain.audit.event.BaseAuditEvent;
 import com.belman.domain.customer.CustomerId;
 import com.belman.domain.customer.CustomerType;
-import com.belman.domain.audit.event.BaseAuditEvent;
 import com.belman.domain.user.UserId;
 
 import java.time.Instant;

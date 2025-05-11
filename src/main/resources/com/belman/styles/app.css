@@ -574,7 +574,7 @@
     -fx-padding: 8px 12px;
 }
 
-.smartphone .text-field, .smartphone .text-area, 
+.smartphone .text-field, .smartphone .text-area,
 .smartphone .combo-box, .smartphone .choice-box {
     -fx-font-size: 14px;
     -fx-padding: 6px;

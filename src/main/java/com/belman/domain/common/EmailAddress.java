@@ -1,6 +1,6 @@
 package com.belman.domain.common;
 
-import com.belman.domain.common.base.DataObject;
+import com.belman.domain.common.base.ValueObject;
 
 import java.util.regex.Pattern;
 
@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
  * Value object representing an email address.
  * This is in the common package as it's used across multiple bounded contexts.
  */
-public record EmailAddress(String value) implements DataObject {
+public record EmailAddress(String value) implements ValueObject {
     // Regular expression for validating email addresses
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$"

@@ -7,7 +7,6 @@ import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.order.photo.PhotoId;
 import com.belman.domain.order.photo.PhotoTemplate;
 import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserBusiness;
 
 import java.io.File;
 import java.util.List;

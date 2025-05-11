@@ -11,12 +11,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Integration tests for database migrations.
  * These tests verify that the database schema has been created correctly.
- * 
+ * <p>
  * Note: These tests will be skipped if the database is not available.
  */
 public class DatabaseMigrationTest {
@@ -39,11 +39,11 @@ public class DatabaseMigrationTest {
 
             // Expected tables
             List<String> expectedTables = List.of(
-                "users",
-                "user_roles",
-                "customers",
-                "orders",
-                "photo_documents"
+                    "users",
+                    "user_roles",
+                    "customers",
+                    "orders",
+                    "photo_documents"
             );
 
             // Get actual tables from database
@@ -69,8 +69,8 @@ public class DatabaseMigrationTest {
                 boolean exists = actualTables.contains(expectedTable.toLowerCase());
                 System.out.println("[DEBUG_LOG] Table '" + expectedTable + "' exists: " + exists);
                 assertTrue(
-                    exists,
-                    "Expected table '" + expectedTable + "' not found in database"
+                        exists,
+                        "Expected table '" + expectedTable + "' not found in database"
                 );
             }
 
@@ -101,16 +101,16 @@ public class DatabaseMigrationTest {
 
             // Expected columns in users table
             List<String> expectedColumns = List.of(
-                "id",
-                "username",
-                "password",
-                "first_name",
-                "last_name",
-                "email",
-                "status",
-                "phone_number",
-                "created_at",
-                "updated_at"
+                    "id",
+                    "username",
+                    "password",
+                    "first_name",
+                    "last_name",
+                    "email",
+                    "status",
+                    "phone_number",
+                    "created_at",
+                    "updated_at"
             );
 
             verifyTableColumns("users", expectedColumns, dataSource);
@@ -120,6 +120,42 @@ public class DatabaseMigrationTest {
             e.printStackTrace();
             // Don't fail the test, just log the error
             System.out.println("[DEBUG_LOG] Users table columns test skipped due to error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Verifies that a table has the expected columns.
+     *
+     * @param tableName       the name of the table to check
+     * @param expectedColumns the list of expected column names
+     * @param dataSource      the data source to use for the connection
+     * @throws SQLException if a database access error occurs
+     */
+    private void verifyTableColumns(String tableName, List<String> expectedColumns,
+                                    DataSource dataSource) throws SQLException {
+        List<String> actualColumns = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection()) {
+            System.out.println("[DEBUG_LOG] Got database connection for " + tableName + " columns check");
+
+            DatabaseMetaData metaData = conn.getMetaData();
+            try (ResultSet columns = metaData.getColumns(null, null, tableName, null)) {
+                while (columns.next()) {
+                    String columnName = columns.getString("COLUMN_NAME");
+                    actualColumns.add(columnName.toLowerCase());
+                    System.out.println("[DEBUG_LOG] Found column in " + tableName + ": " + columnName);
+                }
+            }
+        }
+
+        // Verify all expected columns exist
+        for (String expectedColumn : expectedColumns) {
+            boolean exists = actualColumns.contains(expectedColumn.toLowerCase());
+            System.out.println(
+                    "[DEBUG_LOG] Column '" + expectedColumn + "' in table '" + tableName + "' exists: " + exists);
+            assertTrue(
+                    exists,
+                    "Expected column '" + expectedColumn + "' not found in table '" + tableName + "'"
+            );
         }
     }
 
@@ -141,15 +177,15 @@ public class DatabaseMigrationTest {
 
             // Expected columns in orders table
             List<String> expectedColumns = List.of(
-                "id",
-                "order_number",
-                "customer_id",
-                "product_description",
-                "delivery_information",
-                "status",
-                "created_by",
-                "created_at",
-                "updated_at"
+                    "id",
+                    "order_number",
+                    "customer_id",
+                    "product_description",
+                    "delivery_information",
+                    "status",
+                    "created_by",
+                    "created_at",
+                    "updated_at"
             );
 
             verifyTableColumns("orders", expectedColumns, dataSource);
@@ -180,18 +216,18 @@ public class DatabaseMigrationTest {
 
             // Expected columns in photo_documents table
             List<String> expectedColumns = List.of(
-                "id",
-                "order_id",
-                "angle",
-                "image_path",
-                "status",
-                "uploaded_by",
-                "uploaded_at",
-                "reviewed_by",
-                "reviewed_at",
-                "review_comment",
-                "created_at",
-                "updated_at"
+                    "id",
+                    "order_id",
+                    "angle",
+                    "image_path",
+                    "status",
+                    "uploaded_by",
+                    "uploaded_at",
+                    "reviewed_by",
+                    "reviewed_at",
+                    "review_comment",
+                    "created_at",
+                    "updated_at"
             );
 
             verifyTableColumns("photo_documents", expectedColumns, dataSource);
@@ -200,41 +236,8 @@ public class DatabaseMigrationTest {
             System.out.println("[DEBUG_LOG] Error in photo documents table columns test: " + e.getMessage());
             e.printStackTrace();
             // Don't fail the test, just log the error
-            System.out.println("[DEBUG_LOG] Photo documents table columns test skipped due to error: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Verifies that a table has the expected columns.
-     * 
-     * @param tableName the name of the table to check
-     * @param expectedColumns the list of expected column names
-     * @param dataSource the data source to use for the connection
-     * @throws SQLException if a database access error occurs
-     */
-    private void verifyTableColumns(String tableName, List<String> expectedColumns, DataSource dataSource) throws SQLException {
-        List<String> actualColumns = new ArrayList<>();
-        try (Connection conn = dataSource.getConnection()) {
-            System.out.println("[DEBUG_LOG] Got database connection for " + tableName + " columns check");
-
-            DatabaseMetaData metaData = conn.getMetaData();
-            try (ResultSet columns = metaData.getColumns(null, null, tableName, null)) {
-                while (columns.next()) {
-                    String columnName = columns.getString("COLUMN_NAME");
-                    actualColumns.add(columnName.toLowerCase());
-                    System.out.println("[DEBUG_LOG] Found column in " + tableName + ": " + columnName);
-                }
-            }
-        }
-
-        // Verify all expected columns exist
-        for (String expectedColumn : expectedColumns) {
-            boolean exists = actualColumns.contains(expectedColumn.toLowerCase());
-            System.out.println("[DEBUG_LOG] Column '" + expectedColumn + "' in table '" + tableName + "' exists: " + exists);
-            assertTrue(
-                exists,
-                "Expected column '" + expectedColumn + "' not found in table '" + tableName + "'"
-            );
+            System.out.println(
+                    "[DEBUG_LOG] Photo documents table columns test skipped due to error: " + e.getMessage());
         }
     }
 }

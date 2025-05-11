@@ -1,6 +1,7 @@
 # Architecture Tests
 
-This package contains architecture tests that verify the codebase follows the defined architectural rules and patterns. These tests help maintain the architectural integrity of the codebase and detect architectural antipatterns.
+This package contains architecture tests that verify the codebase follows the defined architectural rules and patterns.
+These tests help maintain the architectural integrity of the codebase and detect architectural antipatterns.
 
 ## Test Categories
 
@@ -82,7 +83,8 @@ When you encounter architectural violations, you should:
 2. Identify the classes or methods that violated the rule
 3. Refactor the code to fix the violation
 
-For detailed recommendations on fixing architectural antipatterns, see the [ARCHITECTURAL_ANTIPATTERNS.md](../../../../../../../../ARCHITECTURAL_ANTIPATTERNS.md) file in the project root.
+For detailed recommendations on fixing architectural antipatterns, see
+the [ARCHITECTURAL_ANTIPATTERNS.md](../../../../../../../../ARCHITECTURAL_ANTIPATTERNS.md) file in the project root.
 
 ## Adding New Architecture Tests
 
@@ -95,6 +97,7 @@ To add a new architecture test:
 Example:
 
 ```java
+
 @Test
 public void servicesShouldNotDependOnRepositoryImplementations() {
     ArchRule rule = noClasses()

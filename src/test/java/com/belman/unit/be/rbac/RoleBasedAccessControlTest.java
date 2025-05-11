@@ -1,17 +1,17 @@
 package com.belman.unit.be.rbac;
 
-import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserRole;
+import com.belman.domain.common.EmailAddress;
 import com.belman.domain.exceptions.AccessDeniedException;
+import com.belman.domain.security.AuthenticationService;
+import com.belman.domain.security.HashedPassword;
+import com.belman.domain.user.UserBusiness;
+import com.belman.domain.user.UserId;
+import com.belman.domain.user.UserRole;
+import com.belman.domain.user.Username;
 import com.belman.domain.user.rbac.AccessPolicy;
 import com.belman.domain.user.rbac.AccessPolicyFactory;
-import com.belman.domain.user.rbac.RoleBasedAccessController;
 import com.belman.domain.user.rbac.RoleBasedAccessControlFactory;
-import com.belman.domain.security.AuthenticationService;
-import com.belman.domain.common.EmailAddress;
-import com.belman.domain.security.HashedPassword;
-import com.belman.domain.user.UserId;
-import com.belman.domain.user.Username;
+import com.belman.domain.user.rbac.RoleBasedAccessController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the role-based access control components.
@@ -47,28 +47,28 @@ public class RoleBasedAccessControlTest {
 
         // Create test users with different roles
         adminUser = new UserBusiness.Builder()
-            .id(UserId.newId())
-            .username(new Username("admin"))
-            .password(new HashedPassword("admin-password"))
-            .email(new EmailAddress("admin@example.com"))
-            .addRole(UserRole.ADMIN)
-            .build();
+                .id(UserId.newId())
+                .username(new Username("admin"))
+                .password(new HashedPassword("admin-password"))
+                .email(new EmailAddress("admin@example.com"))
+                .addRole(UserRole.ADMIN)
+                .build();
 
         qaUser = new UserBusiness.Builder()
-            .id(UserId.newId())
-            .username(new Username("qa"))
-            .password(new HashedPassword("qa-password"))
-            .email(new EmailAddress("qa@example.com"))
-            .addRole(UserRole.QA)
-            .build();
+                .id(UserId.newId())
+                .username(new Username("qa"))
+                .password(new HashedPassword("qa-password"))
+                .email(new EmailAddress("qa@example.com"))
+                .addRole(UserRole.QA)
+                .build();
 
         productionUser = new UserBusiness.Builder()
-            .id(UserId.newId())
-            .username(new Username("production"))
-            .password(new HashedPassword("production-password"))
-            .email(new EmailAddress("production@example.com"))
-            .addRole(UserRole.PRODUCTION)
-            .build();
+                .id(UserId.newId())
+                .username(new Username("production"))
+                .password(new HashedPassword("production-password"))
+                .email(new EmailAddress("production@example.com"))
+                .addRole(UserRole.PRODUCTION)
+                .build();
     }
 
     @Test
@@ -88,7 +88,8 @@ public class RoleBasedAccessControlTest {
         assertFalse(qaPolicy.hasAccess(adminUser), "Admin user should not have access with QA policy");
         assertFalse(qaPolicy.hasAccess(productionUser), "Production user should not have access with QA policy");
 
-        assertTrue(productionPolicy.hasAccess(productionUser), "Production user should have access with production policy");
+        assertTrue(productionPolicy.hasAccess(productionUser),
+                "Production user should have access with production policy");
         assertFalse(productionPolicy.hasAccess(adminUser), "Admin user should not have access with production policy");
         assertFalse(productionPolicy.hasAccess(qaUser), "QA user should not have access with production policy");
     }
@@ -104,15 +105,19 @@ public class RoleBasedAccessControlTest {
         // Act & Assert
         assertTrue(qaAndAdminPolicy.hasAccess(adminUser), "Admin user should have access with QA and admin policy");
         assertTrue(qaAndAdminPolicy.hasAccess(qaUser), "QA user should have access with QA and admin policy");
-        assertFalse(qaAndAdminPolicy.hasAccess(productionUser), "Production user should not have access with QA and admin policy");
+        assertFalse(qaAndAdminPolicy.hasAccess(productionUser),
+                "Production user should not have access with QA and admin policy");
 
-        assertTrue(productionAndQAPolicy.hasAccess(productionUser), "Production user should have access with production and QA policy");
+        assertTrue(productionAndQAPolicy.hasAccess(productionUser),
+                "Production user should have access with production and QA policy");
         assertTrue(productionAndQAPolicy.hasAccess(qaUser), "QA user should have access with production and QA policy");
-        assertFalse(productionAndQAPolicy.hasAccess(adminUser), "Admin user should not have access with production and QA policy");
+        assertFalse(productionAndQAPolicy.hasAccess(adminUser),
+                "Admin user should not have access with production and QA policy");
 
         assertTrue(allRolesPolicy.hasAccess(adminUser), "Admin user should have access with all roles policy");
         assertTrue(allRolesPolicy.hasAccess(qaUser), "QA user should have access with all roles policy");
-        assertTrue(allRolesPolicy.hasAccess(productionUser), "Production user should have access with all roles policy");
+        assertTrue(allRolesPolicy.hasAccess(productionUser),
+                "Production user should have access with all roles policy");
     }
 
     @Test
@@ -160,14 +165,17 @@ public class RoleBasedAccessControlTest {
         // Assert
         assertTrue(adminController.hasAccess(adminUser), "Admin controller should grant access to admin user");
         assertFalse(adminController.hasAccess(qaUser), "Admin controller should deny access to QA user");
-        assertFalse(adminController.hasAccess(productionUser), "Admin controller should deny access to production user");
+        assertFalse(adminController.hasAccess(productionUser),
+                "Admin controller should deny access to production user");
 
         assertTrue(qaController.hasAccess(qaUser), "QA controller should grant access to QA user");
         assertFalse(qaController.hasAccess(adminUser), "QA controller should deny access to admin user");
         assertFalse(qaController.hasAccess(productionUser), "QA controller should deny access to production user");
 
-        assertTrue(productionController.hasAccess(productionUser), "Production controller should grant access to production user");
-        assertFalse(productionController.hasAccess(adminUser), "Production controller should deny access to admin user");
+        assertTrue(productionController.hasAccess(productionUser),
+                "Production controller should grant access to production user");
+        assertFalse(productionController.hasAccess(adminUser),
+                "Production controller should deny access to admin user");
         assertFalse(productionController.hasAccess(qaUser), "Production controller should deny access to QA user");
     }
 }

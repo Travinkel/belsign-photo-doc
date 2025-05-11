@@ -43,9 +43,9 @@ public class PhotoDocument extends BusinessComponent<PhotoId> {
     private final UserBusiness uploadedBy;
     private final Timestamp uploadedAt;
     private final PhotoId photoId;
+    private final ReportType type;
     private OrderId orderId;
     private ApprovalStatus status;
-    private final ReportType type;
     private UserReference reviewedBy;
     private Timestamp reviewedAt;
     private String reviewComment;

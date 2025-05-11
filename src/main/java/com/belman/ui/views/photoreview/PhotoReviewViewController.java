@@ -1,25 +1,20 @@
 package com.belman.ui.views.photoreview;
 
-import com.belman.ui.base.BaseController;
-import com.belman.ui.navigation.Router;
+import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRole;
-import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.repository.service.SessionManager;
+import com.belman.ui.base.BaseController;
 import com.belman.ui.components.TouchFriendlyDialog;
+import com.belman.ui.navigation.Router;
 import com.belman.ui.views.photoupload.PhotoUploadView;
+import com.belman.ui.views.photoupload.TouchFriendlyPhotoListCell;
 import com.belman.ui.views.qadashboard.QADashboardView;
 import com.belman.ui.views.usermanagement.UserManagementView;
-import com.belman.ui.views.photoupload.TouchFriendlyPhotoListCell;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 /**
  * Controller for the photo review view.
@@ -62,12 +57,12 @@ public class PhotoReviewViewController extends BaseController<PhotoReviewViewMod
 
         // Bind button states
         approveButton.disableProperty().bind(
-            Bindings.not(getViewModel().photoSelectedProperty())
+                Bindings.not(getViewModel().photoSelectedProperty())
         );
 
         rejectButton.disableProperty().bind(
-            Bindings.not(getViewModel().photoSelectedProperty())
-            .or(Bindings.isEmpty(commentTextArea.textProperty()))
+                Bindings.not(getViewModel().photoSelectedProperty())
+                        .or(Bindings.isEmpty(commentTextArea.textProperty()))
         );
 
         // Bind list view to photos list
@@ -82,6 +77,14 @@ public class PhotoReviewViewController extends BaseController<PhotoReviewViewMod
                 getViewModel().setSelectedPhoto(newVal);
             }
         });
+    }
+
+    /**
+     * Shows an error message using a touch-friendly dialog.
+     */
+    @Override
+    protected void showError(String message) {
+        TouchFriendlyDialog.showError("Error", message);
     }
 
     /**
@@ -126,6 +129,13 @@ public class PhotoReviewViewController extends BaseController<PhotoReviewViewMod
                 // Buttons will be disabled if no photo is selected (handled by binding)
             });
         }).start();
+    }
+
+    /**
+     * Shows an information message using a touch-friendly dialog.
+     */
+    protected void showInfo(String message) {
+        TouchFriendlyDialog.showInformation("Information", message);
     }
 
     /**
@@ -187,20 +197,5 @@ public class PhotoReviewViewController extends BaseController<PhotoReviewViewMod
 
         // Fallback to QADashboardView if no user is logged in or if an error occurs
         Router.navigateTo(QADashboardView.class);
-    }
-
-    /**
-     * Shows an error message using a touch-friendly dialog.
-     */
-    @Override
-    protected void showError(String message) {
-        TouchFriendlyDialog.showError("Error", message);
-    }
-
-    /**
-     * Shows an information message using a touch-friendly dialog.
-     */
-    protected void showInfo(String message) {
-        TouchFriendlyDialog.showInformation("Information", message);
     }
 }

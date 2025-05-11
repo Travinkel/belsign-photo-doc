@@ -1,11 +1,11 @@
 package com.belman.ui.views.login;
 
-import com.belman.ui.base.BaseViewModel;
-import com.belman.repository.logging.EmojiLogger;
-import com.belman.ui.navigation.Router;
+import com.belman.common.logging.EmojiLogger;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRole;
-import com.belman.repository.service.SessionManager;
+import com.belman.service.session.SessionManager;
+import com.belman.ui.base.BaseViewModel;
+import com.belman.ui.navigation.Router;
 import com.belman.ui.views.photoupload.PhotoUploadView;
 import com.belman.ui.views.qadashboard.QADashboardView;
 import com.belman.ui.views.usermanagement.UserManagementView;
@@ -13,21 +13,23 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import java.util.prefs.Preferences;
 
 import java.util.Optional;
+import java.util.prefs.Preferences;
 
 /**
  * ViewModel for the login view.
  */
 public class LoginViewModel extends BaseViewModel<LoginViewModel> {
+    // Constants for preferences
+    private static final String PREF_USERNAME = "username";
+    private static final String PREF_REMEMBER_ME = "rememberMe";
     private final EmojiLogger logger = EmojiLogger.getLogger(LoginViewModel.class);
     private final StringProperty username = new SimpleStringProperty("");
     private final StringProperty password = new SimpleStringProperty("");
     private final StringProperty errorMessage = new SimpleStringProperty("");
     private final BooleanProperty loginInProgress = new SimpleBooleanProperty(false);
     private final BooleanProperty rememberMe = new SimpleBooleanProperty(false);
-
     private final SessionManager sessionManager;
     private final Preferences preferences = Preferences.userNodeForPackage(LoginViewModel.class);
 
@@ -38,10 +40,6 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
         // Get the SessionManager instance
         sessionManager = SessionManager.getInstance();
     }
-
-    // Constants for preferences
-    private static final String PREF_USERNAME = "username";
-    private static final String PREF_REMEMBER_ME = "rememberMe";
 
     @Override
     public void onShow() {
@@ -55,6 +53,33 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
             String savedUsername = preferences.get(PREF_USERNAME, "");
             username.set(savedUsername);
         }
+    }
+
+    /**
+     * Gets the error message property.
+     *
+     * @return the error message property
+     */
+    public StringProperty errorMessageProperty() {
+        return errorMessage;
+    }
+
+    /**
+     * Gets the error message.
+     *
+     * @return the error message
+     */
+    public String getErrorMessage() {
+        return errorMessage.get();
+    }
+
+    /**
+     * Sets the error message.
+     *
+     * @param errorMessage the error message to set
+     */
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage.set(errorMessage);
     }
 
     /**
@@ -141,7 +166,8 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
                 } else {
                     // Username looks valid, so password is likely incorrect or account is locked
                     logger.warn("Login failed: Invalid password or account locked for user: {}", usernameStr);
-                    errorMessage.set("Login failed. This could be due to an incorrect password or your account may be locked due to too many failed attempts. Please try again later or contact an administrator.");
+                    errorMessage.set(
+                            "Login failed. This could be due to an incorrect password or your account may be locked due to too many failed attempts. Please try again later or contact an administrator.");
                 }
             }
         } catch (Exception e) {
@@ -157,7 +183,7 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
 
     /**
      * Gets the username property.
-     * 
+     *
      * @return the username property
      */
     public StringProperty usernameProperty() {
@@ -166,7 +192,7 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
 
     /**
      * Gets the password property.
-     * 
+     *
      * @return the password property
      */
     public StringProperty passwordProperty() {
@@ -174,17 +200,8 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
     }
 
     /**
-     * Gets the error message property.
-     * 
-     * @return the error message property
-     */
-    public StringProperty errorMessageProperty() {
-        return errorMessage;
-    }
-
-    /**
      * Gets the login in progress property.
-     * 
+     *
      * @return the login in progress property
      */
     public BooleanProperty loginInProgressProperty() {
@@ -193,7 +210,7 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
 
     /**
      * Gets the remember me property.
-     * 
+     *
      * @return the remember me property
      */
     public BooleanProperty rememberMeProperty() {
@@ -202,7 +219,7 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
 
     /**
      * Gets the username.
-     * 
+     *
      * @return the username
      */
     public String getUsername() {
@@ -211,7 +228,7 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
 
     /**
      * Sets the username.
-     * 
+     *
      * @param username the username to set
      */
     public void setUsername(String username) {
@@ -220,7 +237,7 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
 
     /**
      * Gets the password.
-     * 
+     *
      * @return the password
      */
     public String getPassword() {
@@ -229,7 +246,7 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
 
     /**
      * Sets the password.
-     * 
+     *
      * @param password the password to set
      */
     public void setPassword(String password) {
@@ -237,26 +254,8 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
     }
 
     /**
-     * Gets the error message.
-     * 
-     * @return the error message
-     */
-    public String getErrorMessage() {
-        return errorMessage.get();
-    }
-
-    /**
-     * Sets the error message.
-     * 
-     * @param errorMessage the error message to set
-     */
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage.set(errorMessage);
-    }
-
-    /**
      * Checks if login is in progress.
-     * 
+     *
      * @return true if login is in progress, false otherwise
      */
     public boolean isLoginInProgress() {
@@ -265,7 +264,7 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
 
     /**
      * Sets whether login is in progress.
-     * 
+     *
      * @param loginInProgress true if login is in progress, false otherwise
      */
     public void setLoginInProgress(boolean loginInProgress) {

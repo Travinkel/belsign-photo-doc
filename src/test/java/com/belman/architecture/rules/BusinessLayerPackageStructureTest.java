@@ -6,7 +6,7 @@ import com.tngtech.archunit.lang.ArchRule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
 /**
  * Tests to enforce the organization of classes in the business layer by responsibility or feature.
@@ -180,7 +180,8 @@ public class BusinessLayerPackageStructureTest {
                 .and().resideInAPackage("com.belman.business.module..")
                 .should().resideInAPackage("com.belman.business.module.specification..")
                 .orShould().resideInAPackage("com.belman.business.module.*.specification..")
-                .because("Specifications should be in the module.specification package or a feature-specific specification package");
+                .because(
+                        "Specifications should be in the module.specification package or a feature-specific specification package");
 
         rule.check(importedClasses);
     }
@@ -204,7 +205,8 @@ public class BusinessLayerPackageStructureTest {
                 .and().resideInAPackage("com.belman.business.module..")
                 .should().resideInAPackage("com.belman.business.module.services..")
                 .orShould().resideInAPackage("com.belman.business.module.*.services..")
-                .because("Service interfaces should be in the module.services package or a feature-specific services package");
+                .because(
+                        "Service interfaces should be in the module.services package or a feature-specific services package");
 
         rule.check(importedClasses);
     }

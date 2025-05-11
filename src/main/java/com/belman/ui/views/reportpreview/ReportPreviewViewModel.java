@@ -11,6 +11,7 @@ public class ReportPreviewViewModel extends BaseViewModel<ReportPreviewViewModel
 
     /**
      * Get the message property.
+     *
      * @return The message property.
      */
     public StringProperty messageProperty() {
@@ -19,6 +20,7 @@ public class ReportPreviewViewModel extends BaseViewModel<ReportPreviewViewModel
 
     /**
      * Get the message value.
+     *
      * @return The message value.
      */
     public String getMessage() {
@@ -27,6 +29,7 @@ public class ReportPreviewViewModel extends BaseViewModel<ReportPreviewViewModel
 
     /**
      * Set the message value.
+     *
      * @param message The new message value.
      */
     public void setMessage(String message) {

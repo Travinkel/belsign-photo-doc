@@ -3,14 +3,14 @@ package com.belman.service.command;
 // Using the BaseService from the application.core package
 // This class is already in the application.core package, so no import needed
 
-import com.belman.service.base.BaseService;
-import com.belman.service.infrastructure.service.ServiceLocator;
 import com.belman.domain.events.CommandExecutedEvent;
 import com.belman.domain.events.CommandRedoneEvent;
 import com.belman.domain.events.CommandUndoneEvent;
 import com.belman.domain.events.DomainEventPublisher;
 import com.belman.domain.services.LoggerFactory;
 import com.belman.domain.shared.Command;
+import com.belman.service.base.BaseService;
+import com.belman.service.infrastructure.service.ServiceLocator;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -38,7 +38,7 @@ public class CommandManager extends BaseService {
 
     /**
      * Private constructor to enforce singleton pattern.
-     * 
+     *
      * @param loggerFactory the factory to create loggers
      */
     private CommandManager(LoggerFactory loggerFactory) {
@@ -90,6 +90,20 @@ public class CommandManager extends BaseService {
                     logError("Command execution failed: {}", command.getDescription(), ex);
                     throw new RuntimeException("Command execution failed: " + command.getDescription(), ex);
                 });
+    }
+
+    /**
+     * Adds a command to the undo stack, respecting the maximum history size.
+     *
+     * @param command the command to add
+     */
+    private void addToUndoStack(Command<?> command) {
+        undoStack.push(command);
+
+        // Trim the history if needed
+        if (undoStack.size() > maxHistorySize) {
+            undoStack.removeLast();
+        }
     }
 
     /**
@@ -181,6 +195,15 @@ public class CommandManager extends BaseService {
     }
 
     /**
+     * Gets the maximum number of commands to keep in the history.
+     *
+     * @return the maximum history size
+     */
+    public int getMaxHistorySize() {
+        return maxHistorySize;
+    }
+
+    /**
      * Sets the maximum number of commands to keep in the history.
      *
      * @param maxHistorySize the maximum history size
@@ -199,15 +222,6 @@ public class CommandManager extends BaseService {
     }
 
     /**
-     * Gets the maximum number of commands to keep in the history.
-     *
-     * @return the maximum history size
-     */
-    public int getMaxHistorySize() {
-        return maxHistorySize;
-    }
-
-    /**
      * Gets the number of commands in the undo stack.
      *
      * @return the undo stack size
@@ -223,19 +237,5 @@ public class CommandManager extends BaseService {
      */
     public int getRedoStackSize() {
         return redoStack.size();
-    }
-
-    /**
-     * Adds a command to the undo stack, respecting the maximum history size.
-     *
-     * @param command the command to add
-     */
-    private void addToUndoStack(Command<?> command) {
-        undoStack.push(command);
-
-        // Trim the history if needed
-        if (undoStack.size() > maxHistorySize) {
-            undoStack.removeLast();
-        }
     }
 }

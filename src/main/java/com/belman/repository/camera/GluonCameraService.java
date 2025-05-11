@@ -1,9 +1,9 @@
 package com.belman.repository.camera;
 
-import com.belman.service.base.BaseService;
-import com.belman.repository.platform.ErrorHandler;
 import com.belman.domain.services.CameraService;
 import com.belman.repository.logging.EmojiLoggerFactory;
+import com.belman.repository.platform.ErrorHandler;
+import com.belman.service.base.BaseService;
 import com.gluonhq.attach.pictures.PicturesService;
 import com.gluonhq.attach.storage.StorageService;
 import com.gluonhq.attach.util.Services;
@@ -38,7 +38,7 @@ public class GluonCameraService extends BaseService implements CameraService {
 
     /**
      * Creates a new GluonCameraService with the specified temporary directory.
-     * 
+     *
      * @param tempDirectory the directory to store temporary files
      */
     public GluonCameraService(String tempDirectory) {
@@ -67,7 +67,7 @@ public class GluonCameraService extends BaseService implements CameraService {
             PicturesService picturesService = picturesServiceOpt.get();
 
             // Create a temporary file for the image
-            String fileName = "camera_" + UUID.randomUUID().toString() + IMAGE_FILE_EXTENSION;
+            String fileName = "camera_" + UUID.randomUUID() + IMAGE_FILE_EXTENSION;
             File outputFile = new File(tempDirectory, fileName);
 
             // Ensure parent directories exist
@@ -107,10 +107,8 @@ public class GluonCameraService extends BaseService implements CameraService {
                 }
 
                 // Check if the result is an Optional<Image>
-                if (result instanceof Optional) {
-                    Optional<?> optResult = (Optional<?>) result;
-                    if (optResult.isPresent() && optResult.get() instanceof Image) {
-                        Image image = (Image) optResult.get();
+                if (result instanceof Optional<?> optResult) {
+                    if (optResult.isPresent() && optResult.get() instanceof Image image) {
 
                         // Resize the image if needed
                         Image resizedImage = resizeImageIfNeeded(image);
@@ -149,7 +147,7 @@ public class GluonCameraService extends BaseService implements CameraService {
             PicturesService picturesService = picturesServiceOpt.get();
 
             // Create a temporary file for the image
-            String fileName = "gallery_" + UUID.randomUUID().toString() + IMAGE_FILE_EXTENSION;
+            String fileName = "gallery_" + UUID.randomUUID() + IMAGE_FILE_EXTENSION;
             File outputFile = new File(tempDirectory, fileName);
 
             // Ensure parent directories exist
@@ -159,7 +157,8 @@ public class GluonCameraService extends BaseService implements CameraService {
             }
 
             // Try different method names that might be used for selecting photos
-            String[] methodNames = {"selectPhoto", "pickImage", "getImage", "retrieveImage", "pickMedia", "browsePhotos"};
+            String[] methodNames =
+                    {"selectPhoto", "pickImage", "getImage", "retrieveImage", "pickMedia", "browsePhotos"};
 
             for (String methodName : methodNames) {
                 try {
@@ -191,10 +190,8 @@ public class GluonCameraService extends BaseService implements CameraService {
                     }
 
                     // Check if the result is an Optional<Image>
-                    if (result instanceof Optional) {
-                        Optional<?> optResult = (Optional<?>) result;
-                        if (optResult.isPresent() && optResult.get() instanceof Image) {
-                            Image image = (Image) optResult.get();
+                    if (result instanceof Optional<?> optResult) {
+                        if (optResult.isPresent() && optResult.get() instanceof Image image) {
 
                             // Resize the image if needed
                             Image resizedImage = resizeImageIfNeeded(image);
@@ -222,46 +219,20 @@ public class GluonCameraService extends BaseService implements CameraService {
     @Override
     public boolean isCameraAvailable() {
         return Services.get(PicturesService.class)
-            .map(picturesService -> true)
-            .orElse(false);
+                .map(picturesService -> true)
+                .orElse(false);
     }
 
     @Override
     public boolean isGalleryAvailable() {
         return Services.get(PicturesService.class)
-            .map(picturesService -> true)
-            .orElse(false);
-    }
-
-    /**
-     * Saves an image to a temporary file.
-     * 
-     * @param image the image to save
-     * @param prefix the prefix for the file name
-     * @return the saved file
-     */
-    private File saveImageToFile(Image image, String prefix) {
-        try {
-            // Create a temporary file
-            String fileName = prefix + UUID.randomUUID().toString() + IMAGE_FILE_EXTENSION;
-            File file = new File(tempDirectory, fileName);
-
-            // Resize the image if it's too large
-            Image resizedImage = resizeImageIfNeeded(image);
-
-            // Save the image to the file
-            saveImageToFile(resizedImage, file);
-
-            return file;
-        } catch (Exception e) {
-            errorHandler.handleException(e, "Failed to save image to file");
-            throw new RuntimeException("Failed to save image to file", e);
-        }
+                .map(picturesService -> true)
+                .orElse(false);
     }
 
     /**
      * Resizes an image if it's larger than the maximum dimensions.
-     * 
+     *
      * @param image the image to resize
      * @return the resized image, or the original image if it's not too large
      */
@@ -300,9 +271,9 @@ public class GluonCameraService extends BaseService implements CameraService {
 
     /**
      * Saves an image to a file.
-     * 
+     *
      * @param image the image to save
-     * @param file the file to save to
+     * @param file  the file to save to
      * @throws IOException if an I/O error occurs
      */
     private void saveImageToFile(Image image, File file) throws IOException {
@@ -353,9 +324,9 @@ public class GluonCameraService extends BaseService implements CameraService {
     /**
      * Saves an image to a file using JavaFX PixelReader.
      * This method is mobile-compatible and doesn't use any desktop-specific APIs.
-     * 
+     *
      * @param image the image to save
-     * @param file the file to save to
+     * @param file  the file to save to
      * @throws IOException if an I/O error occurs
      */
     private void saveImageToFileUsingPixelReader(Image image, File file) throws IOException {
@@ -408,9 +379,9 @@ public class GluonCameraService extends BaseService implements CameraService {
      * Writes a simple PNG header to the output stream.
      * This is a simplified version and doesn't create a fully compliant PNG file,
      * but it's sufficient for demonstration purposes.
-     * 
-     * @param out the output stream
-     * @param width the image width
+     *
+     * @param out    the output stream
+     * @param width  the image width
      * @param height the image height
      * @throws IOException if an I/O error occurs
      */
@@ -446,5 +417,31 @@ public class GluonCameraService extends BaseService implements CameraService {
         out.write('R');
         out.write(ihdr);
         // CRC would go here in a real PNG
+    }
+
+    /**
+     * Saves an image to a temporary file.
+     *
+     * @param image  the image to save
+     * @param prefix the prefix for the file name
+     * @return the saved file
+     */
+    private File saveImageToFile(Image image, String prefix) {
+        try {
+            // Create a temporary file
+            String fileName = prefix + UUID.randomUUID() + IMAGE_FILE_EXTENSION;
+            File file = new File(tempDirectory, fileName);
+
+            // Resize the image if it's too large
+            Image resizedImage = resizeImageIfNeeded(image);
+
+            // Save the image to the file
+            saveImageToFile(resizedImage, file);
+
+            return file;
+        } catch (Exception e) {
+            errorHandler.handleException(e, "Failed to save image to file");
+            throw new RuntimeException("Failed to save image to file", e);
+        }
     }
 }

@@ -1,6 +1,6 @@
 package com.belman.domain.common;
 
-import com.belman.domain.common.base.DataObject;
+import com.belman.domain.common.base.ValueObject;
 
 import java.util.regex.Pattern;
 
@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
  * Value object representing a phone number.
  * This is in the common package as it's used across multiple bounded contexts.
  */
-public record PhoneNumber(String value) implements DataObject {
+public record PhoneNumber(String value) implements ValueObject {
     // Regular expression for validating phone numbers
     private static final Pattern PHONE_PATTERN = Pattern.compile(
             "^\\+?[0-9\\-\\s]{8,15}$"

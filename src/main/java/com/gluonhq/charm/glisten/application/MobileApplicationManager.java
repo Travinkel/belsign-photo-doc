@@ -23,10 +23,10 @@ public class MobileApplicationManager {
         try {
             // Get the MobileApplication class
             Class<?> mobileAppClass = Class.forName("com.gluonhq.charm.glisten.application.MobileApplication");
-            
+
             // Get the getInstance method
             java.lang.reflect.Method getInstanceMethod = mobileAppClass.getMethod("getInstance");
-            
+
             // Call the getInstance method to get the MobileApplication instance
             this.mobileApplication = (MobileApplication) getInstanceMethod.invoke(null);
         } catch (Exception e) {
@@ -37,7 +37,7 @@ public class MobileApplicationManager {
     /**
      * Initializes the MobileApplicationManager.
      * This method should be called once during application startup.
-     * 
+     *
      * @return the MobileApplicationManager instance
      */
     public static MobileApplicationManager initialize() {
@@ -49,7 +49,7 @@ public class MobileApplicationManager {
 
     /**
      * Gets the singleton instance of the MobileApplicationManager.
-     * 
+     *
      * @return the MobileApplicationManager instance
      */
     public static MobileApplicationManager getInstance() {
@@ -62,32 +62,32 @@ public class MobileApplicationManager {
     /**
      * Starts the application.
      * This method should be called from the Application.start method.
-     * 
+     *
      * @param primaryStage the primary stage
      */
     public void start(Stage primaryStage) {
         // Store the scene from the primaryStage
         this.scene = primaryStage.getScene();
-        
+
         // If the scene is null, create a new one
         if (this.scene == null) {
             // Create a new BorderPane as the root node
             BorderPane root = new BorderPane();
-            
+
             // Create a new Scene with the root node
             this.scene = new Scene(root);
-            
+
             // Set the scene on the primaryStage
             primaryStage.setScene(this.scene);
         }
-        
+
         // Show the stage
         primaryStage.show();
     }
 
     /**
      * Gets the scene.
-     * 
+     *
      * @return the scene
      */
     public Scene getScene() {
@@ -96,7 +96,7 @@ public class MobileApplicationManager {
 
     /**
      * Gets the app bar.
-     * 
+     *
      * @return the app bar
      */
     public AppBar getAppBar() {
@@ -105,7 +105,7 @@ public class MobileApplicationManager {
 
     /**
      * Gets the drawer.
-     * 
+     *
      * @return the drawer
      */
     public com.gluonhq.charm.glisten.control.NavigationDrawer getDrawer() {
@@ -114,8 +114,8 @@ public class MobileApplicationManager {
 
     /**
      * Adds a view factory.
-     * 
-     * @param viewName the view name
+     *
+     * @param viewName    the view name
      * @param viewFactory the view factory
      */
     public void addViewFactory(String viewName, Supplier<View> viewFactory) {
@@ -124,7 +124,7 @@ public class MobileApplicationManager {
 
     /**
      * Switches to the specified view.
-     * 
+     *
      * @param viewName the view name
      */
     public void switchView(String viewName) {

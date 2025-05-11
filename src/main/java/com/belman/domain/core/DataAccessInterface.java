@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Generic data access interface for business objects.
+ * Generic repository interface for business objects.
  * <p>
- * This interface defines the standard operations to be executed on a data access component.
- * Data access interfaces mediate between the business and data mapping layers using a collection-like
+ * This interface defines the standard operations to be executed on a repository.
+ * Repositories mediate between the business and data mapping layers using a collection-like
  * interface for accessing business objects.
  *
- * @param <T>  the type of the business object this interface manages
+ * @param <T>  the type of the business object this repository manages
  * @param <ID> the type of the identifier of the business object
  */
 public interface DataAccessInterface<T extends BusinessObject<ID>, ID> {
@@ -24,7 +24,7 @@ public interface DataAccessInterface<T extends BusinessObject<ID>, ID> {
     Optional<T> findById(ID id);
 
     /**
-     * Saves a business object to the data store. If the business object already exists,
+     * Saves a business object to the repository. If the business object already exists,
      * it will be updated; otherwise, it will be created.
      * <p>
      * Any audit events registered with the business object will be published upon
@@ -36,14 +36,14 @@ public interface DataAccessInterface<T extends BusinessObject<ID>, ID> {
     T save(T businessObject);
 
     /**
-     * Deletes a business object from the data store.
+     * Deletes a business object from the repository.
      *
      * @param businessObject the business object to delete
      */
     void delete(T businessObject);
 
     /**
-     * Deletes a business object from the data store by its identifier.
+     * Deletes a business object from the repository by its identifier.
      *
      * @param id the identifier of the business object to delete
      * @return true if the business object was deleted, false if not found
@@ -51,7 +51,7 @@ public interface DataAccessInterface<T extends BusinessObject<ID>, ID> {
     boolean deleteById(ID id);
 
     /**
-     * Finds all business objects managed by this data access interface.
+     * Finds all business objects managed by this repository.
      * <p>
      * Note: Use with caution as this might return a large number of objects.
      *
@@ -68,7 +68,7 @@ public interface DataAccessInterface<T extends BusinessObject<ID>, ID> {
     boolean existsById(ID id);
 
     /**
-     * Counts the number of business objects managed by this data access interface.
+     * Counts the number of business objects managed by this repository.
      *
      * @return the number of business objects
      */

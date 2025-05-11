@@ -1,16 +1,16 @@
 package com.belman.domain.order.photo;
 
-import com.belman.domain.core.ComponentDataAccessInterface;
+import com.belman.domain.core.ComponentRepository;
 import com.belman.domain.order.OrderId;
 import com.belman.domain.user.ApprovalStatus;
 
 import java.util.List;
 
 /**
- * Data access interface for PhotoDocument business component.
- * This interface defines the standard operations to be executed on a data access component for photo documents.
+ * Repository interface for PhotoDocument business component.
+ * This interface defines the standard operations to be executed on a repository for photo documents.
  */
-public interface PhotoDataAccess extends ComponentDataAccessInterface<PhotoDocument, PhotoId> {
+public interface PhotoDataAccess extends ComponentRepository<PhotoDocument, PhotoId> {
 
     /**
      * Finds all photo documents for a specific order.

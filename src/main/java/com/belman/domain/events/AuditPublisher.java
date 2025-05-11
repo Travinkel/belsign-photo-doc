@@ -86,17 +86,6 @@ public class AuditPublisher implements IAuditPublisher {
         if (logger != null) {
             logger.debug(message, args);
         }
-    }    /**
-     * Safely logs a message at the trace level.
-     * If the logger is not set, this method does nothing.
-     *
-     * @param message the message to log
-     * @param args    the arguments to the message
-     */
-    private void logTrace(String message, Object... args) {
-        if (logger != null) {
-            logger.trace(message, args);
-        }
     }
 
     /**
@@ -136,6 +125,17 @@ public class AuditPublisher implements IAuditPublisher {
         } else {
             logWarn("Executor service is already shut down");
         }
+    }    /**
+     * Safely logs a message at the trace level.
+     * If the logger is not set, this method does nothing.
+     *
+     * @param message the message to log
+     * @param args    the arguments to the message
+     */
+    private void logTrace(String message, Object... args) {
+        if (logger != null) {
+            logger.trace(message, args);
+        }
     }
 
     /**
@@ -163,6 +163,9 @@ public class AuditPublisher implements IAuditPublisher {
             logger.warn(message, args);
         }
     }
+
+
+
 
     @Override
     public void publish(AuditEvent event) {

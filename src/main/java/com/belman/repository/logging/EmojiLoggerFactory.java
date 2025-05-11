@@ -20,7 +20,7 @@ public class EmojiLoggerFactory implements LoggerFactory {
 
     /**
      * Gets the singleton instance of the EmojiLoggerFactory.
-     * 
+     *
      * @return the singleton instance
      */
     public static EmojiLoggerFactory getInstance() {

@@ -1,16 +1,12 @@
 package com.belman.unit.be.services;
 
-import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserStatus;
-import com.belman.domain.user.UserRepository;
-import com.belman.domain.security.AuthenticationService;
-import com.belman.domain.security.PasswordHasher;
 import com.belman.domain.common.EmailAddress;
-import com.belman.domain.security.HashedPassword;
 import com.belman.domain.common.PersonName;
-import com.belman.domain.user.UserId;
-import com.belman.domain.user.Username;
-import com.belman.repository.persistence.InMemoryUserRepository;
+import com.belman.domain.security.AuthenticationService;
+import com.belman.domain.security.HashedPassword;
+import com.belman.domain.security.PasswordHasher;
+import com.belman.domain.user.*;
+import com.belman.repository.persistence.memory.InMemoryUserRepository;
 import com.belman.repository.security.BCryptPasswordHasher;
 import com.belman.repository.security.DefaultAuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,12 +41,12 @@ public class AuthenticationServiceTest {
 
         // Create a test user
         testUser = new UserBusiness.Builder()
-            .id(UserId.newId())
-            .username(new Username("testuser"))
-            .password(HashedPassword.fromPlainText("testpassword", passwordHasher))
-            .name(new PersonName("Test", "User"))
-            .email(new EmailAddress("test@example.com"))
-            .build();
+                .id(UserId.newId())
+                .username(new Username("testuser"))
+                .password(HashedPassword.fromPlainText("testpassword", passwordHasher))
+                .name(new PersonName("Test", "User"))
+                .email(new EmailAddress("test@example.com"))
+                .build();
 
         // Save the test user to the repository
         userRepository.save(testUser);
@@ -155,19 +151,20 @@ public class AuthenticationServiceTest {
 
         // Assert
         assertFalse(authenticationService.isLoggedIn(), "User should not be logged in after logout");
-        assertFalse(authenticationService.getCurrentUser().isPresent(), "Current user should not be present after logout");
+        assertFalse(authenticationService.getCurrentUser().isPresent(),
+                "Current user should not be present after logout");
     }
 
     @Test
     void authenticate_withMultipleFailedAttempts_shouldLockUserAccount() {
         // Create a new user for this test
         UserBusiness lockableUser = new UserBusiness.Builder()
-            .id(UserId.newId())
-            .username(new Username("lockableuser"))
-            .password(HashedPassword.fromPlainText("password123", passwordHasher))
-            .name(new PersonName("Lockable", "User"))
-            .email(new EmailAddress("lockable@example.com"))
-            .build();
+                .id(UserId.newId())
+                .username(new Username("lockableuser"))
+                .password(HashedPassword.fromPlainText("password123", passwordHasher))
+                .name(new PersonName("Lockable", "User"))
+                .email(new EmailAddress("lockable@example.com"))
+                .build();
         userRepository.save(lockableUser);
 
         // Attempt to authenticate with wrong password multiple times
@@ -183,6 +180,7 @@ public class AuthenticationServiceTest {
 
         // Now try with correct password - should still fail because the account is locked
         Optional<UserBusiness> result = authenticationService.authenticate("lockableuser", "password123");
-        assertFalse(result.isPresent(), "Authentication should fail when account is locked, even with correct password");
+        assertFalse(result.isPresent(),
+                "Authentication should fail when account is locked, even with correct password");
     }
 }

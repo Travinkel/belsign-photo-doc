@@ -21,7 +21,7 @@ public class GluonFacade {
 
     /**
      * Gets the singleton instance of the GluonFacade.
-     * 
+     *
      * @return the GluonFacade instance
      */
     public static GluonFacade getInstance() {
@@ -30,7 +30,7 @@ public class GluonFacade {
 
     /**
      * Initializes the Gluon Mobile application.
-     * 
+     *
      * @return the GluonFacade instance
      */
     public static GluonFacade initialize() {
@@ -40,7 +40,7 @@ public class GluonFacade {
 
     /**
      * Starts the Gluon Mobile application.
-     * 
+     *
      * @param primaryStage the primary stage
      */
     public void start(Stage primaryStage) {
@@ -49,7 +49,7 @@ public class GluonFacade {
 
     /**
      * Gets the scene.
-     * 
+     *
      * @return the scene
      */
     public Scene getScene() {
@@ -58,7 +58,7 @@ public class GluonFacade {
 
     /**
      * Gets the app bar.
-     * 
+     *
      * @return the app bar
      */
     public AppBar getAppBar() {
@@ -67,7 +67,7 @@ public class GluonFacade {
 
     /**
      * Gets the drawer.
-     * 
+     *
      * @return the drawer
      */
     public com.gluonhq.charm.glisten.control.NavigationDrawer getDrawer() {
@@ -76,8 +76,8 @@ public class GluonFacade {
 
     /**
      * Adds a view factory.
-     * 
-     * @param viewName the view name
+     *
+     * @param viewName    the view name
      * @param viewFactory the view factory
      */
     public void addViewFactory(String viewName, Supplier<View> viewFactory) {
@@ -86,7 +86,7 @@ public class GluonFacade {
 
     /**
      * Switches to the specified view.
-     * 
+     *
      * @param viewName the view name
      */
     public void switchView(String viewName) {

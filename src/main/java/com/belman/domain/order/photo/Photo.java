@@ -1,12 +1,12 @@
 package com.belman.domain.order.photo;
 
-import com.belman.domain.common.base.DataObject;
+import com.belman.domain.common.base.ValueObject;
 
 /**
  * Value object representing the path to an image file.
  * This is specific to the photo bounded context.
  */
-public record Photo(String value) implements DataObject {
+public record Photo(String value) implements ValueObject {
 
     /**
      * Creates a new ImagePath with the specified value.

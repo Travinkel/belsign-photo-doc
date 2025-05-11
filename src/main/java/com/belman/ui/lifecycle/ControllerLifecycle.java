@@ -21,7 +21,7 @@ public interface ControllerLifecycle {
 
     /**
      * Gets the class name of the controller.
-     * 
+     *
      * @return the simple class name of the controller
      */
     String getControllerName();

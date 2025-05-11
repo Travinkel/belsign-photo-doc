@@ -1,6 +1,7 @@
 package com.belman.domain.audit;
 
 import com.belman.domain.audit.event.AuditEvent;
+import com.belman.domain.event.AuditableBusinessEvent;
 import com.belman.domain.order.photo.PhotoId;
 import com.belman.domain.user.UserId;
 
@@ -55,4 +56,40 @@ public interface AuditFacade {
      * @return a list of audit events for the entity
      */
     List<AuditEvent> getEventsByEntity(String entityType, String entityId);
+
+    /**
+     * Logs an auditable business event.
+     * <p>
+     * This method converts the auditable business event to an audit event
+     * and logs it using the {@link #logEvent(AuditEvent)} method.
+     *
+     * @param event the auditable business event to log
+     */
+    void logBusinessEvent(AuditableBusinessEvent event);
+
+    /**
+     * Logs multiple auditable business events in a batch.
+     * <p>
+     * This method converts the auditable business events to audit events
+     * and logs them using the {@link #logBatch(List)} method.
+     *
+     * @param events the list of auditable business events to log
+     */
+    void logBusinessEvents(List<AuditableBusinessEvent> events);
+
+    /**
+     * Retrieves audit events for a specific user.
+     *
+     * @param userId the ID of the user
+     * @return a list of audit events for the user
+     */
+    List<AuditEvent> getEventsByUser(String userId);
+
+    /**
+     * Retrieves audit events of a specific type.
+     *
+     * @param eventType the type of event
+     * @return a list of audit events of the specified type
+     */
+    List<AuditEvent> getEventsByType(String eventType);
 }

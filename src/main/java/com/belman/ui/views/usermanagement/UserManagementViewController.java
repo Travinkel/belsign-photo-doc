@@ -1,8 +1,8 @@
 package com.belman.ui.views.usermanagement;
 
-import com.belman.ui.base.BaseController;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserStatus;
+import com.belman.ui.base.BaseController;
 import com.belman.ui.components.TouchFriendlyDialog;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -136,7 +136,7 @@ public class UserManagementViewController extends BaseController<UserManagementV
 
     /**
      * Handles the create user button action.
-     * 
+     *
      * @param event the action event
      */
     private void handleCreateUserButtonAction(ActionEvent event) {
@@ -145,7 +145,7 @@ public class UserManagementViewController extends BaseController<UserManagementV
 
     /**
      * Handles the reset password button action.
-     * 
+     *
      * @param event the action event
      */
     private void handleResetPasswordButtonAction(ActionEvent event) {
@@ -154,7 +154,7 @@ public class UserManagementViewController extends BaseController<UserManagementV
 
     /**
      * Handles the save button action.
-     * 
+     *
      * @param event the action event
      */
     private void handleSaveButtonAction(ActionEvent event) {
@@ -166,7 +166,7 @@ public class UserManagementViewController extends BaseController<UserManagementV
 
     /**
      * Handles the cancel button action.
-     * 
+     *
      * @param event the action event
      */
     private void handleCancelButtonAction(ActionEvent event) {
@@ -174,22 +174,22 @@ public class UserManagementViewController extends BaseController<UserManagementV
     }
 
     /**
+     * Shows an information message using a touch-friendly dialog.
+     *
+     * @param message the information message
+     */
+    private void showInfo(String message) {
+        TouchFriendlyDialog.showInformation("Information", message);
+    }
+
+    /**
      * Shows an error message using a touch-friendly dialog.
-     * 
+     *
      * @param message the error message
      */
     @Override
     protected void showError(String message) {
         TouchFriendlyDialog.showError("Error", message);
-    }
-
-    /**
-     * Shows an information message using a touch-friendly dialog.
-     * 
-     * @param message the information message
-     */
-    private void showInfo(String message) {
-        TouchFriendlyDialog.showInformation("Information", message);
     }
 
     /**

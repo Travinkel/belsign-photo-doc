@@ -11,7 +11,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
 /**
  * Tests to verify that the bootstrap layer follows the correct patterns.
  * The bootstrap layer is responsible for initializing the application and
- * should be in the repository.bootstrap package.
+ * should be in the bootstrap package.
  */
 public class BootstrapLayerTest {
 
@@ -24,15 +24,15 @@ public class BootstrapLayerTest {
 
     @Test
     public void bootstrapCodeShouldOnlyBeInBootstrapPackage() {
-        // Bootstrap code should only be in the repository.bootstrap package
+        // Bootstrap code should only be in the bootstrap package
         ArchRule rule = classes()
                 .that().haveSimpleNameContaining("Bootstrap")
                 .or().haveSimpleNameEndingWith("Bootstrapper")
                 .or().haveSimpleNameEndingWith("Main")
                 .and().haveSimpleNameNotEndingWith("Test")
                 .and().resideInAnyPackage("com.belman.repository..", "com.belman.bootstrap..")
-                .should().resideInAnyPackage("com.belman.repository.bootstrap..", "com.belman.bootstrap..")
-                .because("Bootstrap code should only be in the repository.bootstrap or bootstrap package");
+                .should().resideInAPackage("com.belman.bootstrap..")
+                .because("Bootstrap code should only be in the bootstrap package");
 
         rule.check(importedClasses);
     }
@@ -41,7 +41,7 @@ public class BootstrapLayerTest {
     public void bootstrapPackageShouldOnlyContainBootstrapCode() {
         // The bootstrap package should only contain bootstrap-related classes
         ArchRule rule = classes()
-                .that().resideInAPackage("com.belman.repository.bootstrap..")
+                .that().resideInAPackage("com.belman.bootstrap..")
                 .should().haveSimpleNameContaining("Bootstrap")
                 .orShould().haveSimpleNameEndingWith("Bootstrapper")
                 .orShould().haveSimpleNameEndingWith("Main")

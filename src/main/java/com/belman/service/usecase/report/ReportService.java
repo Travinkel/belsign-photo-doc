@@ -42,9 +42,9 @@ public interface ReportService {
     /**
      * Generates a report for an order.
      *
-     * @param orderId the ID of the order
-     * @param type the type of report to generate
-     * @param format the format of the report
+     * @param orderId     the ID of the order
+     * @param type        the type of report to generate
+     * @param format      the format of the report
      * @param generatedBy the user who generated the report
      * @return the generated report
      */
@@ -54,8 +54,8 @@ public interface ReportService {
      * Previews a report for an order without saving it.
      *
      * @param orderId the ID of the order
-     * @param type the type of report to preview
-     * @param format the format of the report
+     * @param type    the type of report to preview
+     * @param format  the format of the report
      * @return the preview of the report
      */
     byte[] previewReport(OrderId orderId, ReportType type, ReportFormat format);
@@ -63,11 +63,11 @@ public interface ReportService {
     /**
      * Sends a report to a recipient.
      *
-     * @param reportId the ID of the report to send
+     * @param reportId       the ID of the report to send
      * @param recipientEmail the email address of the recipient
-     * @param subject the subject of the email
-     * @param message the message body of the email
-     * @param sentBy the user who sent the report
+     * @param subject        the subject of the email
+     * @param message        the message body of the email
+     * @param sentBy         the user who sent the report
      * @return true if the report was sent, false if the report was not found
      */
     boolean sendReport(ReportId reportId, String recipientEmail, String subject, String message, UserBusiness sentBy);
@@ -75,7 +75,7 @@ public interface ReportService {
     /**
      * Deletes a report.
      *
-     * @param reportId the ID of the report to delete
+     * @param reportId  the ID of the report to delete
      * @param deletedBy the user who deleted the report
      * @return true if the report was deleted, false if the report was not found
      */

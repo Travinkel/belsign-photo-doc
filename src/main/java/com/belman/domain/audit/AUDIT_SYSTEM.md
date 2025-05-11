@@ -75,7 +75,7 @@ private void registerAuditEvent(AuditEvent event) {
     updateLastModifiedAt();
 }
 
-protected void registerAuditEvents(Collection<AuditEvent> events) {
+private void registerAuditEvents(Collection<AuditEvent> events) {
     Objects.requireNonNull(events, "events collection must not be null");
     if (auditFacade == null) {
         throw new IllegalStateException(

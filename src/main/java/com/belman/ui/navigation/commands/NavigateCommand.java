@@ -1,9 +1,9 @@
 package com.belman.ui.navigation.commands;
 
 import com.belman.domain.shared.Command;
-import com.belman.ui.navigation.Router;
 import com.belman.ui.core.TransitionPresets;
 import com.belman.ui.core.ViewTransition;
+import com.belman.ui.navigation.Router;
 import com.gluonhq.charm.glisten.mvc.View;
 
 import java.util.HashMap;
@@ -44,6 +44,23 @@ public class NavigateCommand implements Command<Void> {
     }
 
     /**
+     * Creates a new NavigateCommand with the specified target view, parameters, and transition.
+     *
+     * @param targetViewClass the class of the view to navigate to
+     * @param parameters      the parameters to pass to the view
+     * @param transition      the transition to use
+     */
+    public NavigateCommand(Class<? extends View> targetViewClass, Map<String, Object> parameters,
+                           ViewTransition transition) {
+        if (targetViewClass == null) {
+            throw new IllegalArgumentException("Target view class cannot be null");
+        }
+        this.targetViewClass = targetViewClass;
+        this.parameters = parameters != null ? parameters : new HashMap<>();
+        this.transition = transition != null ? transition : TransitionPresets.forward();
+    }
+
+    /**
      * Creates a new NavigateCommand with the specified target view and transition.
      *
      * @param targetViewClass the class of the view to navigate to
@@ -51,22 +68,6 @@ public class NavigateCommand implements Command<Void> {
      */
     public NavigateCommand(Class<? extends View> targetViewClass, ViewTransition transition) {
         this(targetViewClass, new HashMap<>(), transition);
-    }
-
-    /**
-     * Creates a new NavigateCommand with the specified target view, parameters, and transition.
-     *
-     * @param targetViewClass the class of the view to navigate to
-     * @param parameters      the parameters to pass to the view
-     * @param transition      the transition to use
-     */
-    public NavigateCommand(Class<? extends View> targetViewClass, Map<String, Object> parameters, ViewTransition transition) {
-        if (targetViewClass == null) {
-            throw new IllegalArgumentException("Target view class cannot be null");
-        }
-        this.targetViewClass = targetViewClass;
-        this.parameters = parameters != null ? parameters : new HashMap<>();
-        this.transition = transition != null ? transition : TransitionPresets.forward();
     }
 
     @Override

@@ -2,21 +2,30 @@
 
 ## Overview
 
-This document outlines the implementation plan for completing the transition from DDD terminology to business terminology in the business layer. The plan follows the medium-term approach recommended in the REFACTORING_NOTES.md file, which involves gradually migrating from DDD to business terminology one aggregate at a time.
+This document outlines the implementation plan for completing the transition from DDD terminology to business
+terminology in the business layer. The plan follows the medium-term approach recommended in the REFACTORING_NOTES.md
+file, which involves gradually migrating from DDD to business terminology one aggregate at a time.
 
 ## Current Status
 
 The core business layer components have been created:
-- AuditEvent.java, BaseAuditEvent.java, IAuditPublisher.java, AuditHandler.java, AuditHandlerImplementation.java, AuditPublisher.java
-- BusinessObject.java, BusinessComponent.java, IBusinessService.java, BusinessService.java, DataAccessInterface.java, DataObject.java, BusinessException.java
+
+- AuditEvent.java, BaseAuditEvent.java, IAuditPublisher.java, AuditHandler.java, AuditHandlerImplementation.java,
+  AuditPublisher.java
+- BusinessObject.java, BusinessComponent.java, IBusinessService.java, BusinessService.java, DataAccessInterface.java,
+  DataObject.java, BusinessException.java
 
 However, many existing classes still need to be updated to use these new components:
+
 - Business entities (OrderBusiness.java, UserBusiness.java, CustomerBusiness.java, ReportBusiness.java)
 - Business components (Photo.java, etc.)
 - Data objects (EmailAddress.java, Money.java, PersonName.java, PhoneNumber.java, Timestamp.java, etc.)
-- Business services (PhotoApprovalService.java, PhotoValidationService.java, PhotoReportGenerationService.java, OrderBusinessService.java, etc.)
-- Data access interfaces (OrderDataAccess.java, PhotoDataAccess.java, UserDataAccess.java, CustomerDataAccess.java, ReportDataAccess.java)
-- Exceptions (AccessDeniedException.java, BusinessRuleViolationException.java, EntityNotFoundException.java, InvalidValueException.java)
+- Business services (PhotoApprovalService.java, PhotoValidationService.java, PhotoReportGenerationService.java,
+  OrderBusinessService.java, etc.)
+- Data access interfaces (OrderDataAccess.java, PhotoDataAccess.java, UserDataAccess.java, CustomerDataAccess.java,
+  ReportDataAccess.java)
+- Exceptions (AccessDeniedException.java, BusinessRuleViolationException.java, EntityNotFoundException.java,
+  InvalidValueException.java)
 - Audit events (OrderCreatedEvent.java, OrderApprovedEvent.java, etc.)
 
 ## Implementation Strategy
@@ -24,56 +33,56 @@ However, many existing classes still need to be updated to use these new compone
 The implementation will follow these steps:
 
 1. **Prioritize modules based on dependencies**:
-   - Start with modules that have fewer dependencies on other modules
-   - Prioritize modules that are more stable and less likely to change
+    - Start with modules that have fewer dependencies on other modules
+    - Prioritize modules that are more stable and less likely to change
 
 2. **For each module**:
-   - Update business entities to use BusinessObject
-   - Update business components to use BusinessComponent
-   - Update data objects to use DataObject
-   - Update business services to use BusinessService
-   - Update data access interfaces to use DataAccessInterface
-   - Update exceptions to extend BusinessException
-   - Update audit events to use BaseAuditEvent
-   - Update tests to use the new naming conventions
+    - Update business entities to use BusinessObject
+    - Update business components to use BusinessComponent
+    - Update data objects to use DataObject
+    - Update business services to use BusinessService
+    - Update data access interfaces to use DataAccessInterface
+    - Update exceptions to extend BusinessException
+    - Update audit events to use BaseAuditEvent
+    - Update tests to use the new naming conventions
 
 3. **After each module is updated**:
-   - Run tests to ensure functionality is preserved
-   - Fix any issues that arise
-   - Document the changes made
+    - Run tests to ensure functionality is preserved
+    - Fix any issues that arise
+    - Document the changes made
 
 4. **After all modules are updated**:
-   - Remove the old DDD-style classes and interfaces
-   - Update the architecture guide to remove DDD terminology and use the new naming conventions
+    - Remove the old DDD-style classes and interfaces
+    - Update the architecture guide to remove DDD terminology and use the new naming conventions
 
 ## Module Prioritization
 
 Based on dependencies and stability, the modules will be updated in the following order:
 
 1. **Common Module**:
-   - Contains basic data objects like EmailAddress, Money, PersonName, PhoneNumber, Timestamp
-   - Has few dependencies on other modules
-   - Is used by many other modules
+    - Contains basic data objects like EmailAddress, Money, PersonName, PhoneNumber, Timestamp
+    - Has few dependencies on other modules
+    - Is used by many other modules
 
 2. **Customer Module**:
-   - Contains CustomerBusiness, CustomerComponent, CustomerDataAccess
-   - Has dependencies on the Common module
-   - Is relatively self-contained
+    - Contains CustomerBusiness, CustomerComponent, CustomerDataAccess
+    - Has dependencies on the Common module
+    - Is relatively self-contained
 
 3. **Report Module**:
-   - Contains ReportBusiness, ReportDataAccess
-   - Has dependencies on the Common module
-   - Is relatively self-contained
+    - Contains ReportBusiness, ReportDataAccess
+    - Has dependencies on the Common module
+    - Is relatively self-contained
 
 4. **User Module**:
-   - Contains UserBusiness, UserDataAccess
-   - Has dependencies on the Common module
-   - Is used by other modules
+    - Contains UserBusiness, UserDataAccess
+    - Has dependencies on the Common module
+    - Is used by other modules
 
 5. **Order Module**:
-   - Contains OrderBusiness, OrderDataAccess
-   - Has dependencies on the Common, Customer, and User modules
-   - Contains the Photo submodule
+    - Contains OrderBusiness, OrderDataAccess
+    - Has dependencies on the Common, Customer, and User modules
+    - Contains the Photo submodule
 
 ## Detailed Implementation Plan
 
@@ -141,7 +150,8 @@ Based on dependencies and stability, the modules will be updated in the followin
 
 ## Timeline
 
-The implementation will be completed in phases, with each phase focusing on a specific module. The estimated timeline is as follows:
+The implementation will be completed in phases, with each phase focusing on a specific module. The estimated timeline is
+as follows:
 
 - Phase 1 (Common Module): 1 week
 - Phase 2 (Customer Module): 1 week
@@ -155,4 +165,6 @@ Total estimated time: 8 weeks
 
 ## Conclusion
 
-This implementation plan provides a structured approach to completing the transition from DDD terminology to business terminology in the business layer. By following this plan, we can ensure that the transition is completed in a systematic and controlled manner, with minimal disruption to the codebase and functionality.
+This implementation plan provides a structured approach to completing the transition from DDD terminology to business
+terminology in the business layer. By following this plan, we can ensure that the transition is completed in a
+systematic and controlled manner, with minimal disruption to the codebase and functionality.

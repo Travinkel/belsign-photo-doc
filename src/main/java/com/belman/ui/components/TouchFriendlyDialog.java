@@ -22,10 +22,6 @@ import javafx.stage.StageStyle;
  */
 public class TouchFriendlyDialog {
 
-    public enum DialogType {
-        INFORMATION, ERROR, WARNING, CONFIRMATION
-    }
-
     private final Stage dialogStage;
     private final Label titleLabel;
     private final Label messageLabel;
@@ -136,16 +132,6 @@ public class TouchFriendlyDialog {
     }
 
     /**
-     * Shows the dialog and waits for the user to close it.
-     *
-     * @return true if the primary button was clicked, false otherwise
-     */
-    public boolean showAndWait() {
-        dialogStage.showAndWait();
-        return result;
-    }
-
-    /**
      * Shows an information dialog with the specified title and message.
      *
      * @param title   the dialog title
@@ -154,6 +140,16 @@ public class TouchFriendlyDialog {
     public static void showInformation(String title, String message) {
         TouchFriendlyDialog dialog = new TouchFriendlyDialog(title, message, DialogType.INFORMATION);
         dialog.showAndWait();
+    }
+
+    /**
+     * Shows the dialog and waits for the user to close it.
+     *
+     * @return true if the primary button was clicked, false otherwise
+     */
+    public boolean showAndWait() {
+        dialogStage.showAndWait();
+        return result;
     }
 
     /**
@@ -188,5 +184,9 @@ public class TouchFriendlyDialog {
     public static boolean showConfirmation(String title, String message) {
         TouchFriendlyDialog dialog = new TouchFriendlyDialog(title, message, DialogType.CONFIRMATION);
         return dialog.showAndWait();
+    }
+
+    public enum DialogType {
+        INFORMATION, ERROR, WARNING, CONFIRMATION
     }
 }

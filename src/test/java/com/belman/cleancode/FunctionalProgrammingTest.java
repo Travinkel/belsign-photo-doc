@@ -20,27 +20,6 @@ public class FunctionalProgrammingTest {
         importedClasses = new ClassFileImporter().importPackages("com.belman");
     }
 
-    private static ArchCondition<JavaMethod> useStreamAPI() {
-        return new ArchCondition<JavaMethod>("use Stream API") {
-            @Override
-            public void check(JavaMethod method, ConditionEvents events) {
-                // Simple check: method name contains "stream" or class name contains "Stream"
-                String methodName = method.getName().toLowerCase();
-                String className = method.getOwner().getName().toLowerCase();
-
-                boolean usesStreamAPI = methodName.contains("stream") || 
-                                        className.contains("stream") ||
-                                        method.getRawParameterTypes().stream()
-                                            .anyMatch(type -> type.getName().contains("Stream"));
-
-                if (!usesStreamAPI) {
-                    events.add(SimpleConditionEvent.violated(method, 
-                        "Method " + method.getFullName() + " does not use Stream API"));
-                }
-            }
-        };
-    }
-
     @Test
     public void shouldUseStreamAPIWhereAppropriate() {
         ArchRule rule = methods()
@@ -49,5 +28,26 @@ public class FunctionalProgrammingTest {
                 .because("Service methods should use Stream API for collections processing where appropriate");
 
         rule.check(importedClasses);
+    }
+
+    private static ArchCondition<JavaMethod> useStreamAPI() {
+        return new ArchCondition<JavaMethod>("use Stream API") {
+            @Override
+            public void check(JavaMethod method, ConditionEvents events) {
+                // Simple check: method name contains "stream" or class name contains "Stream"
+                String methodName = method.getName().toLowerCase();
+                String className = method.getOwner().getName().toLowerCase();
+
+                boolean usesStreamAPI = methodName.contains("stream") ||
+                                        className.contains("stream") ||
+                                        method.getRawParameterTypes().stream()
+                                                .anyMatch(type -> type.getName().contains("Stream"));
+
+                if (!usesStreamAPI) {
+                    events.add(SimpleConditionEvent.violated(method,
+                            "Method " + method.getFullName() + " does not use Stream API"));
+                }
+            }
+        };
     }
 }

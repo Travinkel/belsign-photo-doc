@@ -39,7 +39,7 @@ public class MainViewController extends BaseController<MainViewModel> {
 
     /**
      * Handles the logout button action.
-     * 
+     *
      * @param event the action event
      */
     private void handleLogoutButtonAction(ActionEvent event) {

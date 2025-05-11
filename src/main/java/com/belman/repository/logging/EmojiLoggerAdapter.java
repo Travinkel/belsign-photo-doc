@@ -1,5 +1,6 @@
 package com.belman.repository.logging;
 
+import com.belman.common.logging.EmojiLogger;
 import com.belman.domain.services.Logger;
 
 /**
@@ -11,7 +12,7 @@ public class EmojiLoggerAdapter implements Logger {
 
     /**
      * Creates a new EmojiLoggerAdapter for the specified class.
-     * 
+     *
      * @param clazz the class to create a logger for
      */
     public EmojiLoggerAdapter(Class<?> clazz) {
@@ -20,7 +21,7 @@ public class EmojiLoggerAdapter implements Logger {
 
     /**
      * Factory method to create a logger for the specified class.
-     * 
+     *
      * @param clazz the class to create a logger for
      * @return a new logger instance
      */

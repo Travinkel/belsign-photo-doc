@@ -2,23 +2,26 @@
 
 ## Overview
 
-This document outlines issues identified during the refactoring of the business layer to move away from DDD terminology and adopt a more business-oriented approach. It highlights areas that need further attention in future refactoring efforts.
+This document outlines issues identified during the refactoring of the business layer to move away from DDD terminology
+and adopt a more business-oriented approach. It highlights areas that need further attention in future refactoring
+efforts.
 
 ## Parallel Class Hierarchies
 
 We currently have two parallel class hierarchies:
 
 1. **DDD-style hierarchy**:
-   - `AggregateRoot` -> `UserAggregate`, `OrderAggregate`, etc.
-   - Uses `DomainEvent` for events
-   - Located in `business.module.core` and `business.module.<feature>`
+    - `AggregateRoot` -> `UserAggregate`, `OrderAggregate`, etc.
+    - Uses `DomainEvent` for events
+    - Located in `business.module.core` and `business.module.<feature>`
 
 2. **Business-style hierarchy**:
-   - `BusinessObject` -> `UserBusiness`, `OrderBusiness`, etc.
-   - Uses `AuditEvent` for events
-   - Located in `business.module.core` and `business.module.<feature>`
+    - `BusinessObject` -> `UserBusiness`, `OrderBusiness`, etc.
+    - Uses `AuditEvent` for events
+    - Located in `business.module.core` and `business.module.<feature>`
 
-This duplication causes compatibility issues, especially with interfaces like `ApprovalState` that are designed to work with one hierarchy but are used by both.
+This duplication causes compatibility issues, especially with interfaces like `ApprovalState` that are designed to work
+with one hierarchy but are used by both.
 
 ## Specific Issues
 
@@ -29,7 +32,8 @@ This duplication causes compatibility issues, especially with interfaces like `A
 
 ### OrderAggregate.java
 
-1. Registers various order events (`OrderCompletedEvent`, `OrderApprovedEvent`, etc.) as `DomainEvent`, but they're not compatible with the new event system
+1. Registers various order events (`OrderCompletedEvent`, `OrderApprovedEvent`, etc.) as `DomainEvent`, but they're not
+   compatible with the new event system
 
 ### ApprovalState.java
 
@@ -38,18 +42,18 @@ This duplication causes compatibility issues, especially with interfaces like `A
 ## Potential Solutions
 
 1. **Short-term**: Keep both hierarchies but ensure they don't interact
-   - Update interfaces to use generic type parameters where needed
-   - Create separate event hierarchies for each class hierarchy
+    - Update interfaces to use generic type parameters where needed
+    - Create separate event hierarchies for each class hierarchy
 
 2. **Medium-term**: Gradually migrate from DDD to business terminology
-   - Convert one aggregate at a time to use the business object hierarchy
-   - Update all references to use the new classes
-   - Remove the old classes once all references are updated
+    - Convert one aggregate at a time to use the business object hierarchy
+    - Update all references to use the new classes
+    - Remove the old classes once all references are updated
 
 3. **Long-term**: Complete removal of DDD terminology
-   - Eliminate all DDD-style classes and interfaces
-   - Use only business-oriented terminology throughout the codebase
-   - Ensure consistent naming and organization
+    - Eliminate all DDD-style classes and interfaces
+    - Use only business-oriented terminology throughout the codebase
+    - Ensure consistent naming and organization
 
 ## Recommended Approach
 

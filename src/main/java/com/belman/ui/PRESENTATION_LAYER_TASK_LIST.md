@@ -1,6 +1,7 @@
 # Presentation Layer Implementation Task List
 
 ## View Models
+
 - [ ] Update LoginViewModel.java to use the new business entity naming conventions
 - [ ] Update AdminViewModel.java to use the new business entity naming conventions
 - [ ] Update PhotoUploadViewModel.java to use the new business entity naming conventions
@@ -12,6 +13,7 @@
 - [ ] Update other view models to use the new business entity naming conventions
 
 ## Controllers
+
 - [ ] Update LoginViewController.java to use the new business entity naming conventions
 - [ ] Update AdminViewController.java to use the new business entity naming conventions
 - [ ] Update PhotoUploadViewController.java to use the new business entity naming conventions
@@ -23,17 +25,20 @@
 - [ ] Update other controllers to use the new business entity naming conventions
 
 ## Navigation
+
 - [ ] Update Router.java to use the new business entity naming conventions
 - [ ] Update RouteGuardImpl.java to use the new business entity naming conventions
 - [ ] Update NavigateCommand.java to use the new business entity naming conventions
 - [ ] Update other navigation-related classes to use the new business entity naming conventions
 
 ## Binding
+
 - [ ] Update CommandBinding.java to use the new business entity naming conventions
 - [ ] Update CommandBindingBuilder.java to use the new business entity naming conventions
 - [ ] Update other binding-related classes to use the new business entity naming conventions
 
 ## Core
+
 - [ ] Update BaseView.java to use the new business entity naming conventions
 - [ ] Update BaseViewModel.java to use the new business entity naming conventions
 - [ ] Update BaseController.java to use the new business entity naming conventions
@@ -41,10 +46,12 @@
 - [ ] Update other core classes to use the new business entity naming conventions
 
 ## UI Components
+
 - [ ] Update TouchFriendlyPhotoListCell.java to use the new business entity naming conventions
 - [ ] Update other UI components to use the new business entity naming conventions
 
 ## Tests
+
 - [ ] Update LoginViewModelTest.java to use the new business entity naming conventions
 - [ ] Update AdminViewModelTest.java to use the new business entity naming conventions
 - [ ] Update PhotoUploadViewModelTest.java to use the new business entity naming conventions

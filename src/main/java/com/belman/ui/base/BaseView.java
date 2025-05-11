@@ -27,16 +27,15 @@ import java.net.URL;
  */
 public abstract class BaseView<T extends BaseViewModel<?>> extends View implements ViewLifecycle<T, BaseController<?>> {
 
-    private final BaseController<?> controller;
     protected final T viewModel;
-
+    private final BaseController<?> controller;
     // AppBar properties
     private final StringProperty title = new SimpleStringProperty("");
     private final BooleanProperty showBackButton = new SimpleBooleanProperty(false);
     private final BooleanProperty showMenuButton = new SimpleBooleanProperty(false);
 
     // Loading indicator
-    private ProgressIndicator loadingIndicator;
+    private final ProgressIndicator loadingIndicator;
     private boolean loadingIndicatorAdded = false;
 
     /**
@@ -68,45 +67,6 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View implemen
         }
     }
 
-    /**
-     * Creates the ViewModel for this View.
-     * Default implementation uses NamingConventions to find the ViewModel class.
-     *
-     * @return the ViewModel instance
-     */
-    @SuppressWarnings("unchecked")
-    protected T createViewModel() {
-        try {
-            String viewModelClassName = getClass().getName().replace("View", "ViewModel");
-            Class<?> viewModelClass = Class.forName(viewModelClassName);
-            return (T) viewModelClass.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create ViewModel for " + getClass().getSimpleName(), e);
-        }
-    }
-
-    /**
-     * Loads the FXML file for this View.
-     * Default implementation uses the View class name to find the FXML file.
-     *
-     * @return the FXMLLoader instance
-     */
-    protected FXMLLoader loadFXML() throws IOException {
-        String viewName = getClass().getSimpleName();
-        String fxmlPath = "/" + getClass().getPackageName().replace('.', '/') + "/" + viewName + ".fxml";
-
-        URL fxmlUrl = getClass().getResource(viewName + ".fxml");
-        if (fxmlUrl == null) {
-            fxmlUrl = getClass().getResource(fxmlPath);
-        }
-
-        if (fxmlUrl == null) {
-            throw new IOException("FXML file not found for " + viewName);
-        }
-
-        return new FXMLLoader(fxmlUrl);
-    }
-
     private void initializeLifecycleListeners() {
         // Register this view with the LifecycleManager for lifecycle management
         try {
@@ -125,96 +85,6 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View implemen
                 onViewHidden();
             }
         });
-    }
-
-    /**
-     * Called when the view is shown.
-     * Delegates to the ViewModel's onShow method.
-     * Implementation of the ViewLifecycle interface.
-     */
-    @Override
-    public void onViewShown() {
-        if (viewModel != null) {
-            viewModel.onShow();
-        }
-
-        // Update the AppBar
-        updateAppBar();
-
-        // Call the lifecycle method
-        onShow();
-    }
-
-    /**
-     * Called when the view is hidden.
-     * Delegates to the ViewModel's onHide method.
-     * Implementation of the ViewLifecycle interface.
-     */
-    @Override
-    public void onViewHidden() {
-        if (viewModel != null) {
-            viewModel.onHide();
-        }
-
-        // Call the lifecycle method
-        onHide();
-    }
-
-    /**
-     * Gets the controller associated with this view.
-     *
-     * @return The controller
-     */
-    public BaseController<?> getController() {
-        return controller;
-    }
-
-    /**
-     * Gets the ViewModel associated with this view.
-     *
-     * @return The ViewModel
-     */
-    public T getViewModel() {
-        return viewModel;
-    }
-
-    /**
-     * Sets up the AppBar for this view.
-     */
-    protected void setUpAppBar() {
-        // To be overridden by subclasses
-    }
-
-    /**
-     * Gets the class name of the view.
-     * Implementation of the ViewLifecycle interface.
-     *
-     * @return the simple class name of the view
-     */
-    @Override
-    public String getViewName() {
-        return this.getClass().getSimpleName();
-    }
-
-    /**
-     * Gets the underlying View object.
-     * Implementation of the ViewLifecycle interface.
-     *
-     * @return this view
-     */
-    @Override
-    public View getView() {
-        return this;
-    }
-
-    /**
-     * Checks if the app bar should be shown for this view.
-     * By default, returns true. Override in subclasses to hide the app bar.
-     *
-     * @return true if the app bar should be shown, false otherwise
-     */
-    public boolean shouldShowAppBar() {
-        return true;
     }
 
     /**
@@ -259,6 +129,30 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View implemen
     }
 
     /**
+     * Called when the view is shown.
+     */
+    public void onShow() {
+        // Default implementation does nothing
+    }
+
+    /**
+     * Called when the view is hidden.
+     */
+    public void onHide() {
+        // Default implementation does nothing
+    }
+
+    /**
+     * Checks if the app bar should be shown for this view.
+     * By default, returns true. Override in subclasses to hide the app bar.
+     *
+     * @return true if the app bar should be shown, false otherwise
+     */
+    public boolean shouldShowAppBar() {
+        return true;
+    }
+
+    /**
      * Navigates back to the previous view.
      */
     protected void navigateBack() {
@@ -274,13 +168,122 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View implemen
     }
 
     /**
-     * Sets the title of the view.
+     * Creates the ViewModel for this View.
+     * Default implementation uses NamingConventions to find the ViewModel class.
      *
-     * @param title the title to set
+     * @return the ViewModel instance
      */
-    public void setTitle(String title) {
-        this.title.set(title);
+    @SuppressWarnings("unchecked")
+    protected T createViewModel() {
+        try {
+            String viewModelClassName = getClass().getName().replace("View", "ViewModel");
+            Class<?> viewModelClass = Class.forName(viewModelClassName);
+            return (T) viewModelClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create ViewModel for " + getClass().getSimpleName(), e);
+        }
+    }
+
+    /**
+     * Loads the FXML file for this View.
+     * Default implementation uses the View class name to find the FXML file.
+     *
+     * @return the FXMLLoader instance
+     */
+    protected FXMLLoader loadFXML() throws IOException {
+        String viewName = getClass().getSimpleName();
+        String fxmlPath = "/" + getClass().getPackageName().replace('.', '/') + "/" + viewName + ".fxml";
+
+        URL fxmlUrl = getClass().getResource(viewName + ".fxml");
+        if (fxmlUrl == null) {
+            fxmlUrl = getClass().getResource(fxmlPath);
+        }
+
+        if (fxmlUrl == null) {
+            throw new IOException("FXML file not found for " + viewName);
+        }
+
+        return new FXMLLoader(fxmlUrl);
+    }
+
+    /**
+     * Sets up the AppBar for this view.
+     */
+    protected void setUpAppBar() {
+        // To be overridden by subclasses
+    }
+
+    /**
+     * Gets the underlying View object.
+     * Implementation of the ViewLifecycle interface.
+     *
+     * @return this view
+     */
+    @Override
+    public View getView() {
+        return this;
+    }
+
+    /**
+     * Gets the ViewModel associated with this view.
+     *
+     * @return The ViewModel
+     */
+    public T getViewModel() {
+        return viewModel;
+    }
+
+    /**
+     * Gets the controller associated with this view.
+     *
+     * @return The controller
+     */
+    public BaseController<?> getController() {
+        return controller;
+    }
+
+    /**
+     * Called when the view is shown.
+     * Delegates to the ViewModel's onShow method.
+     * Implementation of the ViewLifecycle interface.
+     */
+    @Override
+    public void onViewShown() {
+        if (viewModel != null) {
+            viewModel.onShow();
+        }
+
+        // Update the AppBar
         updateAppBar();
+
+        // Call the lifecycle method
+        onShow();
+    }
+
+    /**
+     * Called when the view is hidden.
+     * Delegates to the ViewModel's onHide method.
+     * Implementation of the ViewLifecycle interface.
+     */
+    @Override
+    public void onViewHidden() {
+        if (viewModel != null) {
+            viewModel.onHide();
+        }
+
+        // Call the lifecycle method
+        onHide();
+    }
+
+    /**
+     * Gets the class name of the view.
+     * Implementation of the ViewLifecycle interface.
+     *
+     * @return the simple class name of the view
+     */
+    @Override
+    public String getViewName() {
+        return this.getClass().getSimpleName();
     }
 
     /**
@@ -293,12 +296,31 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View implemen
     }
 
     /**
+     * Sets the title of the view.
+     *
+     * @param title the title to set
+     */
+    public void setTitle(String title) {
+        this.title.set(title);
+        updateAppBar();
+    }
+
+    /**
      * Gets the title property.
      *
      * @return the title property
      */
     public StringProperty titleProperty() {
         return title;
+    }
+
+    /**
+     * Gets whether the back button is shown.
+     *
+     * @return true if the back button is shown, false otherwise
+     */
+    public boolean isShowBackButton() {
+        return showBackButton.get();
     }
 
     /**
@@ -312,21 +334,21 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View implemen
     }
 
     /**
-     * Gets whether the back button is shown.
-     *
-     * @return true if the back button is shown, false otherwise
-     */
-    public boolean isShowBackButton() {
-        return showBackButton.get();
-    }
-
-    /**
      * Gets the showBackButton property.
      *
      * @return the showBackButton property
      */
     public BooleanProperty showBackButtonProperty() {
         return showBackButton;
+    }
+
+    /**
+     * Gets whether the menu button is shown.
+     *
+     * @return true if the menu button is shown, false otherwise
+     */
+    public boolean isShowMenuButton() {
+        return showMenuButton.get();
     }
 
     /**
@@ -337,15 +359,6 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View implemen
     public void setShowMenuButton(boolean show) {
         showMenuButton.set(show);
         updateAppBar();
-    }
-
-    /**
-     * Gets whether the menu button is shown.
-     *
-     * @return true if the menu button is shown, false otherwise
-     */
-    public boolean isShowMenuButton() {
-        return showMenuButton.get();
     }
 
     /**
@@ -373,19 +386,5 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View implemen
      */
     public void hideLoading() {
         loadingIndicator.setVisible(false);
-    }
-
-    /**
-     * Called when the view is shown.
-     */
-    public void onShow() {
-        // Default implementation does nothing
-    }
-
-    /**
-     * Called when the view is hidden.
-     */
-    public void onHide() {
-        // Default implementation does nothing
     }
 }

@@ -46,14 +46,6 @@ public abstract class Entity<ID> {
     }
 
     /**
-     * Returns the identifier of this entity.
-     * The identifier must be unique within the entity's type.
-     *
-     * @return the entity's identifier
-     */
-    public abstract ID getId();
-
-    /**
      * Returns a string representation of this entity.
      * The string representation includes the entity's type and ID.
      *
@@ -63,4 +55,12 @@ public abstract class Entity<ID> {
     public String toString() {
         return String.format("%s[id=%s]", getClass().getSimpleName(), getId());
     }
+
+    /**
+     * Returns the identifier of this entity.
+     * The identifier must be unique within the entity's type.
+     *
+     * @return the entity's identifier
+     */
+    public abstract ID getId();
 }

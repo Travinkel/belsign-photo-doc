@@ -1,18 +1,11 @@
 package com.belman.ui.views.admin;
 
+import com.belman.domain.exceptions.AccessDeniedException;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRole;
 import com.belman.service.usecase.admin.AdminService;
 import com.belman.ui.base.BaseViewModel;
-import com.belman.domain.exceptions.AccessDeniedException;
-
-
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -54,7 +47,7 @@ public class AdminViewModel extends BaseViewModel<AdminViewModel> {
 
     /**
      * Creates a new AdminViewModel with the specified AdminService.
-     * 
+     *
      * @param adminService the admin service
      */
     public AdminViewModel(AdminService adminService) {
@@ -92,6 +85,10 @@ public class AdminViewModel extends BaseViewModel<AdminViewModel> {
         }
     }
 
+    public BooleanProperty loadingProperty() {
+        return loading;
+    }
+
     /**
      * Creates a new user.
      */
@@ -101,11 +98,11 @@ public class AdminViewModel extends BaseViewModel<AdminViewModel> {
 
         try {
             UserBusiness user = adminService.createUser(
-                username.get(),
-                password.get(),
-                firstName.get(),
-                lastName.get(),
-                email.get(),
+                    username.get(),
+                    password.get(),
+                    firstName.get(),
+                    lastName.get(),
+                    email.get(),
                     new UserRole[]{selectedRole.get()}
             );
 
@@ -121,6 +118,18 @@ public class AdminViewModel extends BaseViewModel<AdminViewModel> {
         } finally {
             loading.set(false);
         }
+    }
+
+    /**
+     * Clears the user form.
+     */
+    public void clearUserForm() {
+        username.set("");
+        password.set("");
+        firstName.set("");
+        lastName.set("");
+        email.set("");
+        selectedRole.set(null);
     }
 
     /**
@@ -196,7 +205,7 @@ public class AdminViewModel extends BaseViewModel<AdminViewModel> {
 
     /**
      * Removes a role from the selected user.
-     * 
+     *
      * @param role the role to remove
      */
     public void removeRole(UserRole role) {
@@ -228,6 +237,8 @@ public class AdminViewModel extends BaseViewModel<AdminViewModel> {
             loading.set(false);
         }
     }
+
+    // Getters for properties
 
     /**
      * Resets the password for the selected user.
@@ -265,20 +276,6 @@ public class AdminViewModel extends BaseViewModel<AdminViewModel> {
             loading.set(false);
         }
     }
-
-    /**
-     * Clears the user form.
-     */
-    public void clearUserForm() {
-        username.set("");
-        password.set("");
-        firstName.set("");
-        lastName.set("");
-        email.set("");
-        selectedRole.set(null);
-    }
-
-    // Getters for properties
 
     public StringProperty usernameProperty() {
         return username;
@@ -326,9 +323,5 @@ public class AdminViewModel extends BaseViewModel<AdminViewModel> {
 
     public StringProperty statusMessageProperty() {
         return statusMessage;
-    }
-
-    public BooleanProperty loadingProperty() {
-        return loading;
     }
 }

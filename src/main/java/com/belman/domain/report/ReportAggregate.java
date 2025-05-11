@@ -5,7 +5,6 @@ import com.belman.domain.customer.CustomerAggregate;
 import com.belman.domain.order.OrderId;
 import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserBusiness;
 
 import java.util.Collections;
 import java.util.List;

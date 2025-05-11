@@ -46,14 +46,6 @@ public abstract class BusinessComponent<ID> {
     }
 
     /**
-     * Returns the identifier of this business component.
-     * The identifier must be unique within the component's type.
-     *
-     * @return the component's identifier
-     */
-    public abstract ID getId();
-
-    /**
      * Returns a string representation of this business component.
      * The string representation includes the component's type and ID.
      *
@@ -63,4 +55,12 @@ public abstract class BusinessComponent<ID> {
     public String toString() {
         return String.format("%s[id=%s]", getClass().getSimpleName(), getId());
     }
+
+    /**
+     * Returns the identifier of this business component.
+     * The identifier must be unique within the component's type.
+     *
+     * @return the component's identifier
+     */
+    public abstract ID getId();
 }

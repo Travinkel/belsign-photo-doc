@@ -6,7 +6,8 @@ import com.tngtech.archunit.lang.ArchRule;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 /**
  * Tests to verify that the project follows MVVMC (Model-View-ViewModel-Controller) architecture principles
@@ -29,7 +30,8 @@ public class MVVMCArchitectureTest {
                 .and().resideInAPackage("com.belman.ui..")
                 .and().haveSimpleNameNotStartingWith("Base")
                 .should().resideInAPackage("com.belman.ui..views..")
-                .because("Controllers should be in the same package as their corresponding views in MVVMC architecture");
+                .because(
+                        "Controllers should be in the same package as their corresponding views in MVVMC architecture");
 
         rule.check(importedClasses);
     }

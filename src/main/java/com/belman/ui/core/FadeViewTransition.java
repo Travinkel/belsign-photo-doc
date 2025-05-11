@@ -81,8 +81,8 @@ public class FadeViewTransition extends AbstractViewTransition {
             fadeIn.setToValue(1.0);
 
             transition = new SequentialTransition(
-                fadeOut,
-                fadeIn
+                    fadeOut,
+                    fadeIn
             );
         } else {
             // Just fade in the new view

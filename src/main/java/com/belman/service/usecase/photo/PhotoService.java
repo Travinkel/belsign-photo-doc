@@ -33,8 +33,8 @@ public interface PhotoService {
     /**
      * Uploads a photo for an order.
      *
-     * @param orderId the ID of the order
-     * @param photo the photo to upload
+     * @param orderId    the ID of the order
+     * @param photo      the photo to upload
      * @param uploadedBy the user who uploaded the photo
      * @return the uploaded photo document
      */
@@ -43,8 +43,8 @@ public interface PhotoService {
     /**
      * Uploads multiple photos for an order.
      *
-     * @param orderId the ID of the order
-     * @param photos the photos to upload
+     * @param orderId    the ID of the order
+     * @param photos     the photos to upload
      * @param uploadedBy the user who uploaded the photos
      * @return a list of uploaded photo documents
      */
@@ -53,7 +53,7 @@ public interface PhotoService {
     /**
      * Deletes a photo.
      *
-     * @param photoId the ID of the photo to delete
+     * @param photoId   the ID of the photo to delete
      * @param deletedBy the user who deleted the photo
      * @return true if the photo was deleted, false if the photo was not found
      */
@@ -62,7 +62,7 @@ public interface PhotoService {
     /**
      * Approves a photo.
      *
-     * @param photoId the ID of the photo to approve
+     * @param photoId    the ID of the photo to approve
      * @param approvedBy the user who approved the photo
      * @return true if the photo was approved, false if the photo was not found
      */
@@ -71,9 +71,9 @@ public interface PhotoService {
     /**
      * Rejects a photo.
      *
-     * @param photoId the ID of the photo to reject
+     * @param photoId    the ID of the photo to reject
      * @param rejectedBy the user who rejected the photo
-     * @param reason the reason for rejection
+     * @param reason     the reason for rejection
      * @return true if the photo was rejected, false if the photo was not found
      */
     boolean rejectPhoto(PhotoId photoId, UserBusiness rejectedBy, String reason);
@@ -81,8 +81,8 @@ public interface PhotoService {
     /**
      * Adds a comment to a photo.
      *
-     * @param photoId the ID of the photo to comment on
-     * @param comment the comment to add
+     * @param photoId     the ID of the photo to comment on
+     * @param comment     the comment to add
      * @param commentedBy the user who added the comment
      * @return true if the comment was added, false if the photo was not found
      */

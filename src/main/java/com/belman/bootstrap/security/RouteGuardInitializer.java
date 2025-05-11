@@ -1,9 +1,9 @@
 package com.belman.bootstrap.security;
 
-import com.belman.domain.user.rbac.AccessPolicyFactory;
-import com.belman.domain.user.rbac.RoleBasedAccessControlFactory;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.services.Logger;
+import com.belman.domain.user.rbac.AccessPolicyFactory;
+import com.belman.domain.user.rbac.RoleBasedAccessControlFactory;
 import com.belman.service.infrastructure.routing.RouteGuard;
 
 /**
@@ -18,7 +18,7 @@ public class RouteGuardInitializer {
     /**
      * Sets the logger for this class.
      * This method should be called before using any methods in this class.
-     * 
+     *
      * @param loggerInstance the logger to use
      */
     public static void setLogger(Logger loggerInstance) {
@@ -26,50 +26,11 @@ public class RouteGuardInitializer {
     }
 
     /**
-     * Safely logs a message at the debug level.
-     * If the logger is not set, this method does nothing.
-     * 
-     * @param message the message to log
-     * @param args the arguments to the message
-     */
-    private static void logDebug(String message, Object... args) {
-        if (logger != null) {
-            logger.debug(message, args);
-        }
-    }
-
-    /**
-     * Safely logs a message at the info level.
-     * If the logger is not set, this method does nothing.
-     * 
-     * @param message the message to log
-     * @param args the arguments to the message
-     */
-    private static void logInfo(String message, Object... args) {
-        if (logger != null) {
-            logger.info(message, args);
-        }
-    }
-
-    /**
-     * Safely logs a message at the error level.
-     * If the logger is not set, this method does nothing.
-     * 
-     * @param message the message to log
-     * @param throwable the exception to log
-     */
-    private static void logError(String message, Throwable throwable) {
-        if (logger != null) {
-            logger.error(message, throwable);
-        }
-    }
-
-    /**
      * Initializes route guards for role-based access control.
      * This method should be called once during application startup, after the Router is set up.
-     * 
+     *
      * @param authenticationService the authentication service
-     * @param routeGuard the route guard to register guards with
+     * @param routeGuard            the route guard to register guards with
      */
     public static synchronized void initialize(AuthenticationService authenticationService, RouteGuard routeGuard) {
         if (initialized) {
@@ -85,7 +46,7 @@ public class RouteGuardInitializer {
 
             // Create role-based access control factory
             RoleBasedAccessControlFactory rbacFactory = new RoleBasedAccessControlFactory(
-                authenticationService, accessPolicyFactory);
+                    authenticationService, accessPolicyFactory);
 
             // Add guards for views
 
@@ -124,6 +85,45 @@ public class RouteGuardInitializer {
             logInfo("Failed to initialize route guards");
             logError("Route guard initialization error details", e);
             throw new RuntimeException("Failed to initialize route guards", e);
+        }
+    }
+
+    /**
+     * Safely logs a message at the debug level.
+     * If the logger is not set, this method does nothing.
+     *
+     * @param message the message to log
+     * @param args    the arguments to the message
+     */
+    private static void logDebug(String message, Object... args) {
+        if (logger != null) {
+            logger.debug(message, args);
+        }
+    }
+
+    /**
+     * Safely logs a message at the info level.
+     * If the logger is not set, this method does nothing.
+     *
+     * @param message the message to log
+     * @param args    the arguments to the message
+     */
+    private static void logInfo(String message, Object... args) {
+        if (logger != null) {
+            logger.info(message, args);
+        }
+    }
+
+    /**
+     * Safely logs a message at the error level.
+     * If the logger is not set, this method does nothing.
+     *
+     * @param message   the message to log
+     * @param throwable the exception to log
+     */
+    private static void logError(String message, Throwable throwable) {
+        if (logger != null) {
+            logger.error(message, throwable);
         }
     }
 }

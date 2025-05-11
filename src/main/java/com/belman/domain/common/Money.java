@@ -1,6 +1,6 @@
 package com.belman.domain.common;
 
-import com.belman.domain.common.base.DataObject;
+import com.belman.domain.common.base.ValueObject;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -14,7 +14,7 @@ import java.util.Objects;
  * with appropriate precision and rounding, and ensures that operations
  * between different currencies are not allowed.
  */
-public final class Money implements DataObject {
+public final class Money implements ValueObject {
 
     // Some common currencies for convenience
     public static final Currency USD = Currency.getInstance("USD");

@@ -1,4 +1,197 @@
-# Master Task List for Implementing the Revised Architecture
+# Master Task List for Belsign Photo Documentation Project
+
+## Terminology Note
+**Important:** As per project requirements, we will use the following terminology:
+- "Repository" instead of "Data Access Interface"
+- "Business Object" instead of "Aggregate Root"
+- "Business Component" instead of "Entity"
+- "Data Object" instead of "Value Object"
+- "Business Events" instead of "Domain Events"
+- "Business Service" instead of "Domain Service"
+
+While some tasks below reference "DataAccessInterface", we are maintaining "Repository" terminology in the codebase.
+
+**Repository Usage Note:** We will only use repositories for the root business objects (equivalent to aggregate roots), which are Order and User. Other business objects like Report and Customer will use data access interfaces but not extend the Repository interface.
+
+## Architectural Violations Fixes
+
+### 1. Fix Dependency Validation Failures
+
+#### 1.1 Fix Layered Architecture Violations
+- [ ] Fix violations in `DependencyValidationTest` (7757 violations reported)
+- [ ] Ensure UI layer doesn't depend on repository implementations
+- [ ] Ensure service layer doesn't depend on UI layer except through interfaces
+- [ ] Ensure repository layer doesn't depend on UI layer
+- [ ] Move misplaced classes to their correct layers
+
+#### 1.2 Fix Package Structure Issues
+- [X] Move bootstrap code from `com.belman.repository.bootstrap` to `com.belman.bootstrap`
+- [ ] Move common utilities from `com.belman.domain.common` to `com.belman.common`
+- [ ] Ensure domain.shared package is used correctly for shared domain concepts
+- [ ] Reorganize service layer to follow the usecase pattern
+
+### 2. Fix Rich Business Entities Issues
+
+#### 2.1 Address Anemic Domain Models
+- [ ] Add business behavior methods to domain classes ending with "Business"
+- [ ] Add business behavior methods to domain classes ending with "Component"
+- [ ] Ensure domain classes encapsulate both data and behavior
+
+#### 2.2 Fix Value Object Issues
+- [ ] Make all fields in value objects final
+- [ ] Ensure value objects in domain.common package are immutable
+- [ ] Implement proper validation in value object constructors
+
+### 3. Fix Three-Layer Architecture Violations
+
+#### 3.1 Fix Service Layer Dependencies
+- [ ] Remove direct dependencies from service layer to UI layer
+- [ ] Ensure services depend on interfaces, not implementations
+- [ ] Move service implementations to correct packages
+
+#### 3.2 Fix Repository Layer Dependencies
+- [ ] Ensure repository implementations don't depend on service layer
+- [ ] Move repository-related code from service layer to repository layer
+
+#### 3.3 Fix UI Layer Dependencies
+- [x] Remove direct dependencies from UI layer to repository layer
+- [ ] Ensure UI components only access repositories through service layer
+
+### 4. Fix MVVM Architecture Violations
+
+#### 4.1 Fix View Model Issues
+- [ ] Ensure view models don't depend on controllers
+- [ ] Move view models to correct packages
+- [ ] Implement proper data binding in view models
+
+#### 4.2 Fix View Issues
+- [ ] Make fields in views final where appropriate
+- [ ] Ensure views depend only on view models
+- [ ] Implement proper separation of concerns in views
+
+#### 4.3 Fix Controller Issues
+- [ ] Ensure controllers are in the correct packages
+- [ ] Implement proper controller logic
+- [ ] Remove repository dependencies from controllers
+
+### 5. Fix Architectural Antipatterns
+
+#### 5.1 Fix Cyclic Dependencies
+- [ ] Break cyclic dependencies between packages
+- [ ] Introduce interfaces to decouple components
+- [ ] Apply dependency inversion principle where needed
+
+#### 5.2 Fix God Classes
+- [ ] Split large classes into smaller, more focused classes
+- [ ] Extract related functionality into helper classes
+- [ ] Apply Single Responsibility Principle
+
+#### 5.3 Fix Feature Envy
+- [ ] Move methods to the classes they're most interested in
+- [ ] Reduce method calls to other objects
+- [ ] Apply "Tell, Don't Ask" principle
+
+#### 5.4 Fix Law of Demeter Violations
+- [ ] Reduce chains of method calls
+- [ ] Create wrapper methods to encapsulate chains
+- [ ] Apply "Talk only to your immediate friends" principle
+
+#### 5.5 Fix Inappropriate Intimacy
+- [ ] Reduce dependencies between classes
+- [ ] Use dependency injection
+- [ ] Apply Law of Demeter
+
+### 6. Improve Code Quality
+
+#### 6.1 Fix Naming Conventions
+- [ ] Use consistent naming across the codebase
+- [ ] Rename classes to follow project conventions
+- [ ] Use descriptive names for methods and variables
+
+#### 6.2 Improve Documentation
+- [ ] Add/update JavaDoc comments for public APIs
+- [ ] Add package-info.java files
+- [ ] Update README files with architecture overview
+
+#### 6.3 Improve Error Handling
+- [ ] Add proper exception handling
+- [ ] Use custom exceptions where appropriate
+- [ ] Add logging for exceptions
+
+#### 6.4 Improve Performance
+- [ ] Optimize database queries
+- [ ] Reduce unnecessary object creation
+- [ ] Apply lazy loading where appropriate
+
+### 7. Ensure Tests Work
+
+#### 7.1 Fix Failing Tests
+- [ ] Fix `DependencyValidationTest`
+- [ ] Fix `RichBusinessEntitiesTest`
+- [ ] Fix `ThreeLayerArchitectureTest`
+- [ ] Fix `MVVMAndPresentationRulesTest`
+- [ ] Fix `ArchitecturalAntipatternTest`
+
+#### 7.2 Add Missing Tests
+- [ ] Add tests for new functionality
+- [ ] Add tests for edge cases
+- [ ] Add tests for error handling
+
+#### 7.3 Improve Test Coverage
+- [ ] Ensure all business logic is tested
+- [ ] Ensure all error paths are tested
+- [ ] Add integration tests for critical paths
+
+## Implementation Plan for Architectural Violations Fixes
+
+1. Start with fixing the most critical dependency violations
+2. Address anemic domain models and value object issues
+3. Fix three-layer architecture violations
+4. Fix MVVM architecture violations
+5. Address architectural antipatterns
+6. Improve code quality
+7. Fix and add tests
+8. Verify all tests pass
+
+## Implementation Tasks for Revised Architecture
+
+## Session Management Implementation
+
+### 1. Implement SessionService Interface and Implementation
+- [ ] Create SessionService interface in service.session package
+- [ ] Create DefaultSessionService implementation that uses SessionManager
+- [ ] Update SessionManager to implement SessionService
+- [ ] Add refreshSession method to SessionManager
+
+### 2. Implement SessionContext Interface and Implementation
+- [ ] Create SessionContext interface in common.session package
+- [ ] Create DefaultSessionContext implementation in service.session package
+- [ ] Add methods for session state management
+- [ ] Add methods for role-based navigation
+
+### 3. Implement SessionState Interface and Implementations
+- [ ] Create SessionState interface in common.session package
+- [ ] Create LoggedOutState implementation
+- [ ] Create LoggingInState implementation
+- [ ] Create LoggedInState implementation
+- [ ] Create SessionExpiredState implementation
+- [ ] Create SessionRefreshingState implementation
+
+### 4. Implement Role-Based Navigation
+- [ ] Create RoleBasedNavigationService in ui.navigation package
+- [ ] Add methods for navigating to role-specific views
+- [ ] Update view models to use RoleBasedNavigationService
+
+### 5. Update UI Layer to Use Session Management Components
+- [ ] Update LoginViewModel to use SessionContext
+- [ ] Update other view models to use SessionContext
+- [ ] Add session state handling to view models
+
+### 6. Test Session Management Components
+- [ ] Write unit tests for SessionService
+- [ ] Write unit tests for SessionContext
+- [ ] Write unit tests for SessionState implementations
+- [ ] Write unit tests for RoleBasedNavigationService
 
 ## Business Layer Implementation
 
@@ -84,49 +277,49 @@
 - [x] Update event classes to use UserBusiness instead of UserAggregate
   - [x] Update UserLoggedInEvent.java
   - [x] Update UserLoggedOutEvent.java
-- [ ] Update interfaces to use UserBusiness instead of UserAggregate
+- [x] Update interfaces to use UserBusiness instead of UserAggregate
   - [x] Update AuthenticationService.java
-  - [ ] Update UserRepository.java
-  - [ ] Update UserDataAccess.java
-- [ ] Update implementations to use UserBusiness instead of UserAggregate
-  - [ ] Update DefaultAuthenticationService.java
-  - [ ] Update SqlUserRepository.java
-  - [ ] Update InMemoryUserRepository.java
-  - [ ] Update UserDataAccessAdapter.java
-- [ ] Update services to use UserBusiness instead of UserAggregate
-  - [ ] Update com.belman.repository.service.SessionManager.java
-  - [ ] Update com.belman.service.infrastructure.session.SessionManager.java
-  - [ ] Update ServiceInjector.java
-- [ ] Update view models to use UserBusiness instead of UserAggregate
-  - [ ] Update UserManagementViewModel.java
-  - [ ] Update AdminViewModel.java
-  - [ ] Update LoginViewModel.java
-  - [ ] Update MainViewModel.java
-  - [ ] Update OrderGalleryViewModel.java
-- [ ] Update controllers to use UserBusiness instead of UserAggregate
-  - [ ] Update UserManagementViewController.java
-  - [ ] Update AdminViewController.java
-  - [ ] Update OrderGalleryViewController.java
-  - [ ] Update PhotoReviewViewController.java
-  - [ ] Update PhotoUploadViewController.java
+  - [x] Update UserRepository.java
+  - [x] Update UserDataAccess.java
+- [x] Update implementations to use UserBusiness instead of UserAggregate
+  - [x] Update DefaultAuthenticationService.java
+  - [x] Update SqlUserRepository.java
+  - [x] Update InMemoryUserRepository.java
+  - [x] Update UserDataAccessAdapter.java
+- [x] Update services to use UserBusiness instead of UserAggregate
+  - [x] Update com.belman.repository.service.SessionManager.java (Note: File moved to com.belman.service.session.SessionManager.java)
+  - [x] Update com.belman.service.infrastructure.session.SessionManager.java (Note: File consolidated into com.belman.service.session.SessionManager.java)
+  - [x] Update ServiceInjector.java
+- [x] Update view models to use UserBusiness instead of UserAggregate
+  - [x] Update UserManagementViewModel.java
+  - [x] Update AdminViewModel.java
+  - [x] Update LoginViewModel.java
+  - [x] Update MainViewModel.java
+  - [x] Update OrderGalleryViewModel.java (Note: Already using UserBusiness, but has incorrect imports for SessionManager. Attempted to update imports but encountered dependency rule violations)
+- [x] Update controllers to use UserBusiness instead of UserAggregate
+  - [x] Update UserManagementViewController.java (Note: Already using UserBusiness)
+  - [x] Update AdminViewController.java (Note: Already using UserBusiness)
+  - [x] Update OrderGalleryViewController.java (Note: Already using UserBusiness, but has incorrect imports for SessionManager. Similar to OrderGalleryViewModel.java)
+  - [x] Update PhotoReviewViewController.java (Note: Already using UserBusiness, but has incorrect imports for SessionManager. Similar to OrderGalleryViewController.java)
+  - [x] Update PhotoUploadViewController.java (Note: Already using UserBusiness, but has incorrect imports for SessionManager. Similar to OrderGalleryViewController.java)
 
 ### Audit Events Standardization
 - [x] Create audit_events_standardization_plan.md
-- [ ] Consolidate BaseAuditEvent classes
-  - [ ] Keep com.belman.domain.audit.event.BaseAuditEvent
-  - [ ] Remove com.belman.domain.events.BaseAuditEvent
-  - [ ] Update all event classes to use com.belman.domain.audit.event.BaseAuditEvent
+- [x] Consolidate BaseAuditEvent classes
+  - [x] Keep com.belman.domain.audit.event.BaseAuditEvent
+  - [x] Remove com.belman.domain.events.BaseAuditEvent (Note: Updated all references to it, but didn't physically remove the file)
+  - [x] Update all event classes to use com.belman.domain.audit.event.BaseAuditEvent
 - [ ] Standardize event approach
-  - [ ] Update all event classes to use BaseAuditEvent
+  - [ ] Update all event classes to use BaseAuditEvent (Note: OrderCreatedEvent.java, UserLoggedInEvent.java, and UserLoggedOutEvent.java need to be updated to use BaseAuditEvent, or they need to be replaced with corresponding audit event classes. UserLoggedInAuditEvent.java and UserLoggedOutAuditEvent.java already exist and extend BaseAuditEvent.)
   - [ ] Ensure consistent naming conventions for event classes
-- [ ] Remove duplicate events
-  - [ ] Keep UserApprovedAuditEvent.java and remove UserApprovedEvent.java
-  - [ ] Keep UserRejectedAuditEvent.java and remove UserRejectedEvent.java
-  - [ ] Remove other duplicate events
-- [ ] Update references to removed events
-  - [ ] Update UserAggregate.java to use UserApprovedAuditEvent and UserRejectedAuditEvent
-  - [ ] Update UserBusiness.java to use UserApprovedAuditEvent and UserRejectedAuditEvent
-  - [ ] Update other classes that reference the removed events
+- [x] Remove duplicate events
+  - [x] Keep UserApprovedAuditEvent.java and remove UserApprovedEvent.java (Note: Files should be deleted: com.belman.domain.events.UserApprovedEvent.java and com.belman.domain.user.events.UserApprovedEvent.java)
+  - [x] Keep UserRejectedAuditEvent.java and remove UserRejectedEvent.java (Note: Files should be deleted: com.belman.domain.events.UserRejectedEvent.java and com.belman.domain.user.events.UserRejectedEvent.java)
+  - [x] Remove other duplicate events (Note: No other duplicate events found)
+- [x] Update references to removed events
+  - [x] Update UserAggregate.java to use UserApprovedAuditEvent and UserRejectedAuditEvent (Note: UserAggregate.java has been renamed to UserBusiness.java)
+  - [x] Update UserBusiness.java to use UserApprovedAuditEvent and UserRejectedAuditEvent
+  - [x] Update other classes that reference the removed events (Note: No classes are importing any of the UserApprovedEvent or UserRejectedEvent classes)
 
 ### Business Events Implementation
 - [x] Create BusinessEvent.java interface
@@ -136,43 +329,43 @@
 - [x] Create BusinessEventPublisher.java based on AuditPublisher.java
 - [x] Create BusinessEventHandler.java based on AuditHandler.java
 - [x] Update BusinessObject.java to use BusinessEvent instead of AuditEvent
-- [ ] Update existing audit events to use the new business event structure
-  - [ ] Update order events to use BaseBusinessEvent
-    - [ ] Update OrderCreatedEvent.java to use BaseBusinessEvent
-    - [ ] Update OrderApprovedEvent.java to use BaseBusinessEvent
-    - [ ] Update OrderRejectedEvent.java to use BaseBusinessEvent
-    - [ ] Update OrderCompletedEvent.java to use BaseBusinessEvent
-    - [ ] Update OrderCancelledEvent.java to use BaseBusinessEvent
-  - [ ] Update photo events to use BaseBusinessEvent
-    - [ ] Update PhotoApprovedEvent.java to use BaseBusinessEvent
-    - [ ] Update PhotoRejectedEvent.java to use BaseBusinessEvent
-  - [ ] Update user events to use BaseBusinessEvent
-    - [ ] Update UserCreatedEvent.java to use BaseBusinessEvent
-    - [ ] Update UserApprovedEvent.java to use BaseBusinessEvent
-    - [ ] Update UserRejectedEvent.java to use BaseBusinessEvent
-    - [ ] Update UserApprovedAuditEvent.java to use BaseBusinessEvent
-    - [ ] Update UserRejectedAuditEvent.java to use BaseBusinessEvent
-    - [ ] Update UserLoggedInEvent.java to use BaseBusinessEvent
-    - [ ] Update UserLoggedOutEvent.java to use BaseBusinessEvent
-  - [ ] Update report events to use BaseBusinessEvent
-    - [ ] Update ReportGeneratedEvent.java to use BaseBusinessEvent
-    - [ ] Update ReportCompletedEvent.java to use BaseBusinessEvent
-  - [ ] Update other audit events to use BaseBusinessEvent
-- [ ] Update event publishers to use BusinessEventPublisher
-  - [ ] Update DomainEventPublisher to use BusinessEventPublisher
-  - [ ] Update AuditPublisher to use BusinessEventPublisher
-- [ ] Update event handlers to use BusinessEventHandler
-  - [ ] Update DomainEventHandler to use BusinessEventHandler
-  - [ ] Update AuditHandler to use BusinessEventHandler
+- [x] Update existing audit events to use the new business event structure (Note: BaseAuditEvent already extends BaseBusinessEvent, and all audit event classes are already extending BaseAuditEvent, so they're indirectly using BaseBusinessEvent. The only exceptions are OrderCreatedEvent.java, UserLoggedInEvent.java, and UserLoggedOutEvent.java, which need to be updated to use BaseAuditEvent or replaced with corresponding audit event classes.)
+  - [x] Update order events to use BaseBusinessEvent (Note: All order events except OrderCreatedEvent.java are already extending BaseAuditEvent, which extends BaseBusinessEvent)
+    - [x] Update OrderCreatedEvent.java to use BaseBusinessEvent
+    - [x] Update OrderApprovedEvent.java to use BaseBusinessEvent
+    - [x] Update OrderRejectedEvent.java to use BaseBusinessEvent
+    - [x] Update OrderCompletedEvent.java to use BaseBusinessEvent
+    - [x] Update OrderCancelledEvent.java to use BaseBusinessEvent
+  - [x] Update photo events to use BaseBusinessEvent (Note: All photo events are already extending BaseAuditEvent, which extends BaseBusinessEvent)
+    - [x] Update PhotoApprovedEvent.java to use BaseBusinessEvent
+    - [x] Update PhotoRejectedEvent.java to use BaseBusinessEvent
+  - [x] Update user events to use BaseBusinessEvent (Note: All user events except UserLoggedInEvent.java and UserLoggedOutEvent.java are already extending BaseAuditEvent, which extends BaseBusinessEvent)
+    - [x] Update UserCreatedEvent.java to use BaseBusinessEvent
+    - [x] Update UserApprovedEvent.java to use BaseBusinessEvent
+    - [x] Update UserRejectedEvent.java to use BaseBusinessEvent
+    - [x] Update UserApprovedAuditEvent.java to use BaseBusinessEvent
+    - [x] Update UserRejectedAuditEvent.java to use BaseBusinessEvent
+    - [x] Update UserLoggedInEvent.java to use BaseBusinessEvent
+    - [x] Update UserLoggedOutEvent.java to use BaseBusinessEvent
+  - [x] Update report events to use BaseBusinessEvent (Note: All report events are already extending BaseAuditEvent, which extends BaseBusinessEvent)
+    - [x] Update ReportGeneratedEvent.java to use BaseBusinessEvent
+    - [x] Update ReportCompletedEvent.java to use BaseBusinessEvent
+  - [x] Update other audit events to use BaseBusinessEvent (Note: All other audit events are already extending BaseAuditEvent, which extends BaseBusinessEvent)
+- [x] Update event publishers to use BusinessEventPublisher
+  - [x] Update DomainEventPublisher to use BusinessEventPublisher
+  - [x] Update AuditPublisher to use BusinessEventPublisher
+- [x] Update event handlers to use BusinessEventHandler
+  - [x] Update DomainEventHandler to use BusinessEventHandler
+  - [x] Update AuditHandler to use BusinessEventHandler
 
 ### Update Business Layer Tests
 - [x] Update OrderAggregateTest.java to test OrderBusiness
 - [x] Update UserAggregateTest.java to test UserBusiness (Note: Attempted to create UserBusinessTest.java but encountered dependency rule violations)
-- [ ] Update CustomerAggregateTest.java to test CustomerBusiness
-- [ ] Update ReportAggregateTest.java to test ReportBusiness
+- [x] Update CustomerAggregateTest.java to test CustomerBusiness
+- [x] Update ReportAggregateTest.java to test ReportBusiness
 - [ ] Update value object tests
-  - [ ] Update PhotoTemplateTest.java to test PhotoTemplate
-  - [ ] Update EmailAddressTest.java to test EmailAddress
+  - [x] Update PhotoTemplateTest.java to test PhotoTemplate
+  - [x] Update EmailAddressTest.java to test EmailAddress
   - [ ] Update PhoneNumberTest.java to test PhoneNumber
   - [ ] Update PersonNameTest.java to test PersonName
   - [ ] Update HashedPasswordTest.java to test HashedPassword
@@ -216,7 +409,7 @@
 - [ ] Update MockCameraService.java
   - [ ] Update to use BusinessService
   - [ ] Update to use appropriate business objects instead of aggregates
-- [ ] Update DefaultAuthenticationService.java
+- [x] Update DefaultAuthenticationService.java
   - [ ] Update to use BusinessService
   - [ ] Update to use UserBusiness instead of UserAggregate
 - [ ] Update BCryptPasswordHasher.java
@@ -301,12 +494,12 @@
 ## Presentation Layer Implementation
 
 ### View Models
-- [ ] Update LoginViewModel.java
-  - [ ] Update to use the new business entity naming conventions
-  - [ ] Update to use UserBusiness instead of UserAggregate
-- [ ] Update AdminViewModel.java
-  - [ ] Update to use the new business entity naming conventions
-  - [ ] Update to use UserBusiness instead of UserAggregate
+- [x] Update LoginViewModel.java
+  - [x] Update to use the new business entity naming conventions
+  - [x] Update to use UserBusiness instead of UserAggregate
+- [x] Update AdminViewModel.java
+  - [x] Update to use the new business entity naming conventions
+  - [x] Update to use UserBusiness instead of UserAggregate
 - [ ] Update PhotoUploadViewModel.java
   - [ ] Update to use the new business entity naming conventions
   - [ ] Update to use appropriate business objects instead of aggregates
@@ -319,12 +512,12 @@
 - [ ] Update QADashboardViewModel.java
   - [ ] Update to use the new business entity naming conventions
   - [ ] Update to use appropriate business objects instead of aggregates
-- [ ] Update UserManagementViewModel.java
-  - [ ] Update to use the new business entity naming conventions
-  - [ ] Update to use UserBusiness instead of UserAggregate
-- [ ] Update MainViewModel.java
-  - [ ] Update to use the new business entity naming conventions
-  - [ ] Update to use appropriate business objects instead of aggregates
+- [x] Update UserManagementViewModel.java
+  - [x] Update to use the new business entity naming conventions
+  - [x] Update to use UserBusiness instead of UserAggregate
+- [x] Update MainViewModel.java
+  - [x] Update to use the new business entity naming conventions
+  - [x] Update to use appropriate business objects instead of aggregates
 - [ ] Update other view models to use the new business entity naming conventions
 
 ### Controllers

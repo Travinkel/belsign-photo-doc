@@ -1,24 +1,20 @@
 package com.belman.ui.views.photoupload;
 
-import com.belman.ui.base.BaseController;
-import com.belman.ui.navigation.Router;
-import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserRole;
 import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.services.CameraService;
+import com.belman.domain.user.UserBusiness;
+import com.belman.domain.user.UserRole;
 import com.belman.repository.camera.CameraServiceFactory;
 import com.belman.repository.service.SessionManager;
+import com.belman.ui.base.BaseController;
 import com.belman.ui.components.TouchFriendlyDialog;
+import com.belman.ui.navigation.Router;
 import com.belman.ui.views.qadashboard.QADashboardView;
 import com.belman.ui.views.usermanagement.UserManagementView;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 import java.io.File;
 
@@ -68,12 +64,12 @@ public class PhotoUploadViewController extends BaseController<PhotoUploadViewMod
 
         // Bind button states
         uploadButton.disableProperty().bind(
-            Bindings.not(getViewModel().photoSelectedProperty())
-            .or(Bindings.not(getViewModel().orderSelectedProperty()))
+                Bindings.not(getViewModel().photoSelectedProperty())
+                        .or(Bindings.not(getViewModel().orderSelectedProperty()))
         );
 
         deleteButton.disableProperty().bind(
-            Bindings.isNull(photoListView.getSelectionModel().selectedItemProperty())
+                Bindings.isNull(photoListView.getSelectionModel().selectedItemProperty())
         );
 
         // Bind list view to photos list
@@ -81,6 +77,14 @@ public class PhotoUploadViewController extends BaseController<PhotoUploadViewMod
 
         // Set cell factory to use touch-friendly photo list cells
         photoListView.setCellFactory(listView -> new TouchFriendlyPhotoListCell());
+    }
+
+    /**
+     * Shows an error message using a touch-friendly dialog.
+     */
+    @Override
+    protected void showError(String message) {
+        TouchFriendlyDialog.showError("Error", message);
     }
 
     /**
@@ -94,15 +98,6 @@ public class PhotoUploadViewController extends BaseController<PhotoUploadViewMod
         if (!found) {
             showError(getViewModel().errorMessageProperty().get());
         }
-    }
-
-    /**
-     * Gets a CameraService instance appropriate for the current platform.
-     * 
-     * @return a CameraService instance
-     */
-    private CameraService getCameraService() {
-        return CameraServiceFactory.getCameraService();
     }
 
     /**
@@ -162,6 +157,22 @@ public class PhotoUploadViewController extends BaseController<PhotoUploadViewMod
         } else {
             showError("Camera is not available on this device");
         }
+    }
+
+    /**
+     * Gets a CameraService instance appropriate for the current platform.
+     *
+     * @return a CameraService instance
+     */
+    private CameraService getCameraService() {
+        return CameraServiceFactory.getCameraService();
+    }
+
+    /**
+     * Shows an information message using a touch-friendly dialog.
+     */
+    protected void showInfo(String message) {
+        TouchFriendlyDialog.showInformation("Information", message);
     }
 
     /**
@@ -322,21 +333,6 @@ public class PhotoUploadViewController extends BaseController<PhotoUploadViewMod
 
         // Fallback to PhotoUploadView if no user is logged in or if an error occurs
         Router.navigateTo(PhotoUploadView.class);
-    }
-
-    /**
-     * Shows an error message using a touch-friendly dialog.
-     */
-    @Override
-    protected void showError(String message) {
-        TouchFriendlyDialog.showError("Error", message);
-    }
-
-    /**
-     * Shows an information message using a touch-friendly dialog.
-     */
-    protected void showInfo(String message) {
-        TouchFriendlyDialog.showInformation("Information", message);
     }
 
 }

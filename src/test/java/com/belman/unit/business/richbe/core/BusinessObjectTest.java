@@ -1,9 +1,9 @@
 package com.belman.unit.business.richbe.core;
 
 import com.belman.domain.audit.AuditFacade;
-import com.belman.domain.core.BusinessObject;
 import com.belman.domain.audit.event.AuditEvent;
 import com.belman.domain.audit.event.BaseAuditEvent;
+import com.belman.domain.core.BusinessObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,8 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 
 class BusinessObjectTest {
 

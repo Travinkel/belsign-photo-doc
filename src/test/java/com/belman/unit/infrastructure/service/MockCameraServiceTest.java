@@ -12,8 +12,9 @@ import org.mockito.MockitoAnnotations;
 import java.io.File;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the MockCameraService class.
@@ -24,19 +25,19 @@ class MockCameraServiceTest {
 
     @Mock
     private Stage mockStage;
-    
+
     @Mock
     private FileChooser mockFileChooser;
-    
+
     private CameraService cameraService;
-    
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        
+
         // Create a MockCameraService with the mock stage
         cameraService = new MockCameraService(mockStage);
-        
+
         // Use reflection to replace the FileChooser with our mock
         try {
             java.lang.reflect.Field field = MockCameraService.class.getDeclaredField("fileChooser");
@@ -47,7 +48,7 @@ class MockCameraServiceTest {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Test that isCameraAvailable always returns true for the mock implementation.
      */
@@ -55,7 +56,7 @@ class MockCameraServiceTest {
     void isCameraAvailable_alwaysReturnsTrue() {
         assertTrue(cameraService.isCameraAvailable());
     }
-    
+
     /**
      * Test that isGalleryAvailable always returns true for the mock implementation.
      */
@@ -63,7 +64,7 @@ class MockCameraServiceTest {
     void isGalleryAvailable_alwaysReturnsTrue() {
         assertTrue(cameraService.isGalleryAvailable());
     }
-    
+
     /**
      * Test that takePhoto returns an Optional with the selected file when a file is selected.
      */
@@ -71,16 +72,16 @@ class MockCameraServiceTest {
     void takePhoto_whenFileSelected_returnsOptionalWithFile() {
         // Create a mock file
         File mockFile = new File("mockFile.jpg");
-        
+
         // Mock the FileChooser to return the mock file
         when(mockFileChooser.showOpenDialog(mockStage)).thenReturn(mockFile);
-        
+
         // Test that takePhoto returns an Optional with the mock file
         Optional<File> result = cameraService.takePhoto();
         assertTrue(result.isPresent());
         assertEquals(mockFile, result.get());
     }
-    
+
     /**
      * Test that takePhoto returns an empty Optional when no file is selected.
      */
@@ -88,12 +89,12 @@ class MockCameraServiceTest {
     void takePhoto_whenNoFileSelected_returnsEmptyOptional() {
         // Mock the FileChooser to return null (no file selected)
         when(mockFileChooser.showOpenDialog(mockStage)).thenReturn(null);
-        
+
         // Test that takePhoto returns an empty Optional
         Optional<File> result = cameraService.takePhoto();
         assertTrue(result.isEmpty());
     }
-    
+
     /**
      * Test that selectPhoto returns an Optional with the selected file when a file is selected.
      */
@@ -101,16 +102,16 @@ class MockCameraServiceTest {
     void selectPhoto_whenFileSelected_returnsOptionalWithFile() {
         // Create a mock file
         File mockFile = new File("mockFile.jpg");
-        
+
         // Mock the FileChooser to return the mock file
         when(mockFileChooser.showOpenDialog(mockStage)).thenReturn(mockFile);
-        
+
         // Test that selectPhoto returns an Optional with the mock file
         Optional<File> result = cameraService.selectPhoto();
         assertTrue(result.isPresent());
         assertEquals(mockFile, result.get());
     }
-    
+
     /**
      * Test that selectPhoto returns an empty Optional when no file is selected.
      */
@@ -118,7 +119,7 @@ class MockCameraServiceTest {
     void selectPhoto_whenNoFileSelected_returnsEmptyOptional() {
         // Mock the FileChooser to return null (no file selected)
         when(mockFileChooser.showOpenDialog(mockStage)).thenReturn(null);
-        
+
         // Test that selectPhoto returns an empty Optional
         Optional<File> result = cameraService.selectPhoto();
         assertTrue(result.isEmpty());
