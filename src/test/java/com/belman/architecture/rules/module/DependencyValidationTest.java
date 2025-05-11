@@ -34,10 +34,11 @@ public class DependencyValidationTest {
                 .layer("Bootstrap").definedBy("com.belman.bootstrap..")
 
                 // Allow forward and shared layer flow
-                .whereLayer("UI").mayOnlyAccessLayers("Service", "Domain", "Common")
-                .whereLayer("Service").mayOnlyAccessLayers("UI", "Repository", "Domain", "Common")
-                .whereLayer("Repository").mayOnlyAccessLayers("Service", "Domain", "Common")
+                .whereLayer("UI").mayOnlyAccessLayers("Service", "Domain", "Common", "Bootstrap")
+                .whereLayer("Service").mayOnlyAccessLayers("UI", "Repository", "Domain", "Common", "Bootstrap")
+                .whereLayer("Repository").mayOnlyAccessLayers("Service", "Domain", "Common", "Bootstrap")
                 .whereLayer("Domain").mayOnlyAccessLayers("Common")
+                .whereLayer("Common").mayOnlyAccessLayers()
                 .whereLayer("Bootstrap").mayOnlyAccessLayers("UI", "Service", "Repository", "Domain", "Common");
 
         rule.check(importedClasses);
