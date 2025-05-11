@@ -23,6 +23,35 @@ While some tasks below reference "DataAccessInterface", we are maintaining "Repo
 - [ ] Ensure service layer doesn't depend on UI layer except through interfaces
 - [ ] Ensure repository layer doesn't depend on UI layer
 - [ ] Move misplaced classes to their correct layers
+- [ ] Follow the task list in DEPENDENCY_VIOLATIONS_TASK_LIST.md for fixing specific violations
+
+#### 1.1.1 Fix Bootstrap Layer Violations
+- [ ] Move `StorageServiceFactory` to the Bootstrap layer or create an interface in the Bootstrap layer
+- [ ] Update imports in `StorageServiceFactory` to use classes from appropriate layers
+
+#### 1.1.2 Fix UI Layer Violations
+- [ ] Move `EmojiLogger` to the Common layer or create an interface in the Common layer
+- [ ] Update imports in `ViewFactory`, `Router`, and other UI classes to use the new location
+- [ ] Move platform utilities from Repository layer to Common layer
+- [ ] Update imports in `TransitionPresets`, `ViewLoader`, and other UI classes to use the new location
+- [ ] Create interfaces in the Service layer for classes from `service.infrastructure` package
+- [ ] Update imports in `ViewLoader`, `RouteGuardImpl`, and other UI classes to use the new interfaces
+
+#### 1.1.3 Fix Common Layer Violations
+- [ ] Move platform utilities from Repository layer to Common layer
+- [ ] Update imports in `SecureConfigStorage` and other Common classes to use the new location
+
+#### 1.1.4 Fix Service Layer Violations
+- [ ] Identify and fix any Service layer classes importing from Repository layer
+- [ ] Create interfaces for Repository layer classes that need to be accessed by Service layer
+
+#### 1.1.5 Fix Repository Layer Violations
+- [ ] Identify and fix any Repository layer classes importing from UI or Service layers
+- [ ] Create interfaces for UI or Service layer classes that need to be accessed by Repository layer
+
+#### 1.1.6 Fix Domain Layer Violations
+- [ ] Identify and fix any Domain layer classes importing from UI, Service, or Repository layers
+- [ ] Ensure Domain layer only depends on Common layer
 
 #### 1.2 Fix Package Structure Issues
 - [X] Move bootstrap code from `com.belman.repository.bootstrap` to `com.belman.bootstrap`
