@@ -3,7 +3,7 @@ package com.belman.ui.base;
 import com.belman.bootstrap.lifecycle.LifecycleManager;
 import com.belman.ui.core.ViewLoader;
 import com.belman.ui.lifecycle.ViewLifecycle;
-import com.gluonhq.charm.glisten.application.MobileApplicationManager;
+import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.control.ProgressIndicator;
 import com.gluonhq.charm.glisten.mvc.View;
@@ -99,9 +99,9 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View implemen
                 return;
             }
 
-            MobileApplicationManager app = MobileApplicationManager.getInstance();
+            MobileApplication app = MobileApplication.getInstance();
             if (app == null) {
-                // In unit tests or non-Gluon environments, MobileApplicationManager.getInstance() may return null
+                // In unit tests or non-Gluon environments, MobileApplication.getInstance() may return null
                 return;
             }
 

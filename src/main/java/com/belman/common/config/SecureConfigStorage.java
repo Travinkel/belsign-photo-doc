@@ -1,7 +1,7 @@
 package com.belman.common.config;
 
-import com.belman.repository.InfrastructureService;
-import com.belman.repository.platform.ErrorHandler;
+import com.belman.common.service.InfrastructureService;
+import com.belman.ui.core.ErrorHandler;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;

@@ -4,7 +4,7 @@ import com.belman.domain.common.EmailAddress;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.security.PasswordHasher;
 import com.belman.domain.user.*;
-import com.belman.repository.security.BCryptPasswordHasher;
+import com.belman.service.usecase.security.BCryptPasswordHasher;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -58,9 +58,9 @@ public class InMemoryUserRepository implements UserRepository {
         productionUser.addRole(UserRole.PRODUCTION);
 
         // Create QA user with both usernames
-        EmailAddress qaEmail = new EmailAddress("qa@belman.com");
+        EmailAddress qaEmail = new EmailAddress("qa_user1@belman.com");
         UserBusiness qaUser = UserBusiness.createNewUser(
-                new Username("qa"),
+                new Username("qa_user1"),
                 HashedPassword.fromPlainText("qa", passwordHasher),
                 qaEmail
         );
@@ -128,7 +128,7 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public void save(UserBusiness user) {
+    public UserBusiness save(UserBusiness user) {
         UserId userId = user.getId();
         Username username = user.getUsername();
 
@@ -140,10 +140,12 @@ public class InMemoryUserRepository implements UserRepository {
 
         // Note: We can't update the email mapping here because we don't have access to the email.
         // The email mapping must be added separately using the addEmailMapping method.
+
+        return user;
     }
 
     @Override
-    public boolean delete(UserId id) {
+    public boolean deleteById(UserId id) {
         UserBusiness user = usersById.get(id);
         if (user != null) {
             // Remove the user from the ID map
@@ -164,6 +166,23 @@ public class InMemoryUserRepository implements UserRepository {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void delete(UserBusiness user) {
+        if (user != null) {
+            deleteById(user.getId());
+        }
+    }
+
+    @Override
+    public boolean existsById(UserId id) {
+        return usersById.containsKey(id);
+    }
+
+    @Override
+    public long count() {
+        return usersById.size();
     }
 
     /**

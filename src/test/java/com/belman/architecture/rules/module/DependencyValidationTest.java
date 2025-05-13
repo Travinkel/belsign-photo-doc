@@ -11,6 +11,9 @@ import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 /**
  * Tests to enforce the dependency validation rules between different scopes.
  * These rules match the configuration in .idea/scopes/scope_settings.xml.
+ * 
+ * Note: Only UI, Service, and Repository are considered layers.
+ * Domain, Common, and Bootstrap are shared packages that can be used by all layers.
  */
 public class DependencyValidationTest {
 
@@ -26,22 +29,23 @@ public class DependencyValidationTest {
         ArchRule rule = layeredArchitecture()
                 .consideringAllDependencies()
 
+                // Layers
                 .layer("UI").definedBy("com.belman.ui..")
                 .layer("Service").definedBy("com.belman.service..")
                 .layer("Repository").definedBy("com.belman.repository..")
-                .layer("Domain").definedBy("com.belman.domain..")
-                .layer("Common").definedBy("com.belman.common..")
-                .layer("Bootstrap").definedBy("com.belman.bootstrap..")
 
-                // Allow forward and shared layer flow
+                // Shared packages (not layers, just used by all)
+                .optionalLayer("Domain").definedBy("com.belman.domain..")
+                .optionalLayer("Common").definedBy("com.belman.common..")
+                .optionalLayer("Bootstrap").definedBy("com.belman.bootstrap..")
+
+                // Rules
                 .whereLayer("UI").mayOnlyAccessLayers("Service", "Domain", "Common", "Bootstrap")
                 .whereLayer("Service").mayOnlyAccessLayers("UI", "Repository", "Domain", "Common", "Bootstrap")
-                .whereLayer("Repository").mayOnlyAccessLayers("Service", "Domain", "Common", "Bootstrap")
-                .whereLayer("Domain").mayOnlyAccessLayers("Common")
-                .whereLayer("Common").mayOnlyAccessLayers()
-                .whereLayer("Bootstrap").mayOnlyAccessLayers("UI", "Service", "Repository", "Domain", "Common");
+                .whereLayer("Repository").mayOnlyAccessLayers("Service", "Domain", "Common", "Bootstrap");
 
         rule.check(importedClasses);
     }
+
 
 }

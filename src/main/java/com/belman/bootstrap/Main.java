@@ -14,11 +14,13 @@ import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
 import com.belman.repository.logging.EmojiLoggerAdapter;
-import com.belman.ui.core.GluonFacade;
+import com.belman.service.error.ErrorHandler;
+import com.belman.ui.core.UIErrorHandlerAdapter;
 import com.belman.ui.navigation.RouteGuardImpl;
 import com.belman.ui.navigation.Router;
 import com.belman.ui.views.splash.SplashView;
-import javafx.application.Application;
+import com.gluonhq.charm.glisten.application.MobileApplication;
+import com.gluonhq.charm.glisten.mvc.View;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -28,7 +30,7 @@ import javafx.stage.Stage;
  * This class is the entry point for the application and coordinates bootstrapping
  * across the three layers (BLL, DAL, GUI).
  */
-public class Main extends Application {
+public class Main extends MobileApplication {
 
     public static final String SPLASH_VIEW = SplashView.class.getSimpleName();
     private static final EmojiLogger logger = EmojiLogger.getLogger(Main.class);
@@ -48,8 +50,6 @@ public class Main extends Application {
         }
     }
 
-    private final GluonFacade app = GluonFacade.initialize();
-
     /**
      * Main entry point for the application.
      *
@@ -61,14 +61,17 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        init();
-        app.start(primaryStage);
-        postInit(app.getScene());
-    }
-
-    @Override
     public void init() {
+        try {
+            super.init();
+
+            // Initialize Gluon Mobile application
+            logger.debug("Initializing MobileApplication");
+        } catch (Exception e) {
+            logger.error("Error initializing MobileApplication", e);
+            throw new RuntimeException("Error initializing MobileApplication", e);
+        }
+
         // Initialize Gluon internal classes fixes (DAL)
         logger.debug("Initializing Gluon internal classes fixes");
         GluonInternalClassesFix.initialize();
@@ -76,6 +79,12 @@ public class Main extends Application {
         // Bootstrap the application (DAL)
         logger.startup("Bootstrapping the application");
         ApplicationBootstrapper.initialize();
+
+        // Initialize error handling (BLL)
+        logger.debug("Initializing error handling");
+        // Register the error handler with ServiceLocator instead of using ErrorHandlerFactory
+        ServiceLocator.registerService(ErrorHandler.class, UIErrorHandlerAdapter.createWithDefaultErrorHandler());
+        logger.success("Error handling initialized successfully");
 
         // Initialize service fallbacks for desktop platforms (DAL)
         if (!PlatformUtils.isRunningOnMobile()) {
@@ -93,7 +102,7 @@ public class Main extends Application {
 
         // Set up the Router (GUI)
         logger.debug("Setting up Router");
-        Router.setMobileApplication(app);
+        Router.setMobileApplication(this);
 
         // Initialize route guards for role-based access control (BLL + GUI)
         initializeRouteGuards();
@@ -112,46 +121,46 @@ public class Main extends Application {
     private void registerViews() {
         // Register the splash view
         logger.debug("Registering splash view");
-        app.addViewFactory(SPLASH_VIEW, SplashView::new);
+        this.addViewFactory(SPLASH_VIEW, SplashView::new);
 
         // Register the login view
         logger.debug("Registering login view");
-        app.addViewFactory(com.belman.ui.views.login.LoginView.class.getSimpleName(),
+        this.addViewFactory(com.belman.ui.views.login.LoginView.class.getSimpleName(),
                 com.belman.ui.views.login.LoginView::new);
 
         // Register the admin view
         logger.debug("Registering admin view");
-        app.addViewFactory(com.belman.ui.views.admin.AdminView.class.getSimpleName(),
+        this.addViewFactory(com.belman.ui.views.admin.AdminView.class.getSimpleName(),
                 com.belman.ui.views.admin.AdminView::new);
 
         // Register the order gallery view
         logger.debug("Registering order gallery view");
-        app.addViewFactory(com.belman.ui.views.ordergallery.OrderGalleryView.class.getSimpleName(),
+        this.addViewFactory(com.belman.ui.views.ordergallery.OrderGalleryView.class.getSimpleName(),
                 com.belman.ui.views.ordergallery.OrderGalleryView::new);
 
         // Register the photo review view
         logger.debug("Registering photo review view");
-        app.addViewFactory(com.belman.ui.views.photoreview.PhotoReviewView.class.getSimpleName(),
+        this.addViewFactory(com.belman.ui.views.photoreview.PhotoReviewView.class.getSimpleName(),
                 com.belman.ui.views.photoreview.PhotoReviewView::new);
 
         // Register the photo upload view
         logger.debug("Registering photo upload view");
-        app.addViewFactory(com.belman.ui.views.photoupload.PhotoUploadView.class.getSimpleName(),
+        this.addViewFactory(com.belman.ui.views.photoupload.PhotoUploadView.class.getSimpleName(),
                 com.belman.ui.views.photoupload.PhotoUploadView::new);
 
         // Register the QA dashboard view
         logger.debug("Registering QA dashboard view");
-        app.addViewFactory(com.belman.ui.views.qadashboard.QADashboardView.class.getSimpleName(),
+        this.addViewFactory(com.belman.ui.views.qadashboard.QADashboardView.class.getSimpleName(),
                 com.belman.ui.views.qadashboard.QADashboardView::new);
 
         // Register the report preview view
         logger.debug("Registering report preview view");
-        app.addViewFactory(com.belman.ui.views.reportpreview.ReportPreviewView.class.getSimpleName(),
+        this.addViewFactory(com.belman.ui.views.reportpreview.ReportPreviewView.class.getSimpleName(),
                 com.belman.ui.views.reportpreview.ReportPreviewView::new);
 
         // Register the user management view
         logger.debug("Registering user management view");
-        app.addViewFactory(com.belman.ui.views.usermanagement.UserManagementView.class.getSimpleName(),
+        this.addViewFactory(com.belman.ui.views.usermanagement.UserManagementView.class.getSimpleName(),
                 com.belman.ui.views.usermanagement.UserManagementView::new);
     }
 
@@ -183,7 +192,7 @@ public class Main extends Application {
 
         // Show the splash view (GUI)
         logger.info("Showing splash view");
-        app.switchView(SPLASH_VIEW);
+        this.switchView(SPLASH_VIEW);
     }
 
     /**

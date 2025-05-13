@@ -15,10 +15,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.Locale;
 
 /**
  * View model for the user management view.
@@ -74,29 +72,29 @@ public class UserManagementViewModel extends BaseViewModel<UserManagementViewMod
      * Filters the users based on the search filter.
      */
     public void filterUsers() {
-        String filter = searchFilter.get().toLowerCase();
+        String filter = searchFilter.get().toLowerCase(Locale.ROOT);
 
         if (filter == null || filter.isEmpty()) {
             filteredUsers.setPredicate(user -> true);
         } else {
             filteredUsers.setPredicate(user -> {
                 // Check if username contains filter
-                if (user.getUsername().value().toLowerCase().contains(filter)) {
+                if (user.getUsername().value().toLowerCase(Locale.ROOT).contains(filter)) {
                     return true;
                 }
 
                 // Check if first name contains filter
-                if (user.getName() != null && user.getName().firstName().toLowerCase().contains(filter)) {
+                if (user.getName() != null && user.getName().firstName().toLowerCase(Locale.ROOT).contains(filter)) {
                     return true;
                 }
 
                 // Check if last name contains filter
-                if (user.getName() != null && user.getName().lastName().toLowerCase().contains(filter)) {
+                if (user.getName() != null && user.getName().lastName().toLowerCase(Locale.ROOT).contains(filter)) {
                     return true;
                 }
 
                 // Check if email contains filter
-                return user.getEmail() != null && user.getEmail().value().toLowerCase().contains(filter);
+                return user.getEmail() != null && user.getEmail().value().toLowerCase(Locale.ROOT).contains(filter);
             });
         }
     }

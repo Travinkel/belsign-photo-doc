@@ -7,7 +7,7 @@ import com.belman.domain.order.OrderId;
 import com.belman.domain.order.photo.Photo;
 import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.order.photo.PhotoId;
-import com.belman.domain.services.Logger;
+import com.belman.domain.services.LoggerFactory;
 import com.belman.domain.user.UserBusiness;
 import com.belman.service.base.BaseService;
 
@@ -38,10 +38,10 @@ public class AuditablePhotoService extends BaseService implements PhotoService, 
      *
      * @param delegateService the service to delegate photo operations to
      * @param auditFacade     the facade for logging audit events
-     * @param logger          the logger for logging service operations
+     * @param loggerFactory   the factory to create loggers
      */
-    public AuditablePhotoService(PhotoService delegateService, AuditFacade auditFacade, Logger logger) {
-        super(logger);
+    public AuditablePhotoService(PhotoService delegateService, AuditFacade auditFacade, LoggerFactory loggerFactory) {
+        super(loggerFactory);
         this.delegateService = delegateService;
         this.auditFacade = auditFacade;
     }
@@ -58,11 +58,14 @@ public class AuditablePhotoService extends BaseService implements PhotoService, 
 
     @Override
     public PhotoDocument uploadPhoto(OrderId orderId, Photo photo, UserBusiness uploadedBy) {
+        // Create a new PhotoId for this upload
+        PhotoId photoId = PhotoId.newId();
+
         // Set audit context
         this.currentUser = uploadedBy;
         this.currentAction = "UPLOAD_PHOTO";
         this.currentEntityType = "Photo";
-        this.currentEntityId = photo.getId().toString();
+        this.currentEntityId = photoId.toString();
         this.currentDetails = "Uploaded photo for order " + orderId.toString();
 
         // Delegate to the actual service

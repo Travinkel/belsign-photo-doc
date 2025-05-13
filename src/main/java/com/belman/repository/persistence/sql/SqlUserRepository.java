@@ -141,7 +141,7 @@ public class SqlUserRepository implements UserRepository {
     }
 
     @Override
-    public void save(UserBusiness user) {
+    public UserBusiness save(UserBusiness user) {
         // Check if user already exists
         String checkSql = "SELECT COUNT(*) FROM users WHERE id = ?";
         boolean userExists = false;
@@ -166,6 +166,8 @@ public class SqlUserRepository implements UserRepository {
         } else {
             insertUser(user);
         }
+
+        return user;
     }
 
     private void updateUser(UserBusiness user) {
@@ -305,7 +307,7 @@ public class SqlUserRepository implements UserRepository {
     }
 
     @Override
-    public boolean delete(UserId id) {
+    public boolean deleteById(UserId id) {
         String sql = "DELETE FROM users WHERE id = ?";
 
         try (Connection conn = dataSource.getConnection();
@@ -323,6 +325,52 @@ public class SqlUserRepository implements UserRepository {
         }
 
         return false;
+    }
+
+    @Override
+    public void delete(UserBusiness user) {
+        if (user != null) {
+            deleteById(user.getId());
+        }
+    }
+
+    @Override
+    public boolean existsById(UserId id) {
+        String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, id.id());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error checking if user exists: " + id.id(), e);
+        }
+
+        return false;
+    }
+
+    @Override
+    public long count() {
+        String sql = "SELECT COUNT(*) FROM users";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getLong(1);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error counting users", e);
+        }
+
+        return 0;
     }
 
     private UserBusiness mapResultSetToUser(ResultSet rs) throws SQLException {

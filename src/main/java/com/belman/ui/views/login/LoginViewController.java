@@ -5,10 +5,18 @@ import com.belman.ui.views.login.flow.DefaultLoginContext;
 import com.belman.ui.views.login.flow.PinLoginState;
 import com.belman.ui.views.login.flow.CameraScanLoginState;
 import com.belman.ui.views.login.flow.StartLoginState;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
+
+import java.util.Random;
 
 /**
  * Controller for the login view.
@@ -21,18 +29,7 @@ public class LoginViewController extends BaseController<LoginViewModel> {
     @FXML
     private Button pinButton;
 
-    // Username/password form
-    @FXML
-    private VBox usernamePasswordForm;
-
-    @FXML
-    private TextField usernameField;
-
-    @FXML
-    private PasswordField passwordField;
-
-    @FXML
-    private CheckBox rememberMeCheckBox;
+    // Note: Username/password form has been removed from the FXML
 
     // PIN code form
     @FXML
@@ -48,6 +45,15 @@ public class LoginViewController extends BaseController<LoginViewModel> {
     @FXML
     private Button startScanButton;
 
+    @FXML
+    private Button mockScanSuccessButton;
+
+    @FXML
+    private StackPane cameraPreviewContainer;
+
+    @FXML
+    private ImageView cameraPreviewImage;
+
     // Common controls
     @FXML
     private Button loginButton;
@@ -61,6 +67,9 @@ public class LoginViewController extends BaseController<LoginViewModel> {
     @FXML
     private ProgressIndicator loginProgressIndicator;
 
+    // Timeline for simulating camera preview
+    private Timeline cameraPreviewTimeline;
+
     @Override
     protected void setupBindings() {
         // Bind UI components to ViewModel properties
@@ -72,21 +81,25 @@ public class LoginViewController extends BaseController<LoginViewModel> {
             System.out.println("Created temporary LoginViewModel to avoid NullPointerException");
         }
 
-        // Bind username/password form fields
-        usernameField.textProperty().bindBidirectional(getViewModel().usernameProperty());
-        passwordField.textProperty().bindBidirectional(getViewModel().passwordProperty());
+        // Bind UI components to ViewModel properties
         errorMessageLabel.textProperty().bind(getViewModel().errorMessageProperty());
         loginProgressIndicator.visibleProperty().bind(getViewModel().loginInProgressProperty());
         loginButton.disableProperty().bind(getViewModel().loginInProgressProperty());
-        rememberMeCheckBox.selectedProperty().bindBidirectional(getViewModel().rememberMeProperty());
+
+        // Add a listener to the error message property to show/hide the error message label
+        getViewModel().errorMessageProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && !newValue.isEmpty()) {
+                errorMessageLabel.setVisible(true);
+            } else {
+                errorMessageLabel.setVisible(false);
+            }
+        });
 
         // Set up event handlers for common buttons
         loginButton.setOnAction(this::handleLoginButtonAction);
         cancelButton.setOnAction(this::handleCancelButtonAction);
 
         // Set up key event handlers for Enter key
-        usernameField.setOnAction(this::handleLoginButtonAction);
-        passwordField.setOnAction(this::handleLoginButtonAction);
         pinCodeField.setOnAction(this::handleLoginButtonAction);
 
         // Set up event handlers for authentication method selection
@@ -94,8 +107,8 @@ public class LoginViewController extends BaseController<LoginViewModel> {
         pinButton.setOnAction(this::handlePinButtonAction);
         startScanButton.setOnAction(this::handleStartScanButtonAction);
 
-        // Initially show username/password form
-        showUsernamePasswordForm();
+        // Hide error message label initially
+        errorMessageLabel.setVisible(false);
     }
 
     @Override
@@ -104,12 +117,25 @@ public class LoginViewController extends BaseController<LoginViewModel> {
         setupBindings();
     }
 
+    @Override
+    public void onHide() {
+        super.onHide();
+
+        // Stop the camera preview timeline when the view is hidden
+        if (cameraPreviewTimeline != null) {
+            cameraPreviewTimeline.stop();
+        }
+    }
+
     /**
      * Handles the login button action.
      *
      * @param event the action event
      */
     private void handleLoginButtonAction(ActionEvent event) {
+        // Clear any previous error message
+        errorMessageLabel.setVisible(false);
+
         // Determine which form is visible and call the appropriate login method
         if (pinCodeForm.isVisible()) {
             handlePinCodeLogin();
@@ -118,19 +144,9 @@ public class LoginViewController extends BaseController<LoginViewModel> {
             // This is just a fallback
             handleStartScanButtonAction(event);
         } else {
-            // Default to username/password login using the state pattern
-            try {
-                // Create a login context with the view model
-                DefaultLoginContext context = new DefaultLoginContext(getViewModel());
-
-                // Set the initial state to StartLoginState (default)
-                context.setState(new StartLoginState());
-
-                // Handle the login flow
-                context.handle();
-            } catch (Exception e) {
-                getViewModel().setErrorMessage("Login failed: " + e.getMessage());
-            }
+            // If no form is visible, prompt the user to select an authentication method
+            getViewModel().setErrorMessage("Please select an authentication method: Scan Keychain or Use PIN Code");
+            errorMessageLabel.setVisible(true);
         }
     }
 
@@ -140,7 +156,15 @@ public class LoginViewController extends BaseController<LoginViewModel> {
      * @param event the action event
      */
     private void handleCancelButtonAction(ActionEvent event) {
+        // Clear any error message
+        getViewModel().setErrorMessage("");
+        errorMessageLabel.setVisible(false);
+
+        // Call the view model's cancel method
         getViewModel().cancel();
+
+        // Reset the UI to the default state
+        showUsernamePasswordForm();
     }
 
     /**
@@ -162,17 +186,131 @@ public class LoginViewController extends BaseController<LoginViewModel> {
     }
 
     /**
+     * Handles a PIN button press (0-9).
+     * Appends the digit to the PIN code field.
+     *
+     * @param event the action event
+     */
+    @FXML
+    private void handlePinButtonPressed(ActionEvent event) {
+        Button button = (Button) event.getSource();
+        String digit = button.getText();
+
+        // Append the digit to the PIN code field
+        String currentPin = pinCodeField.getText();
+        pinCodeField.setText(currentPin + digit);
+
+        // Clear any error message
+        errorMessageLabel.setVisible(false);
+    }
+
+    /**
+     * Handles the PIN clear button press.
+     * Clears the PIN code field.
+     *
+     * @param event the action event
+     */
+    @FXML
+    private void handlePinClearPressed(ActionEvent event) {
+        pinCodeField.setText("");
+
+        // Clear any error message
+        errorMessageLabel.setVisible(false);
+    }
+
+    /**
+     * Handles the PIN backspace button press.
+     * Deletes the last digit from the PIN code field.
+     *
+     * @param event the action event
+     */
+    @FXML
+    private void handlePinBackspacePressed(ActionEvent event) {
+        String currentPin = pinCodeField.getText();
+        if (!currentPin.isEmpty()) {
+            pinCodeField.setText(currentPin.substring(0, currentPin.length() - 1));
+        }
+
+        // Clear any error message
+        errorMessageLabel.setVisible(false);
+    }
+
+    /**
      * Handles the start scan button action.
      *
      * @param event the action event
      */
     private void handleStartScanButtonAction(ActionEvent event) {
-        // This would normally start the camera and scan for a barcode/QR code
-        // For now, we'll just simulate a successful scan after a delay
-        loginProgressIndicator.setVisible(true);
+        // Show the camera preview and mock scan button
+        cameraPreviewContainer.setVisible(true);
+        cameraPreviewContainer.setManaged(true);
+        mockScanSuccessButton.setVisible(true);
+        mockScanSuccessButton.setManaged(true);
 
-        // In a real implementation, this would use the CameraService to take a photo
-        // and then process it to extract the barcode/QR code
+        // Hide the start scan button
+        startScanButton.setVisible(false);
+        startScanButton.setManaged(false);
+
+        // Start the camera preview simulation
+        startCameraPreviewSimulation();
+
+        // Add event handler for mock scan success button
+        mockScanSuccessButton.setOnAction(this::handleMockScanSuccessAction);
+    }
+
+    /**
+     * Starts a simulation of the camera preview.
+     * This method creates a timeline that updates the camera preview image
+     * with random noise to simulate a camera feed.
+     */
+    private void startCameraPreviewSimulation() {
+        // Stop any existing timeline
+        if (cameraPreviewTimeline != null) {
+            cameraPreviewTimeline.stop();
+        }
+
+        // Create a new timeline that updates the camera preview image every 100ms
+        cameraPreviewTimeline = new Timeline(
+            new KeyFrame(Duration.millis(100), event -> {
+                // Generate a random image to simulate camera feed
+                // In a real implementation, this would use the CameraService to get a camera frame
+                Random random = new Random();
+                int width = 300;
+                int height = 200;
+
+                // Create a WritableImage and fill it with random noise
+                javafx.scene.image.WritableImage image = new javafx.scene.image.WritableImage(width, height);
+                for (int y = 0; y < height; y++) {
+                    for (int x = 0; x < width; x++) {
+                        int gray = random.nextInt(256);
+                        javafx.scene.paint.Color color = javafx.scene.paint.Color.rgb(gray, gray, gray);
+                        image.getPixelWriter().setColor(x, y, color);
+                    }
+                }
+
+                // Set the image to the camera preview
+                cameraPreviewImage.setImage(image);
+            })
+        );
+
+        cameraPreviewTimeline.setCycleCount(Timeline.INDEFINITE);
+        cameraPreviewTimeline.play();
+    }
+
+    /**
+     * Handles the mock scan success button action.
+     * Simulates a successful scan of a barcode/QR code.
+     *
+     * @param event the action event
+     */
+    private void handleMockScanSuccessAction(ActionEvent event) {
+        // Stop the camera preview simulation
+        if (cameraPreviewTimeline != null) {
+            cameraPreviewTimeline.stop();
+        }
+
+        // Show the login progress indicator
+        loginProgressIndicator.setVisible(true);
 
         // For demonstration purposes, we'll just set a username and password
         // that would normally be extracted from the barcode/QR code
@@ -191,29 +329,27 @@ public class LoginViewController extends BaseController<LoginViewModel> {
             context.handle();
         } catch (Exception e) {
             getViewModel().setErrorMessage("Login failed: " + e.getMessage());
+            errorMessageLabel.setVisible(true);
         }
     }
 
     /**
-     * Shows the username/password form and hides the other forms.
+     * Shows the PIN code form by default since username/password form has been removed.
+     * This method is kept for backward compatibility.
      */
     private void showUsernamePasswordForm() {
-        usernamePasswordForm.setVisible(true);
-        usernamePasswordForm.setManaged(true);
-        pinCodeForm.setVisible(false);
-        pinCodeForm.setManaged(false);
-        cameraScanForm.setVisible(false);
-        cameraScanForm.setManaged(false);
+        // Username/password form has been removed, so show PIN code form instead
+        showPinCodeForm();
     }
 
     /**
      * Shows the PIN code form and hides the other forms.
      */
     private void showPinCodeForm() {
-        usernamePasswordForm.setVisible(false);
-        usernamePasswordForm.setManaged(false);
+        // Show PIN code form
         pinCodeForm.setVisible(true);
         pinCodeForm.setManaged(true);
+        // Hide camera scan form
         cameraScanForm.setVisible(false);
         cameraScanForm.setManaged(false);
 
@@ -232,11 +368,13 @@ public class LoginViewController extends BaseController<LoginViewModel> {
         // Validate PIN code
         if (pin == null || pin.isBlank()) {
             getViewModel().setErrorMessage("PIN code is required");
+            errorMessageLabel.setVisible(true);
             return;
         }
 
         if (!pin.matches("\\d+")) {
             getViewModel().setErrorMessage("PIN code must contain only digits");
+            errorMessageLabel.setVisible(true);
             return;
         }
 
@@ -259,9 +397,11 @@ public class LoginViewController extends BaseController<LoginViewModel> {
                 context.handle();
             } catch (Exception e) {
                 getViewModel().setErrorMessage("Login failed: " + e.getMessage());
+                errorMessageLabel.setVisible(true);
             }
         } else {
             getViewModel().setErrorMessage("Invalid PIN code");
+            errorMessageLabel.setVisible(true);
         }
     }
 
@@ -269,10 +409,10 @@ public class LoginViewController extends BaseController<LoginViewModel> {
      * Shows the camera scan form and hides the other forms.
      */
     private void showCameraScanForm() {
-        usernamePasswordForm.setVisible(false);
-        usernamePasswordForm.setManaged(false);
+        // Hide PIN code form
         pinCodeForm.setVisible(false);
         pinCodeForm.setManaged(false);
+        // Show camera scan form
         cameraScanForm.setVisible(true);
         cameraScanForm.setManaged(true);
     }

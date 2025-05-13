@@ -3,7 +3,7 @@ package com.belman.ui.views.ordergallery;
 import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRole;
-import com.belman.repository.service.SessionManager;
+import com.belman.service.session.SessionManager;
 import com.belman.ui.base.BaseController;
 import com.belman.ui.components.TouchFriendlyDialog;
 import com.belman.ui.navigation.Router;

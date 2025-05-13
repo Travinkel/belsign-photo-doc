@@ -4,7 +4,7 @@ import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.services.Logger;
 import com.belman.domain.user.rbac.AccessPolicyFactory;
 import com.belman.domain.user.rbac.RoleBasedAccessControlFactory;
-import com.belman.service.infrastructure.routing.RouteGuard;
+import com.belman.service.routing.RouteGuard;
 
 /**
  * Initializes route guards for role-based access control.

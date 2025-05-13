@@ -335,7 +335,7 @@
     -fx-padding: 30px 25px;
     -fx-spacing: 18px;
     -fx-alignment: center;
-    -fx-max-width: 350px;
+    -fx-max-width: 450px;
     /* Card elevation with proper shadow */
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 15, 0, 0, 4);
     /* Border to enhance card appearance */
@@ -450,9 +450,128 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 0);
 }
 
+/* PIN Code Numpad Styles */
+.pin-field {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-background-color: white;
+    -fx-border-color: -belman-grey-30;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 10px;
+    -fx-min-height: 50px;
+}
+
+.pin-button {
+    -fx-background-color: -belman-blue;
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-min-width: 60px;
+    -fx-min-height: 60px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+}
+
+.pin-button:hover {
+    -fx-background-color: derive(-belman-blue, 10%);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.pin-button:pressed {
+    -fx-background-color: derive(-belman-blue, -10%);
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 0);
+}
+
+.pin-clear-button {
+    -fx-background-color: #d32f2f; /* Red color for clear button */
+    -fx-font-size: 14px;
+}
+
+.pin-clear-button:hover {
+    -fx-background-color: derive(#d32f2f, 10%);
+}
+
+.pin-clear-button:pressed {
+    -fx-background-color: derive(#d32f2f, -10%);
+}
+
+.pin-backspace-button {
+    -fx-background-color: #ff9800; /* Orange color for backspace button */
+}
+
+.pin-backspace-button:hover {
+    -fx-background-color: derive(#ff9800, 10%);
+}
+
+.pin-backspace-button:pressed {
+    -fx-background-color: derive(#ff9800, -10%);
+}
+
+/* Camera Scan Styles */
+.scan-label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-dark-grey;
+    -fx-padding: 10px 0;
+}
+
+.start-scan-button {
+    -fx-background-color: -belman-green;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-padding: 12px 24px;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+}
+
+.start-scan-button:hover {
+    -fx-background-color: derive(-belman-green, 10%);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 6, 0, 0, 2);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.start-scan-button:pressed {
+    -fx-background-color: derive(-belman-green, -10%);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+}
+
+.mock-scan-button {
+    -fx-background-color: -belman-light-blue;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10px 20px;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+}
+
+.mock-scan-button:hover {
+    -fx-background-color: derive(-belman-light-blue, 10%);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 6, 0, 0, 2);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.mock-scan-button:pressed {
+    -fx-background-color: derive(-belman-light-blue, -10%);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+}
+
 /* Responsive Login Styles */
 .tablet .login-card {
-    -fx-max-width: 350px;
+    -fx-max-width: 450px;
     -fx-padding: 20px;
 }
 

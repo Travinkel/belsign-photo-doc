@@ -12,7 +12,7 @@ import com.belman.domain.specification.Specification;
 import com.belman.domain.user.UserId;
 import com.belman.domain.user.UserReference;
 import com.belman.domain.user.UserRepository;
-import com.belman.service.infrastructure.service.ServiceLocator;
+import com.belman.bootstrap.di.ServiceLocator;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -93,7 +93,7 @@ public class SqlOrderRepository implements OrderRepository {
     }
 
     @Override
-    public void save(OrderBusiness orderBusiness) {
+    public OrderBusiness save(OrderBusiness orderBusiness) {
         // Check if orderBusiness already exists
         String checkSql = "SELECT COUNT(*) FROM orders WHERE id = ?";
         boolean orderExists = false;
@@ -118,6 +118,75 @@ public class SqlOrderRepository implements OrderRepository {
         } else {
             insertOrder(orderBusiness);
         }
+
+        return orderBusiness;
+    }
+
+    @Override
+    public void delete(OrderBusiness orderBusiness) {
+        if (orderBusiness != null) {
+            deleteById(orderBusiness.getId());
+        }
+    }
+
+    @Override
+    public boolean deleteById(OrderId id) {
+        String sql = "DELETE FROM orders WHERE id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, id.id());
+            int rowsAffected = stmt.executeUpdate();
+
+            if (rowsAffected > 0) {
+                LOGGER.info("Order deleted successfully: " + id.id());
+                return true;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error deleting order: " + id.id(), e);
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean existsById(OrderId id) {
+        String sql = "SELECT COUNT(*) FROM orders WHERE id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, id.id());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error checking if order exists: " + id.id(), e);
+        }
+
+        return false;
+    }
+
+    @Override
+    public long count() {
+        String sql = "SELECT COUNT(*) FROM orders";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getLong(1);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error counting orders", e);
+        }
+
+        return 0;
     }
 
     @Override

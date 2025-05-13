@@ -1,9 +1,10 @@
 package com.belman.repository.camera;
 
-import com.belman.domain.services.CameraService;
-import com.belman.repository.logging.EmojiLoggerFactory;
-import com.belman.repository.platform.ErrorHandler;
+import com.belman.bootstrap.di.ServiceLocator;
+import com.belman.domain.services.LoggerFactory;
 import com.belman.service.base.BaseService;
+import com.belman.service.error.ErrorHandler;
+import com.belman.service.platform.PlatformCameraService;
 import com.gluonhq.attach.pictures.PicturesService;
 import com.gluonhq.attach.storage.StorageService;
 import com.gluonhq.attach.util.Services;
@@ -23,7 +24,7 @@ import java.util.UUID;
  * This implementation is designed for mobile platforms and uses the device's camera
  * and photo gallery.
  */
-public class GluonCameraService extends BaseService implements CameraService {
+public class GluonCameraService extends BaseService implements PlatformCameraService {
 
     // File format constants
     private static final String IMAGE_FILE_EXTENSION = ".png";
@@ -33,7 +34,7 @@ public class GluonCameraService extends BaseService implements CameraService {
     private static final int MAX_IMAGE_WIDTH = 1920;
     private static final int MAX_IMAGE_HEIGHT = 1080;
 
-    private final ErrorHandler errorHandler = ErrorHandler.getInstance();
+    private final ErrorHandler errorHandler;
     private final String tempDirectory;
 
     /**
@@ -42,7 +43,8 @@ public class GluonCameraService extends BaseService implements CameraService {
      * @param tempDirectory the directory to store temporary files
      */
     public GluonCameraService(String tempDirectory) {
-        super(EmojiLoggerFactory.getInstance());
+        super(ServiceLocator.getService(LoggerFactory.class));
+        this.errorHandler = ServiceLocator.getService(ErrorHandler.class);
         this.tempDirectory = tempDirectory;
 
         // Create the temporary directory if it doesn't exist

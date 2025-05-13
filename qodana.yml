@@ -1,0 +1,45 @@
+version: '1.0'
+
+linter: 'jetbrains/qodana-jvm:2025.1'
+
+profile:
+  name: qodana.recommended
+
+projectJDK: "17"
+
+include:
+  - name: CheckDependencyLicenses
+
+inspections:
+  - inspection: "Dependency rule violations"
+    enabled: true
+  - inspection: "Package naming conventions"
+    enabled: true
+  - inspection: "Class naming conventions"
+    enabled: true
+  - inspection: "Cyclomatic complexity"
+    enabled: true
+  - inspection: "Method can be static"
+    enabled: true
+  - inspection: "Code can be package-private"
+    enabled: true
+  - inspection: "Redundant throws clause"
+    enabled: true
+  - inspection: "Unused declaration"
+    enabled: true
+  - inspection: "Hardcoded passwords"
+    enabled: true
+  - inspection: "Public field"
+    enabled: true
+  - inspection: "Use of obsolete or banned APIs"
+    enabled: true
+
+exclude:
+  - name: Ignore build output and IDE files
+    paths:
+      - "target"
+      - "out"
+      - ".idea"
+      - ".qodana"
+      - "**/generated/**"
+      - "**/build/**"

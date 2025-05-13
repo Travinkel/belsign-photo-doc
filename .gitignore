@@ -58,3 +58,11 @@ src/main/resources/META-INF/native-image/
 
 # Android build outputs
 /*.apk
+
+# Ignore all Markdown files
+*.md
+
+# But keep important ones
+!README.md
+!docs/
+!docs/**/*.md

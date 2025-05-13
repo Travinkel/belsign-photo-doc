@@ -1,7 +1,7 @@
 package com.belman.ui.core;
 
-import com.belman.repository.platform.NamingConventions;
-import com.belman.service.infrastructure.service.ServiceLocator;
+import com.belman.common.naming.NamingConventions;
+import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.ui.base.BaseController;
 import com.belman.ui.base.BaseViewModel;
 import javafx.fxml.FXMLLoader;
@@ -57,7 +57,35 @@ public class ViewLoader {
 
             System.out.println("Found FXML at: " + fxmlUrl);
 
+            // Create the view model first
+            T viewModel = createViewModel(viewClass);
+            if (viewModel == null) {
+                System.err.println("Error: Failed to create view model for: " + viewClass.getSimpleName());
+            } else {
+                System.out.println("ViewModel created: " + viewModel.getClass().getSimpleName());
+            }
+
+            // Inject services into the view model
+            if (viewModel != null) {
+                ServiceLocator.injectServices(viewModel);
+            }
+
+            // Create a controller factory that sets the view model before JavaFX calls initialize
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            loader.setControllerFactory(controllerClass -> {
+                try {
+                    BaseController<T> controller = (BaseController<T>) controllerClass.getDeclaredConstructor().newInstance();
+                    if (viewModel != null) {
+                        System.out.println("Setting view model: " + viewModel.getClass().getSimpleName()
+                                + " to controller: " + controller.getClass().getSimpleName());
+                        controller.setViewModel(viewModel);
+                        ServiceLocator.injectServices(controller);
+                    }
+                    return controller;
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to create controller: " + controllerClass.getName(), e);
+                }
+            });
 
             P root = loader.load();
             System.out.println("FXML loaded successfully");
@@ -69,26 +97,6 @@ public class ViewLoader {
             } else {
                 System.out.println("Controller loaded: " + controller.getClass().getSimpleName());
             }
-
-            // Create the view model
-            T viewModel = createViewModel(viewClass);
-            if (viewModel == null) {
-                System.err.println("Error: Failed to create view model for: " + viewClass.getSimpleName());
-            } else {
-                System.out.println("ViewModel created: " + viewModel.getClass().getSimpleName());
-            }
-
-            // Inject services into the controller and view model
-            if (controller != null) {
-                ServiceLocator.injectServices(controller);
-            }
-
-            if (viewModel != null) {
-                ServiceLocator.injectServices(viewModel);
-            }
-
-            // Set up the view model
-            setupViewModel(controller, viewModel);
 
             return new LoadedComponents<>(root, controller, viewModel);
         } catch (Exception e) {
@@ -135,13 +143,19 @@ public class ViewLoader {
 
     /**
      * Injects services into the view model and binds it to the controller.
+     * This method is no longer used as the controller factory now handles this.
      *
      * @param controller the controller
      * @param viewModel  the view model
      * @param <T>        the view model type
+     * @deprecated Use the controller factory approach instead
      */
     @SuppressWarnings("unchecked")
+    @Deprecated
     protected static <T extends BaseViewModel<?>> void setupViewModel(BaseController<T> controller, T viewModel) {
+        // This method is kept for backward compatibility but is no longer used
+        // The controller factory now handles setting the view model before JavaFX calls initialize
+
         // Inject services into ViewModel
         ServiceLocator.injectServices(viewModel);
 
@@ -151,7 +165,7 @@ public class ViewLoader {
                 System.out.println("Setting view model: " + viewModel.getClass().getSimpleName()
                                    + " to controller: " + controller.getClass().getSimpleName());
                 controller.setViewModel(viewModel);
-                controller.initialize(); // Ensure initialize is called after setting the view model
+                // Don't call initialize here as it's already been called by JavaFX
             } else {
                 System.err.println("Error: ViewModel is null for controller: " + controller.getClass().getSimpleName());
             }

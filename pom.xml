@@ -234,15 +234,16 @@
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
                 <configuration>
                     <mainClass>com.belman.bootstrap.Main</mainClass>
+                    <options>
+                        <option>--add-opens</option>
+                        <option>java.base/java.lang=ALL-UNNAMED</option>
+                        <option>--add-opens</option>
+                        <option>java.base/java.util=ALL-UNNAMED</option>
+                        <option>--add-opens</option>
+                        <option>java.base/java.lang.reflect=ALL-UNNAMED</option>
+                    </options>
                 </configuration>
             </plugin>
 
@@ -334,14 +335,15 @@
                         </goals>
                     </execution>
                     <execution>
-                        <id>reportAggregate</id>
-                        <phase>test</phase>
+                        <id>jacoco-report</id>
+                        <phase>verify</phase>
                         <goals>
-                            <goal>reportAggregate</goal>
+                            <goal>report</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
+
 
             <!-- SpotBugs plugin for static code analysis -->
             <plugin>

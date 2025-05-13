@@ -1,6 +1,6 @@
 package com.belman.ui.core;
 
-import com.belman.repository.logging.EmojiLogger;
+import com.belman.common.logging.EmojiLogger;
 import com.gluonhq.charm.glisten.mvc.View;
 
 import java.util.HashMap;

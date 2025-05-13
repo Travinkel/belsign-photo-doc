@@ -9,8 +9,8 @@ import com.belman.domain.user.ApprovalState;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRepository;
 import com.belman.domain.user.Username;
-import com.belman.repository.logging.EmojiLoggerFactory;
-import com.belman.repository.security.BCryptPasswordHasher;
+import com.belman.common.logging.EmojiLoggerFactory;
+import com.belman.service.usecase.security.BCryptPasswordHasher;
 import com.belman.service.base.BaseService;
 
 import java.time.Duration;
@@ -105,7 +105,8 @@ public class DefaultAuthenticationService extends BaseService implements Authent
                     updateLastActivityTime();
 
                     // Publish a UserLoggedInEvent
-                    publishEvent(new UserLoggedInEvent(user));
+                    // TODO: Fix event publishing mechanism for BusinessEvent objects
+                    // publishEvent(new UserLoggedInEvent(user));
 
                     logInfo(LOG_USER_AUTHENTICATED, username);
                     return Optional.of(user);
@@ -211,7 +212,8 @@ public class DefaultAuthenticationService extends BaseService implements Authent
     public void logout() {
         if (currentUser != null) {
             // Publish a UserLoggedOutEvent
-            publishEvent(new UserLoggedOutEvent(currentUser));
+            // TODO: Fix event publishing mechanism for BusinessEvent objects
+            // publishEvent(new UserLoggedOutEvent(currentUser));
 
             logInfo(LOG_USER_LOGGED_OUT, currentUser.getUsername().value());
             currentUser = null;

@@ -5,7 +5,7 @@ import com.belman.domain.events.UserLoggedInEvent;
 import com.belman.domain.events.UserLoggedOutEvent;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.user.UserBusiness;
-import com.belman.repository.logging.EmojiLoggerFactory;
+import com.belman.common.logging.EmojiLoggerFactory;
 import com.belman.service.base.BaseService;
 
 import java.util.Optional;
@@ -35,11 +35,12 @@ public class SessionManager extends BaseService {
      * Registers event handlers for session-related events.
      */
     private void registerEventHandlers() {
+        // TODO: Fix event handling mechanism for BusinessEvent objects
         // Handle user login events
-        DomainEvents.on(UserLoggedInEvent.class, this::handleUserLoggedIn);
+        // DomainEvents.on(UserLoggedInEvent.class, this::handleUserLoggedIn);
 
         // Handle user logout events
-        DomainEvents.on(UserLoggedOutEvent.class, this::handleUserLoggedOut);
+        // DomainEvents.on(UserLoggedOutEvent.class, this::handleUserLoggedOut);
     }
 
     /**

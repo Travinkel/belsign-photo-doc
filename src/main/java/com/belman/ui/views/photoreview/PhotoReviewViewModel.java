@@ -9,7 +9,7 @@ import com.belman.domain.order.OrderRepository;
 import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.services.PhotoService;
 import com.belman.domain.user.UserReference;
-import com.belman.repository.service.SessionManager;
+import com.belman.service.session.SessionManager;
 import com.belman.ui.base.BaseViewModel;
 import com.belman.ui.navigation.Router;
 import com.belman.ui.views.login.LoginView;

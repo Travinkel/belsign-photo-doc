@@ -1,7 +1,7 @@
 package com.belman.ui.navigation;
 
-import com.belman.repository.logging.EmojiLogger;
-import com.belman.repository.platform.PlatformUtils;
+import com.belman.common.logging.EmojiLogger;
+import com.belman.common.platform.PlatformUtils;
 import com.belman.ui.core.*;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
@@ -21,7 +21,7 @@ public class Router {
     private static final Map<String, Object> routeParameters = new HashMap<>();
     private static final Map<Class<? extends View>, Supplier<Boolean>> routeGuards = new HashMap<>();
     private static final Stack<Class<? extends View>> navigationHistory = new Stack<>();
-    private static GluonFacade mobileApplication;
+    private static com.gluonhq.charm.glisten.application.MobileApplication mobileApplication;
     private static View currentView;
     // Default transitions
     private static ViewTransition defaultForwardTransition;
@@ -57,9 +57,9 @@ public class Router {
      *
      * @param application the mobile application
      */
-    public static void setMobileApplication(GluonFacade application) {
+    public static void setMobileApplication(com.gluonhq.charm.glisten.application.MobileApplication application) {
         mobileApplication = application;
-        logger.startup("Router initialized with GluonFacade");
+        logger.startup("Router initialized with MobileApplication");
     }
 
     /**
@@ -165,7 +165,7 @@ public class Router {
             navigationHistory.push(viewClass);
             logger.debug("Added {} to navigation history. History size: {}", viewId, navigationHistory.size());
 
-            // Switch to the view using GluonFacade
+            // Switch to the view using MobileApplication
             logger.debug("Switching to view: {}", viewId);
             try {
                 System.out.println("[DEBUG_LOG] About to call mobileApplication.switchView(" + viewId + ")");
@@ -203,7 +203,7 @@ public class Router {
                 logger.warn("AppBar is null. Unable to update title.");
             }
         } else {
-            logger.warn("GluonFacade is null. Unable to update AppBar title.");
+            logger.warn("MobileApplication is null. Unable to update AppBar title.");
         }
     }
 

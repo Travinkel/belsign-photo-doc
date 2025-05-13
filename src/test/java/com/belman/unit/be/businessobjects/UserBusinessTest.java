@@ -8,7 +8,7 @@ import com.belman.domain.core.BusinessObject;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.security.PasswordHasher;
 import com.belman.domain.user.*;
-import com.belman.repository.security.BCryptPasswordHasher;
+import com.belman.service.usecase.security.BCryptPasswordHasher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

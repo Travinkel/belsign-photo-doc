@@ -1,6 +1,6 @@
 package com.belman.service.platform.gluon;
 
-import com.belman.repository.service.StorageServiceFactory;
+import com.belman.bootstrap.platform.StorageServiceFactory;
 import com.gluonhq.attach.storage.StorageService;
 
 import java.io.File;

@@ -72,7 +72,7 @@ public class DefaultAdminService implements AdminService {
     @Override
     public boolean deleteUser(UserId userId) {
         try {
-            return userRepository.delete(userId);
+            return userRepository.deleteById(userId);
         } catch (Exception e) {
             return false;
         }

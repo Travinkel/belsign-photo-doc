@@ -1,6 +1,6 @@
 package com.belman.unit.infrastructure.security;
 
-import com.belman.repository.security.SecureConfigStorage;
+import com.belman.common.config.SecureConfigStorage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

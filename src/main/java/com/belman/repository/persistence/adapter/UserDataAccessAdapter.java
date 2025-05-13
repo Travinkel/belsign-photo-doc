@@ -68,7 +68,7 @@ public class UserDataAccessAdapter implements UserDataAccess {
 
     @Override
     public boolean delete(UserId id) {
-        return repository.delete(id);
+        return repository.deleteById(id);
     }
 
     /**

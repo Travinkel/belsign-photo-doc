@@ -3,8 +3,13 @@ package com.belman.ui.views.login;
 import com.belman.common.logging.EmojiLogger;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRole;
+import com.belman.service.session.DefaultSessionContext;
+import com.belman.service.session.DefaultSessionService;
+import com.belman.service.session.SessionContext;
 import com.belman.service.session.SessionManager;
+import com.belman.service.session.SessionService;
 import com.belman.ui.base.BaseViewModel;
+import com.belman.ui.navigation.RoleBasedNavigationService;
 import com.belman.ui.navigation.Router;
 import com.belman.ui.views.photoupload.PhotoUploadView;
 import com.belman.ui.views.qadashboard.QADashboardView;
@@ -31,14 +36,35 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
     private final BooleanProperty loginInProgress = new SimpleBooleanProperty(false);
     private final BooleanProperty rememberMe = new SimpleBooleanProperty(false);
     private final SessionManager sessionManager;
+    private final RoleBasedNavigationService navigationService;
     private final Preferences preferences = Preferences.userNodeForPackage(LoginViewModel.class);
 
     /**
-     * Creates a new LoginViewModel.
+     * Creates a new LoginViewModel with the default SessionManager and a new RoleBasedNavigationService.
      */
     public LoginViewModel() {
         // Get the SessionManager instance
         sessionManager = SessionManager.getInstance();
+
+        // Create a SessionService
+        SessionService sessionService = new DefaultSessionService(sessionManager);
+
+        // Create a SessionContext
+        SessionContext sessionContext = new DefaultSessionContext(sessionService);
+
+        // Create a RoleBasedNavigationService with the SessionContext
+        navigationService = new RoleBasedNavigationService(sessionContext);
+    }
+
+    /**
+     * Creates a new LoginViewModel with the specified SessionManager and RoleBasedNavigationService.
+     * 
+     * @param sessionManager the session manager
+     * @param navigationService the role-based navigation service
+     */
+    public LoginViewModel(SessionManager sessionManager, RoleBasedNavigationService navigationService) {
+        this.sessionManager = sessionManager;
+        this.navigationService = navigationService;
     }
 
     @Override
@@ -131,25 +157,10 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
                 }
 
                 try {
-                    // Determine which view to navigate to based on user role
-                    if (user.getRoles().contains(UserRole.ADMIN)) {
-                        logger.debug("Navigating to UserManagementView for ADMIN user");
-                        Router.navigateTo(UserManagementView.class);
-                        logger.debug("Navigation to UserManagementView completed");
-                    } else if (user.getRoles().contains(UserRole.QA)) {
-                        logger.debug("Navigating to QADashboardView for QA user");
-                        Router.navigateTo(QADashboardView.class);
-                        logger.debug("Navigation to QADashboardView completed");
-                    } else if (user.getRoles().contains(UserRole.PRODUCTION)) {
-                        logger.debug("Navigating to PhotoUploadView for PRODUCTION user");
-                        Router.navigateTo(PhotoUploadView.class);
-                        logger.debug("Navigation to PhotoUploadView completed");
-                    } else {
-                        // Fallback if no specific role is found
-                        logger.warn("No specific role found for user, using default view");
-                        Router.navigateTo(PhotoUploadView.class);
-                        logger.debug("Navigation to default view completed");
-                    }
+                    // Use the RoleBasedNavigationService to navigate to the appropriate view based on user role
+                    logger.debug("Navigating to user home view");
+                    navigationService.navigateToUserHome();
+                    logger.debug("Navigation to user home view completed");
                 } catch (Exception e) {
                     logger.error("Failed to navigate to role-specific view", e);
                     errorMessage.set("Navigation error: " + e.getMessage());

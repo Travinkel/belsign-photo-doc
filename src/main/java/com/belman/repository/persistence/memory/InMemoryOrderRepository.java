@@ -36,9 +36,42 @@ public class InMemoryOrderRepository implements OrderRepository {
     }
 
     @Override
-    public void save(OrderBusiness orderBusiness) {
+    public OrderBusiness save(OrderBusiness orderBusiness) {
         ordersById.put(orderBusiness.getId(), orderBusiness);
-        ordersByNumber.put(orderBusiness.getOrderNumber(), orderBusiness);
+        if (orderBusiness.getOrderNumber() != null) {
+            ordersByNumber.put(orderBusiness.getOrderNumber(), orderBusiness);
+        }
+        return orderBusiness;
+    }
+
+    @Override
+    public void delete(OrderBusiness orderBusiness) {
+        if (orderBusiness != null) {
+            deleteById(orderBusiness.getId());
+        }
+    }
+
+    @Override
+    public boolean deleteById(OrderId id) {
+        OrderBusiness orderBusiness = ordersById.get(id);
+        if (orderBusiness != null) {
+            ordersById.remove(id);
+            if (orderBusiness.getOrderNumber() != null) {
+                ordersByNumber.remove(orderBusiness.getOrderNumber());
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean existsById(OrderId id) {
+        return ordersById.containsKey(id);
+    }
+
+    @Override
+    public long count() {
+        return ordersById.size();
     }
 
     public Optional<OrderBusiness> findByOrderNumber(OrderNumber orderNumber) {

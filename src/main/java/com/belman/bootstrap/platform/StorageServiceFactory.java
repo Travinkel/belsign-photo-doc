@@ -1,7 +1,7 @@
 package com.belman.bootstrap.platform;
 
-import com.belman.repository.platform.PlatformUtils;
-import com.belman.repository.service.DesktopStorageServiceFallback;
+import com.belman.common.platform.PlatformUtils;
+import com.belman.bootstrap.service.DesktopStorageServiceFallback;
 import com.gluonhq.attach.storage.StorageService;
 
 import java.util.Optional;

@@ -2,6 +2,7 @@ package com.belman.ui.core;
 
 import com.belman.domain.common.validation.ValidationResult;
 import com.belman.domain.shared.*;
+import com.gluonhq.charm.glisten.application.MobileApplication;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -20,12 +21,12 @@ public class StateManager {
         getInstance().listenToState("appBarTitle", StateManager.class, title -> {
             if (title != null) {
                 try {
-                    // Try to get the GluonFacade instance
-                    GluonFacade gluonFacade = GluonFacade.getInstance();
+                    // Try to get the MobileApplication instance
+                    MobileApplication app = MobileApplication.getInstance();
 
-                    if (gluonFacade != null) {
+                    if (app != null) {
                         // Try to get the AppBar
-                        var appBar = gluonFacade.getAppBar();
+                        var appBar = app.getAppBar();
 
                         if (appBar != null) {
                             // Set the title text

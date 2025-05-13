@@ -2,8 +2,6 @@ package com.belman.bootstrap.camera;
 
 import com.belman.common.platform.PlatformUtils;
 import com.belman.domain.services.CameraService;
-import com.belman.repository.camera.GluonCameraService;
-import com.belman.repository.service.MockCameraService;
 
 /**
  * Factory for creating CameraService instances based on the platform.
@@ -17,11 +15,11 @@ public class CameraServiceFactory {
      */
     public static CameraService getCameraService() {
         if (PlatformUtils.isRunningOnMobile()) {
-            // Use GluonCameraService for mobile platforms
-            return new GluonCameraService(getTempDirectory());
+            // Use GluonCameraServiceAdapter for mobile platforms
+            return new GluonCameraServiceAdapter(getTempDirectory());
         } else {
-            // Use MockCameraService for desktop platforms
-            return new MockCameraService();
+            // Use MockCameraServiceAdapter for desktop platforms
+            return new MockCameraServiceAdapter();
         }
     }
 

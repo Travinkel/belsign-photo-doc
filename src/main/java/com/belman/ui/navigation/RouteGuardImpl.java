@@ -1,7 +1,7 @@
 package com.belman.ui.navigation;
 
 import com.belman.domain.services.Logger;
-import com.belman.service.infrastructure.routing.RouteGuard;
+import com.belman.service.routing.RouteGuard;
 import com.belman.ui.views.admin.AdminView;
 import com.belman.ui.views.ordergallery.OrderGalleryView;
 import com.belman.ui.views.photoreview.PhotoReviewView;
