@@ -3,11 +3,15 @@ package com.belman.repository.service;
 import com.belman.domain.services.CameraService;
 import com.belman.repository.logging.EmojiLoggerFactory;
 import com.belman.service.base.BaseService;
+import javafx.application.Platform;
+import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Mock implementation of the CameraService interface for testing purposes.
@@ -68,13 +72,46 @@ public class MockCameraService extends BaseService implements CameraService {
 
     /**
      * Uses a file chooser to select a photo from the file system.
+     * This method handles JavaFX threading properly by using Platform.runLater
+     * and CompletableFuture to ensure it works correctly in all scenarios.
      *
      * @param title the title for the file chooser dialog
      * @return an Optional containing the selected file, or empty if no file was selected
      */
     private Optional<File> selectPhotoWithFileChooser(String title) {
-        fileChooser.setTitle(title);
+        // If we're not on the JavaFX application thread, use CompletableFuture to wait for the result
+        if (!Platform.isFxApplicationThread()) {
+            CompletableFuture<Optional<File>> future = new CompletableFuture<>();
 
+            Platform.runLater(() -> {
+                try {
+                    future.complete(showFileChooser(title));
+                } catch (Exception e) {
+                    future.completeExceptionally(e);
+                }
+            });
+
+            try {
+                return future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                logError("Error showing file chooser", e);
+                return Optional.empty();
+            }
+        } else {
+            // If we're already on the JavaFX application thread, just show the file chooser
+            return showFileChooser(title);
+        }
+    }
+
+    /**
+     * Shows the file chooser dialog.
+     * This method must be called on the JavaFX application thread.
+     *
+     * @param title the title for the file chooser dialog
+     * @return an Optional containing the selected file, or empty if no file was selected
+     */
+    private Optional<File> showFileChooser(String title) {
+        fileChooser.setTitle(title);
         File file = fileChooser.showOpenDialog(stage);
         return Optional.ofNullable(file);
     }

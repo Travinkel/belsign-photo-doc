@@ -1,5 +1,7 @@
 package com.belman.ui.views.login;
 
+import com.belman.bootstrap.camera.CameraServiceFactory;
+import com.belman.domain.services.CameraService;
 import com.belman.ui.base.BaseController;
 import com.belman.ui.views.login.flow.DefaultLoginContext;
 import com.belman.ui.views.login.flow.PinLoginState;
@@ -16,6 +18,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
+import java.io.File;
+import java.util.Optional;
 import java.util.Random;
 
 /**
@@ -259,9 +263,17 @@ public class LoginViewController extends BaseController<LoginViewModel> {
     }
 
     /**
-     * Starts a simulation of the camera preview.
-     * This method creates a timeline that updates the camera preview image
-     * with random noise to simulate a camera feed.
+     * Gets a CameraService instance appropriate for the current platform.
+     *
+     * @return a CameraService instance
+     */
+    private CameraService getCameraService() {
+        return CameraServiceFactory.getCameraService();
+    }
+
+    /**
+     * Starts the camera preview using the CameraService.
+     * If the camera is not available, falls back to a simulation.
      */
     private void startCameraPreviewSimulation() {
         // Stop any existing timeline
@@ -269,11 +281,36 @@ public class LoginViewController extends BaseController<LoginViewModel> {
             cameraPreviewTimeline.stop();
         }
 
+        CameraService cameraService = getCameraService();
+
+        if (cameraService.isCameraAvailable()) {
+            // Use the actual camera
+            // Since we can't get a continuous preview from the CameraService directly,
+            // we'll take a photo when the user clicks the scan button
+            // For now, just show a placeholder image
+            Image placeholderImage = new Image(getClass().getResourceAsStream("/com/belman/ui/views/login/camera_placeholder.png"));
+            if (placeholderImage.isError()) {
+                // If the placeholder image can't be loaded, fall back to simulation
+                startCameraSimulation();
+            } else {
+                cameraPreviewImage.setImage(placeholderImage);
+            }
+        } else {
+            // Fall back to simulation if camera is not available
+            startCameraSimulation();
+        }
+    }
+
+    /**
+     * Starts a simulation of the camera preview.
+     * This method creates a timeline that updates the camera preview image
+     * with random noise to simulate a camera feed.
+     */
+    private void startCameraSimulation() {
         // Create a new timeline that updates the camera preview image every 100ms
         cameraPreviewTimeline = new Timeline(
             new KeyFrame(Duration.millis(100), event -> {
                 // Generate a random image to simulate camera feed
-                // In a real implementation, this would use the CameraService to get a camera frame
                 Random random = new Random();
                 int width = 300;
                 int height = 200;
@@ -299,7 +336,7 @@ public class LoginViewController extends BaseController<LoginViewModel> {
 
     /**
      * Handles the mock scan success button action.
-     * Simulates a successful scan of a barcode/QR code.
+     * Takes a photo using the camera service and processes it for login.
      *
      * @param event the action event
      */
@@ -309,11 +346,42 @@ public class LoginViewController extends BaseController<LoginViewModel> {
             cameraPreviewTimeline.stop();
         }
 
-        // Show the login progress indicator
-        loginProgressIndicator.setVisible(true);
+        // Show the login progress indicator by setting the loginInProgress property
+        getViewModel().setLoginInProgress(true);
 
+        CameraService cameraService = getCameraService();
+
+        if (cameraService.isCameraAvailable()) {
+            // Take a photo using the camera service
+            Optional<File> photoFile = cameraService.takePhoto();
+
+            if (photoFile.isPresent()) {
+                // Photo was taken successfully
+                // In a real implementation, this would process the photo to extract login credentials
+                // For now, we'll just use hardcoded credentials
+                processPhotoForLogin(photoFile.get());
+            } else {
+                // Photo taking was cancelled or failed
+                getViewModel().setErrorMessage("Photo capture cancelled or failed");
+                errorMessageLabel.setVisible(true);
+                getViewModel().setLoginInProgress(false);
+            }
+        } else {
+            // Camera is not available, use mock credentials
+            mockLogin();
+        }
+    }
+
+    /**
+     * Processes a photo file for login.
+     * In a real implementation, this would extract login credentials from the photo.
+     * For now, it just uses hardcoded credentials.
+     *
+     * @param photoFile the photo file to process
+     */
+    private void processPhotoForLogin(File photoFile) {
         // For demonstration purposes, we'll just set a username and password
-        // that would normally be extracted from the barcode/QR code
+        // that would normally be extracted from the photo
         getViewModel().setUsername("scanner");
         getViewModel().setPassword("scanner123");
 
@@ -330,6 +398,33 @@ public class LoginViewController extends BaseController<LoginViewModel> {
         } catch (Exception e) {
             getViewModel().setErrorMessage("Login failed: " + e.getMessage());
             errorMessageLabel.setVisible(true);
+            getViewModel().setLoginInProgress(false);
+        }
+    }
+
+    /**
+     * Performs a mock login with hardcoded credentials.
+     * This is used when the camera is not available.
+     */
+    private void mockLogin() {
+        // For demonstration purposes, we'll just set a username and password
+        getViewModel().setUsername("scanner");
+        getViewModel().setPassword("scanner123");
+
+        // Use the state pattern to handle the login flow
+        try {
+            // Create a login context with the view model
+            DefaultLoginContext context = new DefaultLoginContext(getViewModel());
+
+            // Set the initial state to CameraScanLoginState
+            context.setState(new CameraScanLoginState());
+
+            // Handle the login flow
+            context.handle();
+        } catch (Exception e) {
+            getViewModel().setErrorMessage("Login failed: " + e.getMessage());
+            errorMessageLabel.setVisible(true);
+            getViewModel().setLoginInProgress(false);
         }
     }
 
