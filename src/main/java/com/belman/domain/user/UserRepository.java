@@ -33,4 +33,20 @@ public interface UserRepository extends Repository<UserBusiness, UserId> {
      * @return a list of users with the specified role
      */
     List<UserBusiness> findByRole(UserRole role);
+
+    /**
+     * Finds a user by PIN code.
+     *
+     * @param pinCode the PIN code to search for
+     * @return an Optional containing the user if found, or empty if not found
+     */
+    Optional<UserBusiness> findByPinCode(String pinCode);
+
+    /**
+     * Finds a user by QR code hash.
+     *
+     * @param qrCodeHash the QR code hash to search for
+     * @return an Optional containing the user if found, or empty if not found
+     */
+    Optional<UserBusiness> findByQrCodeHash(String qrCodeHash);
 }

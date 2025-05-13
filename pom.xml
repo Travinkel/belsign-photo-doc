@@ -182,6 +182,13 @@
             <version>5.0.1</version>
         </dependency>
 
+        <!-- Flyway for database migrations -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>9.22.3</version>
+        </dependency>
+
         <!-- Email Dependencies -->
         <dependency>
             <groupId>com.sun.mail</groupId>

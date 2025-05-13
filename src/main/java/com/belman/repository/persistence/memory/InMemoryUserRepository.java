@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 public class InMemoryUserRepository implements UserRepository {
     private final Map<Username, UserId> userIdsByUsername = new HashMap<>();
     private final Map<EmailAddress, UserId> userIdsByEmail = new HashMap<>();
+    private final Map<String, UserId> userIdsByPinCode = new HashMap<>();
+    private final Map<String, UserId> userIdsByQrCodeHash = new HashMap<>();
     private final Map<UserId, UserBusiness> usersById = new HashMap<>();
 
     /**
@@ -81,6 +83,12 @@ public class InMemoryUserRepository implements UserRepository {
         saveWithEmail(productionUser, productionEmail);
         saveWithEmail(qaUser, qaEmail);
         saveWithEmail(qaUser2, qaUserEmail);
+
+        // Add PIN code mappings for testing
+        addPinCodeMapping("1234", productionUser.getId());
+
+        // Add QR code hash mappings for testing
+        addQrCodeHashMapping("scanner123hash", qaUser.getId());
     }
 
     /**
@@ -185,11 +193,39 @@ public class InMemoryUserRepository implements UserRepository {
         return usersById.size();
     }
 
+    @Override
+    public Optional<UserBusiness> findByPinCode(String pinCode) {
+        UserId userId = userIdsByPinCode.get(pinCode);
+        return Optional.ofNullable(userId != null ? usersById.get(userId) : null);
+    }
+
+    @Override
+    public Optional<UserBusiness> findByQrCodeHash(String qrCodeHash) {
+        UserId userId = userIdsByQrCodeHash.get(qrCodeHash);
+        return Optional.ofNullable(userId != null ? usersById.get(userId) : null);
+    }
+
     /**
      * Helper method to add an email mapping for a user.
      * This method must be called after saving a user if the email mapping needs to be updated.
      */
     public void addEmailMapping(EmailAddress email, UserId userId) {
         userIdsByEmail.put(email, userId);
+    }
+
+    /**
+     * Helper method to add a PIN code mapping for a user.
+     * This method must be called after saving a user if the PIN code mapping needs to be updated.
+     */
+    public void addPinCodeMapping(String pinCode, UserId userId) {
+        userIdsByPinCode.put(pinCode, userId);
+    }
+
+    /**
+     * Helper method to add a QR code hash mapping for a user.
+     * This method must be called after saving a user if the QR code hash mapping needs to be updated.
+     */
+    public void addQrCodeHashMapping(String qrCodeHash, UserId userId) {
+        userIdsByQrCodeHash.put(qrCodeHash, userId);
     }
 }

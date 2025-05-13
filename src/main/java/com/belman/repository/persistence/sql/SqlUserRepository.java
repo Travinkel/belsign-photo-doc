@@ -141,6 +141,48 @@ public class SqlUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<UserBusiness> findByPinCode(String pinCode) {
+        String sql = "SELECT * FROM users WHERE pin_code = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, pinCode);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapResultSetToUser(rs));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error finding user by PIN code: " + pinCode, e);
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<UserBusiness> findByQrCodeHash(String qrCodeHash) {
+        String sql = "SELECT * FROM users WHERE qr_code_hash = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, qrCodeHash);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapResultSetToUser(rs));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error finding user by QR code hash: " + qrCodeHash, e);
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
     public UserBusiness save(UserBusiness user) {
         // Check if user already exists
         String checkSql = "SELECT COUNT(*) FROM users WHERE id = ?";
