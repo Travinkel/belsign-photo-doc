@@ -8,7 +8,7 @@ import com.belman.domain.services.Logger;
 /**
  * Base class for all infrastructure services.
  * Provides common functionality and standardizes service implementation.
- * This class is designed to be used in the infrastructure layer and does not depend on the presentation layer.
+ * This class is designed to be used in the service layer and does not depend on the ui layer.
  */
 public abstract class InfrastructureService {
 
