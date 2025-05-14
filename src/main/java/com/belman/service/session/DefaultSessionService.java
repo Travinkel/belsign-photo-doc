@@ -48,7 +48,7 @@ public class DefaultSessionService extends BaseService implements SessionService
         // Implementation depends on session management requirements
         // For now, we'll just log a message
         logInfo("Session refreshed");
-        
+
         // In a real implementation, this might:
         // 1. Check if the session is still valid
         // 2. Extend the session timeout

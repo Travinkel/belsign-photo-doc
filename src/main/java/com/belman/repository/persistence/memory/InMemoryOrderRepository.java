@@ -24,18 +24,6 @@ public class InMemoryOrderRepository implements OrderRepository {
     }
 
     @Override
-    public List<OrderBusiness> findAll() {
-        return new ArrayList<>(ordersById.values());
-    }
-
-    @Override
-    public List<OrderBusiness> findBySpecification(Specification<OrderBusiness> spec) {
-        return ordersById.values().stream()
-                .filter(spec::isSatisfiedBy)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public OrderBusiness save(OrderBusiness orderBusiness) {
         ordersById.put(orderBusiness.getId(), orderBusiness);
         if (orderBusiness.getOrderNumber() != null) {
@@ -65,6 +53,11 @@ public class InMemoryOrderRepository implements OrderRepository {
     }
 
     @Override
+    public List<OrderBusiness> findAll() {
+        return new ArrayList<>(ordersById.values());
+    }
+
+    @Override
     public boolean existsById(OrderId id) {
         return ordersById.containsKey(id);
     }
@@ -72,6 +65,13 @@ public class InMemoryOrderRepository implements OrderRepository {
     @Override
     public long count() {
         return ordersById.size();
+    }
+
+    @Override
+    public List<OrderBusiness> findBySpecification(Specification<OrderBusiness> spec) {
+        return ordersById.values().stream()
+                .filter(spec::isSatisfiedBy)
+                .collect(Collectors.toList());
     }
 
     public Optional<OrderBusiness> findByOrderNumber(OrderNumber orderNumber) {

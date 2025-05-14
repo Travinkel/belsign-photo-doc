@@ -1,7 +1,7 @@
 package com.belman.ui.core;
 
-import com.belman.common.naming.NamingConventions;
 import com.belman.bootstrap.di.ServiceLocator;
+import com.belman.common.naming.NamingConventions;
 import com.belman.ui.base.BaseController;
 import com.belman.ui.base.BaseViewModel;
 import javafx.fxml.FXMLLoader;
@@ -74,10 +74,11 @@ public class ViewLoader {
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             loader.setControllerFactory(controllerClass -> {
                 try {
-                    BaseController<T> controller = (BaseController<T>) controllerClass.getDeclaredConstructor().newInstance();
+                    BaseController<T> controller =
+                            (BaseController<T>) controllerClass.getDeclaredConstructor().newInstance();
                     if (viewModel != null) {
                         System.out.println("Setting view model: " + viewModel.getClass().getSimpleName()
-                                + " to controller: " + controller.getClass().getSimpleName());
+                                           + " to controller: " + controller.getClass().getSimpleName());
                         controller.setViewModel(viewModel);
                         ServiceLocator.injectServices(controller);
                     }

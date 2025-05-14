@@ -8,7 +8,7 @@ import com.belman.domain.order.ProductDescription;
 import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.order.photo.policy.IPhotoQualityService;
 import com.belman.domain.order.photo.service.PhotoValidationService;
-import com.belman.domain.report.ReportAggregate;
+import com.belman.domain.report.ReportBusiness;
 import com.belman.domain.report.ReportId;
 import com.belman.domain.report.ReportStatus;
 import com.belman.domain.services.LoggerFactory;
@@ -63,7 +63,7 @@ public class PhotoReportGenerationService extends BusinessService {
      * @param requester the user requesting the report generation
      * @return the generated report, or null if the order is not ready for a report
      */
-    public ReportAggregate generatePhotoDocumentationReport(OrderBusiness order, UserReference requester) {
+    public ReportBusiness generatePhotoDocumentationReport(OrderBusiness order, UserReference requester) {
         Objects.requireNonNull(order, "order must not be null");
         Objects.requireNonNull(requester, "requester must not be null");
 
@@ -88,11 +88,11 @@ public class PhotoReportGenerationService extends BusinessService {
         ReportId reportId = new ReportId(UUID.randomUUID().toString());
 
         // Use the builder to create the report with the correct parameters
-        ReportAggregate report = ReportAggregate.builder()
+        ReportBusiness report = ReportBusiness.builder()
                 .id(reportId)
                 .orderId(order.getId())
                 .approvedPhotos(approvedPhotos)
-                // Skip generatedBy since we have a UserReference but need a UserAggregate
+                // Skip generatedBy since we have a UserReference but need a UserBusiness
                 .generatedAt(new Timestamp(Instant.now()))
                 .status(ReportStatus.PENDING)
                 .build();

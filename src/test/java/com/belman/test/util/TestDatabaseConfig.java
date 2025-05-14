@@ -2,7 +2,6 @@ package com.belman.test.util;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.flywaydb.core.Flyway;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -83,28 +82,28 @@ public class TestDatabaseConfig {
             // Create users table
             try (Statement stmt = conn.createStatement()) {
                 stmt.execute("CREATE TABLE IF NOT EXISTS users (" +
-                        "id VARCHAR(36) PRIMARY KEY, " +
-                        "username VARCHAR(50) NOT NULL UNIQUE, " +
-                        "password VARCHAR(100) NOT NULL, " +
-                        "first_name VARCHAR(50), " +
-                        "last_name VARCHAR(50), " +
-                        "email VARCHAR(100) NOT NULL UNIQUE, " +
-                        "status VARCHAR(20) NOT NULL, " +
-                        "approval_state VARCHAR(20) NOT NULL DEFAULT 'APPROVED', " +
-                        "phone_number VARCHAR(20), " +
-                        "pin_code VARCHAR(10), " +
-                        "qr_code_hash VARCHAR(100), " +
-                        "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, " +
-                        "updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP" +
-                        ")");
+                             "id VARCHAR(36) PRIMARY KEY, " +
+                             "username VARCHAR(50) NOT NULL UNIQUE, " +
+                             "password VARCHAR(100) NOT NULL, " +
+                             "first_name VARCHAR(50), " +
+                             "last_name VARCHAR(50), " +
+                             "email VARCHAR(100) NOT NULL UNIQUE, " +
+                             "status VARCHAR(20) NOT NULL, " +
+                             "approval_state VARCHAR(20) NOT NULL DEFAULT 'APPROVED', " +
+                             "phone_number VARCHAR(20), " +
+                             "pin_code VARCHAR(10), " +
+                             "qr_code_hash VARCHAR(100), " +
+                             "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, " +
+                             "updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP" +
+                             ")");
 
                 // Create user_roles table
                 stmt.execute("CREATE TABLE IF NOT EXISTS user_roles (" +
-                        "user_id VARCHAR(36) NOT NULL, " +
-                        "role VARCHAR(20) NOT NULL, " +
-                        "PRIMARY KEY (user_id, role), " +
-                        "FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE" +
-                        ")");
+                             "user_id VARCHAR(36) NOT NULL, " +
+                             "role VARCHAR(20) NOT NULL, " +
+                             "PRIMARY KEY (user_id, role), " +
+                             "FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE" +
+                             ")");
 
                 // Create indexes
                 stmt.execute("CREATE INDEX IF NOT EXISTS idx_users_username ON users (username)");
@@ -144,7 +143,7 @@ public class TestDatabaseConfig {
     /**
      * Resets the database connection pool.
      * This method should be called at the end of each test that required database access.
-     * 
+     * <p>
      * Note: We don't actually close the data source here to avoid issues with multiple tests
      * using the same data source. Instead, we'll rely on JVM shutdown to close the data source.
      */

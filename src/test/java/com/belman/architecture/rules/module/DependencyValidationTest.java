@@ -11,7 +11,7 @@ import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 /**
  * Tests to enforce the dependency validation rules between different scopes.
  * These rules match the configuration in .idea/scopes/scope_settings.xml.
- * 
+ * <p>
  * Note: Only UI, Service, and Repository are considered layers.
  * Domain, Common, and Bootstrap are shared packages that can be used by all layers.
  */

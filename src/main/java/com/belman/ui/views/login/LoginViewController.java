@@ -3,15 +3,17 @@ package com.belman.ui.views.login;
 import com.belman.bootstrap.camera.CameraServiceFactory;
 import com.belman.domain.services.CameraService;
 import com.belman.ui.base.BaseController;
+import com.belman.ui.views.login.flow.CameraScanLoginState;
 import com.belman.ui.views.login.flow.DefaultLoginContext;
 import com.belman.ui.views.login.flow.PinLoginState;
-import com.belman.ui.views.login.flow.CameraScanLoginState;
-import com.belman.ui.views.login.flow.StartLoginState;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -21,11 +23,18 @@ import javafx.util.Duration;
 import java.io.File;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Stream;
 
 /**
  * Controller for the login view.
  */
 public class LoginViewController extends BaseController<LoginViewModel> {
+
+
+    @FXML private StackPane root;          // holds the whole scene
+    @FXML private ImageView backgroundImage;
+    @FXML private VBox loginCard;          // the card VBox
+
     // Authentication method selection buttons
     @FXML
     private Button scanButton;
@@ -116,12 +125,6 @@ public class LoginViewController extends BaseController<LoginViewModel> {
     }
 
     @Override
-    public void initializeBinding() {
-        // Call setupBindings to avoid duplication
-        setupBindings();
-    }
-
-    @Override
     public void onHide() {
         super.onHide();
 
@@ -129,6 +132,27 @@ public class LoginViewController extends BaseController<LoginViewModel> {
         if (cameraPreviewTimeline != null) {
             cameraPreviewTimeline.stop();
         }
+    }
+
+    @Override
+    public void initializeBinding() {
+        // Call setupBindings to avoid duplication
+        setupBindings();
+
+
+        // background image always fills the window
+        backgroundImage.fitWidthProperty().bind(root.widthProperty());
+        backgroundImage.fitHeightProperty().bind(root.heightProperty());
+
+        // card: ≤ 450 px, otherwise 90 % of window width
+        root.widthProperty().addListener((obs, o, w) ->
+                loginCard.setMaxWidth(Math.min(450, w.doubleValue() * 0.90)));
+
+        // buttons stay finger-friendly but shrink on small screens
+        Stream.of(scanButton, pinButton, startScanButton,
+                        mockScanSuccessButton, cancelButton, loginButton)
+                .forEach(b -> b.minWidthProperty()
+                        .bind(root.widthProperty().multiply(0.30).subtract(40)));
     }
 
     /**
@@ -288,7 +312,8 @@ public class LoginViewController extends BaseController<LoginViewModel> {
             // Since we can't get a continuous preview from the CameraService directly,
             // we'll take a photo when the user clicks the scan button
             // For now, just show a placeholder image
-            Image placeholderImage = new Image(getClass().getResourceAsStream("/com/belman/ui/views/login/camera_placeholder.png"));
+            Image placeholderImage = new Image(
+                    getClass().getResourceAsStream("/com/belman/ui/views/login/camera_placeholder.png"));
             if (placeholderImage.isError()) {
                 // If the placeholder image can't be loaded, fall back to simulation
                 startCameraSimulation();
@@ -309,25 +334,25 @@ public class LoginViewController extends BaseController<LoginViewModel> {
     private void startCameraSimulation() {
         // Create a new timeline that updates the camera preview image every 100ms
         cameraPreviewTimeline = new Timeline(
-            new KeyFrame(Duration.millis(100), event -> {
-                // Generate a random image to simulate camera feed
-                Random random = new Random();
-                int width = 300;
-                int height = 200;
+                new KeyFrame(Duration.millis(100), event -> {
+                    // Generate a random image to simulate camera feed
+                    Random random = new Random();
+                    int width = 300;
+                    int height = 200;
 
-                // Create a WritableImage and fill it with random noise
-                javafx.scene.image.WritableImage image = new javafx.scene.image.WritableImage(width, height);
-                for (int y = 0; y < height; y++) {
-                    for (int x = 0; x < width; x++) {
-                        int gray = random.nextInt(256);
-                        javafx.scene.paint.Color color = javafx.scene.paint.Color.rgb(gray, gray, gray);
-                        image.getPixelWriter().setColor(x, y, color);
+                    // Create a WritableImage and fill it with random noise
+                    javafx.scene.image.WritableImage image = new javafx.scene.image.WritableImage(width, height);
+                    for (int y = 0; y < height; y++) {
+                        for (int x = 0; x < width; x++) {
+                            int gray = random.nextInt(256);
+                            javafx.scene.paint.Color color = javafx.scene.paint.Color.rgb(gray, gray, gray);
+                            image.getPixelWriter().setColor(x, y, color);
+                        }
                     }
-                }
 
-                // Set the image to the camera preview
-                cameraPreviewImage.setImage(image);
-            })
+                    // Set the image to the camera preview
+                    cameraPreviewImage.setImage(image);
+                })
         );
 
         cameraPreviewTimeline.setCycleCount(Timeline.INDEFINITE);
@@ -454,8 +479,7 @@ public class LoginViewController extends BaseController<LoginViewModel> {
 
     /**
      * Handles PIN code login.
-     * This method converts the PIN code to a username and password
-     * that can be used with the existing login method.
+     * This method uses the view model's loginWithPin method to authenticate with the PIN code.
      */
     private void handlePinCodeLogin() {
         String pin = pinCodeField.getText();
@@ -473,29 +497,11 @@ public class LoginViewController extends BaseController<LoginViewModel> {
             return;
         }
 
-        // For demonstration purposes, we'll use a simple mapping:
-        // PIN code "1234" maps to username "pin_user" and password "pin_pass"
-        // In a real implementation, this would validate against a database or service
-        if (pin.equals("1234")) {
-            getViewModel().setUsername("pin_user");
-            getViewModel().setPassword("pin_pass");
+        // Use the view model's loginWithPin method to authenticate with the PIN code
+        getViewModel().loginWithPin(pin);
 
-            // Use the state pattern to handle the login flow
-            try {
-                // Create a login context with the view model
-                DefaultLoginContext context = new DefaultLoginContext(getViewModel());
-
-                // Set the initial state to PinLoginState
-                context.setState(new PinLoginState());
-
-                // Handle the login flow
-                context.handle();
-            } catch (Exception e) {
-                getViewModel().setErrorMessage("Login failed: " + e.getMessage());
-                errorMessageLabel.setVisible(true);
-            }
-        } else {
-            getViewModel().setErrorMessage("Invalid PIN code");
+        // Show error message if there is one
+        if (!getViewModel().getErrorMessage().isEmpty()) {
             errorMessageLabel.setVisible(true);
         }
     }

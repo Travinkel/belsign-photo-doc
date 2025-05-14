@@ -10,7 +10,6 @@ import com.belman.domain.order.photo.PhotoId;
 import com.belman.domain.order.photo.PhotoTemplate;
 import com.belman.domain.report.ReportBusiness;
 import com.belman.domain.report.ReportFormat;
-import com.belman.domain.report.ReportId;
 import com.belman.domain.report.ReportStatus;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserId;
@@ -25,7 +24,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Unit tests for the ReportBusiness class.

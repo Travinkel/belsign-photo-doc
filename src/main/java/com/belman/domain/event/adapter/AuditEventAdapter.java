@@ -55,7 +55,7 @@ public class AuditEventAdapter implements BusinessEvent {
     @Override
     public String toString() {
         return "AuditEventAdapter{" +
-                "auditEvent=" + auditEvent +
-                '}';
+               "auditEvent=" + auditEvent +
+               '}';
     }
 }

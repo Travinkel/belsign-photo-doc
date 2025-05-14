@@ -81,7 +81,8 @@ public class PDFExportService extends BaseService {
                 contentStream.beginText();
                 contentStream.newLineAtOffset(50, yPosition);
                 contentStream.showText(
-                        "Photo ID: " + photoDocument.getId() + " - Uploader: " + photoDocument.getUploadedBy().getUsername() +
+                        "Photo ID: " + photoDocument.getId() + " - Uploader: " +
+                        photoDocument.getUploadedBy().getUsername() +
                         " - Status: " +
                         photoDocument.getStatus());
                 contentStream.endText();

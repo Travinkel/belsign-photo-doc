@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
  * Publisher for domain events.
  * This class is responsible for publishing domain events and notifying registered handlers.
  * It follows the publisher-subscriber pattern.
- * 
+ * <p>
  * This implementation uses BusinessEventPublisher internally to leverage the common event publishing infrastructure.
  */
 public class DomainEventPublisher implements IDomainEventPublisher {
@@ -24,9 +24,9 @@ public class DomainEventPublisher implements IDomainEventPublisher {
     private final Map<Class<? extends DomainEvent>, List<DomainEventHandler<? extends DomainEvent>>> handlers;
     // Executor for asynchronous event handling
     private final ExecutorService executor;
-    private Logger logger;
     // BusinessEventPublisher for delegating event publishing
     private final BusinessEventPublisher businessEventPublisher;
+    private Logger logger;
 
     // Private constructor for singleton
     private DomainEventPublisher() {
@@ -132,17 +132,6 @@ public class DomainEventPublisher implements IDomainEventPublisher {
         } else {
             logWarn("Executor service is already shut down");
         }
-    }    /**
-     * Safely logs a message at the trace level.
-     * If the logger is not set, this method does nothing.
-     *
-     * @param message the message to log
-     * @param args    the arguments to the message
-     */
-    private void logTrace(String message, Object... args) {
-        if (logger != null) {
-            logger.trace(message, args);
-        }
     }
 
     /**
@@ -155,6 +144,17 @@ public class DomainEventPublisher implements IDomainEventPublisher {
     private void logInfo(String message, Object... args) {
         if (logger != null) {
             logger.info(message, args);
+        }
+    }    /**
+     * Safely logs a message at the trace level.
+     * If the logger is not set, this method does nothing.
+     *
+     * @param message the message to log
+     * @param args    the arguments to the message
+     */
+    private void logTrace(String message, Object... args) {
+        if (logger != null) {
+            logger.trace(message, args);
         }
     }
 

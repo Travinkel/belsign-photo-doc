@@ -84,8 +84,20 @@ public class InMemoryUserRepository implements UserRepository {
         saveWithEmail(qaUser, qaEmail);
         saveWithEmail(qaUser2, qaUserEmail);
 
-        // Add PIN code mappings for testing
-        addPinCodeMapping("1234", productionUser.getId());
+        // Create pin_user for PIN code authentication
+        EmailAddress pinUserEmail = new EmailAddress("pin_user@belman.com");
+        UserBusiness pinUser = UserBusiness.createNewUser(
+                new Username("pin_user"),
+                HashedPassword.fromPlainText("pin_pass", passwordHasher),
+                pinUserEmail
+        );
+        pinUser.addRole(UserRole.PRODUCTION);
+
+        // Save pin_user and add email mapping
+        saveWithEmail(pinUser, pinUserEmail);
+
+        // Add PIN code mapping for pin_user
+        addPinCodeMapping("1234", pinUser.getId());
 
         // Add QR code hash mappings for testing
         addQrCodeHashMapping("scanner123hash", qaUser.getId());
@@ -106,6 +118,22 @@ public class InMemoryUserRepository implements UserRepository {
         userIdsByEmail.put(email, userId);
     }
 
+    /**
+     * Helper method to add a PIN code mapping for a user.
+     * This method must be called after saving a user if the PIN code mapping needs to be updated.
+     */
+    public void addPinCodeMapping(String pinCode, UserId userId) {
+        userIdsByPinCode.put(pinCode, userId);
+    }
+
+    /**
+     * Helper method to add a QR code hash mapping for a user.
+     * This method must be called after saving a user if the QR code hash mapping needs to be updated.
+     */
+    public void addQrCodeHashMapping(String qrCodeHash, UserId userId) {
+        userIdsByQrCodeHash.put(qrCodeHash, userId);
+    }
+
     @Override
     public Optional<UserBusiness> findByUsername(Username username) {
         UserId userId = userIdsByUsername.get(username);
@@ -119,20 +147,27 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<UserBusiness> findById(UserId id) {
-        return Optional.ofNullable(usersById.get(id));
-    }
-
-    @Override
-    public List<UserBusiness> findAll() {
-        return new ArrayList<>(usersById.values());
-    }
-
-    @Override
     public List<UserBusiness> findByRole(UserRole role) {
         return usersById.values().stream()
                 .filter(user -> user.getRoles().contains(role))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<UserBusiness> findByPinCode(String pinCode) {
+        UserId userId = userIdsByPinCode.get(pinCode);
+        return Optional.ofNullable(userId != null ? usersById.get(userId) : null);
+    }
+
+    @Override
+    public Optional<UserBusiness> findByQrCodeHash(String qrCodeHash) {
+        UserId userId = userIdsByQrCodeHash.get(qrCodeHash);
+        return Optional.ofNullable(userId != null ? usersById.get(userId) : null);
+    }
+
+    @Override
+    public Optional<UserBusiness> findById(UserId id) {
+        return Optional.ofNullable(usersById.get(id));
     }
 
     @Override
@@ -150,6 +185,13 @@ public class InMemoryUserRepository implements UserRepository {
         // The email mapping must be added separately using the addEmailMapping method.
 
         return user;
+    }
+
+    @Override
+    public void delete(UserBusiness user) {
+        if (user != null) {
+            deleteById(user.getId());
+        }
     }
 
     @Override
@@ -177,10 +219,8 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public void delete(UserBusiness user) {
-        if (user != null) {
-            deleteById(user.getId());
-        }
+    public List<UserBusiness> findAll() {
+        return new ArrayList<>(usersById.values());
     }
 
     @Override
@@ -193,39 +233,11 @@ public class InMemoryUserRepository implements UserRepository {
         return usersById.size();
     }
 
-    @Override
-    public Optional<UserBusiness> findByPinCode(String pinCode) {
-        UserId userId = userIdsByPinCode.get(pinCode);
-        return Optional.ofNullable(userId != null ? usersById.get(userId) : null);
-    }
-
-    @Override
-    public Optional<UserBusiness> findByQrCodeHash(String qrCodeHash) {
-        UserId userId = userIdsByQrCodeHash.get(qrCodeHash);
-        return Optional.ofNullable(userId != null ? usersById.get(userId) : null);
-    }
-
     /**
      * Helper method to add an email mapping for a user.
      * This method must be called after saving a user if the email mapping needs to be updated.
      */
     public void addEmailMapping(EmailAddress email, UserId userId) {
         userIdsByEmail.put(email, userId);
-    }
-
-    /**
-     * Helper method to add a PIN code mapping for a user.
-     * This method must be called after saving a user if the PIN code mapping needs to be updated.
-     */
-    public void addPinCodeMapping(String pinCode, UserId userId) {
-        userIdsByPinCode.put(pinCode, userId);
-    }
-
-    /**
-     * Helper method to add a QR code hash mapping for a user.
-     * This method must be called after saving a user if the QR code hash mapping needs to be updated.
-     */
-    public void addQrCodeHashMapping(String qrCodeHash, UserId userId) {
-        userIdsByQrCodeHash.put(qrCodeHash, userId);
     }
 }

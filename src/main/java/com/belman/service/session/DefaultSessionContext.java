@@ -3,7 +3,6 @@ package com.belman.service.session;
 import com.belman.domain.user.UserBusiness;
 import com.belman.repository.logging.EmojiLoggerFactory;
 import com.belman.service.base.BaseService;
-import com.belman.ui.navigation.Router;
 
 import java.util.Optional;
 import java.util.logging.Logger;
@@ -15,9 +14,9 @@ import java.util.logging.Logger;
  */
 public class DefaultSessionContext extends BaseService implements SessionContext {
     private final SessionService sessionService;
+    private final Logger logger;
     private SessionState currentState;
     private UserBusiness currentUser;
-    private final Logger logger;
 
     /**
      * Creates a new DefaultSessionContext with the specified session service.
@@ -31,7 +30,14 @@ public class DefaultSessionContext extends BaseService implements SessionContext
         this.currentState = new LoggedOutState();
     }
 
-    @Override
+    /**
+     * Gets the session service.
+     *
+     * @return the session service
+     */
+    public SessionService getSessionService() {
+        return sessionService;
+    }    @Override
     public void setUser(UserBusiness user) {
         this.currentUser = user;
     }
@@ -93,12 +99,5 @@ public class DefaultSessionContext extends BaseService implements SessionContext
         return sessionService.isLoggedIn();
     }
 
-    /**
-     * Gets the session service.
-     *
-     * @return the session service
-     */
-    public SessionService getSessionService() {
-        return sessionService;
-    }
+
 }

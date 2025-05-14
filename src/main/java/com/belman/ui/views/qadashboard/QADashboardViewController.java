@@ -51,6 +51,22 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
         if (selectedOrder != null) {
             getViewModel().navigateToPhotoReview(selectedOrder);
         }
+    }
+
+    /**
+     * Handles the generate report button action.
+     */
+    @FXML
+    private void handleGenerateReport(ActionEvent event) {
+        String selectedOrder = pendingOrdersListView.getSelectionModel().getSelectedItem();
+        if (selectedOrder != null) {
+            boolean success = getViewModel().generateReport(selectedOrder);
+            if (success) {
+                showInfo("ReportAggregate generated successfully");
+            } else {
+                showError(getViewModel().errorMessageProperty().get());
+            }
+        }
     }    @Override
     protected void setupBindings() {
         // Bind UI components to ViewModel properties
@@ -81,35 +97,19 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
     }
 
     /**
-     * Handles the generate report button action.
-     */
-    @FXML
-    private void handleGenerateReport(ActionEvent event) {
-        String selectedOrder = pendingOrdersListView.getSelectionModel().getSelectedItem();
-        if (selectedOrder != null) {
-            boolean success = getViewModel().generateReport(selectedOrder);
-            if (success) {
-                showInfo("ReportAggregate generated successfully");
-            } else {
-                showError(getViewModel().errorMessageProperty().get());
-            }
-        }
-    }
-
-    /**
      * Shows an information message using a touch-friendly dialog.
      */
     private void showInfo(String message) {
         TouchFriendlyDialog.showInformation("Information", message);
-    }    @Override
-    public void initializeBinding() {
-        // Call setupBindings to avoid duplication
-        setupBindings();
     }
 
 
 
-
+    @Override
+    public void initializeBinding() {
+        // Call setupBindings to avoid duplication
+        setupBindings();
+    }
 
 
     /**

@@ -12,13 +12,6 @@ import java.util.Optional;
 public interface SessionContext {
 
     /**
-     * Sets the current user.
-     *
-     * @param user the user to set
-     */
-    void setUser(UserBusiness user);
-
-    /**
      * Gets the current user.
      *
      * @return an Optional containing the current user if one is set, or empty if no user is set
@@ -26,11 +19,11 @@ public interface SessionContext {
     Optional<UserBusiness> getUser();
 
     /**
-     * Sets the current session state.
+     * Sets the current user.
      *
-     * @param state the state to set
+     * @param user the user to set
      */
-    void setState(SessionState state);
+    void setUser(UserBusiness user);
 
     /**
      * Gets the current session state.
@@ -38,6 +31,13 @@ public interface SessionContext {
      * @return the current session state
      */
     SessionState getState();
+
+    /**
+     * Sets the current session state.
+     *
+     * @param state the state to set
+     */
+    void setState(SessionState state);
 
     /**
      * Logs a message related to the session.

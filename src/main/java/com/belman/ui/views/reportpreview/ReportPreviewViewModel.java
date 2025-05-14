@@ -3,6 +3,7 @@ package com.belman.ui.views.reportpreview;
 
 import com.belman.ui.base.BaseViewModel;
 import com.belman.ui.navigation.Router;
+import com.belman.ui.usecases.authentication.login.LoginView;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -44,7 +45,7 @@ public class ReportPreviewViewModel extends BaseViewModel<ReportPreviewViewModel
      */
     public void onLoadingComplete() {
         // Navigate to the login view
-        Router.navigateTo(com.belman.ui.views.login.LoginView.class);
+        Router.navigateTo(LoginView.class);
     }
 
     @Override

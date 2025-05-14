@@ -9,7 +9,6 @@ import com.belman.domain.order.OrderDataAccess;
 import com.belman.domain.order.OrderRepository;
 import com.belman.domain.order.photo.PhotoDataAccess;
 import com.belman.domain.order.photo.PhotoRepository;
-import com.belman.domain.report.ReportDataAccess;
 import com.belman.domain.report.ReportRepository;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.services.PhotoService;
@@ -118,7 +117,7 @@ public class ApplicationInitializer {
                     // Create and register ReportDataAccessAdapter
                     if (reportRepository instanceof InMemoryReportRepository) {
                         logger.database("Creating ReportDataAccessAdapter");
-                        ReportDataAccess reportDataAccess = new ReportDataAccessAdapter(
+                        ReportRepository reportDataAccess = new ReportDataAccessAdapter(
                                 (InMemoryReportRepository) reportRepository);
                         ServiceRegistry.registerService(reportDataAccess);
                         logger.success("ReportDataAccessAdapter created successfully");
@@ -191,7 +190,7 @@ public class ApplicationInitializer {
 
                     // Create and register ReportDataAccessAdapter
                     logger.database("Creating ReportDataAccessAdapter");
-                    ReportDataAccess reportDataAccess = new ReportDataAccessAdapter(
+                    ReportRepository reportDataAccess = new ReportDataAccessAdapter(
                             (InMemoryReportRepository) reportRepository);
                     ServiceRegistry.registerService(reportDataAccess);
                     logger.success("ReportDataAccessAdapter created successfully");
@@ -263,7 +262,7 @@ public class ApplicationInitializer {
 
                 // Create and register ReportDataAccessAdapter
                 logger.database("Creating ReportDataAccessAdapter");
-                ReportDataAccess reportDataAccess = new ReportDataAccessAdapter(
+                ReportRepository reportDataAccess = new ReportDataAccessAdapter(
                         (InMemoryReportRepository) reportRepository);
                 ServiceRegistry.registerService(reportDataAccess);
                 logger.success("ReportDataAccessAdapter created successfully");

@@ -5,26 +5,16 @@ package com.belman.service.error;
  * This class provides access to the application's error handling mechanism.
  */
 public class ErrorHandlerFactory {
-    
+
     private static ErrorHandler instance;
-    
+
     /**
      * Private constructor to prevent instantiation.
      */
     private ErrorHandlerFactory() {
         // Private constructor to prevent instantiation
     }
-    
-    /**
-     * Sets the ErrorHandler instance to be used by the factory.
-     * This method should be called during application initialization.
-     *
-     * @param errorHandler the ErrorHandler instance to use
-     */
-    public static void setInstance(ErrorHandler errorHandler) {
-        instance = errorHandler;
-    }
-    
+
     /**
      * Gets the ErrorHandler instance.
      *
@@ -36,5 +26,15 @@ public class ErrorHandlerFactory {
             throw new IllegalStateException("ErrorHandler instance has not been set. Call setInstance() first.");
         }
         return instance;
+    }
+
+    /**
+     * Sets the ErrorHandler instance to be used by the factory.
+     * This method should be called during application initialization.
+     *
+     * @param errorHandler the ErrorHandler instance to use
+     */
+    public static void setInstance(ErrorHandler errorHandler) {
+        instance = errorHandler;
     }
 }

@@ -1,22 +1,21 @@
 package com.belman.ui.views.usermanagement;
 
+import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.common.di.Inject;
 import com.belman.domain.common.EmailAddress;
 import com.belman.domain.common.PersonName;
+import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.user.*;
-import com.belman.bootstrap.di.ServiceLocator;
-import com.belman.domain.security.AuthenticationService;
 import com.belman.ui.base.BaseViewModel;
 import com.belman.ui.navigation.Router;
-import com.belman.ui.views.login.LoginView;
+import com.belman.ui.usecases.authentication.login.LoginView;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 
 import java.util.*;
-import java.util.Locale;
 
 /**
  * View model for the user management view.

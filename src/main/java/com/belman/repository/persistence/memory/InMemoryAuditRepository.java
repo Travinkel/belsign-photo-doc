@@ -48,7 +48,9 @@ public class InMemoryAuditRepository implements AuditRepository {
      */
     public int getEventCount() {
         return events.size();
-    }    @Override
+    }
+
+    @Override
     public void store(AuditEvent event) {
         Objects.requireNonNull(event, "event must not be null");
 
@@ -65,7 +67,6 @@ public class InMemoryAuditRepository implements AuditRepository {
         // Extract and store user information if available
         extractAndStoreUserInfo(event);
     }
-
 
 
     @Override

@@ -8,7 +8,7 @@ import java.util.Optional;
 /**
  * Data access interface for Report business object.
  */
-public interface ReportDataAccess {
+public interface ReportRepository {
     /**
      * Finds a report by its ID.
      *

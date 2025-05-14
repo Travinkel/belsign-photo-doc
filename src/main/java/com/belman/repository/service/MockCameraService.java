@@ -4,7 +4,6 @@ import com.belman.domain.services.CameraService;
 import com.belman.repository.logging.EmojiLoggerFactory;
 import com.belman.service.base.BaseService;
 import javafx.application.Platform;
-import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 

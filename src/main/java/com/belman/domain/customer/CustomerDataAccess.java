@@ -62,6 +62,7 @@ public interface CustomerDataAccess {
      * @return the number of customers
      */
     long count();
+
     /**
      * Finds customers that satisfy the given specification.
      *

@@ -3,13 +3,12 @@ package com.belman.ui.navigation;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRole;
 import com.belman.service.session.SessionContext;
-import com.belman.ui.views.login.LoginView;
-import com.belman.ui.views.photoupload.PhotoUploadView;
-import com.belman.ui.views.qadashboard.QADashboardView;
-import com.belman.ui.views.usermanagement.UserManagementView;
+import com.belman.ui.usecases.admin.usermanagement.UserManagementView;
+import com.belman.ui.usecases.authentication.login.LoginView;
+import com.belman.ui.usecases.photo.upload.PhotoUploadView;
+import com.belman.ui.usecases.qa.dashboard.QADashboardView;
 
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -40,10 +39,10 @@ public class RoleBasedNavigationService {
         Optional<UserBusiness> userOpt = sessionContext.getUser();
         if (userOpt.isPresent()) {
             UserBusiness user = userOpt.get();
-            
+
             // Count the number of roles the user has
             int roleCount = user.getRoles().size();
-            
+
             if (roleCount == 0) {
                 // Fallback if no specific role is found
                 logger.warning("No specific role found for user, using default view");
@@ -56,7 +55,7 @@ public class RoleBasedNavigationService {
             } else {
                 // If user has multiple roles, navigate to the main view for role selection
                 logger.fine("User has multiple roles, navigating to MainView for role selection");
-                Router.navigateTo(com.belman.ui.views.main.MainView.class);
+                Router.navigateTo(com.belman.ui.usecases.common.main.MainView.class);
                 logger.fine("Navigation to MainView completed");
             }
         } else {
@@ -64,7 +63,7 @@ public class RoleBasedNavigationService {
             navigateToLogin();
         }
     }
-    
+
     /**
      * Navigates to the appropriate view based on the specified role.
      *

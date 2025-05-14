@@ -3,17 +3,19 @@ package com.belman.unit.service.usecase.security;
 import com.belman.domain.common.EmailAddress;
 import com.belman.domain.security.ExtendedAuthenticationService;
 import com.belman.domain.security.HashedPassword;
-import com.belman.domain.security.PasswordHasher;
-import com.belman.domain.user.*;
+import com.belman.domain.user.ApprovalState;
+import com.belman.domain.user.UserBusiness;
+import com.belman.domain.user.UserRole;
+import com.belman.domain.user.Username;
 import com.belman.repository.persistence.memory.InMemoryUserRepository;
-import com.belman.service.usecase.security.BCryptPasswordHasher;
 import com.belman.service.usecase.security.DefaultExtendedAuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for the DefaultExtendedAuthenticationService class.

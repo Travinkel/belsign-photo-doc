@@ -1,4 +1,4 @@
-package com.belman.ui.views.login;
+package com.belman.ui.usecases.authentication.login;
 
 import com.belman.ui.base.BaseView;
 import com.gluonhq.charm.glisten.control.AppBar;

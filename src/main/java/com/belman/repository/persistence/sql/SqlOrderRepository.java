@@ -1,5 +1,6 @@
 package com.belman.repository.persistence.sql;
 
+import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.domain.common.Timestamp;
 import com.belman.domain.customer.CustomerAggregate;
 import com.belman.domain.customer.CustomerId;
@@ -12,7 +13,6 @@ import com.belman.domain.specification.Specification;
 import com.belman.domain.user.UserId;
 import com.belman.domain.user.UserReference;
 import com.belman.domain.user.UserRepository;
-import com.belman.bootstrap.di.ServiceLocator;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -62,34 +62,6 @@ public class SqlOrderRepository implements OrderRepository {
         }
         return Optional.empty();
 
-    }
-
-    @Override
-    public List<OrderBusiness> findAll() {
-        String sql = "SELECT * FROM orders";
-        List<OrderBusiness> orderBusinesses = new ArrayList<>();
-
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                orderBusinesses.add(mapResultSetToOrder(rs));
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error finding all orderBusinesses", e);
-        }
-
-        return orderBusinesses;
-    }
-
-    @Override
-    public List<OrderBusiness> findBySpecification(Specification<OrderBusiness> spec) {
-        // For simplicity, we'll load all orders and filter in memory
-        // In a real implementation, this would translate the specification to SQL
-        return findAll().stream()
-                .filter(spec::isSatisfiedBy)
-                .toList();
     }
 
     @Override
@@ -151,6 +123,25 @@ public class SqlOrderRepository implements OrderRepository {
     }
 
     @Override
+    public List<OrderBusiness> findAll() {
+        String sql = "SELECT * FROM orders";
+        List<OrderBusiness> orderBusinesses = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                orderBusinesses.add(mapResultSetToOrder(rs));
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error finding all orderBusinesses", e);
+        }
+
+        return orderBusinesses;
+    }
+
+    @Override
     public boolean existsById(OrderId id) {
         String sql = "SELECT COUNT(*) FROM orders WHERE id = ?";
 
@@ -187,27 +178,6 @@ public class SqlOrderRepository implements OrderRepository {
         }
 
         return 0;
-    }
-
-    @Override
-    public Optional<OrderBusiness> findByOrderNumber(OrderNumber orderNumber) {
-        String sql = "SELECT * FROM orders WHERE order_number = ?";
-
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, orderNumber.value());
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapResultSetToOrder(rs));
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error finding order by order number: " + orderNumber.value(), e);
-        }
-
-        return Optional.empty();
     }
 
     private void updateOrder(OrderBusiness orderBusiness) {
@@ -501,6 +471,36 @@ public class SqlOrderRepository implements OrderRepository {
             LOGGER.log(Level.SEVERE, "Error mapping result set to photo", e);
             return null;
         }
+    }
+
+    @Override
+    public List<OrderBusiness> findBySpecification(Specification<OrderBusiness> spec) {
+        // For simplicity, we'll load all orders and filter in memory
+        // In a real implementation, this would translate the specification to SQL
+        return findAll().stream()
+                .filter(spec::isSatisfiedBy)
+                .toList();
+    }
+
+    @Override
+    public Optional<OrderBusiness> findByOrderNumber(OrderNumber orderNumber) {
+        String sql = "SELECT * FROM orders WHERE order_number = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, orderNumber.value());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapResultSetToOrder(rs));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error finding order by order number: " + orderNumber.value(), e);
+        }
+
+        return Optional.empty();
     }
 
     /**

@@ -2,7 +2,7 @@ package com.belman.repository.email;
 
 
 import com.belman.domain.common.EmailAddress;
-import com.belman.domain.report.ReportAggregate;
+import com.belman.domain.report.ReportBusiness;
 import com.belman.domain.services.EmailService;
 
 import java.io.File;
@@ -41,11 +41,11 @@ public class SmtpEmailService implements EmailService {
     }
 
     @Override
-    public boolean sendReport(ReportAggregate reportAggregate, List<EmailAddress> recipients, String subject,
+    public boolean sendReport(ReportBusiness report, List<EmailAddress> recipients, String subject,
                               String message, List<File> attachments) {
         try {
             // In a real implementation, this would use JavaMail API to send the email
-            LOGGER.info("Sending reportAggregate " + reportAggregate.getOrderId() + " to " + recipients.size() +
+            LOGGER.info("Sending report " + report.getOrderId() + " to " + recipients.size() +
                         " recipients");
 
             // Log the email details for debugging
@@ -62,8 +62,8 @@ public class SmtpEmailService implements EmailService {
     }
 
     @Override
-    public boolean sendReport(ReportAggregate reportAggregate, EmailAddress recipient, String subject, String message,
+    public boolean sendReport(ReportBusiness report, EmailAddress recipient, String subject, String message,
                               List<File> attachments) {
-        return sendReport(reportAggregate, Collections.singletonList(recipient), subject, message, attachments);
+        return sendReport(report, Collections.singletonList(recipient), subject, message, attachments);
     }
 }

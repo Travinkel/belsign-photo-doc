@@ -1,7 +1,7 @@
 package com.belman.service.usecase.report;
 
 import com.belman.domain.order.OrderId;
-import com.belman.domain.report.ReportAggregate;
+import com.belman.domain.report.ReportBusiness;
 import com.belman.domain.report.ReportFormat;
 import com.belman.domain.report.ReportId;
 import com.belman.domain.report.ReportType;
@@ -21,7 +21,7 @@ public interface ReportService {
      * @param reportId the ID of the report to get
      * @return an Optional containing the report if found, or empty if not found
      */
-    Optional<ReportAggregate> getReportById(ReportId reportId);
+    Optional<ReportBusiness> getReportById(ReportId reportId);
 
     /**
      * Gets all reports for an order.
@@ -29,7 +29,7 @@ public interface ReportService {
      * @param orderId the ID of the order
      * @return a list of reports for the order
      */
-    List<ReportAggregate> getReportsByOrderId(OrderId orderId);
+    List<ReportBusiness> getReportsByOrderId(OrderId orderId);
 
     /**
      * Gets all reports of a specific type.
@@ -37,7 +37,7 @@ public interface ReportService {
      * @param type the type of reports to get
      * @return a list of reports of the specified type
      */
-    List<ReportAggregate> getReportsByType(ReportType type);
+    List<ReportBusiness> getReportsByType(ReportType type);
 
     /**
      * Generates a report for an order.
@@ -48,7 +48,7 @@ public interface ReportService {
      * @param generatedBy the user who generated the report
      * @return the generated report
      */
-    ReportAggregate generateReport(OrderId orderId, ReportType type, ReportFormat format, UserBusiness generatedBy);
+    ReportBusiness generateReport(OrderId orderId, ReportType type, ReportFormat format, UserBusiness generatedBy);
 
     /**
      * Previews a report for an order without saving it.

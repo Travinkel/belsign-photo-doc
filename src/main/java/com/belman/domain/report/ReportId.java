@@ -19,9 +19,9 @@ public final class ReportId implements ValueObject {
      * @throws IllegalArgumentException if value is empty
      */
     public ReportId(String value) {
-        this.value = Objects.requireNonNull(value, "ReportAggregate ID must not be null");
+        this.value = Objects.requireNonNull(value, "Report ID must not be null");
         if (value.isEmpty()) {
-            throw new IllegalArgumentException("ReportAggregate ID must not be empty");
+            throw new IllegalArgumentException("Report ID must not be empty");
         }
     }
 

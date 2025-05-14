@@ -49,7 +49,7 @@ public class BusinessEventHandlerAdapter<T extends DomainEvent> implements Domai
     @Override
     public String toString() {
         return "BusinessEventHandlerAdapter{" +
-                "businessEventHandler=" + businessEventHandler +
-                '}';
+               "businessEventHandler=" + businessEventHandler +
+               '}';
     }
 }

@@ -1,18 +1,12 @@
 package com.belman.ui.views.main;
 
+import com.belman.common.logging.EmojiLogger;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRole;
-import com.belman.common.logging.EmojiLogger;
-import com.belman.service.session.DefaultSessionContext;
-import com.belman.service.session.DefaultSessionService;
-import com.belman.service.session.SessionContext;
-import com.belman.service.session.SessionManager;
-import com.belman.service.session.SessionService;
+import com.belman.service.session.*;
 import com.belman.ui.base.BaseViewModel;
 import com.belman.ui.core.StateManager;
 import com.belman.ui.navigation.RoleBasedNavigationService;
-import com.belman.ui.navigation.Router;
-import com.belman.ui.views.login.LoginView;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -63,7 +57,7 @@ public class MainViewModel extends BaseViewModel<MainViewModel> {
             logger.debug("Calling updateWelcomeMessage()");
             updateWelcomeMessage();
             logger.debug("updateWelcomeMessage() completed");
-            
+
             // Update role availability
             updateRoleAvailability();
         } catch (Exception e) {
@@ -107,7 +101,7 @@ public class MainViewModel extends BaseViewModel<MainViewModel> {
             username.set("");
         }
     }
-    
+
     /**
      * Updates the role availability based on the current user's roles.
      */
@@ -120,13 +114,13 @@ public class MainViewModel extends BaseViewModel<MainViewModel> {
             if (currentUser.isPresent()) {
                 Set<UserRole> roles = currentUser.get().getRoles();
                 logger.debug("Current user has {} roles", roles.size());
-                
+
                 // Update role availability properties
                 adminRoleAvailable.set(roles.contains(UserRole.ADMIN));
                 qaRoleAvailable.set(roles.contains(UserRole.QA));
                 productionRoleAvailable.set(roles.contains(UserRole.PRODUCTION));
-                
-                logger.debug("Role availability updated: Admin={}, QA={}, Production={}", 
+
+                logger.debug("Role availability updated: Admin={}, QA={}, Production={}",
                         adminRoleAvailable.get(), qaRoleAvailable.get(), productionRoleAvailable.get());
             } else {
                 logger.warn("No current user found, all roles unavailable");
@@ -189,7 +183,7 @@ public class MainViewModel extends BaseViewModel<MainViewModel> {
         logger.debug("Logging out user");
         try {
             logger.debug("Calling sessionContext.getSessionService().logout()");
-            ((DefaultSessionContext)sessionContext).getSessionService().logout();
+            ((DefaultSessionContext) sessionContext).getSessionService().logout();
             logger.debug("User logged out successfully");
 
             logger.debug("Navigating to LoginView");
@@ -239,7 +233,7 @@ public class MainViewModel extends BaseViewModel<MainViewModel> {
     public String getUsername() {
         return username.get();
     }
-    
+
     /**
      * Gets the admin role availability property.
      *
@@ -248,7 +242,7 @@ public class MainViewModel extends BaseViewModel<MainViewModel> {
     public BooleanProperty adminRoleAvailableProperty() {
         return adminRoleAvailable;
     }
-    
+
     /**
      * Gets whether the admin role is available.
      *
@@ -257,7 +251,7 @@ public class MainViewModel extends BaseViewModel<MainViewModel> {
     public boolean isAdminRoleAvailable() {
         return adminRoleAvailable.get();
     }
-    
+
     /**
      * Gets the QA role availability property.
      *
@@ -266,7 +260,7 @@ public class MainViewModel extends BaseViewModel<MainViewModel> {
     public BooleanProperty qaRoleAvailableProperty() {
         return qaRoleAvailable;
     }
-    
+
     /**
      * Gets whether the QA role is available.
      *
@@ -275,7 +269,7 @@ public class MainViewModel extends BaseViewModel<MainViewModel> {
     public boolean isQARoleAvailable() {
         return qaRoleAvailable.get();
     }
-    
+
     /**
      * Gets the production role availability property.
      *
@@ -284,7 +278,7 @@ public class MainViewModel extends BaseViewModel<MainViewModel> {
     public BooleanProperty productionRoleAvailableProperty() {
         return productionRoleAvailable;
     }
-    
+
     /**
      * Gets whether the production role is available.
      *

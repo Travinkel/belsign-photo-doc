@@ -1,7 +1,6 @@
 package com.belman.service.usecase.security;
 
-import com.belman.domain.events.UserLoggedInEvent;
-import com.belman.domain.events.UserLoggedOutEvent;
+import com.belman.common.logging.EmojiLoggerFactory;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.security.PasswordHasher;
@@ -9,8 +8,6 @@ import com.belman.domain.user.ApprovalState;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRepository;
 import com.belman.domain.user.Username;
-import com.belman.common.logging.EmojiLoggerFactory;
-import com.belman.service.usecase.security.BCryptPasswordHasher;
 import com.belman.service.base.BaseService;
 
 import java.time.Duration;

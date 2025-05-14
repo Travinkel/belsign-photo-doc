@@ -55,7 +55,7 @@ public class BusinessEventToDomainEventAdapter implements DomainEvent {
     @Override
     public String toString() {
         return "BusinessEventToDomainEventAdapter{" +
-                "businessEvent=" + businessEvent +
-                '}';
+               "businessEvent=" + businessEvent +
+               '}';
     }
 }

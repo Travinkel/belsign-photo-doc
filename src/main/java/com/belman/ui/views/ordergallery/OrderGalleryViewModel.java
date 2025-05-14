@@ -11,7 +11,7 @@ import com.belman.domain.user.UserReference;
 import com.belman.service.session.SessionManager;
 import com.belman.ui.base.BaseViewModel;
 import com.belman.ui.navigation.Router;
-import com.belman.ui.views.login.LoginView;
+import com.belman.ui.usecases.authentication.login.LoginView;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

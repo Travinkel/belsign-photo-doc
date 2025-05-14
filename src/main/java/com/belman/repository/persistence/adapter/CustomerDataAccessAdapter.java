@@ -36,6 +36,13 @@ public class CustomerDataAccessAdapter implements CustomerDataAccess {
     }
 
     @Override
+    public List<CustomerBusiness> findAll() {
+        return repository.findAll().stream()
+                .map(this::convertToBusiness)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public CustomerBusiness save(CustomerBusiness customer) {
         CustomerAggregate aggregate = convertToAggregate(customer);
         repository.save(aggregate);
@@ -59,13 +66,6 @@ public class CustomerDataAccessAdapter implements CustomerDataAccess {
     }
 
     @Override
-    public List<CustomerBusiness> findAll() {
-        return repository.findAll().stream()
-                .map(this::convertToBusiness)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public boolean existsById(CustomerId id) {
         return repository.findById(id) != null;
     }
@@ -73,6 +73,22 @@ public class CustomerDataAccessAdapter implements CustomerDataAccess {
     @Override
     public long count() {
         return repository.findAll().size();
+    }
+
+    @Override
+    public List<CustomerBusiness> findBySpecification(Specification<CustomerBusiness> spec) {
+        // Create a specification that works with CustomerAggregate
+        Specification<CustomerAggregate> aggregateSpec = new AbstractSpecification<CustomerAggregate>() {
+            @Override
+            public boolean isSatisfiedBy(CustomerAggregate aggregate) {
+                CustomerBusiness business = convertToBusiness(aggregate);
+                return spec.isSatisfiedBy(business);
+            }
+        };
+
+        return repository.findBySpecification(aggregateSpec).stream()
+                .map(this::convertToBusiness)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -121,21 +137,5 @@ public class CustomerDataAccessAdapter implements CustomerDataAccess {
                     aggregate.getPhoneNumber()
             );
         }
-    }
-
-    @Override
-    public List<CustomerBusiness> findBySpecification(Specification<CustomerBusiness> spec) {
-        // Create a specification that works with CustomerAggregate
-        Specification<CustomerAggregate> aggregateSpec = new AbstractSpecification<CustomerAggregate>() {
-            @Override
-            public boolean isSatisfiedBy(CustomerAggregate aggregate) {
-                CustomerBusiness business = convertToBusiness(aggregate);
-                return spec.isSatisfiedBy(business);
-            }
-        };
-
-        return repository.findBySpecification(aggregateSpec).stream()
-                .map(this::convertToBusiness)
-                .collect(Collectors.toList());
     }
 }

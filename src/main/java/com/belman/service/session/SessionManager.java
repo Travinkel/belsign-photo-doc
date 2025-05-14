@@ -1,11 +1,11 @@
 package com.belman.service.session;
 
-import com.belman.domain.events.DomainEvents;
+import com.belman.common.logging.EmojiLoggerFactory;
 import com.belman.domain.events.UserLoggedInEvent;
 import com.belman.domain.events.UserLoggedOutEvent;
 import com.belman.domain.security.AuthenticationService;
+import com.belman.domain.security.ExtendedAuthenticationService;
 import com.belman.domain.user.UserBusiness;
-import com.belman.common.logging.EmojiLoggerFactory;
 import com.belman.service.base.BaseService;
 
 import java.util.Optional;
@@ -44,24 +44,6 @@ public class SessionManager extends BaseService {
     }
 
     /**
-     * Handles a UserLoggedInEvent.
-     *
-     * @param event the event to handle
-     */
-    private void handleUserLoggedIn(UserLoggedInEvent event) {
-        logInfo("User logged in: {}", event.getUsername().value());
-    }
-
-    /**
-     * Handles a UserLoggedOutEvent.
-     *
-     * @param event the event to handle
-     */
-    private void handleUserLoggedOut(UserLoggedOutEvent event) {
-        logInfo("User logged out: {}", event.getUsername().value());
-    }
-
-    /**
      * Gets the singleton instance of the SessionManager.
      *
      * @param authenticationService the authentication service to use (only used if the instance doesn't exist yet)
@@ -87,6 +69,24 @@ public class SessionManager extends BaseService {
             System.err.println("WARNING: SessionManager.getInstance() called before initialization");
         }
         return instance;
+    }
+
+    /**
+     * Handles a UserLoggedInEvent.
+     *
+     * @param event the event to handle
+     */
+    private void handleUserLoggedIn(UserLoggedInEvent event) {
+        logInfo("User logged in: {}", event.getUsername().value());
+    }
+
+    /**
+     * Handles a UserLoggedOutEvent.
+     *
+     * @param event the event to handle
+     */
+    private void handleUserLoggedOut(UserLoggedOutEvent event) {
+        logInfo("User logged out: {}", event.getUsername().value());
     }
 
     /**
@@ -140,6 +140,42 @@ public class SessionManager extends BaseService {
             return user;
         } catch (Exception e) {
             logError("Error during authentication: {}", e.getMessage(), e);
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Authenticates a user with the given PIN code.
+     *
+     * @param pinCode the PIN code
+     * @return an Optional containing the authenticated User if successful, or empty if authentication failed
+     */
+    public Optional<UserBusiness> loginWithPin(String pinCode) {
+        if (authenticationService == null) {
+            logError("AuthenticationService is null. Cannot perform login with PIN.");
+            return Optional.empty();
+        }
+
+        try {
+            logInfo("Attempting to authenticate user with PIN code");
+
+            if (authenticationService instanceof ExtendedAuthenticationService) {
+                ExtendedAuthenticationService extendedAuthService = (ExtendedAuthenticationService) authenticationService;
+                Optional<UserBusiness> user = extendedAuthService.authenticateWithPin(pinCode);
+
+                if (user.isPresent()) {
+                    logInfo("Authentication successful with PIN code");
+                } else {
+                    logWarn("Authentication failed with PIN code");
+                }
+
+                return user;
+            } else {
+                logError("AuthenticationService does not support PIN code authentication");
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            logError("Error during PIN code authentication: {}", e.getMessage(), e);
             return Optional.empty();
         }
     }

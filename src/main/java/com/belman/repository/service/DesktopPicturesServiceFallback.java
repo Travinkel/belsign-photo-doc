@@ -20,8 +20,8 @@ import java.util.logging.Logger;
 public class DesktopPicturesServiceFallback implements PicturesService {
     private static final Logger LOGGER = Logger.getLogger(DesktopPicturesServiceFallback.class.getName());
     private final FileChooser fileChooser;
-    private Stage stage;
     private final ObjectProperty<Image> imageProperty = new SimpleObjectProperty<>();
+    private Stage stage;
 
     /**
      * Creates a new DesktopPicturesServiceFallback.
@@ -53,6 +53,26 @@ public class DesktopPicturesServiceFallback implements PicturesService {
     }
 
     /**
+     * Selects an image using a file chooser dialog.
+     *
+     * @param title the title for the file chooser dialog
+     * @return an Optional containing the selected image, or empty if no image was selected
+     */
+    private Optional<Image> selectImage(String title) {
+        fileChooser.setTitle(title);
+        File file = fileChooser.showOpenDialog(stage);
+
+        if (file != null) {
+            try {
+                Image image = new Image(new FileInputStream(file));
+                return Optional.of(image);
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Failed to load image from file: " + file.getAbsolutePath(), e);
+            }
+        }
+
+        return Optional.empty();
+    }    /**
      * Takes a photo using the device camera.
      * On desktop, this opens a file chooser dialog to select an image file.
      *
@@ -64,6 +84,14 @@ public class DesktopPicturesServiceFallback implements PicturesService {
     }
 
     /**
+     * Selects an image from the device gallery.
+     * On desktop, this opens a file chooser dialog to select an image file.
+     *
+     * @return an Optional containing the selected image, or empty if no image was selected
+     */
+    public Optional<Image> retrieveImage() {
+        return selectImage("Select Image");
+    }    /**
      * Takes a photo asynchronously using the device camera.
      * On desktop, this opens a file chooser dialog to select an image file.
      *
@@ -74,15 +102,7 @@ public class DesktopPicturesServiceFallback implements PicturesService {
         takePhoto(savePhoto);
     }
 
-    /**
-     * Selects an image from the device gallery.
-     * On desktop, this opens a file chooser dialog to select an image file.
-     *
-     * @return an Optional containing the selected image, or empty if no image was selected
-     */
-    public Optional<Image> retrieveImage() {
-        return selectImage("Select Image");
-    }
+
 
     /**
      * Loads an image from the device gallery.
@@ -124,25 +144,5 @@ public class DesktopPicturesServiceFallback implements PicturesService {
         return imageProperty;
     }
 
-    /**
-     * Selects an image using a file chooser dialog.
-     *
-     * @param title the title for the file chooser dialog
-     * @return an Optional containing the selected image, or empty if no image was selected
-     */
-    private Optional<Image> selectImage(String title) {
-        fileChooser.setTitle(title);
-        File file = fileChooser.showOpenDialog(stage);
 
-        if (file != null) {
-            try {
-                Image image = new Image(new FileInputStream(file));
-                return Optional.of(image);
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Failed to load image from file: " + file.getAbsolutePath(), e);
-            }
-        }
-
-        return Optional.empty();
-    }
 }

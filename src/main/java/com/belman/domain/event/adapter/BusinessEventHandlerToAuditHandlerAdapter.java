@@ -49,7 +49,7 @@ public class BusinessEventHandlerToAuditHandlerAdapter<T extends AuditEvent> imp
     @Override
     public String toString() {
         return "BusinessEventHandlerToAuditHandlerAdapter{" +
-                "businessEventHandler=" + businessEventHandler +
-                '}';
+               "businessEventHandler=" + businessEventHandler +
+               '}';
     }
 }

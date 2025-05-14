@@ -3,6 +3,7 @@ package com.belman.ui.views.splash;
 
 import com.belman.ui.base.BaseViewModel;
 import com.belman.ui.navigation.Router;
+import com.belman.ui.usecases.authentication.login.LoginView;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -47,7 +48,7 @@ public class SplashViewModel extends BaseViewModel<SplashViewModel> {
             System.out.println("[DEBUG_LOG] SplashViewModel.onLoadingComplete() called");
             // Navigate to the login view
             System.out.println("[DEBUG_LOG] About to navigate to LoginView");
-            Router.navigateTo(com.belman.ui.views.login.LoginView.class);
+            Router.navigateTo(LoginView.class);
             System.out.println("[DEBUG_LOG] Navigation to LoginView completed");
         } catch (Exception e) {
             // Log and handle navigation errors
