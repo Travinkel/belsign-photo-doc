@@ -1,40 +1,35 @@
 package com.belman.domain.report;
 
-import com.belman.domain.audit.event.AuditEvent;
 import com.belman.domain.common.Timestamp;
-import com.belman.domain.core.BusinessObject;
-import com.belman.domain.customer.CustomerBusiness;
+import com.belman.domain.customer.CustomerAggregate;
 import com.belman.domain.order.OrderId;
 import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.report.events.ReportGeneratedEvent;
 import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserReference;
 
-import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * Business object representing a QC report for an order.
+ * Entity representing a QC report for an order.
  * Contains approved photos and metadata about its creation.
  * <p>
  * Use the {@code builder()} method to create instances of this class.
  */
-public class ReportBusiness extends BusinessObject<ReportId> {
+public class ReportAggregate {
     private final ReportId id;
     private final OrderId orderId;
     private final List<PhotoDocument> approvedPhotos;
     private final UserBusiness generatedBy;
     private final Timestamp generatedAt;
-    private CustomerBusiness recipient;
+    private CustomerAggregate recipient;
     private ReportFormat format;
     private ReportStatus status;
     private String comments;
     private int version;
 
     /**
-     * Creates a new ReportBusiness with the specified details.
+     * Creates a new ReportAggregate with the specified details.
      * This constructor is maintained for backward compatibility with existing tests.
      *
      * @param orderId        the ID of the order this report is for
@@ -44,8 +39,8 @@ public class ReportBusiness extends BusinessObject<ReportId> {
      * @deprecated Use {@link Builder} instead
      */
     @Deprecated
-    public ReportBusiness(OrderId orderId, List<PhotoDocument> approvedPhotos, UserBusiness generatedBy,
-                          Timestamp generatedAt) {
+    public ReportAggregate(OrderId orderId, List<PhotoDocument> approvedPhotos, UserBusiness generatedBy,
+                           Timestamp generatedAt) {
         this(builder()
                 .id(ReportId.newId())
                 .orderId(orderId)
@@ -55,11 +50,11 @@ public class ReportBusiness extends BusinessObject<ReportId> {
     }
 
     /**
-     * Creates a new ReportBusiness using the provided builder.
+     * Creates a new ReportAggregate using the provided builder.
      *
      * @param builder the builder containing the report's properties
      */
-    private ReportBusiness(Builder builder) {
+    private ReportAggregate(Builder builder) {
         this.id = Objects.requireNonNull(builder.id, "id must not be null");
         this.orderId = Objects.requireNonNull(builder.orderId, "orderId must not be null");
         this.approvedPhotos = Objects.requireNonNull(builder.approvedPhotos, "approvedPhotos must not be null");
@@ -73,16 +68,16 @@ public class ReportBusiness extends BusinessObject<ReportId> {
     }
 
     /**
-     * Creates a new builder for constructing ReportBusiness instances.
+     * Creates a new builder for constructing ReportAggregate instances.
      *
-     * @return a new ReportBusiness builder
+     * @return a new ReportAggregate builder
      */
     public static Builder builder() {
         return new Builder();
     }
 
     /**
-     * Creates a new ReportBusiness with the specified details.
+     * Creates a new ReportAggregate with the specified details.
      *
      * @param id             the unique identifier for this report
      * @param orderId        the ID of the order this report is for
@@ -92,8 +87,8 @@ public class ReportBusiness extends BusinessObject<ReportId> {
      * @deprecated Use {@link Builder} instead
      */
     @Deprecated
-    public ReportBusiness(ReportId id, OrderId orderId, List<PhotoDocument> approvedPhotos, UserBusiness generatedBy,
-                          Timestamp generatedAt) {
+    public ReportAggregate(ReportId id, OrderId orderId, List<PhotoDocument> approvedPhotos, UserBusiness generatedBy,
+                           Timestamp generatedAt) {
         this(builder()
                 .id(id)
                 .orderId(orderId)
@@ -102,7 +97,31 @@ public class ReportBusiness extends BusinessObject<ReportId> {
                 .generatedAt(generatedAt));
     }
 
-    @Override
+    /**
+     * Creates a new ReportAggregate with the specified details, including recipient and format.
+     *
+     * @param id             the unique identifier for this report
+     * @param orderId        the ID of the order this report is for
+     * @param approvedPhotos the approved photos to include in the report
+     * @param generatedBy    the user who generated this report
+     * @param generatedAt    the time when this report was generated
+     * @param recipient      the customer who will receive this report
+     * @param format         the format of the report
+     * @deprecated Use {@link Builder} instead
+     */
+    @Deprecated
+    public ReportAggregate(ReportId id, OrderId orderId, List<PhotoDocument> approvedPhotos, UserBusiness generatedBy,
+                           Timestamp generatedAt, CustomerAggregate recipient, ReportFormat format) {
+        this(builder()
+                .id(id)
+                .orderId(orderId)
+                .approvedPhotos(approvedPhotos)
+                .generatedBy(generatedBy)
+                .generatedAt(generatedAt)
+                .recipient(recipient)
+                .format(format));
+    }
+
     public ReportId getId() {
         return id;
     }
@@ -123,13 +142,12 @@ public class ReportBusiness extends BusinessObject<ReportId> {
         return generatedAt;
     }
 
-    public CustomerBusiness getRecipient() {
+    public CustomerAggregate getRecipient() {
         return recipient;
     }
 
-    public void setRecipient(CustomerBusiness recipient) {
+    public void setRecipient(CustomerAggregate recipient) {
         this.recipient = Objects.requireNonNull(recipient, "recipient must not be null");
-        updateLastModifiedAt();
     }
 
     public ReportFormat getFormat() {
@@ -138,7 +156,6 @@ public class ReportBusiness extends BusinessObject<ReportId> {
 
     public void setFormat(ReportFormat format) {
         this.format = Objects.requireNonNull(format, "format must not be null");
-        updateLastModifiedAt();
     }
 
     public ReportStatus getStatus() {
@@ -147,7 +164,6 @@ public class ReportBusiness extends BusinessObject<ReportId> {
 
     public void setStatus(ReportStatus status) {
         this.status = Objects.requireNonNull(status, "status must not be null");
-        updateLastModifiedAt();
     }
 
     public String getComments() {
@@ -156,7 +172,6 @@ public class ReportBusiness extends BusinessObject<ReportId> {
 
     public void setComments(String comments) {
         this.comments = comments;
-        updateLastModifiedAt();
     }
 
     public int getVersion() {
@@ -169,7 +184,6 @@ public class ReportBusiness extends BusinessObject<ReportId> {
      */
     public void incrementVersion() {
         this.version++;
-        updateLastModifiedAt();
     }
 
     /**
@@ -183,34 +197,18 @@ public class ReportBusiness extends BusinessObject<ReportId> {
             throw new IllegalStateException("Cannot finalize a report without a recipient");
         }
         this.status = ReportStatus.GENERATED;
-        updateLastModifiedAt();
-
-        // Register audit event
-        registerAuditEvent((AuditEvent) new ReportGeneratedEvent(
-                this.id,
-                this.orderId,
-                ReportType.PHOTO_DOCUMENTATION,
-                new UserReference(this.generatedBy.getId(), this.generatedBy.getUsername())
-        ));
     }
 
     /**
      * Marks this report as sent to the customer.
      *
-     * @param fileUrl the URL where the report file can be accessed
      * @throws IllegalStateException if the report is not in APPROVED status
      */
-    public void markAsSent(URL fileUrl) {
+    public void markAsSent() {
         if (status != ReportStatus.APPROVED) {
             throw new IllegalStateException("Cannot mark a report as sent if it is not approved");
         }
         this.status = ReportStatus.DELIVERED;
-        updateLastModifiedAt();
-
-        // Note: ReportCompletedEvent doesn't implement or extend AuditEvent, so we can't register it directly.
-        // This will be addressed in a future update when ReportCompletedEvent is updated to extend BaseAuditEvent.
-        // For now, we'll just log the event completion without registering an audit event.
-        // TODO: Update when ReportCompletedEvent extends BaseAuditEvent
     }
 
     /**
@@ -218,7 +216,6 @@ public class ReportBusiness extends BusinessObject<ReportId> {
      */
     public void archive() {
         this.status = ReportStatus.ARCHIVED;
-        updateLastModifiedAt();
     }
 
     /**
@@ -250,8 +247,8 @@ public class ReportBusiness extends BusinessObject<ReportId> {
     }
 
     /**
-     * Builder for creating ReportBusiness instances.
-     * This class follows the Builder pattern to simplify the creation of complex ReportBusiness objects.
+     * Builder for creating ReportAggregate instances.
+     * This class follows the Builder pattern to simplify the creation of complex ReportAggregate objects.
      */
     public static class Builder {
         private ReportId id;
@@ -259,7 +256,7 @@ public class ReportBusiness extends BusinessObject<ReportId> {
         private List<PhotoDocument> approvedPhotos;
         private UserBusiness generatedBy;
         private Timestamp generatedAt;
-        private CustomerBusiness recipient;
+        private CustomerAggregate recipient;
         private ReportFormat format;
         private ReportStatus status;
         private String comments;
@@ -333,7 +330,7 @@ public class ReportBusiness extends BusinessObject<ReportId> {
          * @param recipient the recipient
          * @return this builder for method chaining
          */
-        public Builder recipient(CustomerBusiness recipient) {
+        public Builder recipient(CustomerAggregate recipient) {
             this.recipient = recipient;
             return this;
         }
@@ -383,16 +380,17 @@ public class ReportBusiness extends BusinessObject<ReportId> {
         }
 
         /**
-         * Builds a new ReportBusiness instance with the properties set in this builder.
+         * Builds a new ReportAggregate instance with the properties set in this builder.
          *
-         * @return a new ReportBusiness instance
+         * @return a new ReportAggregate instance
          * @throws NullPointerException if any required property is null
          */
-        public ReportBusiness build() {
+        public ReportAggregate build() {
             if (id == null) {
                 id = ReportId.newId();
             }
-            return new ReportBusiness(this);
+            return new ReportAggregate(this);
         }
     }
 }
+
