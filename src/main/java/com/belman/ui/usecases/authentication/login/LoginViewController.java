@@ -479,8 +479,7 @@ public class LoginViewController extends BaseController<LoginViewModel> {
 
     /**
      * Handles PIN code login.
-     * This method converts the PIN code to a username and password
-     * that can be used with the existing login method.
+     * This method uses the view model's loginWithPin method to authenticate with the PIN code.
      */
     private void handlePinCodeLogin() {
         String pin = pinCodeField.getText();
@@ -498,29 +497,11 @@ public class LoginViewController extends BaseController<LoginViewModel> {
             return;
         }
 
-        // For demonstration purposes, we'll use a simple mapping:
-        // PIN code "1234" maps to username "pin_user" and password "pin_pass"
-        // In a real implementation, this would validate against a database or service
-        if (pin.equals("1234")) {
-            getViewModel().setUsername("pin_user");
-            getViewModel().setPassword("pin_pass");
+        // Use the view model's loginWithPin method to authenticate with the PIN code
+        getViewModel().loginWithPin(pin);
 
-            // Use the state pattern to handle the login flow
-            try {
-                // Create a login context with the view model
-                DefaultLoginContext context = new DefaultLoginContext(getViewModel());
-
-                // Set the initial state to PinLoginState
-                context.setState(new PinLoginState());
-
-                // Handle the login flow
-                context.handle();
-            } catch (Exception e) {
-                getViewModel().setErrorMessage("Login failed: " + e.getMessage());
-                errorMessageLabel.setVisible(true);
-            }
-        } else {
-            getViewModel().setErrorMessage("Invalid PIN code");
+        // Show error message if there is one
+        if (!getViewModel().getErrorMessage().isEmpty()) {
             errorMessageLabel.setVisible(true);
         }
     }

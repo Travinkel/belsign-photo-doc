@@ -45,6 +45,24 @@ public class DefaultLoginContext implements LoginContext {
     }
 
     @Override
+    public Optional<UserBusiness> loginWithPin(String pinCode) {
+        // Call the view model's loginWithPin method
+        viewModel.loginWithPin(pinCode);
+
+        // Since the view model's loginWithPin method doesn't return a value,
+        // we'll check if there's an error message to determine if login was successful
+        if (viewModel.getErrorMessage() == null || viewModel.getErrorMessage().isEmpty()) {
+            // No error message means login was successful
+            // Return a non-empty Optional to indicate success
+            // Since we don't have the actual user, we'll create a dummy user
+            return Optional.of(new UserBusiness.Builder().build());
+        } else {
+            // Error message means login failed
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public void setUser(UserBusiness user) {
         // No direct way to set the user in the view model
         // This would be handled by the login method

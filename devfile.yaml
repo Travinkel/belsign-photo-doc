@@ -1,0 +1,28 @@
+schemaVersion: 2.0.0
+metadata:
+  name: java-maven-project
+components:
+  - name: dev
+    container:
+      image: public.ecr.aws/aws-mde/universal-image:latest
+      memoryLimit: 4Gi
+      mountSources: true
+      env:
+        - name: JAVA_HOME
+          value: /usr/lib/jvm/java-17-openjdk
+commands:
+  - id: install
+    exec:
+      component: dev
+      commandLine: "mvn dependency:resolve"
+      workingDir: ${PROJECT_SOURCE}
+  - id: build
+    exec:
+      component: dev
+      commandLine: "mvn clean package -DskipTests"
+      workingDir: ${PROJECT_SOURCE}
+  - id: test
+    exec:
+      component: dev
+      commandLine: "mvn test"
+      workingDir: ${PROJECT_SOURCE}

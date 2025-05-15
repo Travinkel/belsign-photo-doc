@@ -9,22 +9,22 @@ The directory structure for the proposed UI structure has already been created, 
 ## Tasks
 
 ### 1. Complete the Migration of Views
-- [ ] **Move Login View Components**
-  - [ ] Move LoginViewController.java from src/main/java/com/belman/ui/views/login/ to src/main/java/com/belman/ui/usecases/authentication/login/
-  - [ ] Move LoginViewModel.java from src/main/java/com/belman/ui/views/login/ to src/main/java/com/belman/ui/usecases/authentication/login/
-  - [ ] Update imports in all moved files
+- [X] **Move Login View Components**
+  - [X] Move LoginViewController.java from src/main/java/com/belman/ui/views/login/ to src/main/java/com/belman/ui/usecases/authentication/login/
+  - [X] Move LoginViewModel.java from src/main/java/com/belman/ui/views/login/ to src/main/java/com/belman/ui/usecases/authentication/login/
+  - [X] Update imports in all moved files
 
-- [ ] **Move Login Flow States**
-  - [ ] Move AttemptLoginState.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
-  - [ ] Move CameraScanLoginState.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
-  - [ ] Move DefaultLoginContext.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
-  - [ ] Move HandleLoginFailureState.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
-  - [ ] Move HandlePreferencesState.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
-  - [ ] Move LoginContext.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
-  - [ ] Move LoginState.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
-  - [ ] Move PinLoginState.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
-  - [ ] Move StartLoginState.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
-  - [ ] Update imports in all moved files
+- [X] **Move Login Flow States**
+  - [X] Move AttemptLoginState.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
+  - [X] Move CameraScanLoginState.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
+  - [X] Move DefaultLoginContext.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
+  - [X] Move HandleLoginFailureState.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
+  - [X] Move HandlePreferencesState.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
+  - [X] Move LoginContext.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
+  - [X] Move LoginState.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
+  - [X] Move PinLoginState.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
+  - [X] Move StartLoginState.java from src/main/java/com/belman/ui/views/login/flow/ to src/main/java/com/belman/ui/usecases/authentication/login/flow/
+  - [X] Update imports in all moved files
 
 - [ ] **Move Other Views**
   - [ ] Move Admin Views from src/main/java/com/belman/ui/views/admin/ to src/main/java/com/belman/ui/usecases/admin/

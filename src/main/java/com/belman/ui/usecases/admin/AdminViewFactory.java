@@ -1,25 +1,25 @@
-package com.belman.ui.usecases.authentication.login;
+package com.belman.ui.usecases.admin;
 
 import com.belman.ui.core.AbstractViewFactory;
 import com.belman.ui.core.ViewDependencies;
 import com.gluonhq.charm.glisten.mvc.View;
 
 /**
- * Factory for creating LoginView instances.
+ * Factory for creating AdminView instances.
  * This class is part of the Factory Method pattern for view creation.
  */
-public class LoginViewFactory extends AbstractViewFactory {
+public class AdminViewFactory extends AbstractViewFactory {
     /**
-     * Creates a new LoginViewFactory with the specified ViewDependencies.
+     * Creates a new AdminViewFactory with the specified ViewDependencies.
      *
      * @param viewDependencies the view dependencies
      */
-    public LoginViewFactory(ViewDependencies viewDependencies) {
+    public AdminViewFactory(ViewDependencies viewDependencies) {
         super(viewDependencies);
     }
 
     /**
-     * Creates a new LoginView.
+     * Creates a new AdminView.
      * The view model will be created automatically by the BaseView constructor
      * using the ViewLoader.
      *
@@ -27,6 +27,6 @@ public class LoginViewFactory extends AbstractViewFactory {
      */
     @Override
     public View createView() {
-        return new LoginView();
+        return new AdminView();
     }
 }

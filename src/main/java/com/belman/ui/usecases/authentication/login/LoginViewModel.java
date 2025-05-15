@@ -288,4 +288,61 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
         // Ensure login is not in progress
         loginInProgress.set(false);
     }
+
+    /**
+     * Attempts to log in with the given PIN code.
+     * 
+     * @param pinCode the PIN code to use for authentication
+     */
+    public void loginWithPin(String pinCode) {
+        // Clear any previous error message
+        errorMessage.set("");
+
+        logger.debug("PIN login attempt started");
+
+        // Check if PIN code is provided
+        if (pinCode == null || pinCode.isBlank()) {
+            logger.warn("PIN login failed: PIN code is required");
+            errorMessage.set("PIN code is required");
+            return;
+        }
+
+        // Set login in progress
+        loginInProgress.set(true);
+        logger.debug("PIN login in progress");
+
+        try {
+            // Attempt to log in with PIN
+            logger.debug("Calling sessionManager.loginWithPin");
+            Optional<UserBusiness> userOpt = sessionManager.loginWithPin(pinCode);
+
+            if (userOpt.isPresent()) {
+                // Login successful, navigate to role-specific view
+                UserBusiness user = userOpt.get();
+                logger.success("PIN login successful");
+
+                try {
+                    // Use the RoleBasedNavigationService to navigate to the appropriate view based on user role
+                    logger.debug("Navigating to user home view");
+                    navigationService.navigateToUserHome();
+                    logger.debug("Navigation to user home view completed");
+                } catch (Exception e) {
+                    logger.error("Failed to navigate to role-specific view", e);
+                    errorMessage.set("Navigation error: " + e.getMessage());
+                }
+            } else {
+                // PIN login failed
+                logger.warn("PIN login failed: Invalid PIN code");
+                errorMessage.set("Invalid PIN code. Please try again.");
+            }
+        } catch (Exception e) {
+            // Handle any exceptions
+            logger.error("Exception during PIN login", e);
+            errorMessage.set("An error occurred during login. Please try again later.");
+        } finally {
+            // Clear login in progress
+            loginInProgress.set(false);
+            logger.debug("PIN login process completed");
+        }
+    }
 }

@@ -19,6 +19,14 @@ public interface LoginContext {
     Optional<UserBusiness> login();
 
     /**
+     * Attempts to log in with the given PIN code.
+     *
+     * @param pinCode the PIN code to use for authentication
+     * @return an Optional containing the authenticated User if successful, or empty if authentication failed
+     */
+    Optional<UserBusiness> loginWithPin(String pinCode);
+
+    /**
      * Sets the user that has been authenticated.
      *
      * @param user the authenticated user

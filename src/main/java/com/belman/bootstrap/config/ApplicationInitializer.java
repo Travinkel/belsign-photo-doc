@@ -2,6 +2,7 @@ package com.belman.bootstrap.config;
 
 import com.belman.bootstrap.di.ServiceRegistry;
 import com.belman.bootstrap.persistence.DatabaseConfig;
+import com.belman.bootstrap.persistence.SqliteDatabaseConfig;
 import com.belman.common.logging.EmojiLogger;
 import com.belman.domain.customer.CustomerDataAccess;
 import com.belman.domain.customer.CustomerRepository;
@@ -21,6 +22,7 @@ import com.belman.repository.persistence.memory.*;
 import com.belman.service.session.SessionManager;
 import com.belman.service.usecase.photo.DefaultPhotoService;
 import com.belman.service.usecase.security.DefaultAuthenticationService;
+import com.belman.service.usecase.security.DefaultExtendedAuthenticationService;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Constructor;
@@ -65,6 +67,18 @@ public class ApplicationInitializer {
 
             // Try to use SQL-based repositories if database is available
             DataSource dataSource = DatabaseConfig.getDataSource();
+
+            // If main database is not available, try SQLite database
+            if (dataSource == null) {
+                logger.database("Main database not available, trying SQLite database");
+                SqliteDatabaseConfig.initialize();
+                dataSource = SqliteDatabaseConfig.getDataSource();
+                if (dataSource != null) {
+                    logger.success("SQLite database connection pool initialized successfully");
+                } else {
+                    logger.warn("SQLite database not available, falling back to in-memory repositories");
+                }
+            }
             if (dataSource != null) {
                 try {
                     // Initialize UserRepository - try SQL implementation first
@@ -287,11 +301,11 @@ public class ApplicationInitializer {
             }
 
             // Create services
-            logger.debug("Creating authentication service");
-            AuthenticationService authenticationService = new DefaultAuthenticationService(userRepository);
+            logger.debug("Creating extended authentication service");
+            AuthenticationService authenticationService = new DefaultExtendedAuthenticationService(userRepository);
             // Register the AuthenticationService with the ServiceRegistry
             ServiceRegistry.registerService(authenticationService);
-            logger.success("Authentication service created successfully");
+            logger.success("Extended authentication service created successfully");
 
             // Initialize SessionManager
             logger.debug("Initializing SessionManager");
@@ -391,10 +405,11 @@ public class ApplicationInitializer {
         logger.shutdown("Starting application shutdown");
 
         try {
-            // Shutdown database connection pool
-            logger.database("Shutting down database connection pool");
+            // Shutdown database connection pools
+            logger.database("Shutting down database connection pools");
             DatabaseConfig.shutdown();
-            logger.success("Database connection pool shut down successfully");
+            SqliteDatabaseConfig.shutdown();
+            logger.success("Database connection pools shut down successfully");
 
             initialized = false;
             logger.shutdown("Application shut down successfully 👋");

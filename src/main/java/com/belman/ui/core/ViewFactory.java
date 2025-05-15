@@ -1,6 +1,6 @@
 package com.belman.ui.core;
 
-import javafx.scene.Parent;
+import com.gluonhq.charm.glisten.mvc.View;
 
 /**
  * Interface for creating views.
@@ -12,5 +12,5 @@ public interface ViewFactory {
      *
      * @return the created view
      */
-    Parent createView();
+    View createView();
 }
