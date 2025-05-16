@@ -1,5 +1,8 @@
 # 🏴‍☠️ Hacks
 
+**Note**: This is not *actually* a hack of any kind. An attempt was made to bypass the licensemanager, as Gluon allows 
+students a free license. I have kept it because I have a very bad sense of humor.
+
 ```
      .-"     "-.
     /           \
@@ -10,8 +13,8 @@
        (_ ^^ )
       _|IIIIII|__/
      | \IIIIII/ |
-    \    /
---------
+        \    /
+       --------
 ```
 
 ## What even is a "hack"?

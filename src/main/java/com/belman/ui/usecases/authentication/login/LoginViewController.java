@@ -1,11 +1,10 @@
 package com.belman.ui.usecases.authentication.login;
 
-import com.belman.bootstrap.camera.CameraServiceFactory;
-import com.belman.domain.services.CameraService;
+import com.belman.service.platform.CameraServiceFactory;
+import com.belman.service.platform.CameraService;
 import com.belman.ui.base.BaseController;
 import com.belman.ui.usecases.authentication.login.flow.CameraScanLoginState;
 import com.belman.ui.usecases.authentication.login.flow.DefaultLoginContext;
-import com.belman.ui.usecases.authentication.login.flow.PinLoginState;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;

@@ -18,8 +18,16 @@ import com.belman.service.error.ErrorHandler;
 import com.belman.ui.core.UIErrorHandlerAdapter;
 import com.belman.ui.navigation.RouteGuardImpl;
 import com.belman.ui.navigation.Router;
+import com.belman.ui.core.ViewRegistry;
+import com.belman.ui.core.ViewStackManager;
+import com.belman.ui.navigation.RoleBasedNavigationService;
+import com.belman.service.session.DefaultSessionContext;
+import com.belman.service.session.DefaultSessionService;
+import com.belman.service.session.SessionContext;
+import com.belman.service.session.SessionManager;
+import com.belman.service.session.SessionService;
 import com.belman.ui.usecases.authentication.login.LoginView;
-import com.belman.ui.views.splash.SplashView;
+import com.belman.ui.usecases.common.splash.SplashView;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import javafx.scene.Scene;
 
@@ -96,8 +104,26 @@ public class Main extends MobileApplication {
             logger.info("Using com.gluonhq.license.disable=true to disable Gluon licensing checks");
         }
 
-        // Register views (GUI)
-        registerViews();
+        // Set up the ViewStackManager (GUI)
+        logger.debug("Setting up ViewStackManager");
+
+        // Get the SessionManager instance
+        SessionManager sessionManager = SessionManager.getInstance();
+
+        // Create a SessionService
+        SessionService sessionService = new DefaultSessionService(sessionManager);
+
+        // Create a SessionContext
+        SessionContext sessionContext = new DefaultSessionContext(sessionService);
+
+        // Create a RoleBasedNavigationService with the SessionContext
+        RoleBasedNavigationService navigationService = new RoleBasedNavigationService(sessionContext);
+
+        // Get the ViewRegistry instance
+        ViewRegistry viewRegistry = ViewRegistry.getInstance();
+
+        // Initialize the ViewStackManager
+        ViewStackManager.initialize(this, navigationService, viewRegistry);
 
         // Set up the Router (GUI)
         logger.debug("Setting up Router");
@@ -111,56 +137,6 @@ public class Main extends MobileApplication {
         LoggerFactory loggerFactory = ServiceLocator.getService(LoggerFactory.class);
         ServiceRegistry.setLogger(loggerFactory);
         LifecycleManager.init(this, loggerFactory);
-    }
-
-    /**
-     * Registers all views with the application.
-     * This is part of the GUI layer bootstrapping.
-     */
-    private void registerViews() {
-        // Register the splash view
-        logger.debug("Registering splash view");
-        this.addViewFactory(SPLASH_VIEW, SplashView::new);
-
-        // Register the login view
-        logger.debug("Registering login view");
-        this.addViewFactory(LoginView.class.getSimpleName(),
-                LoginView::new);
-
-        // Register the admin view
-        logger.debug("Registering admin view");
-        this.addViewFactory(com.belman.ui.views.admin.AdminView.class.getSimpleName(),
-                com.belman.ui.views.admin.AdminView::new);
-
-        // Register the order gallery view
-        logger.debug("Registering order gallery view");
-        this.addViewFactory(com.belman.ui.views.ordergallery.OrderGalleryView.class.getSimpleName(),
-                com.belman.ui.views.ordergallery.OrderGalleryView::new);
-
-        // Register the photo review view
-        logger.debug("Registering photo review view");
-        this.addViewFactory(com.belman.ui.views.photoreview.PhotoReviewView.class.getSimpleName(),
-                com.belman.ui.views.photoreview.PhotoReviewView::new);
-
-        // Register the photo upload view
-        logger.debug("Registering photo upload view");
-        this.addViewFactory(com.belman.ui.views.photoupload.PhotoUploadView.class.getSimpleName(),
-                com.belman.ui.views.photoupload.PhotoUploadView::new);
-
-        // Register the QA dashboard view
-        logger.debug("Registering QA dashboard view");
-        this.addViewFactory(com.belman.ui.views.qadashboard.QADashboardView.class.getSimpleName(),
-                com.belman.ui.views.qadashboard.QADashboardView::new);
-
-        // Register the report preview view
-        logger.debug("Registering report preview view");
-        this.addViewFactory(com.belman.ui.views.reportpreview.ReportPreviewView.class.getSimpleName(),
-                com.belman.ui.views.reportpreview.ReportPreviewView::new);
-
-        // Register the user management view
-        logger.debug("Registering user management view");
-        this.addViewFactory(com.belman.ui.views.usermanagement.UserManagementView.class.getSimpleName(),
-                com.belman.ui.views.usermanagement.UserManagementView::new);
     }
 
     /**
@@ -200,7 +176,7 @@ public class Main extends MobileApplication {
 
         // Show the splash view (GUI)
         logger.info("Showing splash view");
-        this.switchView(SPLASH_VIEW);
+        ViewStackManager.getInstance().navigateTo("SplashView");
     }
 
     /**

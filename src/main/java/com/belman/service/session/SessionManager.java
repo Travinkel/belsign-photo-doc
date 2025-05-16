@@ -1,8 +1,8 @@
 package com.belman.service.session;
 
 import com.belman.common.logging.EmojiLoggerFactory;
-import com.belman.domain.events.UserLoggedInEvent;
-import com.belman.domain.events.UserLoggedOutEvent;
+import com.belman.domain.user.events.UserLoggedInEvent;
+import com.belman.domain.user.events.UserLoggedOutEvent;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.security.ExtendedAuthenticationService;
 import com.belman.domain.user.UserBusiness;

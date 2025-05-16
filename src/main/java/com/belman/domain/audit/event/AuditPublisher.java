@@ -1,7 +1,6 @@
 package com.belman.domain.audit.event;
 
-import com.belman.domain.event.BusinessEventPublisher;
-import com.belman.domain.event.adapter.AuditEventAdapter;
+import com.belman.domain.audit.BusinessEventPublisher;
 import com.belman.domain.services.Logger;
 
 import java.util.ArrayList;

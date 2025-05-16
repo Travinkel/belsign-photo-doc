@@ -1,6 +1,6 @@
 package com.belman.domain.audit.event;
 
-import com.belman.domain.event.BaseBusinessEvent;
+import com.belman.domain.audit.BaseBusinessEvent;
 
 import java.time.Instant;
 import java.util.UUID;

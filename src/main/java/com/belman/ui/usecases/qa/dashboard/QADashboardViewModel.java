@@ -7,7 +7,7 @@ import com.belman.service.session.SessionManager;
 import com.belman.ui.base.BaseViewModel;
 import com.belman.ui.navigation.Router;
 import com.belman.ui.usecases.authentication.login.LoginView;
-import com.belman.ui.views.photoreview.PhotoReviewView;
+import com.belman.ui.usecases.photo.review.PhotoReviewView;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -30,9 +30,18 @@ public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
     private final StringProperty errorMessage = new SimpleStringProperty("");
     private final ObservableList<String> pendingOrders = FXCollections.observableArrayList();
     private final FilteredList<String> filteredOrders = new FilteredList<>(pendingOrders);
+    
     @Inject
     private OrderRepository orderRepository;
+    
     private String selectedOrder;
+
+    /**
+     * Default constructor for use by the ViewLoader.
+     */
+    public QADashboardViewModel() {
+        // Default constructor
+    }
 
     @Override
     public void onShow() {

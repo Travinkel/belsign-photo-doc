@@ -1,6 +1,7 @@
 package com.belman.domain.shared;
 
 
+import com.belman.domain.state.StateKey;
 import com.belman.domain.user.UserBusiness;
 
 /**

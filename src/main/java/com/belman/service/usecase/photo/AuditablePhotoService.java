@@ -2,7 +2,7 @@ package com.belman.service.usecase.photo;
 
 import com.belman.domain.audit.AuditFacade;
 import com.belman.domain.audit.Auditable;
-import com.belman.domain.event.AuditableBusinessEvent;
+import com.belman.domain.audit.AuditableBusinessEvent;
 import com.belman.domain.order.OrderId;
 import com.belman.domain.order.photo.Photo;
 import com.belman.domain.order.photo.PhotoDocument;

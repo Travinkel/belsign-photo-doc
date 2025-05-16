@@ -2,7 +2,6 @@ package com.belman.domain.audit;
 
 import com.belman.domain.audit.event.AuditEvent;
 import com.belman.domain.audit.event.BaseAuditEvent;
-import com.belman.domain.event.AuditableBusinessEvent;
 import com.belman.domain.order.photo.PhotoId;
 import com.belman.domain.services.Logger;
 import com.belman.domain.user.UserId;

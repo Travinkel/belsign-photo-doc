@@ -1,8 +1,8 @@
 package com.belman.ui.usecases.photo.upload;
 
-import com.belman.bootstrap.camera.CameraServiceFactory;
+import com.belman.service.platform.CameraServiceFactory;
 import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.services.CameraService;
+import com.belman.service.platform.CameraService;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRole;
 import com.belman.service.session.SessionManager;

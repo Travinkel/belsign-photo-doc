@@ -34,13 +34,7 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
     @FXML
     private ProgressIndicator progressIndicator;
 
-    /**
-     * Handles the search button action.
-     */
-    @FXML
-    private void handleSearch(ActionEvent event) {
-        getViewModel().searchOrders();
-    }    @Override
+    @Override
     protected void setupBindings() {
         // Bind UI components to ViewModel properties
         welcomeLabel.textProperty().bind(getViewModel().welcomeMessageProperty());
@@ -69,6 +63,20 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
         getViewModel().loadPendingOrders();
     }
 
+    @Override
+    public void initializeBinding() {
+        // Call setupBindings to avoid duplication
+        setupBindings();
+    }
+
+    /**
+     * Handles the search button action.
+     */
+    @FXML
+    private void handleSearch(ActionEvent event) {
+        getViewModel().searchOrders();
+    }
+
     /**
      * Handles the review photos button action.
      */
@@ -78,10 +86,6 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
         if (selectedOrder != null) {
             getViewModel().navigateToPhotoReview(selectedOrder);
         }
-    }    @Override
-    public void initializeBinding() {
-        // Call setupBindings to avoid duplication
-        setupBindings();
     }
 
     /**
@@ -93,18 +97,11 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
         if (selectedOrder != null) {
             boolean success = getViewModel().generateReport(selectedOrder);
             if (success) {
-                showInfo("ReportAggregate generated successfully");
+                showInfo("Report generated successfully");
             } else {
                 showError(getViewModel().errorMessageProperty().get());
             }
         }
-    }    /**
-     * Shows an error message using a touch-friendly dialog.
-     * Overrides the method in BaseController.
-     */
-    @Override
-    protected void showError(String message) {
-        TouchFriendlyDialog.showError("Error", message);
     }
 
     /**
@@ -114,9 +111,12 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
         TouchFriendlyDialog.showInformation("Information", message);
     }
 
-
-
-
-
-
+    /**
+     * Shows an error message using a touch-friendly dialog.
+     * Overrides the method in BaseController.
+     */
+    @Override
+    protected void showError(String message) {
+        TouchFriendlyDialog.showError("Error", message);
+    }
 }

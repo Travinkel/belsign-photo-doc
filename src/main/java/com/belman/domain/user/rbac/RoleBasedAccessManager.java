@@ -1,6 +1,5 @@
 package com.belman.domain.user.rbac;
 
-import com.belman.domain.core.DomainService;
 import com.belman.domain.exceptions.AccessDeniedException;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.services.LoggerFactory;

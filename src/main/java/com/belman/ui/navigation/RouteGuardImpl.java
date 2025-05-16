@@ -2,13 +2,13 @@ package com.belman.ui.navigation;
 
 import com.belman.domain.services.Logger;
 import com.belman.service.routing.RouteGuard;
-import com.belman.ui.views.admin.AdminView;
-import com.belman.ui.views.ordergallery.OrderGalleryView;
-import com.belman.ui.views.photoreview.PhotoReviewView;
-import com.belman.ui.views.photoupload.PhotoUploadView;
-import com.belman.ui.views.qadashboard.QADashboardView;
-import com.belman.ui.views.reportpreview.ReportPreviewView;
-import com.belman.ui.views.usermanagement.UserManagementView;
+import com.belman.ui.usecases.admin.AdminView;
+import com.belman.ui.usecases.order.gallery.OrderGalleryView;
+import com.belman.ui.usecases.photo.review.PhotoReviewView;
+import com.belman.ui.usecases.photo.upload.PhotoUploadView;
+import com.belman.ui.usecases.qa.dashboard.QADashboardView;
+import com.belman.ui.usecases.report.preview.ReportPreviewView;
+import com.belman.ui.usecases.admin.usermanagement.UserManagementView;
 import com.gluonhq.charm.glisten.mvc.View;
 
 import java.util.HashMap;

@@ -1,20 +1,32 @@
 package com.belman.ui.usecases.common.main;
 
-import com.belman.ui.core.ViewFactory;
-import javafx.scene.Parent;
+import com.belman.ui.core.AbstractViewFactory;
+import com.belman.ui.core.ViewDependencies;
+import com.gluonhq.charm.glisten.mvc.View;
 
 /**
  * Factory for creating MainView instances.
- * This is part of the Factory Method pattern for view creation.
+ * This class is part of the Factory Method pattern for view creation.
  */
-public class MainViewFactory implements ViewFactory {
+public class MainViewFactory extends AbstractViewFactory {
     /**
-     * Creates a MainView.
+     * Creates a new MainViewFactory with the specified ViewDependencies.
      *
-     * @return the created MainView
+     * @param viewDependencies the view dependencies
+     */
+    public MainViewFactory(ViewDependencies viewDependencies) {
+        super(viewDependencies);
+    }
+
+    /**
+     * Creates a new MainView.
+     * The view model will be created automatically by the BaseView constructor
+     * using the ViewLoader.
+     *
+     * @return the created view
      */
     @Override
-    public Parent createView() {
+    public View createView() {
         return new MainView();
     }
 }

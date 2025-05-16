@@ -1,6 +1,6 @@
 package com.belman.unit.infrastructure.service;
 
-import com.belman.domain.services.CameraService;
+import com.belman.service.platform.CameraService;
 import com.belman.repository.service.MockCameraService;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;

@@ -3,7 +3,16 @@ package com.belman.ui.core;
 import com.belman.common.logging.EmojiLogger;
 import com.belman.ui.navigation.Router;
 import com.belman.ui.usecases.admin.AdminViewFactory;
+import com.belman.ui.usecases.admin.usermanagement.UserManagementViewFactory;
 import com.belman.ui.usecases.authentication.login.LoginViewFactory;
+import com.belman.ui.usecases.authentication.logout.LogoutViewFactory;
+import com.belman.ui.usecases.common.main.MainViewFactory;
+import com.belman.ui.usecases.common.splash.SplashViewFactory;
+import com.belman.ui.usecases.order.gallery.OrderGalleryViewFactory;
+import com.belman.ui.usecases.photo.review.PhotoReviewViewFactory;
+import com.belman.ui.usecases.photo.upload.PhotoUploadViewFactory;
+import com.belman.ui.usecases.qa.dashboard.QADashboardViewFactory;
+import com.belman.ui.usecases.report.preview.ReportPreviewViewFactory;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.mvc.View;
 
@@ -197,13 +206,40 @@ public class ViewStackManager {
     public void registerAllViews() {
         logger.debug("Registering all views in the new structure");
 
+        // Register the splash view
+        registerView("SplashView", new SplashViewFactory(viewDependencies));
+
         // Register the login view
         registerView("LoginView", new LoginViewFactory(viewDependencies));
 
         // Register the admin view
         registerView("AdminView", new AdminViewFactory(viewDependencies));
 
-        // TODO: Register other views as they are migrated to the new structure
+        // Register the main view
+        registerView("MainView", new MainViewFactory(viewDependencies));
+
+        // Register the QA dashboard view
+        registerView("QADashboardView", new QADashboardViewFactory(viewDependencies));
+
+        // Register the Photo Review view
+        registerView("PhotoReviewView", new PhotoReviewViewFactory(viewDependencies));
+
+        // Register the Photo Upload view
+        registerView("PhotoUploadView", new PhotoUploadViewFactory(viewDependencies));
+
+        // Register the Order Gallery view
+        registerView("OrderGalleryView", new OrderGalleryViewFactory(viewDependencies));
+
+        // Register the Report Preview view
+        registerView("ReportPreviewView", new ReportPreviewViewFactory(viewDependencies));
+
+        // Register the User Management view
+        registerView("UserManagementView", new UserManagementViewFactory(viewDependencies));
+
+        // Register the Logout view
+        registerView("LogoutView", new LogoutViewFactory(viewDependencies));
+
+        // All views have been registered
 
         logger.success("All views registered successfully");
     }

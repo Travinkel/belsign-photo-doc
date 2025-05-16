@@ -166,11 +166,32 @@ public class ViewStackManager {
     }
 
     public void registerAllViews() {
+        // Register the splash view
+        registerView("SplashView", new SplashViewFactory(viewDependencies));
+
         // Register the login view
         registerView("LoginView", new LoginViewFactory(viewDependencies));
 
         // Register the admin view
         registerView("AdminView", new AdminViewFactory(viewDependencies));
+
+        // Register the main view
+        registerView("MainView", new MainViewFactory(viewDependencies));
+
+        // Register the QA dashboard view
+        registerView("QADashboardView", new QADashboardViewFactory(viewDependencies));
+
+        // Register the Photo Review view
+        registerView("PhotoReviewView", new PhotoReviewViewFactory(viewDependencies));
+
+        // Register the Photo Upload view
+        registerView("PhotoUploadView", new PhotoUploadViewFactory(viewDependencies));
+
+        // Register the Order Gallery view
+        registerView("OrderGalleryView", new OrderGalleryViewFactory(viewDependencies));
+
+        // Register the Report Preview view
+        registerView("ReportPreviewView", new ReportPreviewViewFactory(viewDependencies));
 
         // TODO: Register other views as they are migrated to the new structure
     }
@@ -212,6 +233,111 @@ public class LoginViewFactory extends AbstractViewFactory {
 }
 ```
 
+Similarly, for the splash view:
+
+```java
+public class SplashViewFactory extends AbstractViewFactory {
+    public SplashViewFactory(ViewDependencies viewDependencies) {
+        super(viewDependencies);
+    }
+
+    @Override
+    public View createView() {
+        return new SplashView();
+    }
+}
+```
+
+Similarly, for the main view:
+
+```java
+public class MainViewFactory extends AbstractViewFactory {
+    public MainViewFactory(ViewDependencies viewDependencies) {
+        super(viewDependencies);
+    }
+
+    @Override
+    public View createView() {
+        return new MainView();
+    }
+}
+```
+
+Similarly, for the QA dashboard view:
+
+```java
+public class QADashboardViewFactory extends AbstractViewFactory {
+    public QADashboardViewFactory(ViewDependencies viewDependencies) {
+        super(viewDependencies);
+    }
+
+    @Override
+    public View createView() {
+        return new QADashboardView();
+    }
+}
+```
+
+Similarly, for the Photo Review view:
+
+```java
+public class PhotoReviewViewFactory extends AbstractViewFactory {
+    public PhotoReviewViewFactory(ViewDependencies viewDependencies) {
+        super(viewDependencies);
+    }
+
+    @Override
+    public View createView() {
+        return new PhotoReviewView();
+    }
+}
+```
+
+Similarly, for the Photo Upload view:
+
+```java
+public class PhotoUploadViewFactory extends AbstractViewFactory {
+    public PhotoUploadViewFactory(ViewDependencies viewDependencies) {
+        super(viewDependencies);
+    }
+
+    @Override
+    public View createView() {
+        return new PhotoUploadView();
+    }
+}
+```
+
+Similarly, for the Order Gallery view:
+
+```java
+public class OrderGalleryViewFactory extends AbstractViewFactory {
+    public OrderGalleryViewFactory(ViewDependencies viewDependencies) {
+        super(viewDependencies);
+    }
+
+    @Override
+    public View createView() {
+        return new OrderGalleryView();
+    }
+}
+```
+
+Similarly, for the Report Preview view:
+
+```java
+public class ReportPreviewViewFactory extends AbstractViewFactory {
+    public ReportPreviewViewFactory(ViewDependencies viewDependencies) {
+        super(viewDependencies);
+    }
+
+    @Override
+    public View createView() {
+        return new ReportPreviewView();
+    }
+}
+```
+
 ### Creating a View
 
 To create a view, extend the `BaseView` class:
@@ -229,6 +355,142 @@ public class LoginView extends BaseView<LoginViewModel> {
 }
 ```
 
+For views that don't need an app bar, like the splash screen:
+
+```java
+public class SplashView extends BaseView<SplashViewModel> {
+    @Override
+    public boolean shouldShowAppBar() {
+        return false; // Don't show the app bar on the splash screen
+    }
+
+    @Override
+    public void updateAppBar(AppBar appBar) {
+        appBar.setVisible(false);
+    }
+}
+```
+
+For views that need a back button, like the main view:
+
+```java
+public class MainView extends BaseView<MainViewModel> {
+    public MainView() {
+        super();
+    }
+
+    @Override
+    public void updateAppBar(AppBar appBar) {
+        appBar.setTitleText("Role Selection");
+        appBar.setNavIcon(getBackButton());
+    }
+
+    private javafx.scene.Node getBackButton() {
+        return com.gluonhq.charm.glisten.visual.MaterialDesignIcon.ARROW_BACK.button(e -> navigateBack());
+    }
+
+    @Override
+    protected void navigateBack() {
+        com.belman.ui.navigation.Router.navigateBack();
+    }
+}
+```
+
+For views with action items, like the QA dashboard view:
+
+```java
+public class QADashboardView extends BaseView<QADashboardViewModel> {
+    public QADashboardView() {
+        super();
+    }
+
+    @Override
+    public void updateAppBar(AppBar appBar) {
+        appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> navigateBack()));
+        appBar.setTitleText("QA Dashboard");
+        appBar.getActionItems().add(MaterialDesignIcon.POWER_SETTINGS_NEW.button(e -> getViewModel().logout()));
+    }
+
+    @Override
+    protected void navigateBack() {
+        Router.navigateBack();
+    }
+}
+```
+
+Similarly, for the Photo Review view:
+
+```java
+public class PhotoReviewView extends BaseView<PhotoReviewViewModel> {
+    public PhotoReviewView() {
+        super();
+    }
+
+    @Override
+    public void updateAppBar(AppBar appBar) {
+        appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> navigateBack()));
+        appBar.setTitleText("Photo Review");
+        appBar.getActionItems().add(MaterialDesignIcon.POWER_SETTINGS_NEW.button(e -> getViewModel().logout()));
+    }
+
+    @Override
+    protected void navigateBack() {
+        Router.navigateBack();
+    }
+}
+```
+
+Similarly, for the Photo Upload view:
+
+```java
+public class PhotoUploadView extends BaseView<PhotoUploadViewModel> {
+    public PhotoUploadView() {
+        super();
+    }
+
+    @Override
+    public void updateAppBar(AppBar appBar) {
+        appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> Router.navigateBack()));
+        appBar.setTitleText("Photo Upload");
+        appBar.getActionItems().add(MaterialDesignIcon.POWER_SETTINGS_NEW.button(e -> getViewModel().logout()));
+    }
+}
+```
+
+Similarly, for the Order Gallery view:
+
+```java
+public class OrderGalleryView extends BaseView<OrderGalleryViewModel> {
+    public OrderGalleryView() {
+        super();
+    }
+
+    @Override
+    public void updateAppBar(AppBar appBar) {
+        appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> Router.navigateBack()));
+        appBar.setTitleText("OrderBusiness Gallery");
+        appBar.getActionItems().add(MaterialDesignIcon.POWER_SETTINGS_NEW.button(e -> getViewModel().logout()));
+    }
+}
+```
+
+Similarly, for the Report Preview view:
+
+```java
+public class ReportPreviewView extends BaseView<ReportPreviewViewModel> {
+    public ReportPreviewView() {
+        super();
+    }
+
+    @Override
+    public void updateAppBar(AppBar appBar) {
+        appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> Router.navigateBack()));
+        appBar.setTitleText("Report Preview");
+        appBar.getActionItems().add(MaterialDesignIcon.POWER_SETTINGS_NEW.button(e -> getViewModel().logout()));
+    }
+}
+```
+
 ### Navigating Between Views
 
 To navigate between views, use the `ViewStackManager`:
@@ -237,6 +499,45 @@ To navigate between views, use the `ViewStackManager`:
 // In a controller or view model
 public void navigateToLogin() {
     ViewStackManager.getInstance().navigateTo("LoginView");
+}
+
+// To navigate to the main view
+public void navigateToMain() {
+    ViewStackManager.getInstance().navigateTo("MainView");
+}
+
+// To navigate to the QA dashboard view
+public void navigateToQADashboard() {
+    ViewStackManager.getInstance().navigateTo("QADashboardView");
+}
+
+// To navigate to the Photo Review view
+public void navigateToPhotoReview() {
+    ViewStackManager.getInstance().navigateTo("PhotoReviewView");
+}
+
+// To navigate to the Photo Upload view
+public void navigateToPhotoUpload() {
+    ViewStackManager.getInstance().navigateTo("PhotoUploadView");
+}
+
+// To navigate to the Order Gallery view
+public void navigateToOrderGallery() {
+    ViewStackManager.getInstance().navigateTo("OrderGalleryView");
+}
+
+// To navigate to the Report Preview view
+public void navigateToReportPreview() {
+    ViewStackManager.getInstance().navigateTo("ReportPreviewView");
+}
+
+// In the Main class, to show the splash view at startup
+public void postInit(Scene scene) {
+    // Apply platform-specific styling and load CSS
+    // ...
+
+    // Show the splash view
+    ViewStackManager.getInstance().navigateTo("SplashView");
 }
 
 // To navigate back

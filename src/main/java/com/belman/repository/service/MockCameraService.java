@@ -1,6 +1,6 @@
 package com.belman.repository.service;
 
-import com.belman.domain.services.CameraService;
+import com.belman.service.platform.CameraService;
 import com.belman.repository.logging.EmojiLoggerFactory;
 import com.belman.service.base.BaseService;
 import javafx.application.Platform;

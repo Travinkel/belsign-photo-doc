@@ -1,6 +1,5 @@
 package com.belman.ui.usecases.common.main;
 
-
 import com.belman.ui.base.BaseController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

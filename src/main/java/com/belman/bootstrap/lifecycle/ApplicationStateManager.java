@@ -1,8 +1,8 @@
 package com.belman.bootstrap.lifecycle;
 
 import com.belman.bootstrap.event.EventManager;
-import com.belman.domain.events.*;
-import com.belman.domain.events.ApplicationStateEvent.ApplicationState;
+import com.belman.domain.audit.event.*;
+import com.belman.domain.audit.event.ApplicationStateAuditEvent.ApplicationState;
 import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
 

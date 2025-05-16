@@ -1,13 +1,13 @@
 package com.belman.bootstrap.event;
 
-import com.belman.domain.events.DomainEvent;
-import com.belman.domain.events.DomainEventHandler;
-import com.belman.domain.events.DomainEventPublisher;
+import com.belman.domain.audit.event.AuditEvent;
+import com.belman.domain.audit.event.AuditHandler;
+import com.belman.domain.audit.event.AuditPublisher;
 
 /**
- * Manager for domain events.
+ * Manager for audit events.
  * Provides methods for publishing events and registering event handlers.
- * This class is a wrapper around the DomainEventPublisher class and provides a more convenient API.
+ * This class is a wrapper around the AuditPublisher class and provides a more convenient API.
  */
 public class EventManager {
     private static final EventManager instance = new EventManager();
@@ -32,8 +32,8 @@ public class EventManager {
      * @param handler   the handler to register
      * @param <T>       the type of event
      */
-    public <T extends DomainEvent> void registerEventHandler(Class<T> eventType, DomainEventHandler<T> handler) {
-        DomainEventPublisher.getInstance().register(eventType, handler);
+    public <T extends AuditEvent> void registerEventHandler(Class<T> eventType, AuditHandler<T> handler) {
+        AuditPublisher.getInstance().register(eventType, handler);
     }
 
     /**
@@ -43,8 +43,8 @@ public class EventManager {
      * @param handler   the handler to unregister
      * @param <T>       the type of event
      */
-    public <T extends DomainEvent> void unregisterEventHandler(Class<T> eventType, DomainEventHandler<T> handler) {
-        DomainEventPublisher.getInstance().unregister(eventType, handler);
+    public <T extends AuditEvent> void unregisterEventHandler(Class<T> eventType, AuditHandler<T> handler) {
+        AuditPublisher.getInstance().unregister(eventType, handler);
     }
 
     /**
@@ -53,8 +53,8 @@ public class EventManager {
      * @param event the event to publish
      * @param <T>   the type of event
      */
-    public <T extends DomainEvent> void publishEvent(T event) {
-        DomainEventPublisher.getInstance().publish(event);
+    public <T extends AuditEvent> void publishEvent(T event) {
+        AuditPublisher.getInstance().publish(event);
     }
 
     /**
@@ -63,7 +63,7 @@ public class EventManager {
      * @param event the event to publish
      * @param <T>   the type of event
      */
-    public <T extends DomainEvent> void publishEventAsync(T event) {
-        DomainEventPublisher.getInstance().publishAsync(event);
+    public <T extends AuditEvent> void publishEventAsync(T event) {
+        AuditPublisher.getInstance().publishAsync(event);
     }
 }

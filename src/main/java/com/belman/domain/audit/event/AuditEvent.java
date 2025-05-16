@@ -1,6 +1,6 @@
 package com.belman.domain.audit.event;
 
-import com.belman.domain.event.BusinessEvent;
+import com.belman.domain.audit.BusinessEvent;
 
 /**
  * Interface for audit events in the business model.

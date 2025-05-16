@@ -2,7 +2,7 @@ package com.belman.domain.core;
 
 import com.belman.domain.audit.AuditFacade;
 import com.belman.domain.audit.event.AuditEvent;
-import com.belman.domain.event.BusinessEvent;
+import com.belman.domain.audit.BusinessEvent;
 
 import java.io.Serializable;
 import java.time.Instant;
