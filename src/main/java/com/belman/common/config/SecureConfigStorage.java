@@ -1,7 +1,7 @@
 package com.belman.common.config;
 
-import com.belman.common.service.InfrastructureService;
-import com.belman.ui.core.ErrorHandler;
+import com.belman.common.logging.EmojiLogger;
+import com.belman.ui.error.ErrorHandler;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -23,7 +23,8 @@ import java.util.Properties;
  * Provides secure storage for sensitive configuration data such as database credentials.
  * Uses AES-GCM encryption to protect data at rest.
  */
-public class SecureConfigStorage extends InfrastructureService {
+public class SecureConfigStorage {
+    private final EmojiLogger logger = EmojiLogger.getLogger(SecureConfigStorage.class);
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final int GCM_TAG_LENGTH = 128;
     private static final int GCM_IV_LENGTH = 12;

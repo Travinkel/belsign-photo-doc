@@ -19,9 +19,8 @@ import com.belman.domain.user.rbac.AccessPolicyFactory;
 import com.belman.domain.user.rbac.RoleBasedAccessControlFactory;
 import com.belman.repository.persistence.adapter.*;
 import com.belman.repository.persistence.memory.*;
-import com.belman.service.session.SessionManager;
+import com.belman.ui.session.SessionManager;
 import com.belman.service.usecase.photo.DefaultPhotoService;
-import com.belman.service.usecase.security.DefaultAuthenticationService;
 import com.belman.service.usecase.security.DefaultExtendedAuthenticationService;
 
 import javax.sql.DataSource;

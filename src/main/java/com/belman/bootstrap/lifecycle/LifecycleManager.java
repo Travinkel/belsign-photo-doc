@@ -1,10 +1,8 @@
 package com.belman.bootstrap.lifecycle;
 
 import com.belman.bootstrap.event.EventManager;
-import com.belman.domain.events.ApplicationStateEvent.ApplicationState;
-import com.belman.domain.events.DomainEvent;
-import com.belman.domain.events.ViewHiddenEvent;
-import com.belman.domain.events.ViewShownEvent;
+import com.belman.domain.audit.event.ApplicationStateEvent;
+import com.belman.domain.audit.event.AuditEvent;
 import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
 import com.belman.ui.lifecycle.ControllerLifecycle;
@@ -31,7 +29,7 @@ import java.util.function.Consumer;
  * using interfaces instead of concrete presentation layer classes.
  */
 public class LifecycleManager {
-    private static final Map<LifecycleEvent, DomainEvent> eventMappings = new HashMap<>();
+    private static final Map<LifecycleEvent, AuditEvent> eventMappings = new HashMap<>();
     // Use WeakHashMap to avoid memory leaks - views can be garbage collected when no longer needed
     private static final Map<View, ChangeListener<Boolean>> viewListeners = new WeakHashMap<>();
     private static Logger logger;
@@ -42,10 +40,10 @@ public class LifecycleManager {
      * @param lifecycleEvent the lifecycle event
      * @param domainEvent    the domain event to publish
      */
-    public static void mapLifecycleEventToDomainEvent(LifecycleEvent lifecycleEvent, DomainEvent domainEvent) {
+    public static void mapLifecycleEventToAuditEvent(LifecycleEvent lifecycleEvent, AuditEvent domainEvent) {
         checkLogger();
         if (lifecycleEvent == null || domainEvent == null) {
-            throw new IllegalArgumentException("LifecycleEvent and DomainEvent cannot be null");
+            throw new IllegalArgumentException("LifecycleEvent and AuditEvent cannot be null");
         }
         logger.debug("Mapping lifecycle event {} to domain event {}", lifecycleEvent, domainEvent.getEventType());
         eventMappings.put(lifecycleEvent, domainEvent);
@@ -86,7 +84,7 @@ public class LifecycleManager {
      * @param eventType the class of the domain event
      * @param handler   the handler to execute
      */
-    public static <T extends DomainEvent> void registerDomainEventHandler(Class<T> eventType, Consumer<T> handler) {
+    public static <T extends AuditEvent> void registerAuditEventHandler(Class<T> eventType, Consumer<T> handler) {
         checkLogger();
         logger.debug("Registering domain event handler for event type: {}", eventType.getSimpleName());
         EventManager.getInstance().registerEventHandler(eventType,
@@ -351,12 +349,12 @@ public class LifecycleManager {
         // Register lifecycle handlers for all relevant lifecycle events
         registerLifecycleHandler(LifecycleEvent.PAUSE, () -> {
             logger.info("Application paused");
-            ApplicationStateManager.transitionTo(ApplicationState.PAUSED);
+            ApplicationStateManager.transitionTo(ApplicationStateEvent.ApplicationState.PAUSED);
         });
 
         registerLifecycleHandler(LifecycleEvent.RESUME, () -> {
             logger.info("Application resumed");
-            ApplicationStateManager.transitionTo(ApplicationState.ACTIVE);
+            ApplicationStateManager.transitionTo(ApplicationStateEvent.ApplicationState.ACTIVE);
         });
 
         // Note: Gluon Attach LifecycleService only supports PAUSE and RESUME events

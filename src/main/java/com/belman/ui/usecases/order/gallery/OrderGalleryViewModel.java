@@ -8,7 +8,7 @@ import com.belman.domain.order.OrderNumber;
 import com.belman.domain.order.OrderRepository;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserReference;
-import com.belman.service.session.SessionManager;
+import com.belman.ui.session.SessionManager;
 import com.belman.ui.base.BaseViewModel;
 import com.belman.ui.navigation.Router;
 import com.belman.ui.usecases.authentication.login.LoginView;

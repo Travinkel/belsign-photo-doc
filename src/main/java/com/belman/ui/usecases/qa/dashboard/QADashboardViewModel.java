@@ -3,7 +3,7 @@ package com.belman.ui.usecases.qa.dashboard;
 import com.belman.common.di.Inject;
 import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.order.OrderRepository;
-import com.belman.service.session.SessionManager;
+import com.belman.ui.session.SessionManager;
 import com.belman.ui.base.BaseViewModel;
 import com.belman.ui.navigation.Router;
 import com.belman.ui.usecases.authentication.login.LoginView;

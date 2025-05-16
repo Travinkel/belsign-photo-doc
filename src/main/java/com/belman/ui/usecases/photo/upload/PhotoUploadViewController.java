@@ -1,11 +1,10 @@
 package com.belman.ui.usecases.photo.upload;
 
-import com.belman.service.platform.CameraServiceFactory;
 import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.service.platform.CameraService;
+import com.belman.service.usecase.photo.CameraService;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRole;
-import com.belman.service.session.SessionManager;
+import com.belman.ui.session.SessionManager;
 import com.belman.ui.base.BaseController;
 import com.belman.ui.components.TouchFriendlyDialog;
 import com.belman.ui.navigation.Router;

@@ -1,8 +1,8 @@
 package com.belman.unit.application.core;
 
 import com.belman.bootstrap.lifecycle.ApplicationStateManager;
-import com.belman.domain.events.*;
-import com.belman.domain.events.ApplicationStateEvent.ApplicationState;
+import com.belman.domain.audit.event.*;
+import com.belman.domain.audit.event.ApplicationStateAuditEvent.ApplicationState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class ApplicationStateManagerTest {
 
-    private List<ApplicationStateEvent> receivedEvents;
+    private List<ApplicationStateAuditEvent> receivedEvents;
     private AtomicBoolean backgroundTaskExecuted;
     private AtomicBoolean foregroundTaskExecuted;
     private AtomicBoolean shutdownTaskExecuted;

@@ -1,5 +1,6 @@
 package com.belman.domain.user.rbac;
 
+import com.belman.domain.core.BusinessService;
 import com.belman.domain.exceptions.AccessDeniedException;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.services.LoggerFactory;
@@ -11,7 +12,7 @@ import java.util.Optional;
  * Manager for role-based access control.
  * This class is responsible for checking if users have the required roles to access certain features.
  */
-public class RoleBasedAccessManager extends DomainService {
+public class RoleBasedAccessManager extends BusinessService {
 
     private final AuthenticationService authenticationService;
     private final AccessPolicy accessPolicy;

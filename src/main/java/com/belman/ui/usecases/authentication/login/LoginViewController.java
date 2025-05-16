@@ -1,7 +1,6 @@
 package com.belman.ui.usecases.authentication.login;
 
-import com.belman.service.platform.CameraServiceFactory;
-import com.belman.service.platform.CameraService;
+import com.belman.service.usecase.photo.CameraService;
 import com.belman.ui.base.BaseController;
 import com.belman.ui.usecases.authentication.login.flow.CameraScanLoginState;
 import com.belman.ui.usecases.authentication.login.flow.DefaultLoginContext;

@@ -2,9 +2,9 @@ package com.belman.ui.usecases.authentication.login;
 
 import com.belman.common.logging.EmojiLogger;
 import com.belman.domain.user.UserBusiness;
-import com.belman.service.session.*;
 import com.belman.ui.base.BaseViewModel;
 import com.belman.ui.navigation.RoleBasedNavigationService;
+import com.belman.ui.session.*;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;

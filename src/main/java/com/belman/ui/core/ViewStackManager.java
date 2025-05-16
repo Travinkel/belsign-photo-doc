@@ -1,6 +1,7 @@
 package com.belman.ui.core;
 
 import com.belman.common.logging.EmojiLogger;
+import com.belman.ui.di.ViewDependencies;
 import com.belman.ui.navigation.Router;
 import com.belman.ui.usecases.admin.AdminViewFactory;
 import com.belman.ui.usecases.admin.usermanagement.UserManagementViewFactory;

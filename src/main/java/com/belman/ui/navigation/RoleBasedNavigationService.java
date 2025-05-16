@@ -2,7 +2,7 @@ package com.belman.ui.navigation;
 
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRole;
-import com.belman.service.session.SessionContext;
+import com.belman.ui.session.SessionContext;
 import com.belman.ui.usecases.admin.usermanagement.UserManagementView;
 import com.belman.ui.usecases.authentication.login.LoginView;
 import com.belman.ui.usecases.photo.upload.PhotoUploadView;

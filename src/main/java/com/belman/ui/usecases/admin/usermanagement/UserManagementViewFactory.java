@@ -1,7 +1,7 @@
 package com.belman.ui.usecases.admin.usermanagement;
 
 import com.belman.ui.core.AbstractViewFactory;
-import com.belman.ui.core.ViewDependencies;
+import com.belman.ui.di.ViewDependencies;
 import com.gluonhq.charm.glisten.mvc.View;
 
 /**

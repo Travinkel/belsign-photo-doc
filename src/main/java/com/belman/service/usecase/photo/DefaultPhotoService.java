@@ -11,7 +11,7 @@ import com.belman.domain.order.photo.PhotoId;
 import com.belman.domain.order.photo.PhotoTemplate;
 import com.belman.domain.services.PhotoService;
 import com.belman.domain.user.UserBusiness;
-import com.belman.ui.core.ErrorHandler;
+import com.belman.ui.error.ErrorHandler;
 import com.gluonhq.attach.storage.StorageService;
 import com.gluonhq.attach.util.Services;
 

@@ -1,10 +1,9 @@
 package com.belman.ui.core;
 
 import com.belman.domain.common.validation.ValidationResult;
-import com.belman.domain.shared.*;
-import com.belman.domain.state.StateKey;
-import com.belman.domain.state.StateSchema;
-import com.belman.domain.state.StateStore;
+import com.belman.ui.flow.state.StateKey;
+import com.belman.ui.flow.state.StateSchema;
+import com.belman.ui.flow.state.StateStore;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 
 import java.util.Map;

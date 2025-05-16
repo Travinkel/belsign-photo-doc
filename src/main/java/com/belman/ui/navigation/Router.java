@@ -3,6 +3,10 @@ package com.belman.ui.navigation;
 import com.belman.common.logging.EmojiLogger;
 import com.belman.common.platform.PlatformUtils;
 import com.belman.ui.core.*;
+import com.belman.ui.transitions.FadeViewTransition;
+import com.belman.ui.transitions.SlideDirection;
+import com.belman.ui.transitions.SlideViewTransition;
+import com.belman.ui.transitions.ViewTransition;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
 

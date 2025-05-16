@@ -7,7 +7,6 @@ import com.belman.domain.audit.DefaultAuditFacade;
 import com.belman.domain.core.BusinessObject;
 import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
-import com.belman.repository.persistence.memory.InMemoryAuditRepository;
 
 /**
  * Configuration class for setting up the audit system.

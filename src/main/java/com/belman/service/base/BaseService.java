@@ -2,8 +2,8 @@ package com.belman.service.base;
 
 import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.common.di.Inject;
-import com.belman.domain.events.DomainEvent;
-import com.belman.domain.events.DomainEventPublisher;
+import com.belman.domain.audit.event.AuditEvent;
+import com.belman.domain.audit.event.AuditPublisher;
 import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
 
@@ -52,35 +52,35 @@ public abstract class BaseService {
     }
 
     /**
-     * Publishes a domain event.
+     * Publishes an audit event.
      *
      * @param event the event to publish
      * @throws IllegalArgumentException if the event is null
      */
-    protected void publishEvent(DomainEvent event) {
+    protected void publishEvent(AuditEvent event) {
         if (event == null) {
             logger.error("Cannot publish null event");
             throw new IllegalArgumentException("Event cannot be null");
         }
 
         logger.debug("Publishing event: {}", event.getEventType());
-        DomainEventPublisher.getInstance().publish(event);
+        AuditPublisher.getInstance().publish(event);
     }
 
     /**
-     * Publishes a domain event asynchronously.
+     * Publishes an audit event asynchronously.
      *
      * @param event the event to publish
      * @throws IllegalArgumentException if the event is null
      */
-    protected void publishEventAsync(DomainEvent event) {
+    protected void publishEventAsync(AuditEvent event) {
         if (event == null) {
             logger.error("Cannot publish null event asynchronously");
             throw new IllegalArgumentException("Event cannot be null");
         }
 
         logger.debug("Publishing event asynchronously: {}", event.getEventType());
-        DomainEventPublisher.getInstance().publishAsync(event);
+        AuditPublisher.getInstance().publishAsync(event);
     }
 
     /**

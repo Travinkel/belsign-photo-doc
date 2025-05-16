@@ -10,7 +10,7 @@ import com.belman.domain.user.UserId;
 import com.belman.domain.user.UserRepository;
 import com.belman.domain.user.Username;
 import com.belman.repository.persistence.memory.InMemoryUserRepository;
-import com.belman.service.session.SessionManager;
+import com.belman.ui.session.SessionManager;
 import com.belman.service.usecase.security.BCryptPasswordHasher;
 import com.belman.service.usecase.security.DefaultAuthenticationService;
 import org.junit.jupiter.api.AfterEach;

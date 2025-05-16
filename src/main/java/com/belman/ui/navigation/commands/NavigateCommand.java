@@ -1,8 +1,8 @@
 package com.belman.ui.navigation.commands;
 
-import com.belman.domain.shared.Command;
-import com.belman.ui.core.TransitionPresets;
-import com.belman.ui.core.ViewTransition;
+import com.belman.ui.flow.commands.Command;
+import com.belman.ui.transitions.TransitionPresets;
+import com.belman.ui.transitions.ViewTransition;
 import com.belman.ui.navigation.Router;
 import com.gluonhq.charm.glisten.mvc.View;
 

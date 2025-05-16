@@ -1,11 +1,11 @@
 package com.belman.ui.usecases.authentication.logout;
 
 import com.belman.common.logging.EmojiLogger;
-import com.belman.service.session.DefaultSessionContext;
-import com.belman.service.session.DefaultSessionService;
-import com.belman.service.session.SessionContext;
-import com.belman.service.session.SessionManager;
-import com.belman.service.session.SessionService;
+import com.belman.ui.session.DefaultSessionContext;
+import com.belman.ui.session.DefaultSessionService;
+import com.belman.ui.session.SessionContext;
+import com.belman.ui.session.SessionManager;
+import com.belman.ui.session.SessionService;
 import com.belman.ui.base.BaseViewModel;
 import com.belman.ui.navigation.RoleBasedNavigationService;
 import com.belman.ui.navigation.Router;
