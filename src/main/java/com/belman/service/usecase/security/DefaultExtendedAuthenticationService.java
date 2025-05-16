@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Default implementation of the ExtendedAuthenticationService interface.
  * This class delegates to DefaultAuthenticationService for standard authentication methods
- * and adds support for PIN code and QR code authentication.
+ * and adds support for NFC authentication.
  */
 public class DefaultExtendedAuthenticationService extends BaseService implements ExtendedAuthenticationService {
     // Constants for brute force protection
@@ -24,10 +24,8 @@ public class DefaultExtendedAuthenticationService extends BaseService implements
     private static final Duration LOCKOUT_DURATION = Duration.ofMinutes(15);
 
     // Log message constants
-    private static final String LOG_PIN_AUTHENTICATION_FAILED = "PIN authentication failed for PIN: {}";
-    private static final String LOG_PIN_AUTHENTICATED = "User authenticated successfully with PIN";
-    private static final String LOG_QR_AUTHENTICATION_FAILED = "QR code authentication failed for hash: {}";
-    private static final String LOG_QR_AUTHENTICATED = "User authenticated successfully with QR code";
+    private static final String LOG_NFC_AUTHENTICATION_FAILED = "NFC authentication failed for ID: {}";
+    private static final String LOG_NFC_AUTHENTICATED = "User authenticated successfully with NFC";
     private static final String LOG_AUTHENTICATION_ERROR = "Error during authentication";
     private static final String LOG_ACCOUNT_LOCKED_OUT =
             "Authentication failed: Account {} is locked out due to too many failed attempts";
@@ -81,59 +79,6 @@ public class DefaultExtendedAuthenticationService extends BaseService implements
         this.currentUser = user;
     }
 
-    @Override
-    public Optional<UserBusiness> authenticateWithPin(String pinCode) {
-        if (pinCode == null || pinCode.isBlank()) {
-            return Optional.empty();
-        }
-
-        try {
-            // Find the user by PIN code
-            Optional<UserBusiness> userOpt = userRepository.findByPinCode(pinCode);
-
-            if (userOpt.isPresent()) {
-                UserBusiness user = userOpt.get();
-                String username = user.getUsername().value();
-
-                // Check if the account is locked out due to too many failed attempts
-                if (isAccountLockedOut(username)) {
-                    logWarn(LOG_ACCOUNT_LOCKED_OUT, username);
-                    return Optional.empty();
-                }
-
-                // Check if the user is active (approved)
-                if (!user.getApprovalState().isApproved()) {
-                    logWarn(LOG_USER_NOT_ACTIVE, username);
-                    recordFailedLoginAttempt(username);
-                    return Optional.empty();
-                }
-
-                // Check if the user is locked (rejected)
-                if (user.getApprovalState().isRejected()) {
-                    logWarn(LOG_USER_LOCKED, username);
-                    recordFailedLoginAttempt(username);
-                    return Optional.empty();
-                }
-
-                // Reset failed login attempts
-                resetFailedLoginAttempts(username);
-
-                // Set the current user and update last activity time
-                setCurrentUser(user);
-                updateLastActivityTime();
-
-                logInfo(LOG_PIN_AUTHENTICATED);
-                return Optional.of(user);
-            }
-
-            logWarn(LOG_PIN_AUTHENTICATION_FAILED, pinCode);
-            return Optional.empty();
-        } catch (Exception e) {
-            logError(LOG_AUTHENTICATION_ERROR, e);
-            return Optional.empty();
-        }
-    }
-
     /**
      * Checks if an account is locked out due to too many failed login attempts.
      *
@@ -181,14 +126,14 @@ public class DefaultExtendedAuthenticationService extends BaseService implements
     }
 
     @Override
-    public Optional<UserBusiness> authenticateWithQrCode(String qrCodeHash) {
-        if (qrCodeHash == null || qrCodeHash.isBlank()) {
+    public Optional<UserBusiness> authenticateWithNfc(String nfcId) {
+        if (nfcId == null || nfcId.isBlank()) {
             return Optional.empty();
         }
 
         try {
-            // Find the user by QR code hash
-            Optional<UserBusiness> userOpt = userRepository.findByQrCodeHash(qrCodeHash);
+            // Find the user by NFC ID
+            Optional<UserBusiness> userOpt = userRepository.findByNfcId(nfcId);
 
             if (userOpt.isPresent()) {
                 UserBusiness user = userOpt.get();
@@ -221,11 +166,11 @@ public class DefaultExtendedAuthenticationService extends BaseService implements
                 setCurrentUser(user);
                 updateLastActivityTime();
 
-                logInfo(LOG_QR_AUTHENTICATED);
+                logInfo(LOG_NFC_AUTHENTICATED);
                 return Optional.of(user);
             }
 
-            logWarn(LOG_QR_AUTHENTICATION_FAILED, qrCodeHash);
+            logWarn(LOG_NFC_AUTHENTICATION_FAILED, nfcId);
             return Optional.empty();
         } catch (Exception e) {
             logError(LOG_AUTHENTICATION_ERROR, e);

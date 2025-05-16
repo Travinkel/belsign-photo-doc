@@ -1,6 +1,6 @@
 package com.belman.domain.order.photo;
 
-import com.belman.domain.core.Repository;
+import com.belman.domain.common.base.Repository;
 import com.belman.domain.order.OrderId;
 import com.belman.domain.user.ApprovalStatus;
 

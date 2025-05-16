@@ -1,10 +1,10 @@
 package com.belman.unit.be.businessobjects;
 
 import com.belman.domain.audit.AuditFacade;
-import com.belman.domain.common.EmailAddress;
-import com.belman.domain.common.PersonName;
-import com.belman.domain.common.PhoneNumber;
-import com.belman.domain.core.BusinessObject;
+import com.belman.domain.common.valueobjects.EmailAddress;
+import com.belman.domain.common.valueobjects.PersonName;
+import com.belman.domain.common.valueobjects.PhoneNumber;
+import com.belman.domain.common.base.BusinessObject;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.security.PasswordHasher;
 import com.belman.domain.user.*;

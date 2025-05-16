@@ -1,9 +1,9 @@
 package com.belman.ui.usecases.qa.dashboard;
 
 import com.belman.common.di.Inject;
+import com.belman.common.session.SessionContext;
 import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.order.OrderRepository;
-import com.belman.ui.session.SessionManager;
 import com.belman.ui.base.BaseViewModel;
 import com.belman.ui.navigation.Router;
 import com.belman.ui.usecases.authentication.login.LoginView;
@@ -24,16 +24,18 @@ import java.util.stream.Collectors;
  * Provides data and operations for QA-specific functionality.
  */
 public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
-    private final SessionManager sessionManager = SessionManager.getInstance();
     private final StringProperty welcomeMessage = new SimpleStringProperty("Welcome to QA Dashboard");
     private final StringProperty searchText = new SimpleStringProperty("");
     private final StringProperty errorMessage = new SimpleStringProperty("");
     private final ObservableList<String> pendingOrders = FXCollections.observableArrayList();
     private final FilteredList<String> filteredOrders = new FilteredList<>(pendingOrders);
-    
+
     @Inject
     private OrderRepository orderRepository;
-    
+
+    @Inject
+    private SessionContext sessionContext;
+
     private String selectedOrder;
 
     /**
@@ -46,7 +48,7 @@ public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
     @Override
     public void onShow() {
         // Update welcome message with user name if available
-        sessionManager.getCurrentUser().ifPresent(user -> {
+        sessionContext.getUser().ifPresent(user -> {
             welcomeMessage.set("Welcome, " + user.getUsername().value() + "!");
         });
 
@@ -185,12 +187,9 @@ public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
     public void logout() {
         try {
             // Log out the user
-            if (sessionManager != null) {
-                sessionManager.logout();
+            if (sessionContext != null) {
+                sessionContext.navigateToLogin();
             }
-
-            // Navigate to the login view
-            Router.navigateTo(LoginView.class);
         } catch (Exception e) {
             errorMessage.set("Error logging out: " + e.getMessage());
         }

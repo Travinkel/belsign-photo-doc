@@ -1,6 +1,6 @@
 package com.belman.domain.order;
 
-import com.belman.domain.core.Repository;
+import com.belman.domain.common.base.Repository;
 import com.belman.domain.specification.Specification;
 
 import java.util.List;

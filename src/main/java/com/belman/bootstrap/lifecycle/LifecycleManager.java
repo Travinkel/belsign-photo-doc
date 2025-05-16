@@ -1,8 +1,5 @@
 package com.belman.bootstrap.lifecycle;
 
-import com.belman.bootstrap.event.EventManager;
-import com.belman.domain.audit.event.ApplicationStateEvent;
-import com.belman.domain.audit.event.AuditEvent;
 import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
 import com.belman.ui.lifecycle.ControllerLifecycle;
@@ -29,31 +26,10 @@ import java.util.function.Consumer;
  * using interfaces instead of concrete presentation layer classes.
  */
 public class LifecycleManager {
-    private static final Map<LifecycleEvent, AuditEvent> eventMappings = new HashMap<>();
     // Use WeakHashMap to avoid memory leaks - views can be garbage collected when no longer needed
     private static final Map<View, ChangeListener<Boolean>> viewListeners = new WeakHashMap<>();
     private static Logger logger;
 
-    /**
-     * Registers a handler for a specific lifecycle event that publishes a domain event.
-     *
-     * @param lifecycleEvent the lifecycle event
-     * @param domainEvent    the domain event to publish
-     */
-    public static void mapLifecycleEventToAuditEvent(LifecycleEvent lifecycleEvent, AuditEvent domainEvent) {
-        checkLogger();
-        if (lifecycleEvent == null || domainEvent == null) {
-            throw new IllegalArgumentException("LifecycleEvent and AuditEvent cannot be null");
-        }
-        logger.debug("Mapping lifecycle event {} to domain event {}", lifecycleEvent, domainEvent.getEventType());
-        eventMappings.put(lifecycleEvent, domainEvent);
-
-        registerLifecycleHandler(lifecycleEvent, () -> {
-            logger.debug("Lifecycle event triggered: {}, publishing domain event: {}",
-                    lifecycleEvent, domainEvent.getEventType());
-            EventManager.getInstance().publishEvent(domainEvent); // Publish event using EventManager
-        });
-    }
 
     /**
      * Checks if the logger has been initialized.
@@ -77,19 +53,6 @@ public class LifecycleManager {
         LifecycleService.create().ifPresent(service -> service.addListener(event, handler));
     }
 
-    /**
-     * Registers a handler for a specific domain event that is triggered by a lifecycle event.
-     *
-     * @param <T>       the type of the domain event
-     * @param eventType the class of the domain event
-     * @param handler   the handler to execute
-     */
-    public static <T extends AuditEvent> void registerAuditEventHandler(Class<T> eventType, Consumer<T> handler) {
-        checkLogger();
-        logger.debug("Registering domain event handler for event type: {}", eventType.getSimpleName());
-        EventManager.getInstance().registerEventHandler(eventType,
-                handler::accept); // Register event handler using EventManager
-    }
 
     /**
      * Registers a view for lifecycle management.
@@ -182,15 +145,6 @@ public class LifecycleManager {
         } catch (Exception e) {
             logger.error("Error calling onViewShown() on view: {}", e.getMessage(), e);
         }
-
-        // Publish a ViewShownEvent
-        try {
-            ViewShownEvent event = new ViewShownEvent(viewName);
-            EventManager.getInstance().publishEvent(event);
-            logger.debug("Published ViewShownEvent for view: {}", viewName);
-        } catch (Exception e) {
-            logger.error("Error publishing ViewShownEvent: {}", e.getMessage(), e);
-        }
     }
 
     /**
@@ -240,15 +194,6 @@ public class LifecycleManager {
             logger.debug("Called onViewHidden() on view");
         } catch (Exception e) {
             logger.error("Error calling onViewHidden() on view: {}", e.getMessage(), e);
-        }
-
-        // Publish a ViewHiddenEvent
-        try {
-            ViewHiddenEvent event = new ViewHiddenEvent(viewName);
-            EventManager.getInstance().publishEvent(event);
-            logger.debug("Published ViewHiddenEvent for view: {}", viewName);
-        } catch (Exception e) {
-            logger.error("Error publishing ViewHiddenEvent: {}", e.getMessage(), e);
         }
     }
 
@@ -304,21 +249,6 @@ public class LifecycleManager {
 
         logger.info("Initializing LifecycleManager with application: {}", app.getClass().getSimpleName());
 
-        // Initialize the ApplicationStateManager with a logger
-        ApplicationStateManager.setLogger(loggerFactory);
-        ApplicationStateManager.initialize();
-
-        // Initialize basic lifecycle handlers
-        initializeLifecycleHandlers();
-
-        // Transition the application to the ACTIVE state
-        ApplicationStateManager.transitionTo(ApplicationState.ACTIVE);
-
-        // Register a shutdown hook to handle application termination
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            logger.info("Application shutdown hook triggered");
-            ApplicationStateManager.transitionTo(ApplicationState.STOPPING);
-        }));
 
         // Note: Views will register themselves with LifecycleManager during construction
         logger.info("LifecycleManager initialized. Views will register themselves when created.");
@@ -336,46 +266,5 @@ public class LifecycleManager {
         }
         logger = loggerFactory.getLogger(LifecycleManager.class);
         logger.info("LifecycleManager initialized");
-    }
-
-    /**
-     * Initializes the lifecycle handlers.
-     * This method should be called after the logger is initialized.
-     */
-    public static void initializeLifecycleHandlers() {
-        checkLogger();
-        logger.info("Initializing lifecycle handlers");
-
-        // Register lifecycle handlers for all relevant lifecycle events
-        registerLifecycleHandler(LifecycleEvent.PAUSE, () -> {
-            logger.info("Application paused");
-            ApplicationStateManager.transitionTo(ApplicationStateEvent.ApplicationState.PAUSED);
-        });
-
-        registerLifecycleHandler(LifecycleEvent.RESUME, () -> {
-            logger.info("Application resumed");
-            ApplicationStateManager.transitionTo(ApplicationStateEvent.ApplicationState.ACTIVE);
-        });
-
-        // Note: Gluon Attach LifecycleService only supports PAUSE and RESUME events
-        // For more comprehensive lifecycle management, we use these events to infer other states
-        // When the app is paused, we also register a background task to run after a delay
-        ApplicationStateManager.registerBackgroundTask(() -> {
-            logger.debug("Performing background cleanup");
-            // Release non-essential resources when going to background
-            System.gc(); // Suggest garbage collection
-        });
-
-        // Register default foreground tasks for resource reinitialization
-        ApplicationStateManager.registerForegroundTask(() -> {
-            logger.debug("Performing foreground initialization");
-            // Reinitialize resources when coming to foreground
-        });
-
-        // Register default shutdown tasks for final cleanup
-        ApplicationStateManager.registerShutdownTask(() -> {
-            logger.debug("Performing shutdown cleanup");
-            // Release all resources when shutting down
-        });
     }
 }

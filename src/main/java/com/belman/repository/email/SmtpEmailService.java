@@ -1,7 +1,7 @@
 package com.belman.repository.email;
 
 
-import com.belman.domain.common.EmailAddress;
+import com.belman.domain.common.valueobjects.EmailAddress;
 import com.belman.domain.report.ReportBusiness;
 import com.belman.domain.services.EmailService;
 

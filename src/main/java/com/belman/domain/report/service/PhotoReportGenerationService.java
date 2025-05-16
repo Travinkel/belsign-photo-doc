@@ -1,18 +1,16 @@
 package com.belman.domain.report.service;
 
-import com.belman.domain.common.Timestamp;
-import com.belman.domain.common.validation.ValidationResult;
-import com.belman.domain.core.BusinessService;
+import com.belman.domain.common.valueobjects.Timestamp;
 import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.order.ProductDescription;
 import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.order.photo.policy.IPhotoQualityService;
-import com.belman.domain.order.photo.service.PhotoValidationService;
 import com.belman.domain.report.ReportBusiness;
 import com.belman.domain.report.ReportId;
 import com.belman.domain.report.ReportStatus;
 import com.belman.domain.services.LoggerFactory;
 import com.belman.domain.user.UserReference;
+import com.belman.service.base.BaseService;
+import com.belman.service.validation.ValidationResult;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -27,28 +25,19 @@ import java.util.UUID;
  * approved photos for an order. It ensures that all required photos are present
  * and properly approved before generating a report.
  */
-public class PhotoReportGenerationService extends BusinessService {
+public class PhotoReportGenerationService extends BaseService {
 
-    private final PhotoValidationService photoValidationService;
     private final LoggerFactory loggerFactory;
-    private final IPhotoQualityService photoQualityPolicy;
 
     /**
      * Creates a new PhotoReportGenerationService with the specified dependencies.
      *
-     * @param photoValidationService the service for validating photos
      * @param loggerFactory          the factory for creating loggers
-     * @param photoQualityPolicy     the policy for photo quality requirements
      */
     public PhotoReportGenerationService(
-            PhotoValidationService photoValidationService,
-            LoggerFactory loggerFactory,
-            IPhotoQualityService photoQualityPolicy) {
+            LoggerFactory loggerFactory) {
         super();
-        this.photoValidationService = Objects.requireNonNull(
-                photoValidationService, "photoValidationService must not be null");
         this.loggerFactory = Objects.requireNonNull(loggerFactory, "loggerFactory must not be null");
-        this.photoQualityPolicy = Objects.requireNonNull(photoQualityPolicy, "photoQualityPolicy must not be null");
     }
 
     @Override
@@ -69,20 +58,6 @@ public class PhotoReportGenerationService extends BusinessService {
 
         List<PhotoDocument> approvedPhotos = order.getApprovedPhotos();
 
-        // Validate that we have enough approved photos
-        ValidationResult validationResult = photoValidationService.validateAll(
-                approvedPhotos,
-                order.getId(),
-                order.getProductDescription());
-
-        // If there are validation errors, the report cannot be generated
-        if (!validationResult.isValid()) {
-            loggerFactory.getLogger(getClass()).warn(
-                    "Cannot generate photo documentation report for order {}: {}",
-                    order.getOrderNumber(),
-                    String.join(", ", validationResult.getErrors()));
-            return null;
-        }
 
         // Create the report
         ReportId reportId = new ReportId(UUID.randomUUID().toString());
@@ -98,55 +73,5 @@ public class PhotoReportGenerationService extends BusinessService {
                 .build();
 
         return report;
-    }
-
-    /**
-     * Validates whether an order is ready for report generation.
-     *
-     * @param order the order to validate
-     * @return the validation result
-     */
-    public ValidationResult validateReportReadiness(OrderBusiness order) {
-        Objects.requireNonNull(order, "order must not be null");
-
-        List<PhotoDocument> approvedPhotos = order.getApprovedPhotos();
-
-        // If no photos are approved, the order is not ready
-        if (approvedPhotos.isEmpty()) {
-            return ValidationResult.failure("No approved photos available for report generation");
-        }
-
-        // Validate the approved photos against the product requirements
-        return photoValidationService.validateAll(
-                approvedPhotos,
-                order.getId(),
-                order.getProductDescription());
-    }
-
-    public ValidationResult validatePhotoQuality(List<PhotoDocument> photos, ProductDescription productDescription) {
-        Objects.requireNonNull(photos, "photos must not be null");
-        Objects.requireNonNull(productDescription, "productDescription must not be null");
-
-        ValidationResult result = new ValidationResult(true, new ArrayList<>());
-
-        // Validate minimum photo count
-        int requiredCount = this.photoQualityPolicy.getMinimumPhotoCount(productDescription);
-        if (photos.size() < requiredCount) {
-            result.addError(String.format("Insufficient photos. Required: %d, Provided: %d",
-                    requiredCount, photos.size()));
-        }
-
-        // Validate each individual photo
-        for (PhotoDocument photo : photos) {
-            // Check if photo has annotations when required
-            if (this.photoQualityPolicy.requiresAnnotations(productDescription) && photo.getAnnotations().isEmpty()) {
-                result.addWarning(String.format("Photo %s should have annotations for measurements",
-                        photo.getPhotoId()));
-            }
-
-            // Add more quality checks as needed
-        }
-
-        return result;
     }
 }

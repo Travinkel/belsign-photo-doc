@@ -1,6 +1,5 @@
 package com.belman.unit.application.core;
 
-import com.belman.bootstrap.lifecycle.ApplicationStateManager;
 import com.belman.domain.audit.event.*;
 import com.belman.domain.audit.event.ApplicationStateAuditEvent.ApplicationState;
 import org.junit.jupiter.api.BeforeEach;

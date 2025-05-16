@@ -1,8 +1,8 @@
 package com.belman.bootstrap.persistence.secure;
 
 import com.belman.common.config.SecureConfigStorage;
+import com.belman.common.logging.EmojiLoggerFactory;
 import com.belman.domain.services.Logger;
-import com.belman.repository.logging.EmojiLoggerFactory;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 

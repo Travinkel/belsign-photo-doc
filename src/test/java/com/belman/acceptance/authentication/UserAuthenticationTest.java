@@ -1,7 +1,7 @@
 package com.belman.acceptance.authentication;
 
 import com.belman.acceptance.BaseAcceptanceTest;
-import com.belman.domain.common.EmailAddress;
+import com.belman.domain.common.valueobjects.EmailAddress;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.security.PasswordHasher;

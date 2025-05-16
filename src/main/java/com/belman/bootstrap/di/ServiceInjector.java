@@ -1,14 +1,13 @@
 package com.belman.bootstrap.di;
 
 
-import com.belman.domain.common.EmailAddress;
+import com.belman.domain.common.valueobjects.EmailAddress;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRepository;
 import com.belman.domain.user.UserRole;
 import com.belman.domain.user.Username;
-import com.belman.ui.session.SessionManager;
 import com.belman.service.usecase.security.DefaultAuthenticationService;
 
 import java.util.Optional;
@@ -35,13 +34,6 @@ public final class ServiceInjector {
         com.belman.bootstrap.di.ServiceLocator.registerService(AuthenticationService.class,
                 new DefaultAuthenticationService(userRepository));
 
-        // Initialize SessionManager with the registered AuthenticationService
-        SessionManager sessionManager = SessionManager.getInstance(
-                com.belman.bootstrap.di.ServiceLocator.getService(AuthenticationService.class)
-        );
-
-        // Register other services as needed
-        // ServiceLocator.registerService(EmailService.class, new SmtpEmailService(...));
     }
 
     /**

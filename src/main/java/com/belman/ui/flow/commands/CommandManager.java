@@ -4,10 +4,6 @@ package com.belman.ui.flow.commands;
 // This class is already in the application.core package, so no import needed
 
 import com.belman.bootstrap.di.ServiceLocator;
-import com.belman.domain.audit.event.AuditPublisher;
-import com.belman.domain.audit.event.command.CommandExecutedAuditEvent;
-import com.belman.domain.audit.event.command.CommandRedoneAuditEvent;
-import com.belman.domain.audit.event.command.CommandUndoneAuditEvent;
 import com.belman.domain.services.LoggerFactory;
 import com.belman.service.base.BaseService;
 
@@ -29,8 +25,6 @@ public class CommandManager extends BaseService {
     private final Deque<Command<?>> undoStack = new ArrayDeque<>();
     private final Deque<Command<?>> redoStack = new ArrayDeque<>();
 
-    // Event publisher
-    private final AuditPublisher eventPublisher;
 
     // Maximum history size
     private int maxHistorySize = 100;
@@ -42,7 +36,11 @@ public class CommandManager extends BaseService {
      */
     private CommandManager(LoggerFactory loggerFactory) {
         super(loggerFactory);
-        this.eventPublisher = AuditPublisher.getInstance();
+    }
+
+    @Override
+    protected LoggerFactory getLoggerFactory() {
+        return null;
     }
 
     /**
@@ -80,8 +78,6 @@ public class CommandManager extends BaseService {
                         addToUndoStack(command);
                         // Clear the redo stack when a new command is executed
                         redoStack.clear();
-                        // Publish command executed event
-                        eventPublisher.publish(new CommandExecutedAuditEvent(command));
                     }
                     return result;
                 })
@@ -124,8 +120,6 @@ public class CommandManager extends BaseService {
                 .thenAccept(v -> {
                     // Add the command to the redo stack
                     redoStack.push(command);
-                    // Publish command undone event
-                    eventPublisher.publish(new CommandUndoneAuditEvent(command));
                 })
                 .exceptionally(ex -> {
                     logError("Command undo failed: {}", command.getDescription(), ex);
@@ -154,8 +148,6 @@ public class CommandManager extends BaseService {
                 .thenApply(result -> {
                     // Add the command back to the undo stack
                     addToUndoStack(command);
-                    // Publish command redone event
-                    eventPublisher.publish(new CommandRedoneAuditEvent(command));
                     return result;
                 })
                 .exceptionally(ex -> {

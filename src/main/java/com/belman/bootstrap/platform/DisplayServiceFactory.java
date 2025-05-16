@@ -1,7 +1,6 @@
 package com.belman.bootstrap.platform;
 
 import com.belman.common.platform.PlatformUtils;
-import com.belman.repository.service.DesktopDisplayServiceFallback;
 import com.gluonhq.attach.display.DisplayService;
 
 import java.util.Optional;
@@ -52,7 +51,6 @@ public class DisplayServiceFactory {
         if (desktopFallbackInstance == null) {
             try {
                 // Create a proxy that implements the DisplayService interface
-                desktopFallbackInstance = DesktopDisplayServiceFallback.createDisplayServiceProxy();
                 LOGGER.info("Created desktop fallback instance of DisplayService");
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Failed to create desktop fallback instance of DisplayService", e);

@@ -1,6 +1,7 @@
 package com.belman.ui.flow.commands;
 
-import com.belman.domain.common.validation.ValidationResult;
+
+import com.belman.service.validation.ValidationResult;
 
 import java.util.ArrayList;
 import java.util.List;

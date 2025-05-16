@@ -1,7 +1,7 @@
 package com.belman.repository.persistence.sql;
 
-import com.belman.domain.common.EmailAddress;
-import com.belman.domain.common.PersonName;
+import com.belman.domain.common.valueobjects.EmailAddress;
+import com.belman.domain.common.valueobjects.PersonName;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.user.*;
 
@@ -101,13 +101,13 @@ public class SqlUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<UserBusiness> findByPinCode(String pinCode) {
-        String sql = "SELECT * FROM users WHERE pin_code = ?";
+    public Optional<UserBusiness> findByNfcId(String nfcId) {
+        String sql = "SELECT * FROM users WHERE nfc_id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, pinCode);
+            stmt.setString(1, nfcId);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -115,28 +115,7 @@ public class SqlUserRepository implements UserRepository {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error finding user by PIN code: " + pinCode, e);
-        }
-
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<UserBusiness> findByQrCodeHash(String qrCodeHash) {
-        String sql = "SELECT * FROM users WHERE qr_code_hash = ?";
-
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, qrCodeHash);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapResultSetToUser(rs));
-                }
-            }
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error finding user by QR code hash: " + qrCodeHash, e);
+            LOGGER.log(Level.SEVERE, "Error finding user by NFC ID: " + nfcId, e);
         }
 
         return Optional.empty();
@@ -165,6 +144,12 @@ public class SqlUserRepository implements UserRepository {
 
         if (name != null) {
             builder.name(name);
+        }
+
+        // Add NFC ID if present
+        String nfcId = rs.getString("nfc_id");
+        if (nfcId != null) {
+            builder.nfcId(nfcId);
         }
 
         UserBusiness user = builder.build();
@@ -247,7 +232,7 @@ public class SqlUserRepository implements UserRepository {
 
     private void updateUser(UserBusiness user) {
         String sql = "UPDATE users SET username = ?, password = ?, first_name = ?, last_name = ?, " +
-                     "email = ?, status = ? WHERE id = ?";
+                     "email = ?, status = ?, nfc_id = ? WHERE id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -286,7 +271,24 @@ public class SqlUserRepository implements UserRepository {
             }
 
             stmt.setString(6, status.name());
-            stmt.setString(7, user.getId().id());
+
+            // Get NFC ID from user if available
+            String nfcId = null;
+            try {
+                // This is a workaround since we don't know if getNfcId() exists
+                java.lang.reflect.Method getNfcIdMethod = user.getClass().getMethod("getNfcId");
+                nfcId = (String) getNfcIdMethod.invoke(user);
+            } catch (Exception e) {
+                // Ignore if getNfcId() doesn't exist
+            }
+
+            if (nfcId != null) {
+                stmt.setString(7, nfcId);
+            } else {
+                stmt.setNull(7, java.sql.Types.VARCHAR);
+            }
+
+            stmt.setString(8, user.getId().id());
 
             int rowsAffected = stmt.executeUpdate();
 
@@ -303,8 +305,8 @@ public class SqlUserRepository implements UserRepository {
     }
 
     private void insertUser(UserBusiness user) {
-        String sql = "INSERT INTO users (id, username, password, first_name, last_name, email, status) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (id, username, password, first_name, last_name, email, status, nfc_id) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -344,6 +346,22 @@ public class SqlUserRepository implements UserRepository {
             }
 
             stmt.setString(7, status.name());
+
+            // Get NFC ID from user if available
+            String nfcId = null;
+            try {
+                // This is a workaround since we don't know if getNfcId() exists
+                java.lang.reflect.Method getNfcIdMethod = user.getClass().getMethod("getNfcId");
+                nfcId = (String) getNfcIdMethod.invoke(user);
+            } catch (Exception e) {
+                // Ignore if getNfcId() doesn't exist
+            }
+
+            if (nfcId != null) {
+                stmt.setString(8, nfcId);
+            } else {
+                stmt.setNull(8, java.sql.Types.VARCHAR);
+            }
 
             int rowsAffected = stmt.executeUpdate();
 

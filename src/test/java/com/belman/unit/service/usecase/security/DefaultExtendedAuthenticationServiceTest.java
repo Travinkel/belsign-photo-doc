@@ -1,6 +1,6 @@
 package com.belman.unit.service.usecase.security;
 
-import com.belman.domain.common.EmailAddress;
+import com.belman.domain.common.valueobjects.EmailAddress;
 import com.belman.domain.security.ExtendedAuthenticationService;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.user.ApprovalState;

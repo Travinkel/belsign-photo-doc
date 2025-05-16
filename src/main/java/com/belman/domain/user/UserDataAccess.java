@@ -1,6 +1,6 @@
 package com.belman.domain.user;
 
-import com.belman.domain.common.EmailAddress;
+import com.belman.domain.common.valueobjects.EmailAddress;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,7 +1,7 @@
 package com.belman.domain.services;
 
 
-import com.belman.domain.common.EmailAddress;
+import com.belman.domain.common.valueobjects.EmailAddress;
 import com.belman.domain.report.ReportBusiness;
 
 import java.io.File;

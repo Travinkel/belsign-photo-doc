@@ -1,10 +1,10 @@
 package com.belman.ui.usecases.authentication.login;
 
 import com.belman.common.logging.EmojiLogger;
+import com.belman.common.session.SessionContext;
 import com.belman.domain.user.UserBusiness;
 import com.belman.ui.base.BaseViewModel;
 import com.belman.ui.navigation.RoleBasedNavigationService;
-import com.belman.ui.session.*;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -26,7 +26,6 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
     private final StringProperty errorMessage = new SimpleStringProperty("");
     private final BooleanProperty loginInProgress = new SimpleBooleanProperty(false);
     private final BooleanProperty rememberMe = new SimpleBooleanProperty(false);
-    private final SessionManager sessionManager;
     private final RoleBasedNavigationService navigationService;
     private final Preferences preferences = Preferences.userNodeForPackage(LoginViewModel.class);
 
@@ -34,14 +33,6 @@ public class LoginViewModel extends BaseViewModel<LoginViewModel> {
      * Creates a new LoginViewModel with the default SessionManager and a new RoleBasedNavigationService.
      */
     public LoginViewModel() {
-        // Get the SessionManager instance
-        sessionManager = SessionManager.getInstance();
-
-        // Create a SessionService
-        SessionService sessionService = new DefaultSessionService(sessionManager);
-
-        // Create a SessionContext
-        SessionContext sessionContext = new DefaultSessionContext(sessionService);
 
         // Create a RoleBasedNavigationService with the SessionContext
         navigationService = new RoleBasedNavigationService(sessionContext);

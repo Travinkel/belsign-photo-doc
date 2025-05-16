@@ -4,7 +4,7 @@ import com.belman.domain.audit.AuditFacade;
 import com.belman.domain.audit.AuditRepository;
 import com.belman.domain.audit.DefaultAuditFacade;
 import com.belman.domain.audit.event.AuditEvent;
-import com.belman.domain.core.BusinessObject;
+import com.belman.domain.common.base.BusinessObject;
 import com.belman.domain.customer.CustomerId;
 import com.belman.domain.customer.CustomerType;
 import com.belman.domain.customer.events.CustomerCreatedEvent;

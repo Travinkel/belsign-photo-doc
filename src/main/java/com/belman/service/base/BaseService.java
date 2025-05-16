@@ -2,8 +2,6 @@ package com.belman.service.base;
 
 import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.common.di.Inject;
-import com.belman.domain.audit.event.AuditEvent;
-import com.belman.domain.audit.event.AuditPublisher;
 import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
 
@@ -31,56 +29,12 @@ public abstract class BaseService {
     }
 
     /**
-     * Creates a new BaseService with a logger for the concrete service class.
-     * This constructor is deprecated and will be removed in a future version.
-     * Use the constructor with LoggerFactory parameter instead.
-     */
-    @Deprecated
-    protected BaseService() {
-        // Try to get the LoggerFactory from ServiceLocator
-        LoggerFactory loggerFactory = ServiceLocator.getService(LoggerFactory.class);
-        this.logger = loggerFactory.getLogger(this.getClass());
-    }
-
-    /**
      * Method for injecting services.
      * This method will be overridden by the ServiceLocator to inject services.
      */
     @Inject
     protected void injectServices() {
         // This method will be overridden by the ServiceLocator to inject services.
-    }
-
-    /**
-     * Publishes an audit event.
-     *
-     * @param event the event to publish
-     * @throws IllegalArgumentException if the event is null
-     */
-    protected void publishEvent(AuditEvent event) {
-        if (event == null) {
-            logger.error("Cannot publish null event");
-            throw new IllegalArgumentException("Event cannot be null");
-        }
-
-        logger.debug("Publishing event: {}", event.getEventType());
-        AuditPublisher.getInstance().publish(event);
-    }
-
-    /**
-     * Publishes an audit event asynchronously.
-     *
-     * @param event the event to publish
-     * @throws IllegalArgumentException if the event is null
-     */
-    protected void publishEventAsync(AuditEvent event) {
-        if (event == null) {
-            logger.error("Cannot publish null event asynchronously");
-            throw new IllegalArgumentException("Event cannot be null");
-        }
-
-        logger.debug("Publishing event asynchronously: {}", event.getEventType());
-        AuditPublisher.getInstance().publishAsync(event);
     }
 
     /**
@@ -168,4 +122,6 @@ public abstract class BaseService {
     protected void logError(String message, Throwable throwable) {
         logger.error(message, throwable);
     }
+
+    protected abstract LoggerFactory getLoggerFactory();
 }

@@ -3,7 +3,7 @@ package com.belman.unit.business.richbe.core;
 import com.belman.domain.audit.AuditFacade;
 import com.belman.domain.audit.event.AuditEvent;
 import com.belman.domain.audit.event.BaseAuditEvent;
-import com.belman.domain.core.BusinessObject;
+import com.belman.domain.common.base.BusinessObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

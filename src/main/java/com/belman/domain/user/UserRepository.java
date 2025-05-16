@@ -1,7 +1,7 @@
 package com.belman.domain.user;
 
-import com.belman.domain.common.EmailAddress;
-import com.belman.domain.core.Repository;
+import com.belman.domain.common.valueobjects.EmailAddress;
+import com.belman.domain.common.base.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,18 +35,10 @@ public interface UserRepository extends Repository<UserBusiness, UserId> {
     List<UserBusiness> findByRole(UserRole role);
 
     /**
-     * Finds a user by PIN code.
+     * Finds a user by NFC ID.
      *
-     * @param pinCode the PIN code to search for
+     * @param nfcId the NFC ID to search for
      * @return an Optional containing the user if found, or empty if not found
      */
-    Optional<UserBusiness> findByPinCode(String pinCode);
-
-    /**
-     * Finds a user by QR code hash.
-     *
-     * @param qrCodeHash the QR code hash to search for
-     * @return an Optional containing the user if found, or empty if not found
-     */
-    Optional<UserBusiness> findByQrCodeHash(String qrCodeHash);
+    Optional<UserBusiness> findByNfcId(String nfcId);
 }

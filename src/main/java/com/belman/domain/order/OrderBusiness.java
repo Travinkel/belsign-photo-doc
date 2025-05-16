@@ -1,13 +1,8 @@
 package com.belman.domain.order;
 
-import com.belman.domain.audit.event.AuditEvent;
-import com.belman.domain.common.Timestamp;
-import com.belman.domain.core.BusinessObject;
+import com.belman.domain.common.valueobjects.Timestamp;
+import com.belman.domain.common.base.BusinessObject;
 import com.belman.domain.customer.CustomerId;
-import com.belman.domain.order.events.OrderApprovedEvent;
-import com.belman.domain.order.events.OrderCancelledEvent;
-import com.belman.domain.order.events.OrderCompletedEvent;
-import com.belman.domain.order.events.OrderRejectedEvent;
 import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.user.UserReference;
 
@@ -269,9 +264,6 @@ public class OrderBusiness extends BusinessObject<OrderId> {
         }
         status = OrderStatus.COMPLETED;
         updateLastModifiedAt();
-
-        // Register audit event
-        registerAuditEvent((AuditEvent) new OrderCompletedEvent(id, orderNumber, getApprovedPhotos().size()));
     }
 
     /**
@@ -294,9 +286,6 @@ public class OrderBusiness extends BusinessObject<OrderId> {
         }
         status = OrderStatus.APPROVED;
         updateLastModifiedAt();
-
-        // Register audit event
-        registerAuditEvent((AuditEvent) new OrderApprovedEvent(id, orderNumber));
     }
 
     /**
@@ -310,9 +299,6 @@ public class OrderBusiness extends BusinessObject<OrderId> {
         }
         status = OrderStatus.REJECTED;
         updateLastModifiedAt();
-
-        // Register audit event
-        registerAuditEvent((AuditEvent) new OrderRejectedEvent(id, orderNumber));
     }
 
     /**
@@ -342,9 +328,6 @@ public class OrderBusiness extends BusinessObject<OrderId> {
         OrderStatus previousStatus = status;
         status = OrderStatus.CANCELLED;
         updateLastModifiedAt();
-
-        // Register audit event
-        registerAuditEvent((AuditEvent) new OrderCancelledEvent(id, orderNumber, previousStatus));
     }
 
     /**

@@ -1,6 +1,6 @@
 package com.belman.domain.order;
 
-import com.belman.domain.common.EmailAddress;
+import com.belman.domain.common.valueobjects.EmailAddress;
 import com.belman.domain.common.base.ValueObject;
 
 import java.time.LocalDate;

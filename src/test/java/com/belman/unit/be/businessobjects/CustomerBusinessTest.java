@@ -1,8 +1,8 @@
 package com.belman.unit.be.businessobjects;
 
-import com.belman.domain.common.EmailAddress;
-import com.belman.domain.common.PersonName;
-import com.belman.domain.common.PhoneNumber;
+import com.belman.domain.common.valueobjects.EmailAddress;
+import com.belman.domain.common.valueobjects.PersonName;
+import com.belman.domain.common.valueobjects.PhoneNumber;
 import com.belman.domain.customer.Company;
 import com.belman.domain.customer.CustomerBusiness;
 import com.belman.domain.customer.CustomerId;

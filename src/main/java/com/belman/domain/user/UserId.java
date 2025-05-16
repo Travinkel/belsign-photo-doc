@@ -1,13 +1,11 @@
 package com.belman.domain.user;
 
-import com.belman.domain.common.base.DataObject;
-
 import java.util.UUID;
 
 /**
  * Value object representing a unique identifier for a user.
  */
-public record UserId(String id) implements DataObject {
+public record UserId(String id) {
 
     /**
      * Creates a new UserId with the specified ID.

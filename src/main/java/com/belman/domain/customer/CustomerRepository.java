@@ -15,14 +15,14 @@ public interface CustomerRepository {
      * @param id the customer ID to search for
      * @return the customer with the specified ID, or null if not found
      */
-    CustomerAggregate findById(CustomerId id);
+    CustomerBusiness findById(CustomerId id);
 
     /**
      * Finds all customers in the repository.
      *
      * @return a list of all customers
      */
-    List<CustomerAggregate> findAll();
+    List<CustomerBusiness> findAll();
 
     /**
      * Finds customers that satisfy the given specification.
@@ -30,7 +30,7 @@ public interface CustomerRepository {
      * @param spec the specification to filter customers
      * @return a list of customers that satisfy the specification
      */
-    List<CustomerAggregate> findBySpecification(Specification<CustomerAggregate> spec);
+    List<CustomerBusiness> findBySpecification(Specification<CustomerBusiness> spec);
 
     /**
      * Saves a customer to the repository.
@@ -38,12 +38,12 @@ public interface CustomerRepository {
      *
      * @param customer the customer to save
      */
-    void save(CustomerAggregate customer);
+    void save(CustomerBusiness customer);
 
     /**
      * Deletes a customer from the repository.
      *
      * @param customer the customer to delete
      */
-    void delete(CustomerAggregate customer);
+    void delete(CustomerBusiness customer);
 }

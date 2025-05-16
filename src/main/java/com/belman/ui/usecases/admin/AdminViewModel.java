@@ -5,6 +5,7 @@ import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRole;
 import com.belman.service.usecase.admin.AdminService;
 import com.belman.ui.base.BaseViewModel;
+import com.belman.ui.flow.commands.Command;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -45,6 +46,9 @@ public class AdminViewModel extends BaseViewModel<AdminViewModel> {
     private final StringProperty statusMessage = new SimpleStringProperty();
     private final BooleanProperty loading = new SimpleBooleanProperty(false);
 
+    // Commands
+    private final Command<Void> saveCommand;
+
     /**
      * Creates a new AdminViewModel with the specified AdminService.
      *
@@ -52,6 +56,7 @@ public class AdminViewModel extends BaseViewModel<AdminViewModel> {
      */
     public AdminViewModel(AdminService adminService) {
         this.adminService = adminService;
+        this.saveCommand = new SaveAdminCommand();
     }
 
     /**

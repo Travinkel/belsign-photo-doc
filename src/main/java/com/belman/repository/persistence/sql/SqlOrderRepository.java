@@ -1,8 +1,8 @@
 package com.belman.repository.persistence.sql;
 
 import com.belman.bootstrap.di.ServiceLocator;
-import com.belman.domain.common.Timestamp;
-import com.belman.domain.customer.CustomerAggregate;
+import com.belman.domain.common.valueobjects.Timestamp;
+import com.belman.domain.customer.CustomerBusiness;
 import com.belman.domain.customer.CustomerId;
 import com.belman.domain.customer.CustomerRepository;
 import com.belman.domain.order.*;
@@ -373,7 +373,7 @@ public class SqlOrderRepository implements OrderRepository {
 
         String customerId = rs.getString("customer_id");
         if (customerId != null) {
-            CustomerAggregate customer = fetchCustomer(new CustomerId("dwd"));
+            CustomerBusiness customer = fetchCustomer(new CustomerId("dwd"));
             if (customer != null) {
                 orderBusiness.setCustomerId(customer.getId());
             }
@@ -411,7 +411,7 @@ public class SqlOrderRepository implements OrderRepository {
         return null;
     }
 
-    private CustomerAggregate fetchCustomer(CustomerId customerId) {
+    private CustomerBusiness fetchCustomer(CustomerId customerId) {
         try {
             // Get the CustomerRepository from the ServiceLocator
             CustomerRepository customerRepository = ServiceLocator.getService(CustomerRepository.class);

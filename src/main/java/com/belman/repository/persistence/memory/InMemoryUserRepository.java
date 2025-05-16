@@ -1,6 +1,6 @@
 package com.belman.repository.persistence.memory;
 
-import com.belman.domain.common.EmailAddress;
+import com.belman.domain.common.valueobjects.EmailAddress;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.security.PasswordHasher;
 import com.belman.domain.user.*;
@@ -17,8 +17,7 @@ import java.util.stream.Collectors;
 public class InMemoryUserRepository implements UserRepository {
     private final Map<Username, UserId> userIdsByUsername = new HashMap<>();
     private final Map<EmailAddress, UserId> userIdsByEmail = new HashMap<>();
-    private final Map<String, UserId> userIdsByPinCode = new HashMap<>();
-    private final Map<String, UserId> userIdsByQrCodeHash = new HashMap<>();
+    private final Map<String, UserId> userIdsByNfcId = new HashMap<>();
     private final Map<UserId, UserBusiness> usersById = new HashMap<>();
 
     /**
@@ -84,23 +83,8 @@ public class InMemoryUserRepository implements UserRepository {
         saveWithEmail(qaUser, qaEmail);
         saveWithEmail(qaUser2, qaUserEmail);
 
-        // Create pin_user for PIN code authentication
-        EmailAddress pinUserEmail = new EmailAddress("pin_user@belman.com");
-        UserBusiness pinUser = UserBusiness.createNewUser(
-                new Username("pin_user"),
-                HashedPassword.fromPlainText("pin_pass", passwordHasher),
-                pinUserEmail
-        );
-        pinUser.addRole(UserRole.PRODUCTION);
-
-        // Save pin_user and add email mapping
-        saveWithEmail(pinUser, pinUserEmail);
-
-        // Add PIN code mapping for pin_user
-        addPinCodeMapping("1234", pinUser.getId());
-
-        // Add QR code hash mappings for testing
-        addQrCodeHashMapping("scanner123hash", qaUser.getId());
+        // Add NFC ID mapping for production user
+        addNfcIdMapping("nfc123456", productionUser.getId());
     }
 
     /**
@@ -119,19 +103,11 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     /**
-     * Helper method to add a PIN code mapping for a user.
-     * This method must be called after saving a user if the PIN code mapping needs to be updated.
+     * Helper method to add an NFC ID mapping for a user.
+     * This method must be called after saving a user if the NFC ID mapping needs to be updated.
      */
-    public void addPinCodeMapping(String pinCode, UserId userId) {
-        userIdsByPinCode.put(pinCode, userId);
-    }
-
-    /**
-     * Helper method to add a QR code hash mapping for a user.
-     * This method must be called after saving a user if the QR code hash mapping needs to be updated.
-     */
-    public void addQrCodeHashMapping(String qrCodeHash, UserId userId) {
-        userIdsByQrCodeHash.put(qrCodeHash, userId);
+    public void addNfcIdMapping(String nfcId, UserId userId) {
+        userIdsByNfcId.put(nfcId, userId);
     }
 
     @Override
@@ -154,14 +130,8 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<UserBusiness> findByPinCode(String pinCode) {
-        UserId userId = userIdsByPinCode.get(pinCode);
-        return Optional.ofNullable(userId != null ? usersById.get(userId) : null);
-    }
-
-    @Override
-    public Optional<UserBusiness> findByQrCodeHash(String qrCodeHash) {
-        UserId userId = userIdsByQrCodeHash.get(qrCodeHash);
+    public Optional<UserBusiness> findByNfcId(String nfcId) {
+        UserId userId = userIdsByNfcId.get(nfcId);
         return Optional.ofNullable(userId != null ? usersById.get(userId) : null);
     }
 

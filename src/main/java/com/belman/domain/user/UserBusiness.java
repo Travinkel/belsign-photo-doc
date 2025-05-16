@@ -1,12 +1,10 @@
 package com.belman.domain.user;
 
-import com.belman.domain.common.EmailAddress;
-import com.belman.domain.common.PersonName;
-import com.belman.domain.common.PhoneNumber;
-import com.belman.domain.core.BusinessObject;
+import com.belman.domain.common.valueobjects.EmailAddress;
+import com.belman.domain.common.valueobjects.PersonName;
+import com.belman.domain.common.valueobjects.PhoneNumber;
+import com.belman.domain.common.base.BusinessObject;
 import com.belman.domain.security.HashedPassword;
-import com.belman.domain.user.events.UserApprovedAuditEvent;
-import com.belman.domain.user.events.UserRejectedAuditEvent;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -28,6 +26,7 @@ public class UserBusiness extends BusinessObject<UserId> {
     private EmailAddress email;
     private PhoneNumber phoneNumber;
     private ApprovalState approvalState;
+    private String nfcId; // NFC ID for production worker authentication
 
     private UserBusiness(Builder builder) {
         this.id = Objects.requireNonNull(builder.id, "id must not be null");
@@ -38,6 +37,7 @@ public class UserBusiness extends BusinessObject<UserId> {
         this.phoneNumber = builder.phoneNumber;
         this.approvalState = builder.approvalState != null ? builder.approvalState : ApprovalState.createPendingState();
         this.roles = new HashSet<>(builder.roles);
+        this.nfcId = builder.nfcId;
         this.creationTimestamp = Instant.now();
     }
 
@@ -62,6 +62,22 @@ public class UserBusiness extends BusinessObject<UserId> {
                 .email(email)
                 .phoneNumber(phoneNumber)
                 .approvalState(approvalState);
+        roles.forEach(builder::addRole);
+        return builder.build();
+    }
+
+    public static UserBusiness reconstitute(UserId id, Username username, HashedPassword password, PersonName name,
+                                            EmailAddress email, PhoneNumber phoneNumber, ApprovalState approvalState,
+                                            Set<UserRole> roles, String nfcId) {
+        Builder builder = new Builder()
+                .id(id)
+                .username(username)
+                .password(password)
+                .name(name)
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .approvalState(approvalState)
+                .nfcId(nfcId);
         roles.forEach(builder::addRole);
         return builder.build();
     }
@@ -157,8 +173,7 @@ public class UserBusiness extends BusinessObject<UserId> {
      * Approves the user with the given reviewer and timestamp.
      * <p>
      * This method changes the user's approval state to APPROVED, which allows
-     * the user to access the system. It also registers an audit event to track
-     * who approved the user and when.
+     * the user to access the system.
      * <p>
      * The approval state transition is handled by the current approval state object,
      * which may throw exceptions if the transition is not allowed (e.g., if the user
@@ -173,7 +188,6 @@ public class UserBusiness extends BusinessObject<UserId> {
         Objects.requireNonNull(reviewer, "reviewer must not be null");
         Objects.requireNonNull(reviewedAt, "reviewedAt must not be null");
         approvalState.approve(this, reviewer, reviewedAt);
-        registerAuditEvent(new UserApprovedAuditEvent(this.getId(), reviewer.getId(), ApprovalStatus.APPROVED));
     }
 
     /**
@@ -190,8 +204,7 @@ public class UserBusiness extends BusinessObject<UserId> {
      * Rejects the user with the given reviewer, timestamp, and reason.
      * <p>
      * This method changes the user's approval state to REJECTED, which prevents
-     * the user from accessing the system. It also registers an audit event to track
-     * who rejected the user, when, and why.
+     * the user from accessing the system.
      * <p>
      * The approval state transition is handled by the current approval state object,
      * which may throw exceptions if the transition is not allowed (e.g., if the user
@@ -207,7 +220,6 @@ public class UserBusiness extends BusinessObject<UserId> {
         Objects.requireNonNull(reviewer, "reviewer must not be null");
         Objects.requireNonNull(reviewedAt, "reviewedAt must not be null");
         approvalState.reject(this, reviewer, reviewedAt, reason);
-        registerAuditEvent(new UserRejectedAuditEvent(this.getId(), reviewer.getId(), reason));
     }
 
     /**
@@ -293,6 +305,25 @@ public class UserBusiness extends BusinessObject<UserId> {
     }
 
     /**
+     * Returns the NFC ID of this user.
+     *
+     * @return the NFC ID, may be null if not set
+     */
+    public String getNfcId() {
+        return nfcId;
+    }
+
+    /**
+     * Sets or updates the NFC ID of this user.
+     *
+     * @param nfcId the new NFC ID, can be null to remove the NFC ID
+     */
+    public void setNfcId(String nfcId) {
+        this.nfcId = nfcId; // NFC ID can be null
+        updateLastModifiedAt();
+    }
+
+    /**
      * Returns the status of this user based on the approval state.
      * <p>
      * The status is derived from the approval state as follows:
@@ -321,6 +352,7 @@ public class UserBusiness extends BusinessObject<UserId> {
         private EmailAddress email;
         private PhoneNumber phoneNumber;
         private ApprovalState approvalState;
+        private String nfcId;
 
         public Builder id(UserId id) {
             this.id = id;
@@ -359,6 +391,11 @@ public class UserBusiness extends BusinessObject<UserId> {
 
         public Builder addRole(UserRole role) {
             this.roles.add(role);
+            return this;
+        }
+
+        public Builder nfcId(String nfcId) {
+            this.nfcId = nfcId;
             return this;
         }
 

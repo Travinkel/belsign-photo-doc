@@ -7,8 +7,7 @@ import com.belman.ui.usecases.admin.AdminViewFactory;
 import com.belman.ui.usecases.admin.usermanagement.UserManagementViewFactory;
 import com.belman.ui.usecases.authentication.login.LoginViewFactory;
 import com.belman.ui.usecases.authentication.logout.LogoutViewFactory;
-import com.belman.ui.usecases.common.main.MainViewFactory;
-import com.belman.ui.usecases.common.splash.SplashViewFactory;
+import com.belman.ui.usecases.splash.SplashViewFactory;
 import com.belman.ui.usecases.order.gallery.OrderGalleryViewFactory;
 import com.belman.ui.usecases.photo.review.PhotoReviewViewFactory;
 import com.belman.ui.usecases.photo.upload.PhotoUploadViewFactory;
@@ -216,8 +215,6 @@ public class ViewStackManager {
         // Register the admin view
         registerView("AdminView", new AdminViewFactory(viewDependencies));
 
-        // Register the main view
-        registerView("MainView", new MainViewFactory(viewDependencies));
 
         // Register the QA dashboard view
         registerView("QADashboardView", new QADashboardViewFactory(viewDependencies));

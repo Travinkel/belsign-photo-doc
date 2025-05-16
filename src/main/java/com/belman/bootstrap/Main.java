@@ -9,11 +9,13 @@ import com.belman.bootstrap.platform.DisplayServiceFactory;
 import com.belman.bootstrap.platform.StorageServiceFactory;
 import com.belman.bootstrap.security.RouteGuardInitializer;
 import com.belman.common.logging.EmojiLogger;
+import com.belman.common.logging.EmojiLoggerAdapter;
 import com.belman.common.platform.PlatformUtils;
+import com.belman.common.session.SessionContext;
+import com.belman.common.session.SimpleSessionContext;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
-import com.belman.repository.logging.EmojiLoggerAdapter;
 import com.belman.service.error.ErrorHandler;
 import com.belman.ui.error.UIErrorHandlerAdapter;
 import com.belman.ui.navigation.RouteGuardImpl;
@@ -21,12 +23,7 @@ import com.belman.ui.navigation.Router;
 import com.belman.ui.core.ViewRegistry;
 import com.belman.ui.core.ViewStackManager;
 import com.belman.ui.navigation.RoleBasedNavigationService;
-import com.belman.ui.session.DefaultSessionContext;
-import com.belman.ui.session.DefaultSessionService;
-import com.belman.ui.session.SessionContext;
-import com.belman.ui.session.SessionManager;
-import com.belman.ui.session.SessionService;
-import com.belman.ui.usecases.common.splash.SplashView;
+import com.belman.ui.usecases.splash.SplashView;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import javafx.scene.Scene;
 
@@ -106,14 +103,9 @@ public class Main extends MobileApplication {
         // Set up the ViewStackManager (GUI)
         logger.debug("Setting up ViewStackManager");
 
-        // Get the SessionManager instance
-        SessionManager sessionManager = SessionManager.getInstance();
-
-        // Create a SessionService
-        SessionService sessionService = new DefaultSessionService(sessionManager);
-
-        // Create a SessionContext
-        SessionContext sessionContext = new DefaultSessionContext(sessionService);
+        // Create a simple SessionContext
+        AuthenticationService authService = ServiceLocator.getService(AuthenticationService.class);
+        SessionContext sessionContext = new SimpleSessionContext(authService);
 
         // Create a RoleBasedNavigationService with the SessionContext
         RoleBasedNavigationService navigationService = new RoleBasedNavigationService(sessionContext);

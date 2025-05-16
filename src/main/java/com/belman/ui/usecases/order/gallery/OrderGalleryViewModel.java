@@ -1,7 +1,7 @@
 package com.belman.ui.usecases.order.gallery;
 
 import com.belman.common.di.Inject;
-import com.belman.domain.common.Timestamp;
+import com.belman.domain.common.valueobjects.Timestamp;
 import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.order.OrderId;
 import com.belman.domain.order.OrderNumber;

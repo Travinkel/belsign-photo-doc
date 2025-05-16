@@ -1,12 +1,10 @@
 package com.belman.domain.report;
 
-import com.belman.domain.audit.event.AuditEvent;
-import com.belman.domain.common.Timestamp;
-import com.belman.domain.core.BusinessObject;
+import com.belman.domain.common.valueobjects.Timestamp;
+import com.belman.domain.common.base.BusinessObject;
 import com.belman.domain.customer.CustomerBusiness;
 import com.belman.domain.order.OrderId;
 import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.report.events.ReportGeneratedEvent;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserReference;
 
@@ -185,13 +183,6 @@ public class ReportBusiness extends BusinessObject<ReportId> {
         this.status = ReportStatus.GENERATED;
         updateLastModifiedAt();
 
-        // Register audit event
-        registerAuditEvent((AuditEvent) new ReportGeneratedEvent(
-                this.id,
-                this.orderId,
-                ReportType.PHOTO_DOCUMENTATION,
-                new UserReference(this.generatedBy.getId(), this.generatedBy.getUsername())
-        ));
     }
 
     /**

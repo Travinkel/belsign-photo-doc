@@ -2,7 +2,7 @@ package com.belman.ui.navigation;
 
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRole;
-import com.belman.ui.session.SessionContext;
+import com.belman.common.session.SessionContext;
 import com.belman.ui.usecases.admin.usermanagement.UserManagementView;
 import com.belman.ui.usecases.authentication.login.LoginView;
 import com.belman.ui.usecases.photo.upload.PhotoUploadView;
@@ -31,8 +31,8 @@ public class RoleBasedNavigationService {
 
     /**
      * Navigates to the appropriate home view based on the user's role.
-     * If the user has just one role, navigates directly to the role-specific view.
-     * If the user has multiple roles, navigates to the main view for role selection.
+     * If the user has one or more roles, navigates directly to the role-specific view.
+     * For users with multiple roles, prioritizes in order: ADMIN, QA, PRODUCTION.
      * If no user is logged in, navigates to the login view.
      */
     public void navigateToUserHome() {
@@ -40,23 +40,31 @@ public class RoleBasedNavigationService {
         if (userOpt.isPresent()) {
             UserBusiness user = userOpt.get();
 
-            // Count the number of roles the user has
-            int roleCount = user.getRoles().size();
+            // Get the user's roles
+            var roles = user.getRoles();
 
-            if (roleCount == 0) {
+            if (roles.isEmpty()) {
                 // Fallback if no specific role is found
                 logger.warning("No specific role found for user, using default view");
                 Router.navigateTo(PhotoUploadView.class);
                 logger.fine("Navigation to default view completed");
-            } else if (roleCount == 1) {
-                // If user has exactly one role, navigate directly to the role-specific view
-                UserRole role = user.getRoles().iterator().next();
-                navigateToRoleSpecificView(role);
             } else {
-                // If user has multiple roles, navigate to the main view for role selection
-                logger.fine("User has multiple roles, navigating to MainView for role selection");
-                Router.navigateTo(com.belman.ui.usecases.common.main.MainView.class);
-                logger.fine("Navigation to MainView completed");
+                // Select the highest priority role
+                UserRole selectedRole;
+
+                if (roles.contains(UserRole.ADMIN)) {
+                    selectedRole = UserRole.ADMIN;
+                    logger.fine("User has multiple roles, selecting ADMIN role");
+                } else if (roles.contains(UserRole.QA)) {
+                    selectedRole = UserRole.QA;
+                    logger.fine("User has multiple roles, selecting QA role");
+                } else {
+                    selectedRole = UserRole.PRODUCTION;
+                    logger.fine("User has multiple roles, selecting PRODUCTION role");
+                }
+
+                // Navigate to the view for the selected role
+                navigateToRoleSpecificView(selectedRole);
             }
         } else {
             // If no user is logged in, navigate to login view

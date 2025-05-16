@@ -1,11 +1,10 @@
 package com.belman.acceptance.order;
 
 import com.belman.acceptance.BaseAcceptanceTest;
-import com.belman.domain.common.EmailAddress;
-import com.belman.domain.common.PhoneNumber;
-import com.belman.domain.common.Timestamp;
+import com.belman.domain.common.valueobjects.EmailAddress;
+import com.belman.domain.common.valueobjects.PhoneNumber;
+import com.belman.domain.common.valueobjects.Timestamp;
 import com.belman.domain.customer.Company;
-import com.belman.domain.customer.CustomerAggregate;
 import com.belman.domain.customer.CustomerId;
 import com.belman.domain.customer.CustomerType;
 import com.belman.domain.order.*;

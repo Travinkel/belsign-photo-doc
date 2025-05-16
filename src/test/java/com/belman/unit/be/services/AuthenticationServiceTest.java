@@ -1,7 +1,7 @@
 package com.belman.unit.be.services;
 
-import com.belman.domain.common.EmailAddress;
-import com.belman.domain.common.PersonName;
+import com.belman.domain.common.valueobjects.EmailAddress;
+import com.belman.domain.common.valueobjects.PersonName;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.security.PasswordHasher;

@@ -1,6 +1,6 @@
 package com.belman.unit.be.businessobjects;
 
-import com.belman.domain.common.Timestamp;
+import com.belman.domain.common.valueobjects.Timestamp;
 import com.belman.domain.customer.CustomerBusiness;
 import com.belman.domain.customer.CustomerId;
 import com.belman.domain.order.OrderId;

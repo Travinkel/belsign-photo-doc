@@ -1,11 +1,9 @@
 package com.belman.domain.user;
 
-import com.belman.domain.common.base.DataObject;
-
 /**
  * Value object representing a username.
  */
-public record Username(String value) implements DataObject {
+public record Username(String value) {
 
     /**
      * Creates a new Username with the specified value.

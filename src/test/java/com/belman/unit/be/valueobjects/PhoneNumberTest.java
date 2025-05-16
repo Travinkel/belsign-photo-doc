@@ -1,6 +1,6 @@
 package com.belman.unit.be.valueobjects;
 
-import com.belman.domain.common.PhoneNumber;
+import com.belman.domain.common.valueobjects.PhoneNumber;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;

@@ -1,8 +1,8 @@
 package com.belman.service.usecase.user;
 
-import com.belman.domain.common.EmailAddress;
-import com.belman.domain.common.PersonName;
-import com.belman.domain.common.PhoneNumber;
+import com.belman.domain.common.valueobjects.EmailAddress;
+import com.belman.domain.common.valueobjects.PersonName;
+import com.belman.domain.common.valueobjects.PhoneNumber;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserId;
 import com.belman.domain.user.UserRole;

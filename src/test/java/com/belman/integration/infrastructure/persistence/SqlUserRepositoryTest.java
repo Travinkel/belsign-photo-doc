@@ -1,8 +1,8 @@
 package com.belman.integration.infrastructure.persistence;
 
 import com.belman.bootstrap.persistence.DatabaseConfig;
-import com.belman.domain.common.EmailAddress;
-import com.belman.domain.common.PersonName;
+import com.belman.domain.common.valueobjects.EmailAddress;
+import com.belman.domain.common.valueobjects.PersonName;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.security.PasswordHasher;
 import com.belman.domain.user.*;

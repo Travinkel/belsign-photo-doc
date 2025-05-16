@@ -1,6 +1,6 @@
 package com.belman.unit.be.rbac;
 
-import com.belman.domain.common.EmailAddress;
+import com.belman.domain.common.valueobjects.EmailAddress;
 import com.belman.domain.exceptions.AccessDeniedException;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.security.HashedPassword;
@@ -8,10 +8,6 @@ import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserId;
 import com.belman.domain.user.UserRole;
 import com.belman.domain.user.Username;
-import com.belman.domain.user.rbac.AccessPolicy;
-import com.belman.domain.user.rbac.AccessPolicyFactory;
-import com.belman.domain.user.rbac.RoleBasedAccessControlFactory;
-import com.belman.domain.user.rbac.RoleBasedAccessController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
