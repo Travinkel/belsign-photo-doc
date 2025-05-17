@@ -6,12 +6,13 @@ import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.security.PasswordHasher;
 import com.belman.domain.user.UserBusiness;
+import com.belman.domain.user.ApprovalState;
 import com.belman.domain.user.UserId;
 import com.belman.domain.user.UserRole;
 import com.belman.domain.user.Username;
-import com.belman.repository.persistence.memory.InMemoryUserRepository;
-import com.belman.service.usecase.security.BCryptPasswordHasher;
-import com.belman.service.usecase.security.DefaultAuthenticationService;
+import com.belman.dataaccess.persistence.memory.InMemoryUserRepository;
+import com.belman.application.usecase.security.BCryptPasswordHasher;
+import com.belman.application.usecase.security.DefaultAuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,6 +53,7 @@ public class UserAuthenticationTest extends BaseAcceptanceTest {
         // Create a new user using the builder pattern
         testUser = UserBusiness.createNewUser(username, password, email);
         testUser.addRole(UserRole.PRODUCTION);
+        testUser.setApprovalState(ApprovalState.createApproved());
 
         // Save the test user to the repository
         userRepository.save(testUser);

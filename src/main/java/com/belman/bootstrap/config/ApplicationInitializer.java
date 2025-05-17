@@ -10,8 +10,8 @@ import com.belman.domain.order.OrderRepository;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.services.PhotoService;
 import com.belman.domain.user.UserRepository;
-import com.belman.service.usecase.photo.DefaultPhotoService;
-import com.belman.service.usecase.security.DefaultExtendedAuthenticationService;
+import com.belman.application.usecase.photo.DefaultPhotoService;
+import com.belman.application.usecase.security.DefaultExtendedAuthenticationService;
 
 import javax.sql.DataSource;
 
@@ -90,6 +90,9 @@ public class ApplicationInitializer {
             ServiceRegistry.registerService(sessionContext);
             logger.success("Simple SessionContext initialized successfully");
 
+            // AccessPolicyFactory and RoleBasedAccessControlFactory are no longer used
+            // Commented out as per task list
+            /*
             // Initialize AccessPolicyFactory
             logger.debug("Initializing AccessPolicyFactory");
             AccessPolicyFactory accessPolicyFactory = new AccessPolicyFactory();
@@ -104,6 +107,7 @@ public class ApplicationInitializer {
             // Register the RoleBasedAccessControlFactory with the ServiceRegistry
             ServiceRegistry.registerService(rbacFactory);
             logger.success("RoleBasedAccessControlFactory initialized successfully");
+            */
 
             initialized = true;
             logger.startup("Application initialized successfully ✨");

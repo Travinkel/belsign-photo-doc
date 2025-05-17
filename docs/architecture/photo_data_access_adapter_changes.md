@@ -8,7 +8,7 @@ This document describes the changes made to implement the PhotoDataAccessAdapter
 
 ### 1. Created InMemoryPhotoRepository
 
-The `InMemoryPhotoRepository` class was created in the `com.belman.repository.persistence` package to implement the `PhotoRepository` interface. This implementation stores photo documents in memory and is suitable for development and testing.
+The `InMemoryPhotoRepository` class was created in the `com.belman.dataaccess.persistence` package to implement the `PhotoRepository` interface. This implementation stores photo documents in memory and is suitable for development and testing.
 
 ```java
 public class InMemoryPhotoRepository extends BaseService implements PhotoRepository {
@@ -23,7 +23,7 @@ The implementation includes a helper method to convert between the `PhotoDocumen
 
 ### 2. Created PhotoDataAccessAdapter
 
-The `PhotoDataAccessAdapter` class was created in the `com.belman.repository.persistence` package to implement the `PhotoDataAccess` interface and adapt the existing `PhotoRepository`. This adapter follows the Adapter pattern, delegating all method calls to the underlying repository.
+The `PhotoDataAccessAdapter` class was created in the `com.belman.dataaccess.persistence` package to implement the `PhotoDataAccess` interface and adapt the existing `PhotoRepository`. This adapter follows the Adapter pattern, delegating all method calls to the underlying repository.
 
 ```java
 public class PhotoDataAccessAdapter implements PhotoDataAccess {

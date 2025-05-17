@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.belman.presentation.usecases.worker.capture.CaptureViewController"
+           styleClass="responsive-container, capture-container"
+           stylesheets="/com/belman/styles/app.css">
+
+    <!-- Main Content -->
+    <VBox spacing="20" styleClass="vbox"
+          maxWidth="Infinity" maxHeight="Infinity">
+
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
+
+        <!-- Template Information -->
+        <VBox spacing="5" styleClass="template-info">
+            <Label fx:id="templateNameLabel" text="Template Name" styleClass="title">
+                <font>
+                    <Font name="System Bold" size="22.0"/>
+                </font>
+            </Label>
+            <Label fx:id="templateDescriptionLabel" text="Template description will appear here." 
+                   styleClass="subtitle" wrapText="true">
+                <font>
+                    <Font size="16.0"/>
+                </font>
+            </Label>
+        </VBox>
+
+        <!-- Photo Preview Area -->
+        <StackPane styleClass="preview-container" VBox.vgrow="ALWAYS">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            
+            <effect>
+                <DropShadow radius="10" spread="0.1">
+                    <color>
+                        <Color opacity="0.3"/>
+                    </color>
+                </DropShadow>
+            </effect>
+            
+            <!-- Preview Image -->
+            <ImageView fx:id="previewImageView" fitWidth="600" fitHeight="400" 
+                       preserveRatio="true" styleClass="preview-image"/>
+            
+            <!-- Camera Unavailable Message (initially hidden) -->
+            <VBox fx:id="cameraUnavailablePane" alignment="CENTER" spacing="15" 
+                  styleClass="camera-unavailable" visible="false" managed="false">
+                <Label text="Camera Unavailable" styleClass="error-title">
+                    <font>
+                        <Font name="System Bold" size="20.0"/>
+                    </font>
+                </Label>
+                <Label text="The camera is not available on this device. Please try again later or use a different device." 
+                       wrapText="true" textAlignment="CENTER"/>
+                <Button text="Go Back" onAction="#handleCancelClick" 
+                        styleClass="button-primary">
+                    <font>
+                        <Font size="16.0"/>
+                    </font>
+                </Button>
+            </VBox>
+        </StackPane>
+
+        <!-- Status and Error Messages -->
+        <VBox alignment="CENTER" spacing="5">
+            <Label fx:id="statusLabel" text="Ready to take photo" styleClass="status-message"/>
+            <Label fx:id="errorLabel" text="" styleClass="error-message" textFill="RED"/>
+        </VBox>
+
+        <!-- Photo Actions (visible before taking a photo) -->
+        <HBox fx:id="photoActionsPane" alignment="CENTER" spacing="20">
+            <Button fx:id="takePhotoButton" text="Take Photo" onAction="#handleTakePhotoClick" 
+                    styleClass="button-primary">
+                <font>
+                    <Font size="16.0"/>
+                </font>
+                <padding>
+                    <Insets top="15" right="30" bottom="15" left="30"/>
+                </padding>
+            </Button>
+            
+            <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancelClick" 
+                    styleClass="button-secondary">
+                <font>
+                    <Font size="16.0"/>
+                </font>
+                <padding>
+                    <Insets top="15" right="30" bottom="15" left="30"/>
+                </padding>
+            </Button>
+        </HBox>
+
+        <!-- Review Actions (visible after taking a photo) -->
+        <HBox fx:id="reviewActionsPane" alignment="CENTER" spacing="20" 
+              visible="false" managed="false">
+            <Button fx:id="retakePhotoButton" text="Retake" onAction="#handleRetakePhotoClick" 
+                    styleClass="button-secondary">
+                <font>
+                    <Font size="16.0"/>
+                </font>
+                <padding>
+                    <Insets top="15" right="30" bottom="15" left="30"/>
+                </padding>
+            </Button>
+            
+            <Button fx:id="confirmPhotoButton" text="Confirm" onAction="#handleConfirmPhotoClick" 
+                    styleClass="button-primary">
+                <font>
+                    <Font size="16.0"/>
+                </font>
+                <padding>
+                    <Insets top="15" right="30" bottom="15" left="30"/>
+                </padding>
+            </Button>
+        </HBox>
+    </VBox>
+
+    <!-- Loading Indicator (initially invisible) -->
+    <StackPane fx:id="loadingPane" visible="false" styleClass="loading-overlay">
+        <VBox alignment="CENTER" spacing="15">
+            <ProgressIndicator progress="-1" styleClass="progress-indicator"/>
+            <Label text="Processing..." styleClass="loading-text"/>
+        </VBox>
+    </StackPane>
+</StackPane>

@@ -16,14 +16,13 @@ import com.belman.common.session.SimpleSessionContext;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
-import com.belman.service.error.ErrorHandler;
-import com.belman.ui.error.UIErrorHandlerAdapter;
-import com.belman.ui.navigation.RouteGuardImpl;
-import com.belman.ui.navigation.Router;
-import com.belman.ui.core.ViewRegistry;
-import com.belman.ui.core.ViewStackManager;
-import com.belman.ui.navigation.RoleBasedNavigationService;
-import com.belman.ui.usecases.splash.SplashView;
+import com.belman.application.error.ErrorHandler;
+import com.belman.presentation.error.UIErrorHandlerAdapter;
+import com.belman.presentation.navigation.RouteGuardImpl;
+import com.belman.presentation.core.ViewRegistry;
+import com.belman.presentation.core.ViewStackManager;
+import com.belman.presentation.navigation.RoleBasedNavigationService;
+import com.belman.presentation.usecases.splash.SplashView;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import javafx.scene.Scene;
 
@@ -114,11 +113,11 @@ public class Main extends MobileApplication {
         ViewRegistry viewRegistry = ViewRegistry.getInstance();
 
         // Initialize the ViewStackManager
-        ViewStackManager.initialize(this, navigationService, viewRegistry);
+        ViewStackManager.initialize(navigationService, viewRegistry);
 
         // Set up the Router (GUI)
         logger.debug("Setting up Router");
-        Router.setMobileApplication(this);
+        // Router.setMobileApplication(this) - removed as part of MobileApplication cleanup
 
         // Initialize route guards for role-based access control (BLL + GUI)
         initializeRouteGuards();

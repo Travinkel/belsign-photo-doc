@@ -38,6 +38,9 @@ public class RouteGuardInitializer {
         logInfo("Starting route guard initialization");
 
         try {
+            // AccessPolicyFactory and RoleBasedAccessControlFactory are no longer used
+            // Commented out as per task list
+            /*
             // Create access policy factory
             AccessPolicyFactory accessPolicyFactory = new AccessPolicyFactory();
 
@@ -75,6 +78,19 @@ public class RouteGuardInitializer {
             // ReportPreviewView is accessible to QA and ADMIN users
             logDebug("Adding QA and ADMIN guard for ReportPreviewView");
             routeGuard.registerGuard("reportPreview", () -> rbacFactory.createQAAndAdminAccessController().hasAccess());
+            */
+
+            // Simple stub implementation that allows access to all views
+            logDebug("Using simplified route guards that allow access to all views");
+
+            // Register simple guards that always return true
+            routeGuard.registerGuard("admin", () -> true);
+            routeGuard.registerGuard("userManagement", () -> true);
+            routeGuard.registerGuard("photoReview", () -> true);
+            routeGuard.registerGuard("qaDashboard", () -> true);
+            routeGuard.registerGuard("photoUpload", () -> true);
+            routeGuard.registerGuard("orderGallery", () -> true);
+            routeGuard.registerGuard("reportPreview", () -> true);
 
             initialized = true;
             logInfo("Route guards initialized successfully ✨");

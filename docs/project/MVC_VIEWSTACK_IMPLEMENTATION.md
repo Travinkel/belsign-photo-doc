@@ -391,7 +391,7 @@ public class MainView extends BaseView<MainViewModel> {
 
     @Override
     protected void navigateBack() {
-        com.belman.ui.navigation.Router.navigateBack();
+        com.belman.presentation.navigation.Router.navigateBack();
     }
 }
 ```

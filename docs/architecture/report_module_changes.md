@@ -8,7 +8,7 @@ This document describes the changes made to implement the ReportDataAccessAdapte
 
 ### 1. Created InMemoryReportRepository
 
-The `InMemoryReportRepository` class was created in the `com.belman.repository.persistence` package to implement the `ReportRepository` interface. This implementation stores reports in memory and is suitable for development and testing.
+The `InMemoryReportRepository` class was created in the `com.belman.dataaccess.persistence` package to implement the `ReportRepository` interface. This implementation stores reports in memory and is suitable for development and testing.
 
 ```java
 public class InMemoryReportRepository extends BaseService implements ReportRepository {
@@ -21,7 +21,7 @@ public class InMemoryReportRepository extends BaseService implements ReportRepos
 
 ### 2. Created ReportDataAccessAdapter
 
-The `ReportDataAccessAdapter` class was created in the `com.belman.repository.persistence` package to implement the `ReportDataAccess` interface and adapt the existing `InMemoryReportRepository`. This adapter follows the Adapter pattern, converting between `ReportAggregate` (used by the repository) and `ReportBusiness` (used by the business layer).
+The `ReportDataAccessAdapter` class was created in the `com.belman.dataaccess.persistence` package to implement the `ReportDataAccess` interface and adapt the existing `InMemoryReportRepository`. This adapter follows the Adapter pattern, converting between `ReportAggregate` (used by the repository) and `ReportBusiness` (used by the business layer).
 
 ```java
 public class ReportDataAccessAdapter implements ReportDataAccess {

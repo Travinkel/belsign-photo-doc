@@ -1,1 +1,1 @@
-com.belman.repository.service.DesktopPicturesServiceFallback
+com.belman.dataaccess.service.DesktopPicturesServiceFallback

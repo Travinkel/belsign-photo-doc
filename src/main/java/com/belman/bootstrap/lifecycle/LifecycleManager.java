@@ -2,19 +2,17 @@ package com.belman.bootstrap.lifecycle;
 
 import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
-import com.belman.ui.lifecycle.ControllerLifecycle;
-import com.belman.ui.lifecycle.ViewLifecycle;
-import com.belman.ui.lifecycle.ViewModelLifecycle;
+import com.belman.presentation.lifecycle.ControllerLifecycle;
+import com.belman.presentation.lifecycle.ViewLifecycle;
+import com.belman.presentation.lifecycle.ViewModelLifecycle;
 import com.gluonhq.attach.lifecycle.LifecycleEvent;
 import com.gluonhq.attach.lifecycle.LifecycleService;
 import com.gluonhq.charm.glisten.mvc.View;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
-import java.util.function.Consumer;
 
 /**
  * Utility class for managing application lifecycle events.

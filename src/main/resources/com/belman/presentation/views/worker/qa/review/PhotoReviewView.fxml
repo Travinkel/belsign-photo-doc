@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            xmlns="http://javafx.com/javafx"
+            fx:controller="com.belman.presentation.usecases.qa.review.PhotoReviewViewController"
+            styleClass="responsive-container, photo-review-container"
+            stylesheets="/com/belman/styles/app.css">
+
+    <StackPane AnchorPane.topAnchor="0.0" AnchorPane.rightAnchor="0.0"
+               AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
+
+        <!-- Main Content -->
+        <VBox spacing="20" styleClass="vbox"
+              maxWidth="Infinity" maxHeight="Infinity">
+
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+
+            <Label text="Photo Review" styleClass="title"/>
+
+            <!-- Order Number Section -->
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="form-row">
+                <Label text="Order Number:" styleClass="form-label"/>
+                <TextField fx:id="orderNumberField" promptText="Enter order number" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="searchButton" text="Search" onAction="#handleSearchOrder"/>
+            </HBox>
+
+            <Label fx:id="orderInfoLabel" text="No order selected" styleClass="body-text"/>
+
+            <!-- Photo Preview and List Section -->
+            <HBox spacing="20" VBox.vgrow="ALWAYS">
+                <!-- Photo List -->
+                <ListView fx:id="photoListView" prefWidth="200" styleClass="photo-list"/>
+                
+                <!-- Photo Preview -->
+                <StackPane HBox.hgrow="ALWAYS" styleClass="photo-preview-container">
+                    <ImageView fx:id="photoPreviewImageView" preserveRatio="true" 
+                               fitWidth="400" fitHeight="300"/>
+                </StackPane>
+            </HBox>
+
+            <!-- Comment Section -->
+            <VBox spacing="5" styleClass="form-group">
+                <Label text="Comment:" styleClass="form-label"/>
+                <TextArea fx:id="commentTextArea" promptText="Enter comment (required for rejection)"
+                          VBox.vgrow="ALWAYS" minHeight="80"/>
+            </VBox>
+
+            <!-- Error Message -->
+            <Label fx:id="errorLabel" text="" styleClass="error-message" textFill="RED"/>
+
+            <!-- Action Buttons Section -->
+            <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="form-row">
+                <Button fx:id="rejectButton" text="Reject" onAction="#handleRejectOrder"
+                        styleClass="button-danger"/>
+                <Button fx:id="approveButton" text="Approve" onAction="#handleApproveOrder"
+                        styleClass="button-success"/>
+                <Button fx:id="backButton" text="Back" onAction="#handleBack"
+                        styleClass="button-secondary"/>
+            </HBox>
+        </VBox>
+
+        <!-- Loading Indicator (initially invisible) -->
+        <StackPane fx:id="loadingPane" visible="false" styleClass="loading-overlay">
+            <ProgressIndicator progress="-1" styleClass="progress-indicator"/>
+        </StackPane>
+    </StackPane>
+</AnchorPane>

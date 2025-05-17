@@ -8,7 +8,7 @@ This document describes the changes made to implement the OrderDataAccessAdapter
 
 ### 1. Created OrderDataAccessAdapter
 
-The `OrderDataAccessAdapter` class was created in the `com.belman.repository.persistence` package to implement the `OrderDataAccess` interface and adapt the existing `InMemoryOrderRepository`. This adapter follows the Adapter pattern, converting between `OrderAggregate` (used by the repository) and `OrderBusiness` (used by the business layer).
+The `OrderDataAccessAdapter` class was created in the `com.belman.dataaccess.persistence` package to implement the `OrderDataAccess` interface and adapt the existing `InMemoryOrderRepository`. This adapter follows the Adapter pattern, converting between `OrderAggregate` (used by the repository) and `OrderBusiness` (used by the business layer).
 
 ```java
 public class OrderDataAccessAdapter implements OrderDataAccess {

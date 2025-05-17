@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.belman.presentation.usecases.worker.summary.SummaryViewController"
+           styleClass="responsive-container, summary-container"
+           stylesheets="/com/belman/styles/app.css">
+
+    <!-- Main Content -->
+    <VBox spacing="20" styleClass="vbox"
+          maxWidth="Infinity" maxHeight="Infinity">
+
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
+
+        <!-- Header Section -->
+        <VBox spacing="5" styleClass="header-section">
+            <Label text="Photo Summary" styleClass="title">
+                <font>
+                    <Font name="System Bold" size="24.0"/>
+                </font>
+            </Label>
+            
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Order:" styleClass="form-label">
+                    <font>
+                        <Font name="System Bold" size="16.0"/>
+                    </font>
+                </Label>
+                <Label fx:id="orderNumberLabel" text="Loading..." styleClass="order-value">
+                    <font>
+                        <Font size="16.0"/>
+                    </font>
+                </Label>
+            </HBox>
+            
+            <Label fx:id="photosCountLabel" text="0 photos taken" styleClass="subtitle">
+                <font>
+                    <Font size="16.0"/>
+                </font>
+            </Label>
+        </VBox>
+
+        <!-- Photos List -->
+        <StackPane VBox.vgrow="ALWAYS" styleClass="photos-container">
+            <effect>
+                <DropShadow radius="10" spread="0.1">
+                    <color>
+                        <Color opacity="0.3"/>
+                    </color>
+                </DropShadow>
+            </effect>
+            
+            <!-- List of Photos -->
+            <ListView fx:id="photoListView" styleClass="photo-list-view"/>
+            
+            <!-- Empty State (shown when no photos) -->
+            <VBox fx:id="emptyStatePane" alignment="CENTER" spacing="15" 
+                  styleClass="empty-state" visible="false" managed="false">
+                <Label text="No Photos Taken" styleClass="empty-title">
+                    <font>
+                        <Font name="System Bold" size="20.0"/>
+                    </font>
+                </Label>
+                <Label text="You haven't taken any photos for this order yet. Go back to the photo cube view to take photos." 
+                       wrapText="true" textAlignment="CENTER"/>
+                <Button text="Go Back" onAction="#handleBackClick" 
+                        styleClass="button-primary">
+                    <font>
+                        <Font size="16.0"/>
+                    </font>
+                </Button>
+            </VBox>
+        </StackPane>
+
+        <!-- Status and Error Messages -->
+        <VBox alignment="CENTER" spacing="5">
+            <Label fx:id="statusLabel" text="Review your photos before submission" styleClass="status-message"/>
+            <Label fx:id="errorLabel" text="" styleClass="error-message" textFill="RED"/>
+        </VBox>
+
+        <!-- Action Buttons -->
+        <HBox alignment="CENTER" spacing="20">
+            <Button text="Back" onAction="#handleBackClick" 
+                    styleClass="button-secondary">
+                <font>
+                    <Font size="16.0"/>
+                </font>
+                <padding>
+                    <Insets top="15" right="30" bottom="15" left="30"/>
+                </padding>
+            </Button>
+            
+            <Button fx:id="submitButton" text="Submit Photos" onAction="#handleSubmitClick" 
+                    styleClass="button-primary">
+                <font>
+                    <Font size="16.0"/>
+                </font>
+                <padding>
+                    <Insets top="15" right="30" bottom="15" left="30"/>
+                </padding>
+            </Button>
+        </HBox>
+    </VBox>
+
+    <!-- Loading Indicator (initially invisible) -->
+    <StackPane fx:id="loadingPane" visible="false" styleClass="loading-overlay">
+        <VBox alignment="CENTER" spacing="15">
+            <ProgressIndicator progress="-1" styleClass="progress-indicator"/>
+            <Label text="Submitting photos..." styleClass="loading-text"/>
+        </VBox>
+    </StackPane>
+</StackPane>

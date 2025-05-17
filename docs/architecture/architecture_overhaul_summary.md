@@ -37,7 +37,7 @@ The changes made in this session provide several benefits to the architecture:
 The next steps for continuing the architecture overhaul are:
 
 1. **Create PhotoDataAccessAdapter**:
-   - Create a new class `PhotoDataAccessAdapter` in the `com.belman.repository.persistence` package
+   - Create a new class `PhotoDataAccessAdapter` in the `com.belman.dataaccess.persistence` package
    - This class should implement `PhotoDataAccess` and adapt an existing repository implementation
    - It should convert between `PhotoDocument` and the repository's entity type
 

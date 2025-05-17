@@ -2,18 +2,15 @@ package com.belman.domain.report.service;
 
 import com.belman.domain.common.valueobjects.Timestamp;
 import com.belman.domain.order.OrderBusiness;
-import com.belman.domain.order.ProductDescription;
 import com.belman.domain.order.photo.PhotoDocument;
 import com.belman.domain.report.ReportBusiness;
 import com.belman.domain.report.ReportId;
 import com.belman.domain.report.ReportStatus;
 import com.belman.domain.services.LoggerFactory;
 import com.belman.domain.user.UserReference;
-import com.belman.service.base.BaseService;
-import com.belman.service.validation.ValidationResult;
+import com.belman.application.base.BaseService;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -36,7 +33,7 @@ public class PhotoReportGenerationService extends BaseService {
      */
     public PhotoReportGenerationService(
             LoggerFactory loggerFactory) {
-        super();
+        super(loggerFactory);
         this.loggerFactory = Objects.requireNonNull(loggerFactory, "loggerFactory must not be null");
     }
 

@@ -8,7 +8,7 @@ This document describes the changes made to ensure that bootstrapping is placed 
 
 ### 1. Created New Main Class
 
-A new `Main` class was created in the `com.belman` package (root package) to replace the existing `Main` class in the `com.belman.repository.bootstrap` package. The new class is not tied to any specific layer and serves as the entry point for the application, coordinating bootstrapping across the three layers.
+A new `Main` class was created in the `com.belman` package (root package) to replace the existing `Main` class in the `com.belman.dataaccess.bootstrap` package. The new class is not tied to any specific layer and serves as the entry point for the application, coordinating bootstrapping across the three layers.
 
 ```java
 package com.belman;

@@ -2,9 +2,9 @@ package com.belman.common.session;
 
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.user.UserBusiness;
-import com.belman.ui.navigation.RoleBasedNavigationService;
-import com.belman.ui.navigation.Router;
-import com.belman.ui.usecases.authentication.login.LoginView;
+import com.belman.presentation.navigation.RoleBasedNavigationService;
+import com.belman.presentation.navigation.Router;
+import com.belman.presentation.usecases.archive.authentication.login.LoginView;
 
 import java.util.Optional;
 import java.util.logging.Logger;

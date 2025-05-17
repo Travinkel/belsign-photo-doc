@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.belman.presentation.usecases.worker.completed.CompletedViewController"
+           styleClass="responsive-container, completed-container"
+           stylesheets="/com/belman/styles/app.css">
+
+    <!-- Main Content -->
+    <VBox spacing="30" styleClass="vbox" alignment="CENTER"
+          maxWidth="Infinity" maxHeight="Infinity">
+
+        <padding>
+            <Insets top="30" right="30" bottom="30" left="30"/>
+        </padding>
+
+        <!-- Success Icon -->
+        <StackPane styleClass="success-icon-container">
+            <Circle radius="60" fill="#338d71" styleClass="success-circle"/>
+            <Text text="✓" fill="WHITE" styleClass="success-checkmark">
+                <font>
+                    <Font name="System Bold" size="80.0"/>
+                </font>
+            </Text>
+        </StackPane>
+
+        <!-- Completion Message -->
+        <VBox spacing="10" alignment="CENTER" styleClass="completion-message-container">
+            <Label text="Success!" styleClass="title">
+                <font>
+                    <Font name="System Bold" size="32.0"/>
+                </font>
+            </Label>
+            
+            <Label fx:id="completionMessageLabel" text="Order has been completed successfully!" 
+                   styleClass="subtitle" wrapText="true" textAlignment="CENTER">
+                <font>
+                    <Font size="20.0"/>
+                </font>
+            </Label>
+            
+            <Label fx:id="orderNumberLabel" text="" styleClass="order-number">
+                <font>
+                    <Font name="System Bold" size="18.0"/>
+                </font>
+            </Label>
+        </VBox>
+
+        <!-- Spacer -->
+        <Region VBox.vgrow="ALWAYS"/>
+
+        <!-- Action Buttons -->
+        <VBox spacing="15" alignment="CENTER" styleClass="action-buttons-container">
+            <Button fx:id="newOrderButton" text="Go to Next Order" onAction="#handleNewOrderClick" 
+                    styleClass="button-primary">
+                <font>
+                    <Font size="16.0"/>
+                </font>
+                <padding>
+                    <Insets top="15" right="30" bottom="15" left="30"/>
+                </padding>
+            </Button>
+            
+            <Button fx:id="logoutButton" text="Logout" onAction="#handleLogoutClick" 
+                    styleClass="button-secondary">
+                <font>
+                    <Font size="16.0"/>
+                </font>
+                <padding>
+                    <Insets top="15" right="30" bottom="15" left="30"/>
+                </padding>
+            </Button>
+        </VBox>
+    </VBox>
+</StackPane>

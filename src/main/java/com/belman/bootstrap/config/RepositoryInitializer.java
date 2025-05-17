@@ -4,8 +4,8 @@ import com.belman.bootstrap.di.ServiceRegistry;
 import com.belman.common.logging.EmojiLogger;
 import com.belman.domain.order.OrderRepository;
 import com.belman.domain.user.UserRepository;
-import com.belman.repository.persistence.memory.InMemoryOrderRepository;
-import com.belman.repository.persistence.memory.InMemoryUserRepository;
+import com.belman.dataaccess.persistence.memory.InMemoryOrderRepository;
+import com.belman.dataaccess.persistence.memory.InMemoryUserRepository;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Constructor;

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.belman.presentation.usecases.worker.photocube.PhotoCubeViewController"
+           styleClass="responsive-container, photo-cube-container"
+           stylesheets="/com/belman/styles/app.css">
+
+    <!-- Main Content -->
+    <VBox spacing="20" styleClass="vbox"
+          maxWidth="Infinity" maxHeight="Infinity">
+
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
+
+        <!-- Header Section -->
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label text="Order:" styleClass="form-label">
+                <font>
+                    <Font name="System Bold" size="16.0"/>
+                </font>
+            </Label>
+            <Label fx:id="orderNumberLabel" text="Loading..." styleClass="order-value">
+                <font>
+                    <Font size="16.0"/>
+                </font>
+            </Label>
+        </HBox>
+
+        <Label text="Select a side to photograph:" styleClass="subtitle">
+            <font>
+                <Font name="System Bold" size="18.0"/>
+            </font>
+        </Label>
+
+        <!-- Unfolded Cube Layout -->
+        <GridPane fx:id="cubeGridPane" alignment="CENTER" hgap="10" vgap="10" styleClass="cube-grid">
+            <!-- Empty cell (0,0) -->
+            <Pane GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+            
+            <!-- TOP -->
+            <Button fx:id="topButton" text="TOP" styleClass="cube-button, template-pending" 
+                    onAction="#handleTopButtonClick"
+                    prefWidth="120" prefHeight="120"
+                    GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <font>
+                    <Font name="System Bold" size="16.0"/>
+                </font>
+            </Button>
+            
+            <!-- Empty cell (2,0) -->
+            <Pane GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+            
+            <!-- LEFT -->
+            <Button fx:id="leftButton" text="LEFT" styleClass="cube-button, template-pending" 
+                    onAction="#handleLeftButtonClick"
+                    prefWidth="120" prefHeight="120"
+                    GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <font>
+                    <Font name="System Bold" size="16.0"/>
+                </font>
+            </Button>
+            
+            <!-- FRONT -->
+            <Button fx:id="frontButton" text="FRONT" styleClass="cube-button, template-pending" 
+                    onAction="#handleFrontButtonClick"
+                    prefWidth="120" prefHeight="120"
+                    GridPane.columnIndex="1" GridPane.rowIndex="1">
+                <font>
+                    <Font name="System Bold" size="16.0"/>
+                </font>
+            </Button>
+            
+            <!-- RIGHT -->
+            <Button fx:id="rightButton" text="RIGHT" styleClass="cube-button, template-pending" 
+                    onAction="#handleRightButtonClick"
+                    prefWidth="120" prefHeight="120"
+                    GridPane.columnIndex="2" GridPane.rowIndex="1">
+                <font>
+                    <Font name="System Bold" size="16.0"/>
+                </font>
+            </Button>
+            
+            <!-- Empty cell (0,2) -->
+            <Pane GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+            
+            <!-- BOTTOM -->
+            <Button fx:id="bottomButton" text="BOTTOM" styleClass="cube-button, template-pending" 
+                    onAction="#handleBottomButtonClick"
+                    prefWidth="120" prefHeight="120"
+                    GridPane.columnIndex="1" GridPane.rowIndex="2">
+                <font>
+                    <Font name="System Bold" size="16.0"/>
+                </font>
+            </Button>
+            
+            <!-- Empty cell (2,2) -->
+            <Pane GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+            
+            <!-- Empty cell (0,3) -->
+            <Pane GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+            
+            <!-- BACK -->
+            <Button fx:id="backButton" text="BACK" styleClass="cube-button, template-pending" 
+                    onAction="#handleBackButtonClick"
+                    prefWidth="120" prefHeight="120"
+                    GridPane.columnIndex="1" GridPane.rowIndex="3">
+                <font>
+                    <Font name="System Bold" size="16.0"/>
+                </font>
+            </Button>
+            
+            <!-- Empty cell (2,3) -->
+            <Pane GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+        </GridPane>
+
+        <!-- Spacer -->
+        <Region VBox.vgrow="ALWAYS"/>
+
+        <!-- Status and Progress -->
+        <HBox alignment="CENTER" spacing="10">
+            <Label fx:id="statusLabel" text="Loading..." styleClass="status-message"/>
+        </HBox>
+
+        <!-- Action Buttons -->
+        <HBox alignment="CENTER" spacing="20">
+            <Button text="Back" onAction="#handleNavigateBackClick" 
+                    styleClass="button-secondary">
+                <font>
+                    <Font size="16.0"/>
+                </font>
+                <padding>
+                    <Insets top="10" right="20" bottom="10" left="20"/>
+                </padding>
+            </Button>
+            
+            <Button fx:id="summaryButton" text="Go to Summary" onAction="#handleSummaryButtonClick" 
+                    styleClass="button-primary" disable="true">
+                <font>
+                    <Font size="16.0"/>
+                </font>
+                <padding>
+                    <Insets top="10" right="20" bottom="10" left="20"/>
+                </padding>
+            </Button>
+        </HBox>
+
+        <!-- Error Message -->
+        <Label fx:id="errorLabel" text="" styleClass="error-message" textFill="RED"/>
+    </VBox>
+
+    <!-- Loading Indicator (initially invisible) -->
+    <StackPane fx:id="loadingPane" visible="false" styleClass="loading-overlay">
+        <VBox alignment="CENTER" spacing="15">
+            <ProgressIndicator progress="-1" styleClass="progress-indicator"/>
+            <Label text="Loading..." styleClass="loading-text"/>
+        </VBox>
+    </StackPane>
+</StackPane>

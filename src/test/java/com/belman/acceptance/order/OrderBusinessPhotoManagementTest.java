@@ -5,6 +5,7 @@ import com.belman.domain.common.valueobjects.EmailAddress;
 import com.belman.domain.common.valueobjects.PhoneNumber;
 import com.belman.domain.common.valueobjects.Timestamp;
 import com.belman.domain.customer.Company;
+import com.belman.domain.customer.CustomerBusiness;
 import com.belman.domain.customer.CustomerId;
 import com.belman.domain.customer.CustomerType;
 import com.belman.domain.order.*;
@@ -15,8 +16,8 @@ import com.belman.domain.order.photo.PhotoTemplate;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserReference;
 import com.belman.domain.user.Username;
-import com.belman.repository.persistence.memory.InMemoryOrderRepository;
-import com.belman.repository.persistence.memory.InMemoryUserRepository;
+import com.belman.dataaccess.persistence.memory.InMemoryOrderRepository;
+import com.belman.dataaccess.persistence.memory.InMemoryUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
 
-    private static final String TEST_ORDER_NUMBER = "ORD-12345";
+    private static final String TEST_ORDER_NUMBER = "01/23-123456-12345678";
     private OrderRepository orderRepository;
     private UserBusiness productionUser;
     private OrderBusiness testOrderBusiness;
@@ -62,7 +63,7 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
         testOrderBusiness = new OrderBusiness(orderId, orderNumber, userRef, createdAt);
 
         // Add customer and product details
-        CustomerAggregate customer = new CustomerAggregate.Builder()
+        CustomerBusiness customer = new CustomerBusiness.Builder()
                 .withId(CustomerId.newId())
                 .withType(CustomerType.COMPANY)
                 .withCompany(new Company("Belman Test Customer", "123 Test Street", "REG-12345"))

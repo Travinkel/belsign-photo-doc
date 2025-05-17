@@ -3,7 +3,7 @@ package com.belman.bootstrap.di;
 
 import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
-import com.belman.service.base.BaseService;
+import com.belman.application.base.BaseService;
 
 import java.util.Arrays;
 import java.util.Collection;

@@ -24,7 +24,7 @@ public interface UserDataAccess {
 
 ### 2. Created UserDataAccessAdapter
 
-The `UserDataAccessAdapter` class was created in the `com.belman.repository.persistence` package to implement the `UserDataAccess` interface and adapt the existing `InMemoryUserRepository`. This adapter follows the Adapter pattern, converting between `UserAggregate` (used by the repository) and `UserBusiness` (used by the business layer).
+The `UserDataAccessAdapter` class was created in the `com.belman.dataaccess.persistence` package to implement the `UserDataAccess` interface and adapt the existing `InMemoryUserRepository`. This adapter follows the Adapter pattern, converting between `UserAggregate` (used by the repository) and `UserBusiness` (used by the business layer).
 
 ```java
 public class UserDataAccessAdapter implements UserDataAccess {

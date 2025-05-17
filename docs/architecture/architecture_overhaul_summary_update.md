@@ -5,12 +5,12 @@
 In this session, I've made the following changes to continue the architecture overhaul:
 
 1. **Created InMemoryPhotoRepository**:
-   - Created a new class `InMemoryPhotoRepository` in the `com.belman.repository.persistence` package
+   - Created a new class `InMemoryPhotoRepository` in the `com.belman.dataaccess.persistence` package
    - This class implements the `PhotoRepository` interface and stores photo documents in memory
    - Added a helper method to convert between `PhotoDocument.ApprovalStatus` and `com.belman.domain.user.ApprovalStatus`
 
 2. **Created PhotoDataAccessAdapter**:
-   - Created a new class `PhotoDataAccessAdapter` in the `com.belman.repository.persistence` package
+   - Created a new class `PhotoDataAccessAdapter` in the `com.belman.dataaccess.persistence` package
    - This class implements the `PhotoDataAccess` interface and adapts the `PhotoRepository` interface
    - It delegates all method calls to the underlying repository
 

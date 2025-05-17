@@ -111,15 +111,15 @@ The `RoleBasedNavigationService` has been updated to work with the new structure
 
 The following view classes have been moved to the new structure:
 
-1. **LoginView**: Moved from `com.belman.ui.views.login` to `com.belman.ui.usecases.authentication.login`.
+1. **LoginView**: Moved from `com.belman.presentation.views.login` to `com.belman.presentation.usecases.authentication.login`.
 
-2. **MainView**: Moved from `com.belman.ui.views.main` to `com.belman.ui.usecases.common.main`.
+2. **MainView**: Moved from `com.belman.presentation.views.main` to `com.belman.presentation.usecases.common.main`.
 
-3. **PhotoUploadView**: Moved from `com.belman.ui.views.photoupload` to `com.belman.ui.usecases.photo.upload`.
+3. **PhotoUploadView**: Moved from `com.belman.presentation.views.photoupload` to `com.belman.presentation.usecases.photo.upload`.
 
-4. **QADashboardView**: Moved from `com.belman.ui.views.qadashboard` to `com.belman.ui.usecases.qa.dashboard`.
+4. **QADashboardView**: Moved from `com.belman.presentation.views.qadashboard` to `com.belman.presentation.usecases.qa.dashboard`.
 
-5. **UserManagementView**: Moved from `com.belman.ui.views.usermanagement` to `com.belman.ui.usecases.admin.usermanagement`.
+5. **UserManagementView**: Moved from `com.belman.presentation.views.usermanagement` to `com.belman.presentation.usecases.admin.usermanagement`.
 
 ## Benefits of the New Structure
 

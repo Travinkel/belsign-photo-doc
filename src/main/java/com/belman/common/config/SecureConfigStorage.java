@@ -1,7 +1,7 @@
 package com.belman.common.config;
 
 import com.belman.common.logging.EmojiLogger;
-import com.belman.ui.error.ErrorHandler;
+import com.belman.presentation.error.ErrorHandler;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;

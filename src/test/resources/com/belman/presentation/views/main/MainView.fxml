@@ -7,7 +7,7 @@
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
             xmlns="http://javafx.com/javafx"
-            fx:controller="com.belman.ui.views.main.MainViewController"
+            fx:controller="com.belman.presentation.views.main.MainViewController"
             prefHeight="600.0" prefWidth="800.0"
             style="-fx-background-color: #f2f2f2;">
 

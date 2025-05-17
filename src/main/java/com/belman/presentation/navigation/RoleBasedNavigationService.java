@@ -1,0 +1,156 @@
+package com.belman.presentation.navigation;
+
+import com.belman.domain.user.UserBusiness;
+import com.belman.domain.user.UserRole;
+import com.belman.common.session.SessionContext;
+import com.belman.presentation.usecases.archive.admin.usermanagement.UserManagementView;
+import com.belman.presentation.usecases.archive.authentication.login.LoginView;
+import com.belman.presentation.usecases.qa.dashboard.QADashboardView;
+import com.belman.presentation.usecases.worker.assignedorder.AssignedOrderView;
+
+import java.util.Optional;
+import java.util.logging.Logger;
+
+/**
+ * Service for role-based navigation in the application.
+ * This class encapsulates the logic for navigating to different views based on user roles.
+ */
+public class RoleBasedNavigationService {
+    private final SessionContext sessionContext;
+    private final Logger logger;
+
+    /**
+     * Creates a new RoleBasedNavigationService with the specified session context.
+     *
+     * @param sessionContext the session context
+     */
+    public RoleBasedNavigationService(SessionContext sessionContext) {
+        this.sessionContext = sessionContext;
+        this.logger = Logger.getLogger(RoleBasedNavigationService.class.getName());
+    }
+
+    /**
+     * Navigates to the appropriate home view based on the user's role.
+     * If the user has one or more roles, navigates directly to the role-specific view.
+     * For users with multiple roles, prioritizes in order: ADMIN, QA, PRODUCTION.
+     * If no user is logged in, navigates to the login view.
+     */
+    public void navigateToUserHome() {
+        Optional<UserBusiness> userOpt = sessionContext.getUser();
+        if (userOpt.isPresent()) {
+            UserBusiness user = userOpt.get();
+
+            // Get the user's roles
+            var roles = user.getRoles();
+
+            if (roles.isEmpty()) {
+                // Fallback if no specific role is found
+                logger.warning("No specific role found for user, using default view");
+                Router.navigateTo(AssignedOrderView.class);
+                logger.fine("Navigation to default view completed");
+            } else {
+                // Select the highest priority role
+                UserRole selectedRole;
+
+                if (roles.contains(UserRole.ADMIN)) {
+                    selectedRole = UserRole.ADMIN;
+                    logger.fine("User has multiple roles, selecting ADMIN role");
+                } else if (roles.contains(UserRole.QA)) {
+                    selectedRole = UserRole.QA;
+                    logger.fine("User has multiple roles, selecting QA role");
+                } else {
+                    selectedRole = UserRole.PRODUCTION;
+                    logger.fine("User has multiple roles, selecting PRODUCTION role");
+                }
+
+                // Navigate to the view for the selected role
+                navigateToRoleSpecificView(selectedRole);
+            }
+        } else {
+            // If no user is logged in, navigate to login view
+            navigateToLogin();
+        }
+    }
+
+    /**
+     * Navigates to the appropriate view based on the specified role.
+     *
+     * @param role the user role
+     */
+    public void navigateToRoleSpecificView(UserRole role) {
+        switch (role) {
+            case ADMIN:
+                logger.fine("Navigating to UserManagementView for ADMIN user");
+                Router.navigateTo(UserManagementView.class);
+                logger.fine("Navigation to UserManagementView completed");
+                break;
+            case QA:
+                logger.fine("Navigating to QADashboardView for QA user");
+                Router.navigateTo(QADashboardView.class);
+                logger.fine("Navigation to QADashboardView completed");
+                break;
+            case PRODUCTION:
+                logger.fine("Navigating to AssignedOrderView for PRODUCTION user");
+                Router.navigateTo(AssignedOrderView.class);
+                logger.fine("Navigation to AssignedOrderView completed");
+                break;
+            default:
+                // Fallback if no specific role is found
+                logger.warning("Unknown role: " + role + ", using default view");
+                Router.navigateTo(AssignedOrderView.class);
+                logger.fine("Navigation to default view completed");
+                break;
+        }
+    }
+
+    /**
+     * Navigates to the login view.
+     */
+    public void navigateToLogin() {
+        logger.fine("Navigating to login view");
+        Router.navigateTo(LoginView.class);
+        logger.fine("Navigation to login view completed");
+    }
+
+    /**
+     * Navigates to the user management view.
+     * This is typically used for administrative tasks.
+     */
+    public void navigateToUserManagement() {
+        logger.fine("Navigating to user management view");
+        Router.navigateTo(UserManagementView.class);
+        logger.fine("Navigation to user management view completed");
+    }
+
+    /**
+     * Navigates to the QA dashboard view.
+     * This is typically used by quality assurance personnel.
+     */
+    public void navigateToQADashboard() {
+        logger.fine("Navigating to QA dashboard view");
+        Router.navigateTo(QADashboardView.class);
+        logger.fine("Navigation to QA dashboard view completed");
+    }
+
+    /**
+     * Navigates to the assigned order view.
+     * This is typically used by production workers.
+     */
+    public void navigateToAssignedOrder() {
+        logger.fine("Navigating to assigned order view");
+        Router.navigateTo(AssignedOrderView.class);
+        logger.fine("Navigation to assigned order view completed");
+    }
+
+    /**
+     * Navigates to the photo upload view.
+     * This is kept for backward compatibility.
+     * @deprecated Use {@link #navigateToAssignedOrder()} instead.
+     */
+    @Deprecated
+    public void navigateToPhotoUpload() {
+        logger.fine("Navigating to assigned order view (redirected from photo upload)");
+        Router.navigateTo(AssignedOrderView.class);
+        logger.fine("Navigation to assigned order view completed");
+    }
+}

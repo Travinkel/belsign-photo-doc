@@ -101,8 +101,8 @@ Example:
 @Test
 public void servicesShouldNotDependOnRepositoryImplementations() {
     ArchRule rule = noClasses()
-            .that().resideInAPackage("com.belman.service..")
-            .should().dependOnClassesThat().resideInAPackage("com.belman.repository.persistence..")
+            .that().resideInAPackage("com.belman.application..")
+            .should().dependOnClassesThat().resideInAPackage("com.belman.dataaccess.persistence..")
             .because("Services should depend on repository interfaces, not implementations");
 
     rule.check(importedClasses);

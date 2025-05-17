@@ -10,51 +10,51 @@ This document summarizes the implementation of the new UI structure for the BelS
 
 The following views have been moved to the new structure:
 
-- **Login View**: Moved from `com.belman.ui.views.login` to `com.belman.ui.usecases.authentication.login`
+- **Login View**: Moved from `com.belman.presentation.views.login` to `com.belman.presentation.usecases.authentication.login`
   - LoginViewController.java
   - LoginViewModel.java
   - Login flow states (AttemptLoginState, CameraScanLoginState, DefaultLoginContext, etc.)
 
-- **Main View**: Moved from `com.belman.ui.views.main` to `com.belman.ui.usecases.common.main`
+- **Main View**: Moved from `com.belman.presentation.views.main` to `com.belman.presentation.usecases.common.main`
   - MainView.java
   - MainViewController.java
   - MainViewModel.java
 
-- **Photo Upload View**: Moved from `com.belman.ui.views.photoupload` to `com.belman.ui.usecases.photo.upload`
+- **Photo Upload View**: Moved from `com.belman.presentation.views.photoupload` to `com.belman.presentation.usecases.photo.upload`
   - PhotoUploadView.java
   - PhotoUploadViewModel.java
 
-- **QA Dashboard View**: Moved from `com.belman.ui.views.qadashboard` to `com.belman.ui.usecases.qa.dashboard`
+- **QA Dashboard View**: Moved from `com.belman.presentation.views.qadashboard` to `com.belman.presentation.usecases.qa.dashboard`
   - QADashboardView.java
   - QADashboardViewModel.java
 
-- **User Management View**: Moved from `com.belman.ui.views.usermanagement` to `com.belman.ui.usecases.admin.usermanagement`
+- **User Management View**: Moved from `com.belman.presentation.views.usermanagement` to `com.belman.presentation.usecases.admin.usermanagement`
   - UserManagementView.java
   - UserManagementViewController.java
   - UserManagementViewModel.java
   - UserManagementViewFactory.java (newly created)
 
-- **Admin View**: Moved from `com.belman.ui.views.admin` to `com.belman.ui.usecases.admin.dashboard`
+- **Admin View**: Moved from `com.belman.presentation.views.admin` to `com.belman.presentation.usecases.admin.dashboard`
   - AdminView.java
   - AdminViewController.java
   - AdminViewModel.java
 
-- **Order Gallery View**: Moved from `com.belman.ui.views.ordergallery` to `com.belman.ui.usecases.order.gallery`
+- **Order Gallery View**: Moved from `com.belman.presentation.views.ordergallery` to `com.belman.presentation.usecases.order.gallery`
   - OrderGalleryView.java
   - OrderGalleryViewController.java
   - OrderGalleryViewModel.java
 
-- **Photo Review View**: Moved from `com.belman.ui.views.photoreview` to `com.belman.ui.usecases.photo.review`
+- **Photo Review View**: Moved from `com.belman.presentation.views.photoreview` to `com.belman.presentation.usecases.photo.review`
   - PhotoReviewView.java
   - PhotoReviewViewController.java
   - PhotoReviewViewModel.java
 
-- **Report Preview View**: Moved from `com.belman.ui.views.reportpreview` to `com.belman.ui.usecases.report.preview`
+- **Report Preview View**: Moved from `com.belman.presentation.views.reportpreview` to `com.belman.presentation.usecases.report.preview`
   - ReportPreviewView.java
   - ReportPreviewViewController.java
   - ReportPreviewViewModel.java
 
-- **Splash View**: Moved from `com.belman.ui.views.splash` to `com.belman.ui.usecases.common.splash`
+- **Splash View**: Moved from `com.belman.presentation.views.splash` to `com.belman.presentation.usecases.common.splash`
   - SplashView.java
   - SplashViewController.java
   - SplashViewModel.java

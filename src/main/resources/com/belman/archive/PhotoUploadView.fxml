@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml"
             xmlns="http://javafx.com/javafx"
-            fx:controller="com.belman.ui.views.photoupload.PhotoUploadViewController"
+            fx:controller="com.belman.presentation.views.photoupload.PhotoUploadViewController"
             styleClass="responsive-container, photo-upload-container"
             stylesheets="@../styles/app.css">
 
