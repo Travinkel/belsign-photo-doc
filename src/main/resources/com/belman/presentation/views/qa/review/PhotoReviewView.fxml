@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.belman.presentation.usecases.qa.review.PhotoReviewViewController"
+           prefHeight="600.0" prefWidth="400.0"
+           styleClass="photo-review-view">
+    
+    <BorderPane>
+        <!-- Header -->
+        <top>
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                </padding>
+                
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="header">
+                    <Button fx:id="backButton" text="Back" styleClass="back-button"/>
+                    <Label text="Photo Review" styleClass="title-label"/>
+                </HBox>
+                
+                <!-- Order Info -->
+                <VBox spacing="5.0" styleClass="order-info">
+                    <Label fx:id="orderNumberLabel" text="Order #: ORD-123" styleClass="order-number"/>
+                    <Label fx:id="orderDescriptionLabel" text="Description: Sample order description" styleClass="order-description"/>
+                    <Label fx:id="photoCountLabel" text="Photos: 0/0" styleClass="photo-count"/>
+                </VBox>
+            </VBox>
+        </top>
+        
+        <!-- Main Content -->
+        <center>
+            <HBox spacing="10.0">
+                <padding>
+                    <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                </padding>
+                
+                <!-- Photo List -->
+                <VBox spacing="5.0" HBox.hgrow="NEVER" maxWidth="120.0">
+                    <Label text="Photos" styleClass="section-title"/>
+                    <ListView fx:id="photoListView" VBox.vgrow="ALWAYS" prefWidth="120.0">
+                        <placeholder>
+                            <Label text="No photos available"/>
+                        </placeholder>
+                    </ListView>
+                </VBox>
+                
+                <!-- Photo Preview -->
+                <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                    <Label text="Preview" styleClass="section-title"/>
+                    <StackPane fx:id="previewContainer" VBox.vgrow="ALWAYS" styleClass="preview-container">
+                        <ImageView fx:id="photoPreview" preserveRatio="true" fitWidth="400.0"/>
+                        <Label fx:id="noPreviewLabel" text="Select a photo to preview" visible="false"/>
+                    </StackPane>
+                    
+                    <!-- Comments -->
+                    <Label text="QA Comments" styleClass="section-title"/>
+                    <TextArea fx:id="commentsTextArea" promptText="Enter your feedback here..." VBox.vgrow="NEVER" prefHeight="80.0"/>
+                </VBox>
+            </HBox>
+        </center>
+        
+        <!-- Footer -->
+        <bottom>
+            <HBox alignment="CENTER" spacing="20.0">
+                <padding>
+                    <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                </padding>
+                
+                <Button fx:id="rejectButton" text="Reject" styleClass="reject-button"/>
+                <Button fx:id="approveButton" text="Approve" styleClass="approve-button"/>
+            </HBox>
+        </bottom>
+    </BorderPane>
+</StackPane>

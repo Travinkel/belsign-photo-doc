@@ -1,9 +1,9 @@
 package com.belman.application.usecase.photo;
 
 import com.belman.domain.order.OrderId;
-import com.belman.domain.order.photo.Photo;
-import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.order.photo.PhotoId;
+import com.belman.domain.photo.Photo;
+import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoId;
 import com.belman.domain.user.UserBusiness;
 
 import java.util.List;

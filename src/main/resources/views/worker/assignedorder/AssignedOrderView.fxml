@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.belman.presentation.usecases.worker.assignedorder.AssignedOrderViewController"
+           prefHeight="600.0" prefWidth="400.0"
+           styleClass="assigned-order-view">
+    
+    <BorderPane>
+        <!-- Header -->
+        <top>
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets top="15.0" right="15.0" bottom="10.0" left="15.0"/>
+                </padding>
+                
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="header">
+                    <Label text="Assigned Order" styleClass="title-label"/>
+                    <HBox HBox.hgrow="ALWAYS" />
+                    <Button fx:id="logoutButton" text="Logout" styleClass="logout-button"/>
+                </HBox>
+                
+                <!-- Worker Info -->
+                <HBox spacing="10.0" styleClass="worker-info">
+                    <Label text="Worker:" styleClass="worker-label"/>
+                    <Label fx:id="workerNameLabel" text="John Doe" styleClass="worker-name"/>
+                </HBox>
+            </VBox>
+        </top>
+        
+        <!-- Main Content -->
+        <center>
+            <ScrollPane fitToWidth="true" styleClass="content-scroll">
+                <VBox spacing="15.0">
+                    <padding>
+                        <Insets top="15.0" right="15.0" bottom="15.0" left="15.0"/>
+                    </padding>
+                    
+                    <!-- Order Details -->
+                    <VBox spacing="8.0" styleClass="order-details">
+                        <Label text="Order Details" styleClass="section-title"/>
+                        
+                        <HBox spacing="10.0">
+                            <Label text="Order #:" styleClass="detail-label"/>
+                            <Label fx:id="orderNumberLabel" text="ORD-123-230615-WLD-0001" styleClass="detail-value"/>
+                        </HBox>
+                        
+                        <HBox spacing="10.0">
+                            <Label text="Customer:" styleClass="detail-label"/>
+                            <Label fx:id="customerLabel" text="Acme Corporation" styleClass="detail-value"/>
+                        </HBox>
+                        
+                        <HBox spacing="10.0">
+                            <Label text="Project:" styleClass="detail-label"/>
+                            <Label fx:id="projectLabel" text="Main Building Welding" styleClass="detail-value"/>
+                        </HBox>
+                        
+                        <HBox spacing="10.0">
+                            <Label text="Location:" styleClass="detail-label"/>
+                            <Label fx:id="locationLabel" text="Building A, Floor 3" styleClass="detail-value"/>
+                        </HBox>
+                        
+                        <HBox spacing="10.0">
+                            <Label text="Due Date:" styleClass="detail-label"/>
+                            <Label fx:id="dueDateLabel" text="2023-06-20" styleClass="detail-value"/>
+                        </HBox>
+                    </VBox>
+                    
+                    <!-- Order Description -->
+                    <VBox spacing="8.0" styleClass="order-description">
+                        <Label text="Description" styleClass="section-title"/>
+                        <Label fx:id="descriptionLabel" text="Document welding work on the main support beams. Ensure all safety protocols are followed and capture before/after photos." wrapText="true"/>
+                    </VBox>
+                    
+                    <!-- Required Photos -->
+                    <VBox spacing="8.0" styleClass="required-photos">
+                        <Label text="Required Photos" styleClass="section-title"/>
+                        <Label fx:id="photoCountLabel" text="5 photos required" styleClass="photo-count"/>
+                        
+                        <ListView fx:id="photoTemplateListView" prefHeight="150.0">
+                            <placeholder>
+                                <Label text="No photo templates available"/>
+                            </placeholder>
+                        </ListView>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+        </center>
+        
+        <!-- Footer -->
+        <bottom>
+            <HBox alignment="CENTER" spacing="20.0">
+                <padding>
+                    <Insets top="15.0" right="15.0" bottom="20.0" left="15.0"/>
+                </padding>
+                
+                <Button fx:id="startButton" text="Start Photo Session" styleClass="start-button"/>
+            </HBox>
+        </bottom>
+    </BorderPane>
+</StackPane>

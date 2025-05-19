@@ -1,6 +1,6 @@
--- Drop indexes on PIN code and QR code hash
-DROP INDEX idx_users_pin_code;
-DROP INDEX idx_users_qr_code_hash;
+-- Drop indexes on PIN code and QR code hash if they exist
+DROP INDEX IF EXISTS idx_users_pin_code;
+DROP INDEX IF EXISTS idx_users_qr_code_hash;
 
 -- SQLite doesn't support dropping columns directly, so we need to:
 -- 1. Create a new table without the columns we want to drop
@@ -36,6 +36,6 @@ DROP TABLE users;
 ALTER TABLE users_new RENAME TO users;
 
 -- Recreate indexes
-CREATE INDEX idx_users_username ON users (username);
-CREATE INDEX idx_users_email ON users (email);
-CREATE INDEX idx_users_nfc_id ON users (nfc_id);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users (username);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users (email);
+CREATE INDEX IF NOT EXISTS idx_users_nfc_id ON users (nfc_id);

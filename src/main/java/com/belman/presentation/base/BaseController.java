@@ -66,14 +66,27 @@ public abstract class BaseController<T extends BaseViewModel<?>> implements Init
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         if (viewModel == null) {
+            System.err.println("Error: ViewModel is null in " + getClass().getSimpleName());
             throw new IllegalStateException("ViewModel must be set before initializing controller");
         }
 
-        // Set up common bindings and initialization
-        setupBindings();
+        try {
+            // Set up common bindings and initialization
+            setupBindings();
+        } catch (Exception e) {
+            System.err.println("Error in setupBindings() for " + getClass().getSimpleName() + ": " + e.getMessage());
+            e.printStackTrace();
+            // Continue execution to avoid crashing the application
+        }
 
-        // Initialize the ViewModel
-        viewModel.initialize();
+        try {
+            // Initialize the ViewModel
+            viewModel.initialize();
+        } catch (Exception e) {
+            System.err.println("Error initializing ViewModel in " + getClass().getSimpleName() + ": " + e.getMessage());
+            e.printStackTrace();
+            // Continue execution to avoid crashing the application
+        }
     }
 
     /**
@@ -158,5 +171,97 @@ public abstract class BaseController<T extends BaseViewModel<?>> implements Init
      */
     public void initializeBinding() {
         // Optional: Override in subclasses to bind ViewModel to the view
+    }
+
+    /**
+     * Safely binds a property to a UI element, checking for null first.
+     * This helps prevent NullPointerExceptions when UI elements are not properly initialized.
+     *
+     * @param uiElement The UI element to bind to
+     * @param property The property to bind
+     * @param <T> The type of the property
+     * @return true if binding was successful, false otherwise
+     */
+    protected <T> boolean safelyBind(javafx.scene.control.Labeled uiElement, javafx.beans.property.Property<T> property) {
+        if (uiElement == null) {
+            System.err.println("Warning: UI element is null in " + getClass().getSimpleName() + " when trying to bind property");
+            return false;
+        }
+
+        if (property == null) {
+            System.err.println("Warning: Property is null in " + getClass().getSimpleName() + " when trying to bind to " + uiElement);
+            return false;
+        }
+
+        try {
+            if (property instanceof javafx.beans.property.StringProperty) {
+                uiElement.textProperty().bind((javafx.beans.property.StringProperty) property);
+            } else {
+                // For non-string properties, use a binding that converts to string
+                uiElement.textProperty().bind(javafx.beans.binding.Bindings.createStringBinding(
+                    () -> property.getValue() != null ? property.getValue().toString() : "",
+                    property
+                ));
+            }
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error binding property to UI element in " + getClass().getSimpleName() + ": " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Safely binds a property to a UI element's visibility, checking for null first.
+     *
+     * @param uiElement The UI element to bind to
+     * @param property The property to bind
+     * @return true if binding was successful, false otherwise
+     */
+    protected boolean safelyBindVisibility(javafx.scene.Node uiElement, javafx.beans.property.BooleanProperty property) {
+        if (uiElement == null) {
+            System.err.println("Warning: UI element is null in " + getClass().getSimpleName() + " when trying to bind visibility");
+            return false;
+        }
+
+        if (property == null) {
+            System.err.println("Warning: Property is null in " + getClass().getSimpleName() + " when trying to bind visibility to " + uiElement);
+            return false;
+        }
+
+        try {
+            uiElement.visibleProperty().bind(property);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error binding visibility property to UI element in " + getClass().getSimpleName() + ": " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Safely sets an event handler on a UI element, checking for null first.
+     *
+     * @param uiElement The UI element to set the event handler on
+     * @param eventHandler The event handler to set
+     * @param <T> The type of the event
+     * @return true if setting the event handler was successful, false otherwise
+     */
+    protected <T extends javafx.event.Event> boolean safelySetEventHandler(javafx.scene.Node uiElement, javafx.event.EventType<T> eventType, javafx.event.EventHandler<T> eventHandler) {
+        if (uiElement == null) {
+            System.err.println("Warning: UI element is null in " + getClass().getSimpleName() + " when trying to set event handler");
+            return false;
+        }
+
+        if (eventHandler == null) {
+            System.err.println("Warning: Event handler is null in " + getClass().getSimpleName() + " when trying to set on " + uiElement);
+            return false;
+        }
+
+        try {
+            uiElement.addEventHandler(eventType, eventHandler);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error setting event handler on UI element in " + getClass().getSimpleName() + ": " + e.getMessage());
+            return false;
+        }
     }
 }

@@ -135,12 +135,23 @@ public class SqlUserRepository implements UserRepository {
         EmailAddress email = new EmailAddress(rs.getString("email"));
         UserStatus status = UserStatus.valueOf(rs.getString("status"));
 
+        // Set approval state based on status
+        ApprovalState approvalState;
+        if (status == UserStatus.ACTIVE) {
+            approvalState = ApprovalState.createApproved();
+        } else if (status == UserStatus.INACTIVE) {
+            approvalState = ApprovalState.createRejected("User is inactive");
+        } else {
+            approvalState = ApprovalState.createPendingState();
+        }
+
         // Create a UserBusiness using the Builder pattern
         UserBusiness.Builder builder = new UserBusiness.Builder()
                 .id(id)
                 .username(username)
                 .password(password)
-                .email(email);
+                .email(email)
+                .approvalState(approvalState);
 
         if (name != null) {
             builder.name(name);

@@ -5,11 +5,13 @@ import com.belman.common.session.SessionContext;
 import com.belman.presentation.base.BaseViewModel;
 import com.belman.presentation.navigation.Router;
 import com.belman.presentation.usecases.qa.dashboard.QADashboardView;
+import com.belman.presentation.usecases.qa.done.QADoneView;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -71,10 +73,16 @@ public class ApprovalSummaryViewModel extends BaseViewModel<ApprovalSummaryViewM
     }
 
     /**
-     * Navigates back to the QA dashboard.
+     * Navigates to the QA done view.
      */
-    public void navigateToDashboard() {
-        Router.navigateTo(QADashboardView.class);
+    public void navigateToQADone() {
+        // Create parameters to pass to the QA done view
+        Map<String, Object> params = new HashMap<>();
+        params.put("orderNumber", orderNumber.get());
+        params.put("approved", approved.get());
+
+        // Navigate to the QA done view
+        Router.navigateTo(QADoneView.class, params);
     }
 
     /**

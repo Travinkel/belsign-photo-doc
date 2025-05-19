@@ -1,71 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.gluonhq.charm.glisten.control.ProgressBar?>
-<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.image.Image?>
+<?import com.gluonhq.charm.glisten.control.ProgressBar?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.Color?>
-<?import javafx.scene.text.Font?>
-<StackPane xmlns:fx="http://javafx.com/fxml"
-           fx:controller="com.belman.presentation.views.splash.SplashViewController"
-           styleClass="splash-container, responsive-container"
-           stylesheets="@../../../styles/app.css">
+<?import javafx.scene.image.Image?>
+<?import javafx.geometry.Insets?>
 
-    <!-- Simple white background for better visibility -->
-    <Region styleClass="splash-background"/>
-
-    <VBox styleClass="splash-content" alignment="CENTER" spacing="20">
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.belman.presentation.usecases.splash.SplashViewController"
+           prefHeight="600.0" prefWidth="400.0"
+           styleClass="splash-view">
+    <VBox alignment="CENTER" spacing="20.0">
         <padding>
-            <Insets top="30" right="30" bottom="30" left="30"/>
+            <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
         </padding>
 
-        <!-- Logo with subtle shadow effect -->
-        <ImageView fx:id="logoImage" styleClass="splash-logo, responsive-image"
-                   fitWidth="180" fitHeight="120" preserveRatio="true">
-            <Image url="@../../../images/logo.png"/>
-            <effect>
-                <DropShadow radius="5" spread="0.1">
-                    <color>
-                        <Color opacity="0.2"/>
-                    </color>
-                </DropShadow>
-            </effect>
+        <!-- Logo -->
+        <ImageView fx:id="logoImage" fitWidth="200.0" preserveRatio="true">
+            <Image url="@/com/belman/images/logo.png"/>
         </ImageView>
 
-        <Label fx:id="titleLabel" text="BelSign" styleClass="splash-title">
-            <font>
-                <Font name="System Bold" size="28.0"/>
-            </font>
-        </Label>
+        <!-- App Name -->
+        <Label fx:id="titleLabel" text="BelSign Photo Documentation" styleClass="title-label"/>
 
-        <Label fx:id="subtitleLabel" text="Photo Documentation System" styleClass="subtitle">
-            <font>
-                <Font size="16.0"/>
-            </font>
-            <textFill>
-                <Color red="0.2" green="0.2" blue="0.2" opacity="0.8"/>
-            </textFill>
-        </Label>
+        <!-- Version -->
+        <Label fx:id="subtitleLabel" text="Version 1.0" styleClass="version-label"/>
 
-        <Region VBox.vgrow="ALWAYS" minHeight="25" maxHeight="25"/>
+        <!-- Loading Message -->
+        <Label fx:id="messageLabel" text="Loading..." styleClass="message-label"/>
 
-        <ProgressBar fx:id="loadingProgress" progress="0.0" styleClass="splash-progress" prefWidth="240"
-                     maxWidth="280"/>
-
-        <Label fx:id="messageLabel" text="Loading..." styleClass="body-text">
-            <textFill>
-                <Color red="0.0" green="0.29" blue="0.53" opacity="0.8"/>
-            </textFill>
-        </Label>
-
-        <!-- Version display -->
-        <Label text="v1.0" styleClass="version-text">
-            <VBox.margin>
-                <Insets top="15.0"/>
-            </VBox.margin>
-        </Label>
+        <!-- Loading Progress -->
+        <ProgressBar fx:id="loadingProgress" progress="0.0" prefWidth="250.0" styleClass="loading-progress"/>
     </VBox>
 </StackPane>

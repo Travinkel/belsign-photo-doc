@@ -1,6 +1,6 @@
 package com.belman.presentation.usecases.worker.summary;
 
-import com.belman.domain.order.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoDocument;
 import com.belman.presentation.base.BaseController;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

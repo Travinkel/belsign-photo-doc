@@ -1,6 +1,7 @@
 package com.belman.bootstrap;
 
 import com.belman.bootstrap.config.ApplicationBootstrapper;
+import com.belman.bootstrap.config.DevModeConfig;
 import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.bootstrap.di.ServiceRegistry;
 import com.belman.bootstrap.hacks.GluonInternalClassesFix;
@@ -23,8 +24,11 @@ import com.belman.presentation.core.ViewRegistry;
 import com.belman.presentation.core.ViewStackManager;
 import com.belman.presentation.navigation.RoleBasedNavigationService;
 import com.belman.presentation.usecases.splash.SplashView;
-import com.gluonhq.charm.glisten.application.MobileApplication;
+import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import org.mindrot.jbcrypt.BCrypt;
 
 /**
  * Main application class for BelSign.
@@ -32,20 +36,16 @@ import javafx.scene.Scene;
  * This class is the entry point for the application and coordinates bootstrapping
  * across the three layers (BLL, DAL, GUI).
  */
-public class Main extends MobileApplication {
+public class Main extends Application {
 
     public static final String SPLASH_VIEW = SplashView.class.getSimpleName();
     private static final EmojiLogger logger = EmojiLogger.getLogger(Main.class);
+    private static final StackPane rootPane = new StackPane();
 
     /**
      * Static initializer to set system properties.
      */
     static {
-        // Set system properties for Gluon
-        // This disables licensing and tracking features in Glisten safely
-        // It's officially supported for students and works fine with native-image too
-        System.setProperty("com.gluonhq.license.disable", "true");
-
         // Set platform to Desktop for consistent behavior
         if (System.getProperty("javafx.platform") == null) {
             System.setProperty("javafx.platform", "Desktop");
@@ -58,20 +58,43 @@ public class Main extends MobileApplication {
      * @param args command line arguments
      */
     public static void main(String[] args) {
-        System.setProperty("com.gluonhq.license.disable", "true");
-        launch(args);
+        // Check for dev mode flag in command line arguments or system properties
+        boolean devMode = false;
+        for (String arg : args) {
+            if (arg.equals("--dev")) {
+                devMode = true;
+                break;
+            }
+        }
+
+        // Also check system property
+        if (!devMode && "true".equals(System.getProperty("belsign.devMode"))) {
+            devMode = true;
+        }
+
+        // Initialize dev mode configuration
+        DevModeConfig.initialize(devMode);
+
+        // Generate a hashed password for testing (this should be removed in production)
+        if (DevModeConfig.isDevMode()) {
+            String password = "pass1234";
+            String hashed = BCrypt.hashpw(password, BCrypt.gensalt(10));
+            System.out.println("Hashed password: " + hashed);
+        }
+
+        Application.launch(args);
     }
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         try {
             super.init();
 
-            // Initialize Gluon Mobile application
-            logger.debug("Initializing MobileApplication");
+            // Initialize application
+            logger.debug("Initializing Application");
         } catch (Exception e) {
-            logger.error("Error initializing MobileApplication", e);
-            throw new RuntimeException("Error initializing MobileApplication", e);
+            logger.error("Error initializing Application", e);
+            throw new RuntimeException("Error initializing Application", e);
         }
 
         // Initialize Gluon internal classes fixes (DAL)
@@ -126,6 +149,7 @@ public class Main extends MobileApplication {
         logger.debug("Initializing LifecycleManager and ServiceRegistry");
         LoggerFactory loggerFactory = ServiceLocator.getService(LoggerFactory.class);
         ServiceRegistry.setLogger(loggerFactory);
+        // Pass this Application instance to LifecycleManager
         LifecycleManager.init(this, loggerFactory);
     }
 
@@ -143,30 +167,42 @@ public class Main extends MobileApplication {
     }
 
     @Override
+    public void start(Stage primaryStage) {
+        try {
+            // Create the scene with the root pane
+            Scene scene = new Scene(rootPane, 800, 600);
+            primaryStage.setScene(scene);
+            primaryStage.setTitle("BelSign Photo Documentation");
+
+            // Initialize ViewStackManager with the root pane
+            ViewStackManager.initWithRootPane(rootPane);
+
+            // Apply platform-specific styling (GUI)
+            logger.debug("Applying platform-specific styling");
+            applyPlatformStyling(scene);
+
+            // Load CSS (GUI)
+            loadCss(scene);
+
+            // Show the stage
+            primaryStage.show();
+
+            // Show the splash view (GUI)
+            logger.info("Showing splash view");
+            ViewStackManager.getInstance().navigateTo("SplashView");
+        } catch (Exception e) {
+            logger.error("Error starting application", e);
+            throw new RuntimeException("Error starting application", e);
+        }
+    }
+
+    @Override
     public void stop() throws Exception {
         // Shutdown the application (DAL)
         logger.shutdown("Shutting down the application");
         ApplicationBootstrapper.shutdown();
 
         super.stop();
-    }
-
-    /**
-     * Performs post-initialization tasks.
-     *
-     * @param scene the JavaFX scene
-     */
-    public void postInit(Scene scene) {
-        // Apply platform-specific styling (GUI)
-        logger.debug("Applying platform-specific styling");
-        applyPlatformStyling(scene);
-
-        // Load CSS (GUI)
-        loadCss(scene);
-
-        // Show the splash view (GUI)
-        logger.info("Showing splash view");
-        ViewStackManager.getInstance().navigateTo("SplashView");
     }
 
     /**

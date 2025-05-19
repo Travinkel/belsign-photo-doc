@@ -37,8 +37,24 @@ public class SplashViewController extends BaseController<SplashViewModel> {
     @Override
     protected void setupBindings() {
         try {
-            // Bind UI components to ViewModel properties
-            messageLabel.textProperty().bind(getViewModel().messageProperty());
+            // Check for null UI components before binding
+            if (messageLabel != null) {
+                messageLabel.textProperty().bind(getViewModel().messageProperty());
+            } else {
+                System.err.println("Warning: messageLabel is null in SplashViewController");
+            }
+
+            if (titleLabel != null) {
+                titleLabel.setText("BelSign Photo Documentation");
+            } else {
+                System.err.println("Warning: titleLabel is null in SplashViewController");
+            }
+
+            if (subtitleLabel != null) {
+                subtitleLabel.setText("Version 1.0");
+            } else {
+                System.err.println("Warning: subtitleLabel is null in SplashViewController");
+            }
 
             // Adjust UI based on platform if needed
             adjustForPlatform();
@@ -60,38 +76,61 @@ public class SplashViewController extends BaseController<SplashViewModel> {
      * Initializes the loading animation with a timeline.
      */
     private void initializeLoadingAnimation() {
-        // Make the logo smaller to signify loading
-        logoImage.setFitWidth(150);
-
-        // Create a flickering animation for the logo
-        Timeline flickerTimeline = new Timeline(
-                new KeyFrame(Duration.ZERO, new KeyValue(logoImage.opacityProperty(), 1.0)),
-                new KeyFrame(Duration.seconds(0.7), new KeyValue(logoImage.opacityProperty(), 0.5)),
-                new KeyFrame(Duration.seconds(1.4), new KeyValue(logoImage.opacityProperty(), 1.0))
-        );
-        flickerTimeline.setCycleCount(Timeline.INDEFINITE);
-        flickerTimeline.play();
-
-        // Simulate loading with a timeline animation
-        loadingTimeline = new Timeline(
-                new KeyFrame(Duration.ZERO, new KeyValue(loadingProgress.progressProperty(), 0)),
-                new KeyFrame(Duration.seconds(2.5), new KeyValue(loadingProgress.progressProperty(), 1))
-        );
-
-        loadingTimeline.setOnFinished(event -> {
-            try {
-                // Stop the flickering animation
-                flickerTimeline.stop();
-
-                // Navigate to the next view after splash screen finishes
-                Platform.runLater(() -> getViewModel().onLoadingComplete());
-            } catch (Exception e) {
-                handleNavigationError(e);
+        try {
+            // Check for null UI components before using them
+            if (logoImage == null) {
+                System.err.println("Warning: logoImage is null in SplashViewController");
+                return;
             }
-        });
 
-        // Start the animation
-        loadingTimeline.play();
+            if (loadingProgress == null) {
+                System.err.println("Warning: loadingProgress is null in SplashViewController");
+                return;
+            }
+
+            // Make the logo smaller to signify loading
+            logoImage.setFitWidth(150);
+
+            // Create a flickering animation for the logo
+            Timeline flickerTimeline = new Timeline(
+                    new KeyFrame(Duration.ZERO, new KeyValue(logoImage.opacityProperty(), 1.0)),
+                    new KeyFrame(Duration.seconds(0.7), new KeyValue(logoImage.opacityProperty(), 0.5)),
+                    new KeyFrame(Duration.seconds(1.4), new KeyValue(logoImage.opacityProperty(), 1.0))
+            );
+            flickerTimeline.setCycleCount(Timeline.INDEFINITE);
+            flickerTimeline.play();
+
+            // Simulate loading with a timeline animation
+            loadingTimeline = new Timeline(
+                    new KeyFrame(Duration.ZERO, new KeyValue(loadingProgress.progressProperty(), 0)),
+                    new KeyFrame(Duration.seconds(2.5), new KeyValue(loadingProgress.progressProperty(), 1))
+            );
+
+            loadingTimeline.setOnFinished(event -> {
+                try {
+                    // Stop the flickering animation
+                    flickerTimeline.stop();
+
+                    // Navigate to the next view after splash screen finishes
+                    Platform.runLater(() -> getViewModel().onLoadingComplete());
+                } catch (Exception e) {
+                    handleNavigationError(e);
+                }
+            });
+
+            // Start the animation
+            loadingTimeline.play();
+        } catch (Exception e) {
+            System.err.println("Error initializing loading animation: " + e.getMessage());
+            e.printStackTrace();
+
+            // Try to navigate to the next view even if animation fails
+            try {
+                Platform.runLater(() -> getViewModel().onLoadingComplete());
+            } catch (Exception ex) {
+                handleNavigationError(ex);
+            }
+        }
     }
 
     /**

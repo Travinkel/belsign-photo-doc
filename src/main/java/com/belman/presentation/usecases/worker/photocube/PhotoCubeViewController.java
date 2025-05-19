@@ -1,6 +1,6 @@
 package com.belman.presentation.usecases.worker.photocube;
 
-import com.belman.domain.order.photo.PhotoTemplate;
+import com.belman.domain.photo.PhotoTemplate;
 import com.belman.presentation.base.BaseController;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

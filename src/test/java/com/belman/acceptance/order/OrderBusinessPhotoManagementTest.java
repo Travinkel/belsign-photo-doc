@@ -1,6 +1,7 @@
 package com.belman.acceptance.order;
 
 import com.belman.acceptance.BaseAcceptanceTest;
+import com.belman.dataaccess.repository.memory.InMemoryPhotoRepository;
 import com.belman.domain.common.valueobjects.EmailAddress;
 import com.belman.domain.common.valueobjects.PhoneNumber;
 import com.belman.domain.common.valueobjects.Timestamp;
@@ -9,10 +10,12 @@ import com.belman.domain.customer.CustomerBusiness;
 import com.belman.domain.customer.CustomerId;
 import com.belman.domain.customer.CustomerType;
 import com.belman.domain.order.*;
-import com.belman.domain.order.photo.Photo;
-import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.order.photo.PhotoId;
-import com.belman.domain.order.photo.PhotoTemplate;
+import com.belman.domain.photo.Photo;
+import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoId;
+import com.belman.domain.photo.PhotoRepository;
+import com.belman.domain.photo.PhotoTemplate;
+import com.belman.domain.services.LoggerFactory;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserReference;
 import com.belman.domain.user.Username;
@@ -24,6 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +42,7 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
 
     private static final String TEST_ORDER_NUMBER = "01/23-123456-12345678";
     private OrderRepository orderRepository;
+    private PhotoRepository photoRepository;
     private UserBusiness productionUser;
     private OrderBusiness testOrderBusiness;
 
@@ -48,6 +53,37 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
         // Create repositories
         orderRepository = new InMemoryOrderRepository();
         InMemoryUserRepository userRepository = new InMemoryUserRepository();
+        // Create a mock LoggerFactory for the PhotoRepository
+        LoggerFactory loggerFactory = new LoggerFactory() {
+            @Override
+            public com.belman.domain.services.Logger getLogger(Class<?> clazz) {
+                return new com.belman.domain.services.Logger() {
+                    @Override
+                    public void debug(String message) {}
+                    @Override
+                    public void info(String message) {}
+                    @Override
+                    public void warn(String message) {}
+                    @Override
+                    public void error(String message) {}
+                    @Override
+                    public void error(String message, Throwable throwable) {}
+                    @Override
+                    public void debug(String message, Object... args) {}
+                    @Override
+                    public void info(String message, Object... args) {}
+                    @Override
+                    public void warn(String message, Object... args) {}
+                    @Override
+                    public void error(String message, Object... args) {}
+                    @Override
+                    public void trace(String message) {}
+                    @Override
+                    public void trace(String message, Object... args) {}
+                };
+            }
+        };
+        photoRepository = new InMemoryPhotoRepository(loggerFactory);
 
         // Get a production user from the repository
         Optional<UserBusiness> userOpt = userRepository.findByUsername(new Username("production"));
@@ -93,7 +129,6 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
         PhotoTemplate template = PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY;
         Photo photo = new Photo("/path/to/test/image.jpg");
         Timestamp uploadedAt = new Timestamp(LocalDateTime.now().toInstant(ZoneOffset.UTC));
-        UserReference userRef = new UserReference(productionUser.getId(), productionUser.getUsername());
 
         PhotoDocument photoDoc = PhotoDocument.builder()
                 .photoId(photoId)
@@ -101,10 +136,14 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
                 .imagePath(photo)
                 .uploadedBy(productionUser)
                 .uploadedAt(uploadedAt)
+                .orderId(testOrderBusiness.getId())
                 .build();
 
-        // Add the photo to the order
-        testOrderBusiness.addPhoto(photoDoc);
+        // Save the photo document to the repository
+        photoRepository.save(photoDoc);
+
+        // Add the photo ID to the order
+        testOrderBusiness.addPhotoId(photoId);
 
         // Save the updated order
         orderRepository.save(testOrderBusiness);
@@ -115,14 +154,20 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
         assertTrue(retrievedOrderOpt.isPresent(), "OrderBusiness should exist in repository");
 
         OrderBusiness retrievedOrderBusiness = retrievedOrderOpt.get();
-        List<PhotoDocument> photos = retrievedOrderBusiness.getPhotos();
+        List<PhotoId> photoIds = retrievedOrderBusiness.getPhotoIds();
 
-        // Verify that the photo was added
-        assertEquals(1, photos.size(), "OrderBusiness should have one photo");
-        assertEquals(photoId, photos.get(0).getPhotoId(), "Photo ID should match");
-        assertEquals(template, photos.get(0).getTemplate(), "Photo template should match");
-        assertEquals(photo, photos.get(0).getImagePath(), "Image path should match");
-        assertEquals(productionUser, photos.get(0).getUploadedBy(), "Uploader should match");
+        // Verify that the photo ID was added to the order
+        assertEquals(1, photoIds.size(), "OrderBusiness should have one photo ID");
+        assertEquals(photoId, photoIds.get(0), "Photo ID should match");
+
+        // Retrieve the photo from the repository
+        Optional<PhotoDocument> retrievedPhotoOpt = photoRepository.findById(photoId);
+        assertTrue(retrievedPhotoOpt.isPresent(), "Photo should exist in repository");
+
+        PhotoDocument retrievedPhoto = retrievedPhotoOpt.get();
+        assertEquals(template, retrievedPhoto.getTemplate(), "Photo template should match");
+        assertEquals(photo, retrievedPhoto.getImagePath(), "Image path should match");
+        assertEquals(productionUser, retrievedPhoto.getUploadedBy(), "Uploader should match");
 
         logDebug("Photo successfully added to order");
     }
@@ -132,7 +177,7 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
     void testUpdateOrderStatusToCompleted() {
         logDebug("Testing updating order status to COMPLETED");
 
-        // Create and add a photo document
+        // Create a photo document
         PhotoId photoId = PhotoId.newId();
         PhotoTemplate template = PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY;
         Photo photo = new Photo("/path/to/test/image.jpg");
@@ -144,9 +189,14 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
                 .imagePath(photo)
                 .uploadedBy(productionUser)
                 .uploadedAt(uploadedAt)
+                .orderId(testOrderBusiness.getId())
                 .build();
 
-        testOrderBusiness.addPhoto(photoDoc);
+        // Save the photo document to the repository
+        photoRepository.save(photoDoc);
+
+        // Add the photo ID to the order
+        testOrderBusiness.addPhotoId(photoId);
 
         // Update order status to COMPLETED
         testOrderBusiness.setStatus(OrderStatus.COMPLETED);
@@ -186,6 +236,7 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
                 .imagePath(photo1)
                 .uploadedBy(productionUser)
                 .uploadedAt(uploadedAt1)
+                .orderId(testOrderBusiness.getId())
                 .build();
 
         // Side view from the right
@@ -200,6 +251,7 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
                 .imagePath(photo2)
                 .uploadedBy(productionUser)
                 .uploadedAt(uploadedAt2)
+                .orderId(testOrderBusiness.getId())
                 .build();
 
         // Side view from the left
@@ -214,11 +266,18 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
                 .imagePath(photo3)
                 .uploadedBy(productionUser)
                 .uploadedAt(uploadedAt3)
+                .orderId(testOrderBusiness.getId())
                 .build();
 
-        testOrderBusiness.addPhoto(photoDoc1);
-        testOrderBusiness.addPhoto(photoDoc2);
-        testOrderBusiness.addPhoto(photoDoc3);
+        // Save the photo documents to the repository
+        photoRepository.save(photoDoc1);
+        photoRepository.save(photoDoc2);
+        photoRepository.save(photoDoc3);
+
+        // Add the photo IDs to the order
+        testOrderBusiness.addPhotoId(photoId1);
+        testOrderBusiness.addPhotoId(photoId2);
+        testOrderBusiness.addPhotoId(photoId3);
 
         // Save the updated order
         orderRepository.save(testOrderBusiness);
@@ -229,13 +288,39 @@ public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
         assertTrue(retrievedOrderOpt.isPresent(), "OrderBusiness should exist in repository");
 
         OrderBusiness retrievedOrderBusiness = retrievedOrderOpt.get();
-        List<PhotoDocument> photos = retrievedOrderBusiness.getPhotos();
+        List<PhotoId> photoIds = retrievedOrderBusiness.getPhotoIds();
 
-        // Verify that all photos were retrieved
-        assertEquals(3, photos.size(), "OrderBusiness should have three photos");
-        assertEquals(template1, photos.get(0).getTemplate(), "First photo should be front view");
-        assertEquals(template2, photos.get(1).getTemplate(), "Second photo should be right view");
-        assertEquals(template3, photos.get(2).getTemplate(), "Third photo should be left view");
+        // Verify that all photo IDs were retrieved
+        assertEquals(3, photoIds.size(), "OrderBusiness should have three photo IDs");
+
+        // Retrieve the photos from the repository
+        List<PhotoDocument> photos = new ArrayList<>();
+        for (PhotoId photoId : photoIds) {
+            Optional<PhotoDocument> photoOpt = photoRepository.findById(photoId);
+            assertTrue(photoOpt.isPresent(), "Photo should exist in repository");
+            photos.add(photoOpt.get());
+        }
+
+        // Verify that all photos were retrieved with the correct templates
+        assertEquals(3, photos.size(), "Should have retrieved three photos");
+
+        // Find the photo with template1
+        Optional<PhotoDocument> frontViewPhoto = photos.stream()
+                .filter(p -> p.getTemplate() == template1)
+                .findFirst();
+        assertTrue(frontViewPhoto.isPresent(), "Front view photo should exist");
+
+        // Find the photo with template2
+        Optional<PhotoDocument> rightViewPhoto = photos.stream()
+                .filter(p -> p.getTemplate() == template2)
+                .findFirst();
+        assertTrue(rightViewPhoto.isPresent(), "Right view photo should exist");
+
+        // Find the photo with template3
+        Optional<PhotoDocument> leftViewPhoto = photos.stream()
+                .filter(p -> p.getTemplate() == template3)
+                .findFirst();
+        assertTrue(leftViewPhoto.isPresent(), "Left view photo should exist");
 
         logDebug("OrderBusiness with photos successfully retrieved by order number");
     }

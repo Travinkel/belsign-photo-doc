@@ -1,12 +1,15 @@
 package com.belman.bootstrap.di;
 
 
+import com.belman.bootstrap.config.DevModeConfig;
 import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
 import com.belman.application.base.BaseService;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Registry for services.
@@ -14,6 +17,32 @@ import java.util.Collection;
  */
 public class ServiceRegistry {
     private static Logger logger;
+
+    /**
+     * Gets all interfaces implemented by a class, including those implemented by its superinterfaces.
+     *
+     * @param clazz the class to get interfaces for
+     * @return a set of all interfaces implemented by the class
+     */
+    private static Set<Class<?>> getAllInterfaces(Class<?> clazz) {
+        Set<Class<?>> interfaces = new HashSet<>();
+
+        // Add direct interfaces
+        for (Class<?> interfaceClass : clazz.getInterfaces()) {
+            interfaces.add(interfaceClass);
+
+            // Add interfaces implemented by this interface
+            interfaces.addAll(getAllInterfaces(interfaceClass));
+        }
+
+        // Add interfaces from superclass
+        Class<?> superclass = clazz.getSuperclass();
+        if (superclass != null && !superclass.equals(Object.class)) {
+            interfaces.addAll(getAllInterfaces(superclass));
+        }
+
+        return interfaces;
+    }
 
     /**
      * Sets the logger for this class.
@@ -96,7 +125,12 @@ public class ServiceRegistry {
 
         Class<?> serviceClass = service.getClass();
         if (logger != null) {
-            logger.debug("Registering service: {}", serviceClass.getName());
+            if (DevModeConfig.isDevMode()) {
+                // More detailed logging in dev mode
+                logger.info("🔌 Registering service: {}", serviceClass.getName());
+            } else {
+                logger.debug("Registering service: {}", serviceClass.getName());
+            }
         }
 
         // Register the service under its class
@@ -111,8 +145,16 @@ public class ServiceRegistry {
             }
         }
 
-        // Register the service under all interfaces it implements
-        for (Class<?> interfaceClass : serviceClass.getInterfaces()) {
+        // Register the service under all interfaces it implements, including those implemented by its superinterfaces
+        for (Class<?> interfaceClass : getAllInterfaces(serviceClass)) {
+            // Skip registration for Repository interface to avoid conflicts with multiple repository implementations
+            if (interfaceClass.getName().equals("com.belman.domain.common.base.Repository")) {
+                if (logger != null) {
+                    logger.debug("Skipping registration for Repository interface to avoid conflicts");
+                }
+                continue;
+            }
+
             try {
                 ServiceLocator.registerService((Class<Object>) interfaceClass, service);
                 if (logger != null) {

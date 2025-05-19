@@ -44,15 +44,52 @@ public class ViewLoader {
 
                 // If still null, try another approach
                 if (fxmlUrl == null) {
-                    path = "/com/belman/presentation/views/" + viewClass.getSimpleName().toLowerCase() + "/" +
+                    path = "/com/belman/presentation/views/" + viewClass.getSimpleName().toLowerCase().replace("view", "") + "/" +
                            viewClass.getSimpleName() + ".fxml";
                     System.out.println("Still not found, trying convention-based path: " + path);
+                    fxmlUrl = ViewLoader.class.getResource(path);
+                }
+
+                // Try with worker subdirectory
+                if (fxmlUrl == null) {
+                    path = "/com/belman/presentation/views/worker/" + viewClass.getSimpleName().toLowerCase().replace("view", "") + "/" +
+                           viewClass.getSimpleName() + ".fxml";
+                    System.out.println("Still not found, trying worker subdirectory path: " + path);
+                    fxmlUrl = ViewLoader.class.getResource(path);
+                }
+
+                // Try one more approach - look in the usecases directory
+                if (fxmlUrl == null) {
+                    path = "/com/belman/presentation/usecases/" + viewClass.getSimpleName().toLowerCase().replace("view", "") + "/" +
+                           viewClass.getSimpleName() + ".fxml";
+                    System.out.println("Still not found, trying usecases path: " + path);
+                    fxmlUrl = ViewLoader.class.getResource(path);
+                }
+
+                // Try with direct resources path
+                if (fxmlUrl == null) {
+                    path = "/views/worker/" + viewClass.getSimpleName().toLowerCase().replace("view", "") + "/" +
+                           viewClass.getSimpleName() + ".fxml";
+                    System.out.println("Still not found, trying direct resources path: " + path);
                     fxmlUrl = ViewLoader.class.getResource(path);
                 }
             }
 
             if (fxmlUrl == null) {
-                throw new FileNotFoundException("FXML file not found: " + path);
+                String errorMessage = "Failed to load view: " + viewClass.getSimpleName() + " - Error: FXML file not found: " + path;
+                System.err.println(errorMessage);
+                System.err.println("Please ensure the FXML file exists at one of these locations:");
+                System.err.println("1. In the same package as the view class: " + viewClass.getPackageName());
+                System.err.println("2. In the conventional path: /com/belman/presentation/views/" + viewClass.getSimpleName().toLowerCase().replace("view", "") + "/");
+                System.err.println("3. In the worker path: /com/belman/presentation/views/worker/" + viewClass.getSimpleName().toLowerCase().replace("view", "") + "/");
+                System.err.println("4. In the usecases path: /com/belman/presentation/usecases/" + viewClass.getSimpleName().toLowerCase().replace("view", "") + "/");
+                System.err.println("5. In the direct resources path: /views/worker/" + viewClass.getSimpleName().toLowerCase().replace("view", "") + "/");
+
+                // Log the error for debugging
+                java.util.logging.Logger.getLogger(ViewLoader.class.getName()).severe(errorMessage);
+
+                // Create a fallback view with an error message
+                return createFallbackView(viewClass);
             }
 
             System.out.println("Found FXML at: " + fxmlUrl);
@@ -61,40 +98,63 @@ public class ViewLoader {
             T viewModel = createViewModel(viewClass);
             if (viewModel == null) {
                 System.err.println("Error: Failed to create view model for: " + viewClass.getSimpleName());
+                // Create a fallback view model
+                viewModel = createFallbackViewModel(viewClass);
             } else {
                 System.out.println("ViewModel created: " + viewModel.getClass().getSimpleName());
             }
 
             // Inject services into the view model
             if (viewModel != null) {
-                ServiceLocator.injectServices(viewModel);
+                try {
+                    ServiceLocator.injectServices(viewModel);
+                } catch (Exception e) {
+                    System.err.println("Warning: Failed to inject services into view model: " + e.getMessage());
+                }
             }
 
             // Create a controller factory that sets the view model before JavaFX calls initialize
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
+            final T finalViewModel = viewModel; // Make effectively final for lambda
             loader.setControllerFactory(controllerClass -> {
                 try {
                     BaseController<T> controller =
                             (BaseController<T>) controllerClass.getDeclaredConstructor().newInstance();
-                    if (viewModel != null) {
-                        System.out.println("Setting view model: " + viewModel.getClass().getSimpleName()
+                    if (finalViewModel != null) {
+                        System.out.println("Setting view model: " + finalViewModel.getClass().getSimpleName()
                                            + " to controller: " + controller.getClass().getSimpleName());
-                        controller.setViewModel(viewModel);
-                        ServiceLocator.injectServices(controller);
+                        controller.setViewModel(finalViewModel);
+                        try {
+                            ServiceLocator.injectServices(controller);
+                        } catch (Exception e) {
+                            System.err.println("Warning: Failed to inject services into controller: " + e.getMessage());
+                        }
                     }
                     return controller;
                 } catch (Exception e) {
-                    throw new RuntimeException("Failed to create controller: " + controllerClass.getName(), e);
+                    System.err.println("Error creating controller: " + controllerClass.getName() + " - " + e.getMessage());
+                    // Return a fallback controller
+                    return createFallbackController(finalViewModel);
                 }
             });
 
-            P root = loader.load();
-            System.out.println("FXML loaded successfully");
+            P root;
+            try {
+                root = loader.load();
+                System.out.println("FXML loaded successfully");
+            } catch (Exception e) {
+                System.err.println("Error loading FXML: " + e.getMessage());
+                e.printStackTrace();
+                // Create a fallback view with an error message
+                return createFallbackView(viewClass);
+            }
 
             // Get the controller
             BaseController<T> controller = loader.getController();
             if (controller == null) {
                 System.err.println("Warning: No controller found in FXML");
+                // Create a fallback controller
+                controller = createFallbackController(viewModel);
             } else {
                 System.out.println("Controller loaded: " + controller.getClass().getSimpleName());
             }
@@ -103,7 +163,138 @@ public class ViewLoader {
         } catch (Exception e) {
             System.err.println("Failed to load view: " + viewClass.getSimpleName() + " - Error: " + e.getMessage());
             e.printStackTrace();
-            throw new RuntimeException("Failed to load view: " + viewClass.getSimpleName(), e);
+            // Create a fallback view with an error message
+            return createFallbackView(viewClass);
+        }
+    }
+
+    /**
+     * Creates a fallback view with an error message when the normal view loading fails.
+     * This ensures the application doesn't crash when a view can't be loaded.
+     *
+     * @param viewClass the view class that failed to load
+     * @param <T>       the view model type
+     * @param <P>       the parent type
+     * @return a LoadedComponents object with a fallback view
+     */
+    @SuppressWarnings("unchecked")
+    private static <T extends BaseViewModel<?>, P> LoadedComponents<T, P> createFallbackView(Class<?> viewClass) {
+        try {
+            // Create a simple VBox with an error message
+            javafx.scene.layout.VBox vbox = new javafx.scene.layout.VBox(15);
+            vbox.setAlignment(javafx.geometry.Pos.CENTER);
+            vbox.setPadding(new javafx.geometry.Insets(30));
+            vbox.setStyle("-fx-background-color: #f8d7da; -fx-border-color: #f5c6cb; -fx-border-width: 1px; -fx-border-radius: 5px;");
+
+            javafx.scene.control.Label titleLabel = new javafx.scene.control.Label("Error Loading View");
+            titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #721c24;");
+
+            // Create a more detailed error message
+            String detailedError = "Failed to load view: " + viewClass.getSimpleName() + "\n\n" +
+                                  "Possible causes:\n" +
+                                  "• FXML file not found\n" +
+                                  "• FXML file contains errors\n" +
+                                  "• Missing fx:id references in FXML\n" +
+                                  "• Controller class not properly defined\n\n" +
+                                  "Searched in:\n" +
+                                  "• " + viewClass.getPackageName() + "\n" +
+                                  "• /com/belman/presentation/views/...\n" +
+                                  "• /com/belman/presentation/views/worker/...\n" +
+                                  "• /com/belman/presentation/usecases/...\n" +
+                                  "• /views/worker/...\n\n" +
+                                  "Please check the console for more details.";
+
+            javafx.scene.control.TextArea messageArea = new javafx.scene.control.TextArea(detailedError);
+            messageArea.setEditable(false);
+            messageArea.setWrapText(true);
+            messageArea.setPrefRowCount(10);
+            messageArea.setPrefWidth(400);
+            messageArea.setStyle("-fx-font-size: 14px; -fx-text-fill: #721c24; -fx-control-inner-background: #f8d7da;");
+
+            javafx.scene.layout.HBox buttonBox = new javafx.scene.layout.HBox(10);
+            buttonBox.setAlignment(javafx.geometry.Pos.CENTER);
+
+            javafx.scene.control.Button retryButton = new javafx.scene.control.Button("Retry Loading View");
+            retryButton.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20;");
+            retryButton.setOnAction(e -> {
+                // Try to reload the view
+                System.out.println("Retrying to load view: " + viewClass.getSimpleName());
+                try {
+                    load(viewClass);
+                } catch (Exception ex) {
+                    System.err.println("Retry failed: " + ex.getMessage());
+                }
+            });
+
+            buttonBox.getChildren().add(retryButton);
+
+            // Add a spacer
+            javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
+            spacer.setPrefHeight(10);
+
+            vbox.getChildren().addAll(titleLabel, spacer, messageArea, buttonBox);
+
+            // Create a fallback view model
+            T viewModel = createFallbackViewModel(viewClass);
+
+            // Create a fallback controller
+            BaseController<T> controller = createFallbackController(viewModel);
+
+            return new LoadedComponents<>((P) vbox, controller, viewModel);
+        } catch (Exception e) {
+            System.err.println("Failed to create fallback view: " + e.getMessage());
+            e.printStackTrace();
+            // If even the fallback view fails, return null components
+            return new LoadedComponents<>(null, null, null);
+        }
+    }
+
+    /**
+     * Creates a fallback view model when the normal view model creation fails.
+     *
+     * @param viewClass the view class
+     * @param <T>       the view model type
+     * @return a fallback view model
+     */
+    @SuppressWarnings("unchecked")
+    private static <T extends BaseViewModel<?>> T createFallbackViewModel(Class<?> viewClass) {
+        try {
+            // Create a simple BaseViewModel that can be used as a fallback
+            BaseViewModel<?> fallbackViewModel = new BaseViewModel<Object>() {
+                @Override
+                public void onShow() {
+                    // Do nothing
+                }
+            };
+            return (T) fallbackViewModel;
+        } catch (Exception e) {
+            System.err.println("Failed to create fallback view model: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Creates a fallback controller when the normal controller creation fails.
+     *
+     * @param viewModel the view model
+     * @param <T>       the view model type
+     * @return a fallback controller
+     */
+    @SuppressWarnings("unchecked")
+    private static <T extends BaseViewModel<?>> BaseController<T> createFallbackController(T viewModel) {
+        try {
+            // Create a simple BaseController that can be used as a fallback
+            BaseController<T> fallbackController = new BaseController<T>() {
+                @Override
+                protected void setupBindings() {
+                    // Do nothing
+                }
+            };
+            fallbackController.setViewModel(viewModel);
+            return fallbackController;
+        } catch (Exception e) {
+            System.err.println("Failed to create fallback controller: " + e.getMessage());
+            return null;
         }
     }
 

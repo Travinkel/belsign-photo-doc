@@ -1,5 +1,6 @@
 package com.belman.presentation.navigation;
 
+import com.belman.common.logging.AuthLoggingService;
 import com.belman.common.logging.EmojiLogger;
 import com.belman.common.platform.PlatformUtils;
 import com.belman.presentation.core.*;
@@ -105,6 +106,7 @@ public class Router {
      * @param viewClass the class of the view to navigate to
      */
     public static void navigateTo(Class<? extends View> viewClass) {
+        AuthLoggingService.logNavigation("Router", "Navigating to view: " + viewClass.getSimpleName() + " with default transition");
         navigateTo(viewClass, new HashMap<>(), defaultForwardTransition);
     }
 

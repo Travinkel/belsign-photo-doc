@@ -3,6 +3,7 @@ package com.belman.bootstrap.di;
 
 import com.belman.common.di.Inject;
 import com.belman.common.di.ServiceInjectionException;
+import com.belman.common.logging.EmojiLogger;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -16,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServiceLocator {
 
     private static final Map<Class<?>, Object> services = new ConcurrentHashMap<>();
+    private static final EmojiLogger logger = EmojiLogger.getLogger(ServiceLocator.class);
 
     /**
      * Registers a service instance.
@@ -59,6 +61,8 @@ public class ServiceLocator {
      * @param target the object to inject services into
      */
     public static void injectServices(Object target) {
+        logger.debug("Injecting services into: {}", target.getClass().getName());
+
         // Field injection
         for (Field field : target.getClass().getDeclaredFields()) {
             if (field.isAnnotationPresent(Inject.class)) {
@@ -66,12 +70,28 @@ public class ServiceLocator {
                     field.setAccessible(true);
                     Object service = services.get(field.getType());
                     if (service == null) {
+                        logger.error("❌ No service registered for: {} in {}", field.getType().getSimpleName(), target.getClass().getSimpleName());
                         throw new ServiceInjectionException(
                                 "No service registered for: " + field.getType().getSimpleName());
                     }
                     field.set(target, service);
 
+                    // Log successful injection
+                    if (target.getClass().getPackage().getName().contains("viewmodel") || 
+                        target.getClass().getSimpleName().contains("ViewModel")) {
+                        // More detailed logging for view models
+                        logger.info("💉 Injected {} into {}.{}", 
+                                service.getClass().getSimpleName(), 
+                                target.getClass().getSimpleName(), 
+                                field.getName());
+                    } else {
+                        logger.debug("Injected {} into {}.{}", 
+                                service.getClass().getSimpleName(), 
+                                target.getClass().getSimpleName(), 
+                                field.getName());
+                    }
                 } catch (IllegalAccessException e) {
+                    logger.error("❌ Failed to inject service into: {}", target.getClass().getSimpleName(), e);
                     throw new ServiceInjectionException(
                             "Failed to inject service into: " + target.getClass().getSimpleName(),
                             e);

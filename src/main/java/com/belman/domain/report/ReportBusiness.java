@@ -4,9 +4,8 @@ import com.belman.domain.common.valueobjects.Timestamp;
 import com.belman.domain.common.base.BusinessObject;
 import com.belman.domain.customer.CustomerBusiness;
 import com.belman.domain.order.OrderId;
-import com.belman.domain.order.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoDocument;
 import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserReference;
 
 import java.net.URL;
 import java.util.Collections;

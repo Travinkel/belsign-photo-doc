@@ -11,11 +11,12 @@ public class PlatformUtils {
      *
      * @return true if running on Android, false otherwise
      * <p>
-     * Note: This method always returns true as the app is now mobile-only and Android-focused.
+     * Note: For development on desktop, this returns false.
      */
     public static boolean isAndroid() {
-        // App is now mobile-only and Android-focused, so always return true
-        return true;
+        // Check if we're running on desktop for development
+        String os = System.getProperty("os.name").toLowerCase();
+        return !(os.contains("win") || os.contains("mac") || os.contains("linux"));
     }
 
     /**
@@ -44,10 +45,11 @@ public class PlatformUtils {
      *
      * @return true if running on Android or iOS, false otherwise
      * <p>
-     * Note: This method always returns true as the app is now mobile-only.
+     * Note: For development on desktop, this returns false to enable desktop fallbacks.
      */
     public static boolean isRunningOnMobile() {
-        // App is now mobile-only, so always return true
-        return true;
+        // Check if we're running on desktop for development
+        String os = System.getProperty("os.name").toLowerCase();
+        return !(os.contains("win") || os.contains("mac") || os.contains("linux"));
     }
 }

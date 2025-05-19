@@ -6,10 +6,10 @@ import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.order.OrderNumber;
 import com.belman.domain.order.OrderRepository;
 import com.belman.domain.order.OrderStatus;
-import com.belman.domain.order.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoRepository;
 import com.belman.presentation.base.BaseViewModel;
 import com.belman.presentation.navigation.Router;
-import com.belman.presentation.usecases.qa.summary.ApprovalSummaryView;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -33,6 +33,9 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
 
     @Inject
     private OrderRepository orderRepository;
+
+    @Inject
+    private PhotoRepository photoRepository;
 
     @Inject
     private SessionContext sessionContext;
@@ -77,7 +80,7 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
                               currentOrder.getProductDescription().toString() : "No description"));
 
                 // Load photos
-                List<PhotoDocument> orderPhotos = currentOrder.getPhotos();
+                List<PhotoDocument> orderPhotos = photoRepository.findByOrderId(currentOrder.getId());
                 photos.setAll(orderPhotos);
             } else {
                 errorMessage.set("Order not found: " + orderNumberStr);

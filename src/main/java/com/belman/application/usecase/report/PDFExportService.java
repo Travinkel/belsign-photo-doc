@@ -3,7 +3,7 @@ package com.belman.application.usecase.report;
 import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.order.OrderRepository;
-import com.belman.domain.order.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoDocument;
 import com.belman.domain.report.ReportBusiness;
 import com.belman.domain.services.LoggerFactory;
 import com.belman.application.base.BaseService;

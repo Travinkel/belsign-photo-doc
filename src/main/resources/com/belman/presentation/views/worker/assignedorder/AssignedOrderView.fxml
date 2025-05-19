@@ -1,116 +1,130 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.Color?>
-<?import javafx.scene.text.Font?>
-<StackPane xmlns:fx="http://javafx.com/fxml"
+
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
            fx:controller="com.belman.presentation.usecases.worker.assignedorder.AssignedOrderViewController"
-           styleClass="responsive-container, assigned-order-container"
-           stylesheets="/com/belman/styles/app.css">
+           prefHeight="600.0" prefWidth="400.0"
+           styleClass="assigned-order-view">
 
-    <!-- Main Content -->
-    <VBox spacing="20" styleClass="vbox"
-          maxWidth="Infinity" maxHeight="Infinity">
-
-        <padding>
-            <Insets top="20" right="20" bottom="20" left="20"/>
-        </padding>
-
-        <Label text="Your Assigned Order" styleClass="title">
-            <font>
-                <Font name="System Bold" size="24.0"/>
-            </font>
-        </Label>
-
-        <!-- Order Information Card -->
-        <VBox styleClass="order-card" spacing="15">
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
-            </padding>
-            
-            <effect>
-                <DropShadow radius="10" spread="0.1">
-                    <color>
-                        <Color opacity="0.3"/>
-                    </color>
-                </DropShadow>
-            </effect>
-
-            <!-- Order Number -->
-            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="form-row">
-                <Label text="Order Number:" styleClass="form-label">
-                    <font>
-                        <Font name="System Bold" size="16.0"/>
-                    </font>
-                </Label>
-                <Label fx:id="orderNumberLabel" text="Loading..." styleClass="order-value">
-                    <font>
-                        <Font size="16.0"/>
-                    </font>
-                </Label>
-            </HBox>
-
-            <!-- Customer Name -->
-            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="form-row">
-                <Label text="Customer:" styleClass="form-label">
-                    <font>
-                        <Font name="System Bold" size="16.0"/>
-                    </font>
-                </Label>
-                <Label fx:id="customerNameLabel" text="Loading..." styleClass="order-value">
-                    <font>
-                        <Font size="16.0"/>
-                    </font>
-                </Label>
-            </HBox>
-
-            <!-- Product Description -->
-            <VBox spacing="5" styleClass="form-row">
-                <Label text="Product Description:" styleClass="form-label">
-                    <font>
-                        <Font name="System Bold" size="16.0"/>
-                    </font>
-                </Label>
-                <Label fx:id="productDescriptionLabel" text="Loading..." styleClass="order-value" wrapText="true">
-                    <font>
-                        <Font size="16.0"/>
-                    </font>
-                </Label>
-            </VBox>
-        </VBox>
-
-        <!-- Spacer -->
-        <Region VBox.vgrow="ALWAYS"/>
-
-        <!-- Action Buttons -->
-        <HBox alignment="CENTER" spacing="20">
-            <Button fx:id="startPhotoProcessButton" text="Start Photo Process" 
-                    onAction="#handleStartPhotoProcess"
-                    styleClass="button-primary">
-                <font>
-                    <Font size="18.0"/>
-                </font>
+    <BorderPane>
+        <!-- Header -->
+        <top>
+            <VBox spacing="10.0">
                 <padding>
-                    <Insets top="15" right="30" bottom="15" left="30"/>
+                    <Insets top="15.0" right="15.0" bottom="10.0" left="15.0"/>
                 </padding>
-            </Button>
-        </HBox>
 
-        <!-- Status and Error Messages -->
-        <VBox alignment="CENTER" spacing="5">
-            <Label fx:id="statusLabel" text="" styleClass="status-message"/>
-            <Label fx:id="errorLabel" text="" styleClass="error-message" textFill="RED"/>
-        </VBox>
-    </VBox>
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="header">
+                    <Label text="Assigned Order" styleClass="title-label"/>
+                    <HBox HBox.hgrow="ALWAYS" />
+                    <Button fx:id="logoutButton" text="Logout" styleClass="logout-button"/>
+                </HBox>
 
-    <!-- Loading Indicator (initially invisible) -->
+                <!-- Worker Info -->
+                <HBox spacing="10.0" styleClass="worker-info">
+                    <Label text="Worker:" styleClass="worker-label"/>
+                    <Label fx:id="workerNameLabel" text="John Doe" styleClass="worker-name"/>
+                </HBox>
+            </VBox>
+        </top>
+
+        <!-- Main Content -->
+        <center>
+            <ScrollPane fitToWidth="true" styleClass="content-scroll">
+                <VBox spacing="15.0">
+                    <padding>
+                        <Insets top="15.0" right="15.0" bottom="15.0" left="15.0"/>
+                    </padding>
+
+                    <!-- Order Details -->
+                    <VBox spacing="8.0" styleClass="order-details">
+                        <Label text="Order Details" styleClass="section-title"/>
+
+                        <HBox spacing="10.0">
+                            <Label text="Order #:" styleClass="detail-label"/>
+                            <Label fx:id="orderNumberLabel" text="ORD-123-230615-WLD-0001" styleClass="detail-value"/>
+                        </HBox>
+
+                        <HBox spacing="10.0">
+                            <Label text="Customer:" styleClass="detail-label"/>
+                            <Label fx:id="customerLabel" text="Acme Corporation" styleClass="detail-value"/>
+                        </HBox>
+
+                        <HBox spacing="10.0">
+                            <Label text="Project:" styleClass="detail-label"/>
+                            <Label fx:id="projectLabel" text="Main Building Welding" styleClass="detail-value"/>
+                        </HBox>
+
+                        <HBox spacing="10.0">
+                            <Label text="Location:" styleClass="detail-label"/>
+                            <Label fx:id="locationLabel" text="Building A, Floor 3" styleClass="detail-value"/>
+                        </HBox>
+
+                        <HBox spacing="10.0">
+                            <Label text="Due Date:" styleClass="detail-label"/>
+                            <Label fx:id="dueDateLabel" text="2023-06-20" styleClass="detail-value"/>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Order Description -->
+                    <VBox spacing="8.0" styleClass="order-description">
+                        <Label text="Description" styleClass="section-title"/>
+                        <Label fx:id="descriptionLabel" text="Document welding work on the main support beams. Ensure all safety protocols are followed and capture before/after photos." wrapText="true"/>
+                    </VBox>
+
+                    <!-- Required Photos -->
+                    <VBox spacing="8.0" styleClass="required-photos">
+                        <Label text="Required Photos" styleClass="section-title"/>
+                        <Label fx:id="photoCountLabel" text="5 photos required" styleClass="photo-count"/>
+
+                        <ListView fx:id="photoTemplateListView" prefHeight="150.0">
+                            <placeholder>
+                                <Label text="No photo templates available"/>
+                            </placeholder>
+                        </ListView>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+        </center>
+
+        <!-- Footer -->
+        <bottom>
+            <VBox spacing="10.0">
+                <!-- Status and Error Messages -->
+                <VBox spacing="5.0" styleClass="status-container">
+                    <Label fx:id="statusLabel" text="" styleClass="status-label"/>
+                    <Label fx:id="errorLabel" text="" styleClass="error-label"/>
+                </VBox>
+
+                <HBox alignment="CENTER" spacing="20.0">
+                    <padding>
+                        <Insets top="15.0" right="15.0" bottom="20.0" left="15.0"/>
+                    </padding>
+
+                    <Button fx:id="startButton" text="Start Photo Session" styleClass="start-button"/>
+                </HBox>
+            </VBox>
+        </bottom>
+    </BorderPane>
+
+    <!-- Loading Overlay -->
     <StackPane fx:id="loadingPane" visible="false" styleClass="loading-overlay">
-        <VBox alignment="CENTER" spacing="15">
-            <ProgressIndicator progress="-1" styleClass="progress-indicator"/>
-            <Label text="Loading order..." styleClass="loading-text"/>
+        <VBox alignment="CENTER" spacing="15.0">
+            <Label text="Loading..." styleClass="loading-text"/>
+            <ProgressIndicator />
         </VBox>
     </StackPane>
 </StackPane>

@@ -5,17 +5,17 @@ import com.belman.common.di.Inject;
 import com.belman.common.session.SessionContext;
 import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.order.OrderId;
-import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.order.photo.PhotoTemplate;
+import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoTemplate;
 import com.belman.domain.services.PhotoService;
 import com.belman.application.usecase.order.OrderService;
 import com.belman.application.usecase.photo.CameraService;
+import com.belman.application.usecase.worker.WorkerService;
 import com.belman.presentation.base.BaseViewModel;
 import com.belman.presentation.navigation.Router;
-import com.belman.presentation.usecases.worker.capture.CaptureView;
+import com.belman.presentation.usecases.worker.WorkerFlowContext;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import java.util.*;
 
@@ -31,6 +31,9 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
 
     @Inject
     private PhotoService photoService;
+
+    @Inject
+    private WorkerService workerService;
 
     private final CameraService cameraService = ServiceLocator.getService(CameraService.class);
 
@@ -48,15 +51,8 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
     private final IntegerProperty photosCompleted = new SimpleIntegerProperty(0);
     private final IntegerProperty totalPhotosRequired = new SimpleIntegerProperty(0);
 
-    // Required templates for the unfolded cube
-    private final List<PhotoTemplate> requiredTemplates = Arrays.asList(
-        PhotoTemplate.TOP_VIEW_OF_JOINT,
-        PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY,
-        PhotoTemplate.BACK_VIEW_OF_ASSEMBLY,
-        PhotoTemplate.LEFT_VIEW_OF_ASSEMBLY,
-        PhotoTemplate.RIGHT_VIEW_OF_ASSEMBLY,
-        PhotoTemplate.BOTTOM_VIEW_OF_ASSEMBLY
-    );
+    // Templates for the unfolded cube - will be loaded from WorkerService
+    private List<PhotoTemplate> requiredTemplates = new ArrayList<>();
 
     @Override
     public void onShow() {
@@ -65,75 +61,121 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
     }
 
     /**
-     * Loads the current order from the session context.
+     * Loads the current order from the WorkerFlowContext.
      */
     private void loadCurrentOrder() {
         loading.set(true);
         statusMessage.set("Loading order...");
 
-        // Get the current user
-        SessionContext.getCurrentUser().ifPresentOrElse(
-            user -> {
-                // Get all orders and find the first one for the current user
-                List<OrderBusiness> orders = orderService.getAllOrders();
+        // Get the current order from the WorkerFlowContext
+        OrderBusiness order = WorkerFlowContext.getCurrentOrder();
 
-                // Filter orders for the current user
-                List<OrderBusiness> userOrders = orders.stream()
-                    .filter(o -> o.getCreatedBy() != null && 
-                           o.getCreatedBy().id().equals(user.getId()))
-                    .toList();
+        if (order == null) {
+            // If no order is in the context, try to get one from the session
+            SessionContext.getCurrentUser().ifPresentOrElse(
+                user -> {
+                    // Get all orders and find the first one for the current user
+                    List<OrderBusiness> orders = orderService.getAllOrders();
 
-                if (userOrders.isEmpty()) {
-                    errorMessage.set("No active order found for the current user.");
+                    // Filter orders for the current user
+                    List<OrderBusiness> userOrders = orders.stream()
+                        .filter(o -> o.getCreatedBy() != null && 
+                               o.getCreatedBy().id().equals(user.getId()))
+                        .toList();
+
+                    if (userOrders.isEmpty()) {
+                        errorMessage.set("No active order found for the current user.");
+                        loading.set(false);
+                        return;
+                    }
+
+                    // Set the current order to the first order for the user
+                    OrderBusiness userOrder = userOrders.get(0);
+                    currentOrder.set(userOrder);
+                    orderNumber.set(userOrder.getOrderNumber().toString());
+
+                    // Store the order in the WorkerFlowContext for future use
+                    WorkerFlowContext.setCurrentOrder(userOrder);
+
+                    // Load the photos for this order
+                    loadPhotosForOrder(userOrder.getId());
+                },
+                () -> {
+                    errorMessage.set("No user is logged in.");
                     loading.set(false);
-                    return;
                 }
+            );
+        } else {
+            // Use the order from the WorkerFlowContext
+            currentOrder.set(order);
+            orderNumber.set(order.getOrderNumber().toString());
 
-                // Set the current order to the first order for the user
-                OrderBusiness order = userOrders.get(0);
-                currentOrder.set(order);
-                orderNumber.set(order.getOrderNumber().toString());
-
-                // Load the photos for this order
-                loadPhotosForOrder(order.getId());
-            },
-            () -> {
-                errorMessage.set("No user is logged in.");
-                loading.set(false);
-            }
-        );
+            // Load the photos for this order
+            loadPhotosForOrder(order.getId());
+        }
     }
 
     /**
-     * Loads the photos for the specified order.
+     * Loads the photos and templates for the specified order.
      *
      * @param orderId the ID of the order
      */
     private void loadPhotosForOrder(OrderId orderId) {
-        statusMessage.set("Loading photos...");
+        statusMessage.set("Loading photos and templates...");
 
-        // Get all photos for the order
-        List<PhotoDocument> photos = photoService.getPhotosForOrder(orderId);
-        takenPhotos.setAll(photos);
+        try {
+            // Get all photos for the order
+            List<PhotoDocument> photos = photoService.getPhotosForOrder(orderId);
+            takenPhotos.setAll(photos);
 
-        // Update the photos completed count
-        photosCompleted.set(photos.size());
+            // Update the photos completed count
+            photosCompleted.set(photos.size());
 
-        // Set the total required photos count
-        totalPhotosRequired.set(requiredTemplates.size());
+            // Get available templates from the WorkerService
+            requiredTemplates = workerService.getAvailableTemplates(orderId);
 
-        // Initialize the template completion status map
-        Map<PhotoTemplate, Boolean> completionStatus = new HashMap<>();
-        for (PhotoTemplate template : requiredTemplates) {
-            boolean isCompleted = photos.stream()
-                .anyMatch(photo -> photo.getTemplate().equals(template));
-            completionStatus.put(template, isCompleted);
+            // If no templates are available, use default templates
+            if (requiredTemplates.isEmpty()) {
+                requiredTemplates = Arrays.asList(
+                    PhotoTemplate.TOP_VIEW_OF_JOINT,
+                    PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY,
+                    PhotoTemplate.BACK_VIEW_OF_ASSEMBLY,
+                    PhotoTemplate.LEFT_VIEW_OF_ASSEMBLY,
+                    PhotoTemplate.RIGHT_VIEW_OF_ASSEMBLY,
+                    PhotoTemplate.BOTTOM_VIEW_OF_ASSEMBLY
+                );
+                statusMessage.set("Using default templates. No custom templates found for this order.");
+            }
+
+            // Set the total required photos count
+            totalPhotosRequired.set(requiredTemplates.size());
+
+            // Initialize the template completion status map
+            Map<PhotoTemplate, Boolean> completionStatus = new HashMap<>();
+            for (PhotoTemplate template : requiredTemplates) {
+                boolean isCompleted = photos.stream()
+                    .anyMatch(photo -> photo.getTemplate().equals(template));
+                completionStatus.put(template, isCompleted);
+            }
+            templateCompletionStatus.putAll(completionStatus);
+
+            // Check if there's a selected template in the WorkerFlowContext
+            PhotoTemplate selectedTemplateFromContext = WorkerFlowContext.getSelectedTemplate();
+            if (selectedTemplateFromContext != null) {
+                selectedTemplate.set(selectedTemplateFromContext);
+            } else if (!requiredTemplates.isEmpty()) {
+                // Auto-select the first template if none is selected
+                selectedTemplate.set(requiredTemplates.get(0));
+                WorkerFlowContext.setSelectedTemplate(requiredTemplates.get(0));
+            }
+
+            loading.set(false);
+            statusMessage.set("Ready to take photos. " + photosCompleted.get() + " of " + 
+                            totalPhotosRequired.get() + " photos taken.");
+        } catch (Exception e) {
+            errorMessage.set("Error loading photos and templates: " + e.getMessage());
+            loading.set(false);
         }
-        templateCompletionStatus.putAll(completionStatus);
-
-        loading.set(false);
-        statusMessage.set("Ready to take photos. " + photosCompleted.get() + " of " + 
-                         totalPhotosRequired.get() + " photos taken.");
     }
 
     /**
@@ -150,8 +192,8 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
         selectedTemplate.set(template);
 
         // Store the selected template in the worker flow context for the capture view
-        com.belman.presentation.usecases.worker.WorkerFlowContext.setSelectedTemplate(template);
-        com.belman.presentation.usecases.worker.WorkerFlowContext.setCurrentOrder(currentOrder.get());
+        WorkerFlowContext.setSelectedTemplate(template);
+        WorkerFlowContext.setCurrentOrder(currentOrder.get());
 
         // Navigate to the capture view
         Router.navigateTo(com.belman.presentation.usecases.worker.capture.CaptureView.class);
@@ -163,7 +205,40 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
      * @return true if all required photos have been taken, false otherwise
      */
     public boolean areAllPhotosTaken() {
-        return templateCompletionStatus.values().stream().allMatch(Boolean::booleanValue);
+        OrderBusiness order = currentOrder.get();
+        if (order == null) {
+            return false;
+        }
+
+        try {
+            // Use the WorkerService to check if all required photos have been taken
+            return workerService.hasAllRequiredPhotos(order.getId());
+        } catch (Exception e) {
+            // If there's an error, fall back to checking the template completion status map
+            errorMessage.set("Error checking if all photos are taken: " + e.getMessage());
+            return templateCompletionStatus.values().stream().allMatch(Boolean::booleanValue);
+        }
+    }
+
+    /**
+     * Gets the missing required templates for the current order.
+     * 
+     * @return a list of required templates that are missing photos
+     */
+    public List<PhotoTemplate> getMissingRequiredTemplates() {
+        OrderBusiness order = currentOrder.get();
+        if (order == null) {
+            return Collections.emptyList();
+        }
+
+        try {
+            // Use the WorkerService to get the missing required templates
+            return workerService.getMissingRequiredTemplates(order.getId());
+        } catch (Exception e) {
+            // If there's an error, log it and return an empty list
+            errorMessage.set("Error getting missing required templates: " + e.getMessage());
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -171,7 +246,22 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
      */
     public void goToSummary() {
         if (!areAllPhotosTaken()) {
-            errorMessage.set("Not all required photos have been taken.");
+            // Get the missing required templates
+            List<PhotoTemplate> missingTemplates = getMissingRequiredTemplates();
+
+            if (missingTemplates.isEmpty()) {
+                errorMessage.set("Not all required photos have been taken.");
+            } else {
+                // Build a message with the missing templates
+                StringBuilder message = new StringBuilder("Missing required photos for: ");
+                for (int i = 0; i < missingTemplates.size(); i++) {
+                    if (i > 0) {
+                        message.append(", ");
+                    }
+                    message.append(missingTemplates.get(i).name());
+                }
+                errorMessage.set(message.toString());
+            }
             return;
         }
 

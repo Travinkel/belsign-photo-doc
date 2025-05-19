@@ -1,82 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.Color?>
-<?import javafx.scene.shape.Circle?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
-<StackPane xmlns:fx="http://javafx.com/fxml"
+
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
            fx:controller="com.belman.presentation.usecases.worker.completed.CompletedViewController"
-           styleClass="responsive-container, completed-container"
-           stylesheets="/com/belman/styles/app.css">
-
-    <!-- Main Content -->
-    <VBox spacing="30" styleClass="vbox" alignment="CENTER"
-          maxWidth="Infinity" maxHeight="Infinity">
-
-        <padding>
-            <Insets top="30" right="30" bottom="30" left="30"/>
-        </padding>
-
-        <!-- Success Icon -->
-        <StackPane styleClass="success-icon-container">
-            <Circle radius="60" fill="#338d71" styleClass="success-circle"/>
-            <Text text="✓" fill="WHITE" styleClass="success-checkmark">
-                <font>
-                    <Font name="System Bold" size="80.0"/>
-                </font>
-            </Text>
-        </StackPane>
-
-        <!-- Completion Message -->
-        <VBox spacing="10" alignment="CENTER" styleClass="completion-message-container">
-            <Label text="Success!" styleClass="title">
-                <font>
-                    <Font name="System Bold" size="32.0"/>
-                </font>
-            </Label>
-            
-            <Label fx:id="completionMessageLabel" text="Order has been completed successfully!" 
-                   styleClass="subtitle" wrapText="true" textAlignment="CENTER">
-                <font>
-                    <Font size="20.0"/>
-                </font>
-            </Label>
-            
-            <Label fx:id="orderNumberLabel" text="" styleClass="order-number">
-                <font>
-                    <Font name="System Bold" size="18.0"/>
-                </font>
-            </Label>
-        </VBox>
-
-        <!-- Spacer -->
-        <Region VBox.vgrow="ALWAYS"/>
-
-        <!-- Action Buttons -->
-        <VBox spacing="15" alignment="CENTER" styleClass="action-buttons-container">
-            <Button fx:id="newOrderButton" text="Go to Next Order" onAction="#handleNewOrderClick" 
-                    styleClass="button-primary">
-                <font>
-                    <Font size="16.0"/>
-                </font>
+           prefHeight="600.0" prefWidth="400.0"
+           styleClass="completed-view">
+    
+    <BorderPane>
+        <!-- Header -->
+        <top>
+            <VBox spacing="10.0">
                 <padding>
-                    <Insets top="15" right="30" bottom="15" left="30"/>
+                    <Insets top="20.0" right="20.0" bottom="10.0" left="20.0"/>
                 </padding>
-            </Button>
-            
-            <Button fx:id="logoutButton" text="Logout" onAction="#handleLogoutClick" 
-                    styleClass="button-secondary">
-                <font>
-                    <Font size="16.0"/>
-                </font>
+                
+                <HBox alignment="CENTER" spacing="10.0" styleClass="header">
+                    <Label text="Upload Complete" styleClass="title-label"/>
+                </HBox>
+            </VBox>
+        </top>
+        
+        <!-- Main Content -->
+        <center>
+            <VBox spacing="30.0" alignment="CENTER">
                 <padding>
-                    <Insets top="15" right="30" bottom="15" left="30"/>
+                    <Insets top="30.0" right="30.0" bottom="30.0" left="30.0"/>
                 </padding>
-            </Button>
-        </VBox>
-    </VBox>
+                
+                <!-- Success Icon -->
+                <StackPane styleClass="success-icon-container">
+                    <ImageView fx:id="successIcon" fitHeight="120.0" fitWidth="120.0" preserveRatio="true"/>
+                </StackPane>
+                
+                <!-- Completion Message -->
+                <Label text="Photos Uploaded Successfully!" styleClass="completion-label"/>
+                
+                <!-- Order Info -->
+                <VBox spacing="10.0" styleClass="order-info" alignment="CENTER">
+                    <Label fx:id="orderNumberLabel" text="Order #: ORD-123-230615-WLD-0001" styleClass="order-number"/>
+                    <Label fx:id="photoCountLabel" text="5 photos uploaded" styleClass="photo-count"/>
+                    <Label fx:id="timestampLabel" text="Completed on: 2023-06-15 14:30" styleClass="timestamp-label"/>
+                </VBox>
+                
+                <!-- Next Steps -->
+                <VBox spacing="10.0" styleClass="next-steps">
+                    <Label text="Next Steps" styleClass="section-title"/>
+                    <Label text="Your photos have been uploaded and will be reviewed by the QA team. You will be notified when the review is complete." 
+                           wrapText="true" styleClass="next-steps-text"/>
+                </VBox>
+                
+                <!-- Summary -->
+                <VBox spacing="5.0" styleClass="summary-container">
+                    <Label text="Summary" styleClass="section-title"/>
+                    <HBox spacing="20.0" alignment="CENTER">
+                        <VBox alignment="CENTER" styleClass="summary-item">
+                            <Label text="Photos" styleClass="summary-label"/>
+                            <Label fx:id="totalPhotosLabel" text="5" styleClass="summary-value"/>
+                        </VBox>
+                        <VBox alignment="CENTER" styleClass="summary-item">
+                            <Label text="Metadata" styleClass="summary-label"/>
+                            <Label fx:id="metadataLabel" text="Complete" styleClass="summary-value"/>
+                        </VBox>
+                        <VBox alignment="CENTER" styleClass="summary-item">
+                            <Label text="Status" styleClass="summary-label"/>
+                            <Label fx:id="statusLabel" text="Pending Review" styleClass="summary-value"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </center>
+        
+        <!-- Footer -->
+        <bottom>
+            <HBox alignment="CENTER" spacing="20.0">
+                <padding>
+                    <Insets top="10.0" right="10.0" bottom="30.0" left="10.0"/>
+                </padding>
+                
+                <Button fx:id="homeButton" text="Back to Home" styleClass="home-button"/>
+            </HBox>
+        </bottom>
+    </BorderPane>
 </StackPane>

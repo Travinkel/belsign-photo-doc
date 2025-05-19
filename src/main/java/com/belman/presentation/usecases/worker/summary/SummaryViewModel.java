@@ -1,19 +1,18 @@
 package com.belman.presentation.usecases.worker.summary;
 
-import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.common.di.Inject;
 import com.belman.common.session.SessionContext;
 import com.belman.domain.order.OrderBusiness;
-import com.belman.domain.order.OrderStatus;
-import com.belman.domain.order.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoTemplate;
 import com.belman.application.usecase.order.OrderService;
+import com.belman.application.usecase.worker.WorkerService;
 import com.belman.presentation.base.BaseViewModel;
 import com.belman.presentation.navigation.Router;
 import com.belman.presentation.usecases.worker.WorkerFlowContext;
 import com.belman.presentation.usecases.worker.completed.CompletedView;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import java.util.List;
 
@@ -26,6 +25,9 @@ public class SummaryViewModel extends BaseViewModel<SummaryViewModel> {
     @Inject
     private OrderService orderService;
 
+    @Inject
+    private WorkerService workerService;
+
     // Properties for UI binding
     private final StringProperty errorMessage = new SimpleStringProperty("");
     private final StringProperty statusMessage = new SimpleStringProperty("Review your photos before submission");
@@ -34,6 +36,9 @@ public class SummaryViewModel extends BaseViewModel<SummaryViewModel> {
     private final StringProperty orderNumber = new SimpleStringProperty("");
     private final ListProperty<PhotoDocument> takenPhotos = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final IntegerProperty photosCount = new SimpleIntegerProperty(0);
+    private final IntegerProperty totalRequiredPhotosCount = new SimpleIntegerProperty(0);
+    private final ListProperty<PhotoTemplate> missingTemplates = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final BooleanProperty allRequiredPhotosTaken = new SimpleBooleanProperty(false);
 
     @Override
     public void onShow() {
@@ -45,25 +50,60 @@ public class SummaryViewModel extends BaseViewModel<SummaryViewModel> {
      * Loads the current order and its photos from the worker flow context.
      */
     private void loadOrderAndPhotos() {
-        // Get the current order from the worker flow context
-        OrderBusiness order = WorkerFlowContext.getCurrentOrder();
-        if (order == null) {
-            errorMessage.set("No order is currently loaded.");
-            return;
-        }
+        loading.set(true);
 
-        currentOrder.set(order);
-        orderNumber.set(order.getOrderNumber().toString());
+        try {
+            // Get the current order from the worker flow context
+            OrderBusiness order = WorkerFlowContext.getCurrentOrder();
+            if (order == null) {
+                errorMessage.set("No order is currently loaded.");
+                loading.set(false);
+                return;
+            }
 
-        // Get the taken photos from the worker flow context
-        List<PhotoDocument> photos = WorkerFlowContext.getTakenPhotos();
-        takenPhotos.setAll(photos);
-        photosCount.set(photos.size());
+            currentOrder.set(order);
+            orderNumber.set(order.getOrderNumber().toString());
 
-        if (photos.isEmpty()) {
-            errorMessage.set("No photos have been taken for this order.");
-        } else {
-            statusMessage.set("Review your photos before submission. " + photos.size() + " photos taken.");
+            // Get the taken photos from the worker flow context
+            List<PhotoDocument> photos = WorkerFlowContext.getTakenPhotos();
+            takenPhotos.setAll(photos);
+            photosCount.set(photos.size());
+
+            // Check if all required photos have been taken
+            boolean allTaken = workerService.hasAllRequiredPhotos(order.getId());
+            allRequiredPhotosTaken.set(allTaken);
+
+            // Get the missing templates
+            List<PhotoTemplate> missing = workerService.getMissingRequiredTemplates(order.getId());
+            missingTemplates.setAll(missing);
+
+            // Get the total required photos count
+            int totalRequired = photos.size() + missing.size();
+            totalRequiredPhotosCount.set(totalRequired);
+
+            if (photos.isEmpty()) {
+                errorMessage.set("No photos have been taken for this order.");
+                statusMessage.set("You need to take photos before submitting.");
+            } else if (!allTaken) {
+                // Build a message with the missing templates
+                StringBuilder message = new StringBuilder("Missing required photos: ");
+                for (int i = 0; i < missing.size(); i++) {
+                    if (i > 0) {
+                        message.append(", ");
+                    }
+                    message.append(missing.get(i).name());
+                }
+                errorMessage.set(message.toString());
+                statusMessage.set("Review your photos before submission. " + photos.size() + " of " + 
+                                totalRequired + " required photos taken.");
+            } else {
+                errorMessage.set("");
+                statusMessage.set("All required photos have been taken. Ready to submit.");
+            }
+        } catch (Exception e) {
+            errorMessage.set("Error loading photos: " + e.getMessage());
+        } finally {
+            loading.set(false);
         }
     }
 
@@ -82,6 +122,20 @@ public class SummaryViewModel extends BaseViewModel<SummaryViewModel> {
             return;
         }
 
+        // Check if all required photos have been taken
+        if (!allRequiredPhotosTaken.get()) {
+            // Build a message with the missing templates
+            StringBuilder message = new StringBuilder("Cannot submit: Missing required photos for ");
+            for (int i = 0; i < missingTemplates.size(); i++) {
+                if (i > 0) {
+                    message.append(", ");
+                }
+                message.append(missingTemplates.get(i).name());
+            }
+            errorMessage.set(message.toString());
+            return;
+        }
+
         loading.set(true);
         statusMessage.set("Submitting photos...");
 
@@ -97,8 +151,11 @@ public class SummaryViewModel extends BaseViewModel<SummaryViewModel> {
                         loading.set(false);
                         statusMessage.set("Photos submitted successfully!");
 
-                        // Store the order number in the worker flow context for the completed view
+                        // Store information in the worker flow context for the completed view
                         WorkerFlowContext.setAttribute("completedOrderNumber", order.getOrderNumber().toString());
+                        WorkerFlowContext.setAttribute("completedPhotoCount", photosCount.get());
+                        WorkerFlowContext.setAttribute("completedByUsername", user.getUsername().value());
+                        WorkerFlowContext.setAttribute("completedTimestamp", java.time.Instant.now().toString());
 
                         // Short delay before navigating to the completed view
                         new Thread(() -> {

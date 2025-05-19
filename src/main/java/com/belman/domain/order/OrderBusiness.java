@@ -3,7 +3,7 @@ package com.belman.domain.order;
 import com.belman.domain.common.valueobjects.Timestamp;
 import com.belman.domain.common.base.BusinessObject;
 import com.belman.domain.customer.CustomerId;
-import com.belman.domain.order.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoId;
 import com.belman.domain.user.UserReference;
 
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ public class OrderBusiness extends BusinessObject<OrderId> {
     private final OrderId id;
     private final UserReference createdBy;
     private final Timestamp createdAt;
-    private final List<PhotoDocument> photoDocuments = new ArrayList<>();
+    private final List<PhotoId> photoIds = new ArrayList<>();
     private OrderNumber orderNumber;
     private CustomerId customerId;
     private ProductDescription productDescription;
@@ -203,41 +203,31 @@ public class OrderBusiness extends BusinessObject<OrderId> {
     }
 
     /**
-     * Returns an unmodifiable view of all photo documents associated with this order.
+     * Returns an unmodifiable view of all photo IDs associated with this order.
      */
-    public List<PhotoDocument> getPhotos() {
-        return Collections.unmodifiableList(photoDocuments);
+    public List<PhotoId> getPhotoIds() {
+        return Collections.unmodifiableList(photoIds);
     }
 
     /**
-     * Associates a photo document with this order and adds it to the order's photo collection.
+     * Associates a photo with this order by adding its ID to the order's photo collection.
      *
-     * @param photo the photo document to add to this order
-     * @throws NullPointerException if photo is null
+     * @param photoId the ID of the photo to add to this order
+     * @throws NullPointerException if photoId is null
      */
-    public void addPhoto(PhotoDocument photo) {
-        Objects.requireNonNull(photo, "photo must not be null");
-        photo.assignToOrder(this.id);
-        this.photoDocuments.add(photo);
+    public void addPhotoId(PhotoId photoId) {
+        Objects.requireNonNull(photoId, "photoId must not be null");
+        this.photoIds.add(photoId);
         updateLastModifiedAt();
     }
 
     /**
-     * Returns a filtered list of photo documents that are still pending QA review.
-     */
-    public List<PhotoDocument> getPendingPhotos() {
-        return photoDocuments.stream()
-                .filter(PhotoDocument::isPending)
-                .toList();
-    }
-
-    /**
      * Checks if this order is ready for quality assurance review.
-     * An order is ready for QA review when it has at least one photo document
+     * An order is ready for QA review when it has at least one photo
      * and its status is COMPLETED, indicating that production work is finished.
      */
     public boolean isReadyForQaReview() {
-        return status == OrderStatus.COMPLETED && !photoDocuments.isEmpty();
+        return status == OrderStatus.COMPLETED && !photoIds.isEmpty();
     }
 
     /**
@@ -266,14 +256,6 @@ public class OrderBusiness extends BusinessObject<OrderId> {
         updateLastModifiedAt();
     }
 
-    /**
-     * Returns a filtered list of photo documents that have been approved by QA.
-     */
-    public List<PhotoDocument> getApprovedPhotos() {
-        return photoDocuments.stream()
-                .filter(PhotoDocument::isApproved)
-                .toList();
-    }
 
     /**
      * Approves this order by changing its status to APPROVED.

@@ -2,13 +2,11 @@ package com.belman.presentation.navigation;
 
 import com.belman.domain.services.Logger;
 import com.belman.bootstrap.security.RouteGuard;
-import com.belman.presentation.usecases.archive.admin.AdminView;
-import com.belman.presentation.usecases.archive.order.gallery.OrderGalleryView;
-import com.belman.presentation.usecases.archive.photo.review.PhotoReviewView;
-import com.belman.presentation.usecases.archive.photo.upload.PhotoUploadView;
-import com.belman.presentation.usecases.archive.qa.dashboard.QADashboardView;
-import com.belman.presentation.usecases.archive.report.preview.ReportPreviewView;
-import com.belman.presentation.usecases.archive.admin.usermanagement.UserManagementView;
+import com.belman.presentation.usecases.admin.dashboard.AdminDashboardView;
+import com.belman.presentation.usecases.admin.usermanagement.UserManagementView;
+import com.belman.presentation.usecases.qa.dashboard.QADashboardView;
+import com.belman.presentation.usecases.qa.review.PhotoReviewView;
+import com.belman.presentation.usecases.worker.assignedorder.AssignedOrderView;
 import com.gluonhq.charm.glisten.mvc.View;
 
 import java.util.HashMap;
@@ -25,13 +23,13 @@ public class RouteGuardImpl implements RouteGuard {
 
     static {
         // Initialize the route map
-        ROUTE_MAP.put("admin", AdminView.class);
+        ROUTE_MAP.put("admin", AdminDashboardView.class);
         ROUTE_MAP.put("userManagement", UserManagementView.class);
         ROUTE_MAP.put("photoReview", PhotoReviewView.class);
         ROUTE_MAP.put("qaDashboard", QADashboardView.class);
-        ROUTE_MAP.put("photoUpload", PhotoUploadView.class);
-        ROUTE_MAP.put("orderGallery", OrderGalleryView.class);
-        ROUTE_MAP.put("reportPreview", ReportPreviewView.class);
+        ROUTE_MAP.put("assignedOrder", AssignedOrderView.class); // Updated route name to match the view name
+        ROUTE_MAP.put("photoUpload", AssignedOrderView.class); // Keep old route name for backward compatibility
+        // Removed orderGallery and reportPreview as they are not used in the current application
     }
 
     private final Logger logger;

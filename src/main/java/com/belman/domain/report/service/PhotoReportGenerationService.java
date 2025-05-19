@@ -2,7 +2,8 @@ package com.belman.domain.report.service;
 
 import com.belman.domain.common.valueobjects.Timestamp;
 import com.belman.domain.order.OrderBusiness;
-import com.belman.domain.order.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoRepository;
 import com.belman.domain.report.ReportBusiness;
 import com.belman.domain.report.ReportId;
 import com.belman.domain.report.ReportStatus;
@@ -25,16 +26,20 @@ import java.util.UUID;
 public class PhotoReportGenerationService extends BaseService {
 
     private final LoggerFactory loggerFactory;
+    private final PhotoRepository photoRepository;
 
     /**
      * Creates a new PhotoReportGenerationService with the specified dependencies.
      *
-     * @param loggerFactory          the factory for creating loggers
+     * @param loggerFactory    the factory for creating loggers
+     * @param photoRepository  the repository for accessing photos
      */
     public PhotoReportGenerationService(
-            LoggerFactory loggerFactory) {
+            LoggerFactory loggerFactory,
+            PhotoRepository photoRepository) {
         super(loggerFactory);
         this.loggerFactory = Objects.requireNonNull(loggerFactory, "loggerFactory must not be null");
+        this.photoRepository = Objects.requireNonNull(photoRepository, "photoRepository must not be null");
     }
 
     @Override
@@ -53,7 +58,7 @@ public class PhotoReportGenerationService extends BaseService {
         Objects.requireNonNull(order, "order must not be null");
         Objects.requireNonNull(requester, "requester must not be null");
 
-        List<PhotoDocument> approvedPhotos = order.getApprovedPhotos();
+        List<PhotoDocument> approvedPhotos = photoRepository.findByOrderIdAndStatus(order.getId(), PhotoDocument.ApprovalStatus.APPROVED);
 
 
         // Create the report

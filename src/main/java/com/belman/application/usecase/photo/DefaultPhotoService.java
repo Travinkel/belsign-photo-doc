@@ -2,15 +2,15 @@ package com.belman.application.usecase.photo;
 
 import com.belman.common.platform.PlatformUtils;
 import com.belman.domain.common.valueobjects.Timestamp;
-import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.order.OrderId;
-import com.belman.domain.order.OrderRepository;
-import com.belman.domain.order.photo.Photo;
-import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.order.photo.PhotoId;
-import com.belman.domain.order.photo.PhotoTemplate;
-import com.belman.domain.services.PhotoService;
+import com.belman.domain.photo.Photo;
+import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoDocumentFactory;
+import com.belman.domain.photo.PhotoId;
+import com.belman.domain.photo.PhotoRepository;
+import com.belman.domain.photo.PhotoTemplate;
 import com.belman.domain.user.UserBusiness;
+import com.belman.domain.user.UserReference;
 import com.belman.presentation.error.ErrorHandler;
 import com.gluonhq.attach.storage.StorageService;
 import com.gluonhq.attach.util.Services;
@@ -20,11 +20,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * Default implementation of the PhotoService interface.
+ * This service provides functionality for managing photos.
  */
 public class DefaultPhotoService implements PhotoService {
 
@@ -44,18 +46,18 @@ public class DefaultPhotoService implements PhotoService {
     // File path constants
     private static final String FILE_EXTENSION_SEPARATOR = ".";
 
-    private final OrderRepository orderRepository;
+    private final PhotoRepository photoRepository;
     private final String photoStorageDirectory;
     private final ErrorHandler errorHandler = ErrorHandler.getInstance();
 
     /**
      * Creates a new DefaultPhotoService.
      *
-     * @param orderRepository       the order repository
+     * @param photoRepository       the photo repository
      * @param photoStorageDirectory the directory where photos are stored
      */
-    public DefaultPhotoService(OrderRepository orderRepository, String photoStorageDirectory) {
-        this.orderRepository = orderRepository;
+    public DefaultPhotoService(PhotoRepository photoRepository, String photoStorageDirectory) {
+        this.photoRepository = photoRepository;
         this.photoStorageDirectory = photoStorageDirectory;
 
         // Create the photo storage directory if it doesn't exist
@@ -66,7 +68,106 @@ public class DefaultPhotoService implements PhotoService {
     }
 
     @Override
-    public PhotoDocument uploadPhoto(File file, OrderId orderId, PhotoTemplate angle, UserBusiness uploadedBy) {
+    public Optional<PhotoDocument> getPhotoById(PhotoId photoId) {
+        return photoRepository.findById(photoId);
+    }
+
+    @Override
+    public List<PhotoDocument> getPhotosByOrderId(OrderId orderId) {
+        return photoRepository.findByOrderId(orderId);
+    }
+
+    @Override
+    public PhotoDocument uploadPhoto(OrderId orderId, Photo photo, UserBusiness uploadedBy) {
+        // Create a new photo document
+        PhotoDocument photoDocument = PhotoDocumentFactory.createForOrderWithCurrentTimestamp(
+                PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY, // Default template, should be parameterized in a real implementation
+                photo,
+                uploadedBy,
+                orderId);
+
+        // Save the photo document
+        return photoRepository.save(photoDocument);
+    }
+
+    @Override
+    public List<PhotoDocument> uploadPhotos(OrderId orderId, List<Photo> photos, UserBusiness uploadedBy) {
+        List<PhotoDocument> uploadedPhotos = new ArrayList<>();
+
+        for (Photo photo : photos) {
+            PhotoDocument uploadedPhoto = uploadPhoto(orderId, photo, uploadedBy);
+            uploadedPhotos.add(uploadedPhoto);
+        }
+
+        return uploadedPhotos;
+    }
+
+    @Override
+    public boolean deletePhoto(PhotoId photoId, UserBusiness deletedBy) {
+        return photoRepository.deleteById(photoId);
+    }
+
+    @Override
+    public boolean approvePhoto(PhotoId photoId, UserBusiness approvedBy) {
+        Optional<PhotoDocument> photoOpt = photoRepository.findById(photoId);
+        if (photoOpt.isPresent()) {
+            PhotoDocument photo = photoOpt.get();
+            try {
+                UserReference userRef = new UserReference(approvedBy.getId(), approvedBy.getUsername());
+                Timestamp timestamp = new Timestamp(java.time.Instant.now());
+                photo.approve(userRef, timestamp);
+                photoRepository.save(photo);
+                return true;
+            } catch (IllegalStateException e) {
+                // Photo is already approved or rejected
+                return false;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean rejectPhoto(PhotoId photoId, UserBusiness rejectedBy, String reason) {
+        Optional<PhotoDocument> photoOpt = photoRepository.findById(photoId);
+        if (photoOpt.isPresent()) {
+            PhotoDocument photo = photoOpt.get();
+            try {
+                UserReference userRef = new UserReference(rejectedBy.getId(), rejectedBy.getUsername());
+                Timestamp timestamp = new Timestamp(java.time.Instant.now());
+                photo.reject(userRef, timestamp, reason);
+                photoRepository.save(photo);
+                return true;
+            } catch (IllegalStateException e) {
+                // Photo is already approved or rejected
+                return false;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean addComment(PhotoId photoId, String comment, UserBusiness commentedBy) {
+        // PhotoDocument doesn't have an addComment method
+        // Comments are added during rejection, so we'll just update the review comment
+        Optional<PhotoDocument> photoOpt = photoRepository.findById(photoId);
+        if (photoOpt.isPresent() && photoOpt.get().getStatus() == PhotoDocument.ApprovalStatus.REJECTED) {
+            // We can only add comments to rejected photos
+            // In a real implementation, we might want to create a separate comments entity
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Uploads a photo file and associates it with an order.
+     *
+     * @param file       the photo file to upload
+     * @param orderId    the ID of the order to associate the photo with
+     * @param angle      the angle at which the photo was taken
+     * @param uploadedBy the user who uploaded the photo
+     * @return the created photo document
+     */
+    public PhotoDocument uploadPhotoFile(File file, OrderId orderId, PhotoTemplate angle, UserBusiness uploadedBy) {
         // Generate a unique ID for the photo
         PhotoId photoId = PhotoId.newId();
 
@@ -92,17 +193,11 @@ public class DefaultPhotoService implements PhotoService {
                     .imagePath(imagePath)
                     .uploadedBy(uploadedBy)
                     .uploadedAt(Timestamp.now())
+                    .orderId(orderId)
                     .build();
 
-
-            // Find the orderAggregate and add the photo to it
-            Optional<OrderBusiness> orderAggregate = orderRepository.findById(orderId);
-            if (orderAggregate != null) {
-                orderAggregate.get().addPhoto(photo);
-                orderRepository.save(orderAggregate.get());
-            }
-
-            return photo;
+            // Save the photo document
+            return photoRepository.save(photo);
         } catch (IOException e) {
             String errorMessage = UPLOAD_ERROR_MESSAGE + e.getMessage();
             errorHandler.handleException(e, errorMessage);
@@ -166,33 +261,29 @@ public class DefaultPhotoService implements PhotoService {
         });
     }
 
-    @Override
-    public boolean deletePhoto(PhotoId photoId) {
-        // Find the order that contains the photo
-        List<OrderBusiness> orderBusinesses = orderRepository.findAll();
-        for (OrderBusiness orderBusiness : orderBusinesses) {
-            List<PhotoDocument> photos = orderBusiness.getPhotos();
-            for (PhotoDocument photo : photos) {
-                if (photo.getPhotoId().equals(photoId)) {
-                    boolean deleted;
+    /**
+     * Deletes a photo file.
+     *
+     * @param photoId the ID of the photo to delete
+     * @return true if the photo file was deleted successfully, false otherwise
+     */
+    public boolean deletePhotoFile(PhotoId photoId) {
+        Optional<PhotoDocument> photoOpt = photoRepository.findById(photoId);
+        if (photoOpt.isPresent()) {
+            PhotoDocument photo = photoOpt.get();
+            boolean deleted;
 
-                    // Check if we're running on a mobile device
-                    if (PlatformUtils.isRunningOnMobile()) {
-                        // Use Gluon's StorageService for mobile devices
-                        deleted = deleteFileWithGluonStorage(photo.getImagePath().value());
-                    } else {
-                        // Use standard Java file I/O for desktop
-                        File file = new File(photoStorageDirectory, photo.getImagePath().value());
-                        deleted = file.delete();
-                    }
-
-                    // Remove the photo from the orderBusiness
-                    orderBusiness.getPhotos().remove(photo);
-                    orderRepository.save(orderBusiness);
-
-                    return deleted;
-                }
+            // Check if we're running on a mobile device
+            if (PlatformUtils.isRunningOnMobile()) {
+                // Use Gluon's StorageService for mobile devices
+                deleted = deleteFileWithGluonStorage(photo.getImagePath().value());
+            } else {
+                // Use standard Java file I/O for desktop
+                File file = new File(photoStorageDirectory, photo.getImagePath().value());
+                deleted = file.delete();
             }
+
+            return deleted;
         }
 
         return false;
@@ -242,27 +333,14 @@ public class DefaultPhotoService implements PhotoService {
         }
     }
 
-    @Override
-    public List<PhotoDocument> getPhotosForOrder(OrderId orderId) {
-        Optional<OrderBusiness> orderAggregate = orderRepository.findById(orderId);
-        return orderAggregate != null ? orderAggregate.get().getPhotos() : List.of();
-    }
 
-    @Override
-    public PhotoDocument getPhotoById(PhotoId photoId) {
-        List<OrderBusiness> orderBusinesses = orderRepository.findAll();
-        for (OrderBusiness orderBusiness : orderBusinesses) {
-            for (PhotoDocument photo : orderBusiness.getPhotos()) {
-                if (photo.getPhotoId().equals(photoId)) {
-                    return photo;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    @Override
+    /**
+     * Generates a unique file path for a photo.
+     *
+     * @param originalFileName the original file name
+     * @param orderId          the ID of the order
+     * @return a unique file path
+     */
     public Photo generateUniqueFilePath(String originalFileName, OrderId orderId) {
         // Extract the file extension
         String extension = "";

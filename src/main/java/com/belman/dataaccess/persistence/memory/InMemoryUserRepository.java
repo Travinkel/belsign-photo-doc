@@ -28,60 +28,59 @@ public class InMemoryUserRepository implements UserRepository {
         createDefaultUsers();
     }
 
-    private void createDefaultUsers() {
-        // Create password hasher
-        PasswordHasher passwordHasher = new BCryptPasswordHasher();
+    /**
+     * Creates a new InMemoryUserRepository with or without default users.
+     * 
+     * @param createDefaultUsers whether to create default users
+     */
+    public InMemoryUserRepository(boolean createDefaultUsers) {
+        if (createDefaultUsers) {
+            createDefaultUsers();
+        }
+    }
 
-        // Create admin user with both old and new credentials
+    private void createDefaultUsers() {
+        // Use the specified hash value for all users
+        String standardHashedPassword = "$2a$10$ReM2gCw1o9rZz/ctET48N.XCmTxSKFcQvwNaqtjCSZxGr78adkX5u";
+        HashedPassword hashedPassword = new HashedPassword(standardHashedPassword);
+
+        // Create admin user
         EmailAddress adminEmail = new EmailAddress("admin@belman.com");
         UserBusiness adminUser = UserBusiness.createNewUser(
                 new Username("admin"),
-                HashedPassword.fromPlainText("admin", passwordHasher),
+                hashedPassword,
                 adminEmail
         );
         adminUser.addRole(UserRole.ADMIN);
-
-        // Create admin user with password123 (for Android compatibility)
-        UserBusiness adminUser2 = UserBusiness.createNewUser(
-                new Username("admin"),
-                HashedPassword.fromPlainText("password123", passwordHasher),
-                adminEmail
-        );
-        adminUser2.addRole(UserRole.ADMIN);
+        // Set approval state to APPROVED to make user active
+        adminUser.setApprovalState(ApprovalState.createApproved());
 
         // Create production user
         EmailAddress productionEmail = new EmailAddress("production@belman.com");
         UserBusiness productionUser = UserBusiness.createNewUser(
                 new Username("production"),
-                HashedPassword.fromPlainText("production", passwordHasher),
+                hashedPassword,
                 productionEmail
         );
         productionUser.addRole(UserRole.PRODUCTION);
+        // Set approval state to APPROVED to make user active
+        productionUser.setApprovalState(ApprovalState.createApproved());
 
-        // Create QA user with both usernames
-        EmailAddress qaEmail = new EmailAddress("qa_user1@belman.com");
-        UserBusiness qaUser = UserBusiness.createNewUser(
-                new Username("qa_user1"),
-                HashedPassword.fromPlainText("qa", passwordHasher),
-                qaEmail
-        );
-        qaUser.addRole(UserRole.QA);
-
-        // Create QA user with qa_user username (for Android compatibility)
+        // Create QA user
         EmailAddress qaUserEmail = new EmailAddress("qa_user@belman.com");
-        UserBusiness qaUser2 = UserBusiness.createNewUser(
+        UserBusiness qaUser = UserBusiness.createNewUser(
                 new Username("qa_user"),
-                HashedPassword.fromPlainText("qa", passwordHasher),
+                hashedPassword,
                 qaUserEmail
         );
-        qaUser2.addRole(UserRole.QA);
+        qaUser.addRole(UserRole.QA);
+        // Set approval state to APPROVED to make user active
+        qaUser.setApprovalState(ApprovalState.createApproved());
 
         // Save users and add email mappings
         saveWithEmail(adminUser, adminEmail);
-        saveWithEmail(adminUser2, adminEmail);
         saveWithEmail(productionUser, productionEmail);
-        saveWithEmail(qaUser, qaEmail);
-        saveWithEmail(qaUser2, qaUserEmail);
+        saveWithEmail(qaUser, qaUserEmail);
 
         // Add NFC ID mapping for production user
         addNfcIdMapping("nfc123456", productionUser.getId());

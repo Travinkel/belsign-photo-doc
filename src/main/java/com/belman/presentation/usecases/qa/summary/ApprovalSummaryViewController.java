@@ -23,7 +23,7 @@ public class ApprovalSummaryViewController extends BaseController<ApprovalSummar
     private TextArea commentTextArea;
 
     @FXML
-    private Button backToDashboardButton;
+    private Button continueButton;
 
     @FXML
     private VBox approvedContainer;
@@ -46,10 +46,10 @@ public class ApprovalSummaryViewController extends BaseController<ApprovalSummar
     }
 
     /**
-     * Handles the back to dashboard button click.
+     * Handles the continue button click.
      */
     @FXML
-    private void handleBackToDashboard() {
-        getViewModel().navigateToDashboard();
+    private void handleContinue() {
+        getViewModel().navigateToQADone();
     }
 }

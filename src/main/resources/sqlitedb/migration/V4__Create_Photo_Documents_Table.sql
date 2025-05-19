@@ -1,5 +1,5 @@
 -- Create Photo Documents Table
-CREATE TABLE photo_documents
+CREATE TABLE IF NOT EXISTS photo_documents
 (
     id             TEXT PRIMARY KEY,
     order_id       TEXT  NOT NULL,
@@ -19,10 +19,10 @@ CREATE TABLE photo_documents
 );
 
 -- Create Index on OrderBusiness ID
-CREATE INDEX idx_photo_documents_order_id ON photo_documents (order_id);
+CREATE INDEX IF NOT EXISTS idx_photo_documents_order_id ON photo_documents (order_id);
 
 -- Create Index on Status
-CREATE INDEX idx_photo_documents_status ON photo_documents (status);
+CREATE INDEX IF NOT EXISTS idx_photo_documents_status ON photo_documents (status);
 
 -- Create Index on Uploaded By
-CREATE INDEX idx_photo_documents_uploaded_by ON photo_documents (uploaded_by);
+CREATE INDEX IF NOT EXISTS idx_photo_documents_uploaded_by ON photo_documents (uploaded_by);

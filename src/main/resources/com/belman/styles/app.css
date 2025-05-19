@@ -3,24 +3,32 @@
 /* Color Definitions - Based on Belsign UI Style Guide */
 * {
     /* Primary Colors */
-    -belman-light-blue: #7fa8c5;
-    -belman-blue: #004b88;
-    -belman-green: #338d71;
-    -belman-dark-grey: #333535;
+    -belman-light-blue: #7fa8c5;  /* Icons, Call-to-actions, Links, Highlighted messages */
+    -belman-blue: #004b88;        /* Main brand symbol, Icons, Important actions/messages */
+    -belman-green: #338d71;       /* Flexibles branding, Secondary CTAs */
+    -belman-dark-grey: #333535;   /* Document back pages, Footers */
 
     /* Secondary Colors (Greys) */
-    -belman-grey-80: #575757;
-    -belman-grey-50: #9d9d9d;
-    -belman-grey-30: #c6c6c6;
-    -belman-grey-20: #dadada;
-    -belman-grey-15: #e3e3e3;
-    -belman-grey-07: #f2f2f2;
+    -belman-grey-80: #575757;     /* Table headers, Legal footers */
+    -belman-grey-50: #9d9d9d;     /* Info boxes, SoMe icons, Hover states */
+    -belman-grey-30: #c6c6c6;     /* Info boxes, Tables */
+    -belman-grey-20: #dadada;     /* Info highlight boxes, Table body, Some CTA buttons */
+    -belman-grey-15: #e3e3e3;     /* Image backgrounds, Text box backgrounds */
+    -belman-grey-07: #f2f2f2;     /* Website background, Light box backgrounds */
 
-    /* Responsive Sizing Variables */
-    -touch-target-size: 48px;
-    -spacing-small: 8px;
-    -spacing-medium: 16px;
-    -spacing-large: 24px;
+    /* Responsive Sizing Variables - Based on UI Style Guide */
+    -touch-target-size: 48px;     /* Minimum size for touch targets */
+    -spacing-small: 10px;         /* Minimum spacing between elements */
+    -spacing-medium: 16px;        /* Standard spacing */
+    -spacing-large: 24px;         /* Large spacing for sections */
+
+    /* Font Sizes - Based on UI Style Guide */
+    -font-size-small: 14px;       /* Small text, captions */
+    -font-size-body: 16px;        /* Body text (minimum size) */
+    -font-size-large: 18px;       /* Large text, buttons */
+    -font-size-heading-small: 20px; /* Small headings */
+    -font-size-heading: 24px;     /* Standard headings */
+    -font-size-heading-large: 28px; /* Large headings */
 }
 
 /* Global Styles */
@@ -215,9 +223,17 @@
 }
 
 /* Splash Screen Specific Styles */
+.splash-view {
+    -fx-background-color: linear-gradient(to bottom, white, #f0f8ff);
+    -fx-padding: 30px;
+    -fx-effect: innershadow(gaussian, rgba(0, 75, 136, 0.1), 10, 0, 0, 0);
+}
+
 .splash-container {
     -fx-background-color: white;
     -fx-padding: 30px;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0, 0, 5);
 }
 
 .splash-background {
@@ -237,24 +253,40 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 5, 0, 0, 2);
 }
 
-.splash-title {
+.title-label {
     -fx-font-size: 28px;
     -fx-font-weight: bold;
     -fx-text-fill: -belman-blue;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 1, 0, 0, 1);
 }
 
-.splash-progress {
-    -fx-pref-width: 300px;
+.version-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: -belman-grey-50;
+    -fx-padding: 0 0 10px 0;
 }
 
-.splash-progress .bar {
+.message-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: -belman-dark-grey;
+    -fx-padding: 5px 0;
+}
+
+.loading-progress {
+    -fx-pref-width: 250px;
+    -fx-accent: -belman-blue;
+}
+
+.loading-progress .bar {
     -fx-background-color: -belman-blue;
     -fx-background-radius: 4px;
+    -fx-background-insets: 0;
 }
 
-.splash-progress .track {
+.loading-progress .track {
     -fx-background-color: -belman-grey-20;
     -fx-background-radius: 4px;
+    -fx-background-insets: 0;
 }
 
 .version-text {
@@ -317,6 +349,13 @@
 }
 
 /* Login View Styles */
+.login-view {
+    -fx-background-image: url('com/belman/images/loginBackground.png');
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+    -fx-background-repeat: no-repeat;
+}
+
 .login-background-container {
     -fx-background-color: black;
 }
@@ -336,16 +375,24 @@
     -fx-spacing: 18px;
     -fx-alignment: center;
     -fx-max-width: 450px;
-    /* Card elevation with proper shadow */
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 15, 0, 0, 4);
-    /* Border to enhance card appearance */
-    -fx-border-color: rgba(255, 255, 255, 0.2);
+    /* Enhanced card elevation with stronger shadow */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 20, 0, 0, 6);
+    /* Improved border to enhance card appearance */
+    -fx-border-color: rgba(255, 255, 255, 0.3);
     -fx-border-width: 1px;
     -fx-border-radius: 20px;
+    /* Add a subtle background gradient for depth */
+    -fx-background-color: linear-gradient(to bottom, white, #f8f8f8);
 }
 
 .login-logo {
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 5, 0, 0, 2);
+    -fx-opacity: 1.0;
+    -fx-transition: opacity 0.3s ease-in-out;
+}
+
+.login-logo:hover {
+    -fx-opacity: 0.9;
 }
 
 .login-title {
@@ -353,6 +400,7 @@
     -fx-font-weight: bold;
     -fx-text-fill: -belman-blue;
     -fx-padding: 5px 0 10px 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 1, 0, 0, 1);
 }
 
 .login-form {
@@ -360,6 +408,16 @@
     -fx-padding: 5px 0;
     -fx-max-width: 350px;
     -fx-min-width: 250px;
+}
+
+/* Input container for validation icons */
+.input-container {
+    -fx-spacing: 8px;
+    -fx-alignment: center-left;
+}
+
+.validation-icon {
+    -fx-opacity: 0.8;
 }
 
 .login-field {
@@ -370,6 +428,7 @@
     -fx-padding: 14px;
     -fx-font-size: 16px;
     -fx-background-color: rgba(255, 255, 255, 0.8);
+    -fx-transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
 }
 
 .login-field:focused {
@@ -379,19 +438,51 @@
     -fx-background-color: white;
 }
 
+.login-field:hover {
+    -fx-border-color: -belman-grey-50;
+    -fx-background-color: white;
+}
+
 .login-remember-me {
     -fx-font-size: 14px;
     -fx-text-fill: -belman-grey-80;
 }
 
-.login-error {
-    -fx-font-size: 14px;
-    -fx-text-fill: #d32f2f;
-    -fx-padding: 5px 10px;
-    -fx-opacity: 0.9;
-    -fx-alignment: center;
+/* Error message styling */
+.error-container {
     -fx-background-color: rgba(211, 47, 47, 0.1);
     -fx-background-radius: 4px;
+    -fx-padding: 8px 12px;
+    -fx-border-color: rgba(211, 47, 47, 0.3);
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+}
+
+.error-icon-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #d32f2f;
+    -fx-font-weight: bold;
+}
+
+.error-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #d32f2f;
+    -fx-wrap-text: true;
+}
+
+/* Separator styling */
+.separator-container {
+    -fx-alignment: center;
+}
+
+.separator-line {
+    -fx-fill: -belman-grey-20;
+}
+
+.separator-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: -belman-grey-50;
+    -fx-font-weight: bold;
 }
 
 .login-buttons-container {
@@ -407,6 +498,7 @@
     -fx-padding: 12px 24px;
     -fx-background-radius: 8px;
     -fx-cursor: hand;
+    -fx-transition: background-color 0.2s ease-in-out, scale 0.1s ease-in-out;
 }
 
 .login-button:hover {
@@ -421,6 +513,57 @@
     -fx-scale-x: 0.98;
     -fx-scale-y: 0.98;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+}
+
+.nfc-button {
+    -fx-background-color: -belman-green;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-padding: 12px 24px;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-transition: background-color 0.2s ease-in-out, scale 0.1s ease-in-out;
+}
+
+.nfc-button:hover {
+    -fx-background-color: derive(-belman-green, 10%);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 6, 0, 0, 2);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.nfc-button:pressed {
+    -fx-background-color: derive(-belman-green, -10%);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+}
+
+/* Development Helper Button - Subtle styling */
+.dev-helper-button {
+    -fx-background-color: rgba(200, 200, 200, 0.2);
+    -fx-text-fill: -belman-grey-50;
+    -fx-font-size: 12px;
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 4px;
+    -fx-border-color: rgba(200, 200, 200, 0.3);
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-cursor: hand;
+    -fx-margin-top: 10px;
+    -fx-opacity: 0.7;
+    -fx-transition: opacity 0.2s ease-in-out;
+}
+
+.dev-helper-button:hover {
+    -fx-opacity: 1.0;
+    -fx-background-color: rgba(200, 200, 200, 0.3);
+}
+
+.dev-helper-button:pressed {
+    -fx-background-color: rgba(200, 200, 200, 0.4);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
 }
 
 .login-cancel-button {
@@ -448,6 +591,13 @@
     -fx-scale-x: 0.98;
     -fx-scale-y: 0.98;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 0);
+}
+
+/* Loading indicator styling */
+.loading-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: -belman-blue;
+    -fx-font-weight: bold;
 }
 
 /* PIN Code Numpad Styles */

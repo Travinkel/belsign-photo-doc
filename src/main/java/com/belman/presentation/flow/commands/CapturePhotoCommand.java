@@ -3,9 +3,9 @@ package com.belman.presentation.flow.commands;
 import com.belman.common.di.Inject;
 import com.belman.common.session.SessionContext;
 import com.belman.domain.order.OrderId;
-import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.order.photo.PhotoId;
-import com.belman.domain.order.photo.PhotoTemplate;
+import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoId;
+import com.belman.domain.photo.PhotoTemplate;
 import com.belman.domain.services.PhotoService;
 import com.belman.domain.user.UserBusiness;
 

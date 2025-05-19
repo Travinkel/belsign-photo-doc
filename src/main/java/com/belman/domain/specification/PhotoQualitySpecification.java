@@ -1,7 +1,7 @@
 package com.belman.domain.specification;
 
-import com.belman.domain.order.photo.PhotoDocument;
-import com.belman.domain.order.photo.PhotoTemplate;
+import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoTemplate;
 
 import java.util.ArrayList;
 import java.util.List;

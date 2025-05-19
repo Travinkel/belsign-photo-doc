@@ -1,119 +1,120 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.Color?>
-<?import javafx.scene.text.Font?>
-<StackPane xmlns:fx="http://javafx.com/fxml"
+
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
            fx:controller="com.belman.presentation.usecases.worker.summary.SummaryViewController"
-           styleClass="responsive-container, summary-container"
-           stylesheets="/com/belman/styles/app.css">
-
-    <!-- Main Content -->
-    <VBox spacing="20" styleClass="vbox"
-          maxWidth="Infinity" maxHeight="Infinity">
-
-        <padding>
-            <Insets top="20" right="20" bottom="20" left="20"/>
-        </padding>
-
-        <!-- Header Section -->
-        <VBox spacing="5" styleClass="header-section">
-            <Label text="Photo Summary" styleClass="title">
-                <font>
-                    <Font name="System Bold" size="24.0"/>
-                </font>
-            </Label>
-            
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label text="Order:" styleClass="form-label">
-                    <font>
-                        <Font name="System Bold" size="16.0"/>
-                    </font>
-                </Label>
-                <Label fx:id="orderNumberLabel" text="Loading..." styleClass="order-value">
-                    <font>
-                        <Font size="16.0"/>
-                    </font>
-                </Label>
-            </HBox>
-            
-            <Label fx:id="photosCountLabel" text="0 photos taken" styleClass="subtitle">
-                <font>
-                    <Font size="16.0"/>
-                </font>
-            </Label>
-        </VBox>
-
-        <!-- Photos List -->
-        <StackPane VBox.vgrow="ALWAYS" styleClass="photos-container">
-            <effect>
-                <DropShadow radius="10" spread="0.1">
-                    <color>
-                        <Color opacity="0.3"/>
-                    </color>
-                </DropShadow>
-            </effect>
-            
-            <!-- List of Photos -->
-            <ListView fx:id="photoListView" styleClass="photo-list-view"/>
-            
-            <!-- Empty State (shown when no photos) -->
-            <VBox fx:id="emptyStatePane" alignment="CENTER" spacing="15" 
-                  styleClass="empty-state" visible="false" managed="false">
-                <Label text="No Photos Taken" styleClass="empty-title">
-                    <font>
-                        <Font name="System Bold" size="20.0"/>
-                    </font>
-                </Label>
-                <Label text="You haven't taken any photos for this order yet. Go back to the photo cube view to take photos." 
-                       wrapText="true" textAlignment="CENTER"/>
-                <Button text="Go Back" onAction="#handleBackClick" 
-                        styleClass="button-primary">
-                    <font>
-                        <Font size="16.0"/>
-                    </font>
-                </Button>
+           prefHeight="600.0" prefWidth="400.0"
+           styleClass="summary-view">
+    
+    <BorderPane>
+        <!-- Header -->
+        <top>
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets top="15.0" right="15.0" bottom="10.0" left="15.0"/>
+                </padding>
+                
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="header">
+                    <Button fx:id="backButton" text="Back" styleClass="back-button"/>
+                    <Label text="Photo Summary" styleClass="title-label"/>
+                </HBox>
+                
+                <!-- Order Info -->
+                <HBox spacing="10.0" styleClass="order-info">
+                    <Label text="Order:" styleClass="order-label"/>
+                    <Label fx:id="orderNumberLabel" text="ORD-123-230615-WLD-0001" styleClass="order-number"/>
+                </HBox>
             </VBox>
-        </StackPane>
-
-        <!-- Status and Error Messages -->
-        <VBox alignment="CENTER" spacing="5">
-            <Label fx:id="statusLabel" text="Review your photos before submission" styleClass="status-message"/>
-            <Label fx:id="errorLabel" text="" styleClass="error-message" textFill="RED"/>
-        </VBox>
-
-        <!-- Action Buttons -->
-        <HBox alignment="CENTER" spacing="20">
-            <Button text="Back" onAction="#handleBackClick" 
-                    styleClass="button-secondary">
-                <font>
-                    <Font size="16.0"/>
-                </font>
+        </top>
+        
+        <!-- Main Content -->
+        <center>
+            <ScrollPane fitToWidth="true" styleClass="content-scroll">
+                <VBox spacing="15.0">
+                    <padding>
+                        <Insets top="15.0" right="15.0" bottom="15.0" left="15.0"/>
+                    </padding>
+                    
+                    <!-- Photo Summary -->
+                    <VBox spacing="10.0" styleClass="photo-summary">
+                        <Label text="Photos Captured" styleClass="section-title"/>
+                        
+                        <HBox spacing="10.0">
+                            <Label text="Total Photos:" styleClass="summary-label"/>
+                            <Label fx:id="photoCountLabel" text="5" styleClass="summary-value"/>
+                        </HBox>
+                        
+                        <!-- Photo Thumbnails -->
+                        <ListView fx:id="photoListView" prefHeight="150.0">
+                            <placeholder>
+                                <Label text="No photos captured"/>
+                            </placeholder>
+                        </ListView>
+                    </VBox>
+                    
+                    <!-- Metadata -->
+                    <VBox spacing="10.0" styleClass="metadata">
+                        <Label text="Photo Metadata" styleClass="section-title"/>
+                        
+                        <GridPane hgap="10.0" vgap="10.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="NEVER" minWidth="100.0" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                            </columnConstraints>
+                            
+                            <Label text="Location:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="metadata-label"/>
+                            <TextField fx:id="locationField" promptText="Enter location" 
+                                      GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="metadata-field"/>
+                            
+                            <Label text="Project Phase:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="metadata-label"/>
+                            <TextField fx:id="phaseField" promptText="Enter project phase" 
+                                      GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="metadata-field"/>
+                            
+                            <Label text="Work Type:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="metadata-label"/>
+                            <TextField fx:id="workTypeField" promptText="Enter work type" 
+                                      GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="metadata-field"/>
+                            
+                            <Label text="Date:" GridPane.rowIndex="3" GridPane.columnIndex="0" styleClass="metadata-label"/>
+                            <TextField fx:id="dateField" promptText="YYYY-MM-DD" 
+                                      GridPane.rowIndex="3" GridPane.columnIndex="1" styleClass="metadata-field"/>
+                        </GridPane>
+                    </VBox>
+                    
+                    <!-- Notes -->
+                    <VBox spacing="10.0" styleClass="notes">
+                        <Label text="Additional Notes" styleClass="section-title"/>
+                        <TextArea fx:id="notesTextArea" promptText="Enter any additional notes or comments about the photos..." 
+                                 prefHeight="100.0" wrapText="true" styleClass="notes-field"/>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+        </center>
+        
+        <!-- Footer -->
+        <bottom>
+            <HBox alignment="CENTER" spacing="20.0">
                 <padding>
-                    <Insets top="15" right="30" bottom="15" left="30"/>
+                    <Insets top="15.0" right="15.0" bottom="20.0" left="15.0"/>
                 </padding>
-            </Button>
-            
-            <Button fx:id="submitButton" text="Submit Photos" onAction="#handleSubmitClick" 
-                    styleClass="button-primary">
-                <font>
-                    <Font size="16.0"/>
-                </font>
-                <padding>
-                    <Insets top="15" right="30" bottom="15" left="30"/>
-                </padding>
-            </Button>
-        </HBox>
-    </VBox>
-
-    <!-- Loading Indicator (initially invisible) -->
-    <StackPane fx:id="loadingPane" visible="false" styleClass="loading-overlay">
-        <VBox alignment="CENTER" spacing="15">
-            <ProgressIndicator progress="-1" styleClass="progress-indicator"/>
-            <Label text="Submitting photos..." styleClass="loading-text"/>
-        </VBox>
-    </StackPane>
+                
+                <Button fx:id="submitButton" text="Submit Photos" styleClass="submit-button"/>
+            </HBox>
+        </bottom>
+    </BorderPane>
 </StackPane>

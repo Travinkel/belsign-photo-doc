@@ -1,5 +1,5 @@
 -- Create Customers Table
-CREATE TABLE customers
+CREATE TABLE IF NOT EXISTS customers
 (
     id           TEXT PRIMARY KEY,
     type         TEXT  NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE customers
 );
 
 -- Create Index on Email
-CREATE INDEX idx_customers_email ON customers (email);
+CREATE INDEX IF NOT EXISTS idx_customers_email ON customers (email);
 
 -- Create Index on Type
-CREATE INDEX idx_customers_type ON customers (type);
+CREATE INDEX IF NOT EXISTS idx_customers_type ON customers (type);
