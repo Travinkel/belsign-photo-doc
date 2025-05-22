@@ -156,15 +156,27 @@ public class ApplicationInitializer {
             logger.success("Using DefaultReportService");
 
             // Initialize CameraService
-            logger.database("Creating CameraServiceFactory");
-            CameraServiceFactory cameraServiceFactory = new CameraServiceFactory(ServiceLocator.getService(LoggerFactory.class), PHOTO_STORAGE_DIRECTORY, true);
-            logger.success("Using CameraServiceFactory");
+            CameraService cameraService;
 
-            // Create and register MockCameraService
-            logger.database("Creating MockCameraService");
-            CameraService cameraService = cameraServiceFactory.createMockCameraService();
-            ServiceRegistry.registerService(cameraService);
-            logger.success("Using MockCameraService");
+            // Check if we're running in memory mode
+            if (StorageTypeConfig.isMemoryMode()) {
+                // In memory mode, use InMemoryCameraService to avoid searching mock/camera folder
+                logger.database("Creating InMemoryCameraService for memory mode");
+                cameraService = new com.belman.application.usecase.photo.InMemoryCameraService();
+                ServiceRegistry.registerService(cameraService);
+                logger.success("Using InMemoryCameraService (no mock/camera folder search)");
+            } else {
+                // In other modes, use the regular CameraServiceFactory
+                logger.database("Creating CameraServiceFactory");
+                CameraServiceFactory cameraServiceFactory = new CameraServiceFactory(ServiceLocator.getService(LoggerFactory.class), PHOTO_STORAGE_DIRECTORY, true);
+                logger.success("Using CameraServiceFactory");
+
+                // Create and register MockCameraService
+                logger.database("Creating MockCameraService");
+                cameraService = cameraServiceFactory.createMockCameraService();
+                ServiceRegistry.registerService(cameraService);
+                logger.success("Using MockCameraService");
+            }
 
             // Log which repositories are active
             logger.database("Active repositories:");

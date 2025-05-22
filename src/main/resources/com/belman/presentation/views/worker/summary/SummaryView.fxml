@@ -60,12 +60,10 @@
                             <Label fx:id="photoCountLabel" text="5" styleClass="summary-value"/>
                         </HBox>
 
-                        <!-- Photo Thumbnails -->
-                        <ListView fx:id="photoListView" prefHeight="150.0">
-                            <placeholder>
-                                <Label text="No photos captured"/>
-                            </placeholder>
-                        </ListView>
+                        <!-- Photo Gallery -->
+                        <StackPane fx:id="photoGalleryContainer" prefHeight="200.0">
+                            <!-- The PhotoGalleryComponent will be added here programmatically -->
+                        </StackPane>
                     </VBox>
 
                     <!-- Simplified Metadata -->

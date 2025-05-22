@@ -354,7 +354,13 @@ public class RepositoryInitializer {
                         .filter(user -> user.getRoles().contains(com.belman.domain.user.UserRole.PRODUCTION))
                         .toList();
 
+                    // Find QA users for photo approval
+                    var qaUsers = users.stream()
+                        .filter(user -> user.getRoles().contains(com.belman.domain.user.UserRole.QA))
+                        .toList();
+
                     logger.info("Found " + productionWorkers.size() + " production workers for order assignment");
+                    logger.info("Found " + qaUsers.size() + " QA users for photo approval");
 
                     // Create and save test orders
                     try {
@@ -418,6 +424,12 @@ public class RepositoryInitializer {
 
                             // Associate photo templates with order
                             associateTemplatesWithOrder(photoTemplateRepository, order2.getId());
+
+                            // Add test photos to this order for QA review
+                            if (!productionWorkers.isEmpty() && !qaUsers.isEmpty()) {
+                                createTestPhotosForOrder(order2.getId(), productionWorkers.get(0), qaUsers.get(0), photoRepository, photoTemplateRepository);
+                                logger.info("Created test photos for order: " + order2.getOrderNumber().value());
+                            }
                         } else {
                             logger.info("Order with number " + orderNumber2 + " already exists, skipping creation");
                         }
@@ -488,6 +500,76 @@ public class RepositoryInitializer {
             }
         } catch (Exception e) {
             logger.error("Error associating templates with order: " + orderId.id(), e);
+        }
+    }
+
+    /**
+     * Creates test photos for an order with different approval statuses.
+     * This method creates photos for each template associated with the order,
+     * with some photos in PENDING status, some APPROVED, and some REJECTED.
+     *
+     * @param orderId the ID of the order to create photos for
+     * @param productionUser the production user who uploads the photos
+     * @param qaUser the QA user who reviews the photos
+     * @param photoRepository the photo repository to save photos to
+     * @param photoTemplateRepository the photo template repository to get templates from
+     */
+    private static void createTestPhotosForOrder(
+            com.belman.domain.order.OrderId orderId,
+            com.belman.domain.user.UserBusiness productionUser,
+            com.belman.domain.user.UserBusiness qaUser,
+            com.belman.domain.photo.PhotoRepository photoRepository,
+            com.belman.domain.photo.PhotoTemplateRepository photoTemplateRepository) {
+
+        try {
+            // Get templates for this order
+            List<com.belman.domain.photo.PhotoTemplate> templates = photoTemplateRepository.findByOrderId(orderId);
+            if (templates.isEmpty()) {
+                logger.warn("No templates found for order: " + orderId.id() + ", cannot create test photos");
+                return;
+            }
+
+            logger.info("Creating test photos for " + templates.size() + " templates");
+
+            // Create a reference to the QA user for approval/rejection
+            com.belman.domain.user.UserReference qaUserRef = new com.belman.domain.user.UserReference(
+                qaUser.getId(), qaUser.getUsername());
+
+            // Create photos for each template with different statuses
+            int count = 0;
+            for (com.belman.domain.photo.PhotoTemplate template : templates) {
+                // Create a test photo path
+                String photoPath = "memory://test-photos/order-" + orderId.id() + "/photo-" + count + ".jpg";
+                com.belman.domain.photo.Photo photo = new com.belman.domain.photo.Photo(photoPath);
+
+                // Create the photo document
+                com.belman.domain.photo.PhotoDocument photoDoc = 
+                    com.belman.domain.photo.PhotoDocumentFactory.createForOrderWithCurrentTimestamp(
+                        template, photo, productionUser, orderId);
+
+                // Set different statuses based on the count
+                if (count % 3 == 0) {
+                    // Leave as PENDING for the first template and every third one
+                    logger.info("Created PENDING photo for template: " + template.name());
+                } else if (count % 3 == 1) {
+                    // Approve the second template and every third one after that
+                    photoDoc.approve(qaUserRef, com.belman.domain.common.valueobjects.Timestamp.now());
+                    logger.info("Created APPROVED photo for template: " + template.name());
+                } else {
+                    // Reject the third template and every third one after that
+                    photoDoc.reject(qaUserRef, com.belman.domain.common.valueobjects.Timestamp.now(), 
+                                   "Test rejection comment for template " + template.name());
+                    logger.info("Created REJECTED photo for template: " + template.name());
+                }
+
+                // Save the photo
+                photoRepository.save(photoDoc);
+                count++;
+            }
+
+            logger.info("Created " + count + " test photos for order: " + orderId.id());
+        } catch (Exception e) {
+            logger.error("Error creating test photos for order: " + orderId.id(), e);
         }
     }
 

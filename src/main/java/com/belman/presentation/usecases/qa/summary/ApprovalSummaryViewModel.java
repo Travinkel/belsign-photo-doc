@@ -80,6 +80,7 @@ public class ApprovalSummaryViewModel extends BaseViewModel<ApprovalSummaryViewM
         Map<String, Object> params = new HashMap<>();
         params.put("orderNumber", orderNumber.get());
         params.put("approved", approved.get());
+        params.put("comment", comment.get());
 
         // Navigate to the QA done view
         Router.navigateTo(QADoneView.class, params);

@@ -4,11 +4,16 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.geometry.Insets?>
@@ -61,10 +66,54 @@
                 <!-- Photo Preview -->
                 <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                     <Label text="Preview" styleClass="section-title"/>
-                    <StackPane fx:id="previewContainer" VBox.vgrow="ALWAYS" styleClass="preview-container">
-                        <ImageView fx:id="photoPreview" preserveRatio="true" fitWidth="400.0"/>
-                        <Label fx:id="noPreviewLabel" text="Select a photo to preview" visible="false"/>
-                    </StackPane>
+
+                    <!-- Zoom Controls -->
+                    <HBox spacing="5.0" alignment="CENTER_LEFT">
+                        <Button fx:id="zoomOutButton" text="-" styleClass="zoom-button" minWidth="30.0">
+                            <tooltip>
+                                <Tooltip text="Zoom Out"/>
+                            </tooltip>
+                        </Button>
+                        <Slider fx:id="zoomSlider" min="1.0" max="5.0" value="1.0" HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="zoomInButton" text="+" styleClass="zoom-button" minWidth="30.0">
+                            <tooltip>
+                                <Tooltip text="Zoom In"/>
+                            </tooltip>
+                        </Button>
+                        <Button fx:id="resetZoomButton" text="Reset" styleClass="zoom-button">
+                            <tooltip>
+                                <Tooltip text="Reset Zoom"/>
+                            </tooltip>
+                        </Button>
+                    </HBox>
+
+                    <!-- Annotation Tools -->
+                    <HBox spacing="5.0" alignment="CENTER_LEFT">
+                        <ToggleButton fx:id="annotationModeButton" text="Annotate" styleClass="annotation-button">
+                            <tooltip>
+                                <Tooltip text="Toggle Annotation Mode"/>
+                            </tooltip>
+                        </ToggleButton>
+                        <ComboBox fx:id="annotationTypeComboBox" promptText="Type" prefWidth="100.0">
+                            <tooltip>
+                                <Tooltip text="Select Annotation Type"/>
+                            </tooltip>
+                        </ComboBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="deleteAnnotationButton" text="Delete" styleClass="annotation-button" disable="true">
+                            <tooltip>
+                                <Tooltip text="Delete Selected Annotation"/>
+                            </tooltip>
+                        </Button>
+                    </HBox>
+
+                    <!-- Photo Container with ScrollPane for panning -->
+                    <ScrollPane fx:id="photoScrollPane" VBox.vgrow="ALWAYS" styleClass="photo-scroll-pane" pannable="true">
+                        <StackPane fx:id="previewContainer" styleClass="preview-container">
+                            <ImageView fx:id="photoPreview" preserveRatio="true"/>
+                            <Label fx:id="noPreviewLabel" text="Select a photo to preview" visible="false"/>
+                        </StackPane>
+                    </ScrollPane>
 
                     <!-- Individual Photo Actions -->
                     <HBox spacing="10.0" alignment="CENTER">

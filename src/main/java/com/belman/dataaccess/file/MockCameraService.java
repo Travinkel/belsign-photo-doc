@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 public class MockCameraService implements CameraService {
 
-    private static final String MOCK_CAMERA_PATH = "src/main/resources/mock/camera";
+    private static final String MOCK_CAMERA_PATH = "src/main/resources/photos";
     private final LoggerFactory loggerFactory;
     private final Random random = new Random();
 
@@ -111,7 +111,8 @@ public class MockCameraService implements CameraService {
 
             // Select a random image file
             Path imageFile = rootImageFiles.get(random.nextInt(rootImageFiles.size()));
-            logInfo("Using image file from root directory: " + imageFile.getFileName());
+            logInfo("Using image file from photos directory: " + imageFile.getFileName());
+            System.out.println("[DEBUG_LOG] Found image in photos directory: " + imageFile.getFileName() + " (path: " + MOCK_CAMERA_PATH + ")");
             return Optional.of(imageFile.toFile());
         } catch (IOException e) {
             logError("Error accessing mock camera directory", e);

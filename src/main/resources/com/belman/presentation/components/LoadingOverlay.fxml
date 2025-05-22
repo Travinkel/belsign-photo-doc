@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.belman.presentation.components.LoadingOverlayController"
+           fx:id="loadingOverlay"
+           styleClass="loading-overlay"
+           visible="false">
+    <VBox alignment="CENTER" spacing="20.0" styleClass="loading-container">
+        <padding>
+            <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
+        </padding>
+        <ProgressBar fx:id="progressBar" styleClass="loading-progress" progress="-1.0"/>
+        <Label fx:id="messageLabel" text="Loading..." styleClass="loading-text"/>
+    </VBox>
+</StackPane>

@@ -21,9 +21,9 @@ import java.util.stream.Collectors;
  */
 public class SimulatedCameraService extends BaseService implements CameraService {
 
-    private static final String MOCK_CAMERA_PATH = "src/main/resources/mock/camera";
-    private static final String DEV_SIMULATED_PATH = "src/main/resources/mock/camera/dev-simulated";
-    
+    private static final String MOCK_CAMERA_PATH = "src/main/resources/photos";
+    private static final String DEV_SIMULATED_PATH = "src/main/resources/photos/dev-simulated";
+
     private List<File> availableMockImages = new ArrayList<>();
     private File selectedImage = null;
 
@@ -82,14 +82,14 @@ public class SimulatedCameraService extends BaseService implements CameraService
      */
     private void loadMockImages() {
         availableMockImages.clear();
-        
+
         try {
             // First try to load from dev-simulated directory
             Path devSimulatedPath = Paths.get(DEV_SIMULATED_PATH);
             if (Files.exists(devSimulatedPath)) {
                 loadImagesFromDirectory(devSimulatedPath);
             }
-            
+
             // If no images were found in dev-simulated, load from the main mock camera directory
             if (availableMockImages.isEmpty()) {
                 Path mockCameraPath = Paths.get(MOCK_CAMERA_PATH);
@@ -97,13 +97,14 @@ public class SimulatedCameraService extends BaseService implements CameraService
                     loadImagesFromDirectory(mockCameraPath);
                 }
             }
-            
-            logInfo("Loaded " + availableMockImages.size() + " mock images");
+
+            logInfo("Loaded " + availableMockImages.size() + " mock images from " + MOCK_CAMERA_PATH);
+            System.out.println("[DEBUG_LOG] Loaded " + availableMockImages.size() + " mock images from " + MOCK_CAMERA_PATH);
         } catch (IOException e) {
             logError("Error loading mock images", e);
         }
     }
-    
+
     /**
      * Loads images from the specified directory.
      *
@@ -119,7 +120,7 @@ public class SimulatedCameraService extends BaseService implements CameraService
             })
             .map(Path::toFile)
             .collect(Collectors.toList());
-        
+
         availableMockImages.addAll(imageFiles);
     }
 

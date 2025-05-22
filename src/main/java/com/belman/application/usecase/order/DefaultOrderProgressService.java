@@ -66,12 +66,16 @@ public class DefaultOrderProgressService implements OrderProgressService {
 
         if (assignedOrders.isEmpty()) {
             logger.debug("No assigned orders found for worker");
+            System.out.println("[DEBUG_LOG] No assigned orders found for worker: " + worker.getUsername().value() + " (ID: " + worker.getId().id() + ")");
             return Optional.empty();
         } else {
             OrderBusiness assignedOrder = assignedOrders.get(0);
+            String orderNumber = assignedOrder.getOrderNumber() != null ? assignedOrder.getOrderNumber().value() : "null";
             logger.debug("Returning first assigned order: {}, Number: {}", 
-                        assignedOrder.getId().id(), 
-                        (assignedOrder.getOrderNumber() != null ? assignedOrder.getOrderNumber().value() : "null"));
+                        assignedOrder.getId().id(), orderNumber);
+            System.out.println("[DEBUG_LOG] Retrieved assigned order for worker: " + worker.getUsername().value() 
+                + " - Order ID: " + assignedOrder.getId().id() 
+                + ", Order Number: " + orderNumber);
             return Optional.of(assignedOrder);
         }
     }

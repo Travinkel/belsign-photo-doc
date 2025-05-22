@@ -248,6 +248,17 @@ public class Main extends Application {
             logger.warn("⚠️ Could not find app.css at /com/belman/styles/app.css");
         }
 
+        // Load Belman UI Style Guide CSS
+        var styleGuideCss = getClass().getResource("/com/belman/styles/belman-ui-styleguide.css");
+        logger.debug("Loading belman-ui-styleguide.css from: " + styleGuideCss);
+
+        if (styleGuideCss != null) {
+            scene.getStylesheets().add(styleGuideCss.toExternalForm());
+            logger.info("✅ Loaded belman-ui-styleguide.css from: " + styleGuideCss);
+        } else {
+            logger.warn("⚠️ Could not find belman-ui-styleguide.css at /com/belman/styles/belman-ui-styleguide.css");
+        }
+
         // Load Progressive Capture Dashboard CSS
         var dashboardCss = getClass().getResource("/com/belman/styles/progressive-capture-dashboard.css");
         logger.debug("Loading progressive-capture-dashboard.css from: " + dashboardCss);
@@ -257,6 +268,17 @@ public class Main extends Application {
             logger.info("✅ Loaded progressive-capture-dashboard.css from: " + dashboardCss);
         } else {
             logger.warn("⚠️ Could not find progressive-capture-dashboard.css at /com/belman/styles/progressive-capture-dashboard.css");
+        }
+
+        // Load Photo Gallery CSS
+        var photoGalleryCss = getClass().getResource("/com/belman/styles/photo-gallery.css");
+        logger.debug("Loading photo-gallery.css from: " + photoGalleryCss);
+
+        if (photoGalleryCss != null) {
+            scene.getStylesheets().add(photoGalleryCss.toExternalForm());
+            logger.info("✅ Loaded photo-gallery.css from: " + photoGalleryCss);
+        } else {
+            logger.warn("⚠️ Could not find photo-gallery.css at /com/belman/styles/photo-gallery.css");
         }
     }
 }

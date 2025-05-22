@@ -2,15 +2,17 @@ package com.belman.presentation.usecases.worker.summary;
 
 import com.belman.domain.photo.PhotoDocument;
 import com.belman.presentation.base.BaseController;
+import com.belman.presentation.components.PhotoGalleryComponent;
+import com.belman.presentation.components.PhotoGalleryComponent.PhotoItem;
+import com.belman.presentation.components.UIComponentUtils;
+import com.belman.presentation.providers.PhotoTemplateLabelProvider;
+import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -19,6 +21,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controller for the SummaryView.
@@ -39,7 +43,7 @@ public class SummaryViewController extends BaseController<SummaryViewModel> {
     private Label photosCountLabel;
 
     @FXML
-    private ListView<PhotoDocument> photoListView;
+    private StackPane photoGalleryContainer;
 
     @FXML
     private Button submitButton;
@@ -62,6 +66,12 @@ public class SummaryViewController extends BaseController<SummaryViewModel> {
     @FXML
     private TextField workTypeField;
 
+    @FXML
+    private TextArea notesTextArea;
+
+    // The photo gallery component
+    private PhotoGalleryComponent photoGallery;
+
     @Override
     protected void setupBindings() {
         // Bind view model properties to UI elements
@@ -80,11 +90,8 @@ public class SummaryViewController extends BaseController<SummaryViewModel> {
         locationField.setPromptText("Example: Assembly Hall, Station 3");
         workTypeField.setPromptText("Example: Welding, Assembly, Inspection");
 
-        // Bind the photo list to the view model
-        photoListView.setItems(getViewModel().takenPhotosProperty());
-
-        // Set up the cell factory for the photo list
-        photoListView.setCellFactory(listView -> new PhotoListCell());
+        // Create and configure the photo gallery
+        setupPhotoGallery();
 
         // Show empty state when there are no photos
         emptyStatePane.visibleProperty().bind(getViewModel().takenPhotosProperty().emptyProperty());
@@ -96,6 +103,98 @@ public class SummaryViewController extends BaseController<SummaryViewModel> {
                 getViewModel().loadingProperty()
             )
         );
+    }
+
+    /**
+     * Sets up the photo gallery component.
+     */
+    private void setupPhotoGallery() {
+        // Create the photo gallery component
+        photoGallery = new PhotoGalleryComponent();
+        photoGallery.setThumbnailSize(150.0); // Larger thumbnails for better visibility
+        photoGallery.setEmptyText("No photos captured");
+        photoGallery.setSelectionMode(true);
+
+        // Add the photo gallery to the container
+        photoGalleryContainer.getChildren().add(photoGallery);
+
+        // Set up callbacks
+        photoGallery.setOnPhotoSelected(this::handlePhotoSelected);
+        photoGallery.setOnPhotoDoubleClicked(this::handlePhotoDoubleClicked);
+
+        // Listen for changes to the taken photos list
+        getViewModel().takenPhotosProperty().addListener((ListChangeListener<PhotoDocument>) c -> {
+            updatePhotoGallery();
+        });
+
+        // Initial update
+        updatePhotoGallery();
+    }
+
+    /**
+     * Updates the photo gallery with the current photos.
+     */
+    private void updatePhotoGallery() {
+        List<PhotoItem> photoItems = new ArrayList<>();
+
+        for (PhotoDocument doc : getViewModel().takenPhotosProperty()) {
+            try {
+                // Create a file object for the image
+                File file = new File(doc.getImagePath().path());
+
+                if (file.exists()) {
+                    // Create a photo item with the image URL
+                    String fileUrl = file.toURI().toString();
+                    PhotoItem item = new PhotoItem(fileUrl);
+
+                    // Set the caption to the template name
+                    item.setCaption(PhotoTemplateLabelProvider.getDisplayLabel(doc.getTemplate()));
+
+                    // Set the status based on the approval status
+                    if (doc.isApproved()) {
+                        item.setStatus("Approved");
+                    } else if (doc.isPending()) {
+                        item.setStatus("Pending");
+                    } else {
+                        item.setStatus("Rejected");
+                    }
+
+                    // Store the photo document as user data for reference
+                    item.setUserData(doc);
+
+                    photoItems.add(item);
+                }
+            } catch (Exception e) {
+                System.err.println("Error loading photo: " + e.getMessage());
+            }
+        }
+
+        // Update the photo gallery
+        photoGallery.setPhotoItems(photoItems);
+    }
+
+    /**
+     * Handles selection of a photo.
+     *
+     * @param item the selected photo item
+     */
+    private void handlePhotoSelected(PhotoItem item) {
+        // This method can be used to show details about the selected photo
+        // or to enable actions like retaking the photo
+        if (item != null && item.getUserData() instanceof PhotoDocument) {
+            PhotoDocument doc = (PhotoDocument) item.getUserData();
+            System.out.println("Selected photo: " + doc.getTemplate());
+        }
+    }
+
+    /**
+     * Handles double-clicking on a photo.
+     *
+     * @param item the double-clicked photo item
+     */
+    private void handlePhotoDoubleClicked(PhotoItem item) {
+        // Show the photo in a larger view
+        photoGallery.showZoomOverlay(item);
     }
 
     /**
@@ -114,51 +213,4 @@ public class SummaryViewController extends BaseController<SummaryViewModel> {
         getViewModel().goBack();
     }
 
-    /**
-     * Custom list cell for displaying photo documents.
-     */
-    private static class PhotoListCell extends ListCell<PhotoDocument> {
-        private final ImageView imageView = new ImageView();
-        private final Label templateLabel = new Label();
-        private final VBox container = new VBox(5, imageView, templateLabel);
-
-        public PhotoListCell() {
-            imageView.setFitWidth(120);
-            imageView.setFitHeight(90);
-            imageView.setPreserveRatio(true);
-            container.getStyleClass().add("photo-list-cell");
-            templateLabel.getStyleClass().add("template-label");
-        }
-
-        @Override
-        protected void updateItem(PhotoDocument item, boolean empty) {
-            super.updateItem(item, empty);
-
-            if (empty || item == null) {
-                setGraphic(null);
-                setText(null);
-            } else {
-                // Set the template name with user-friendly label
-                templateLabel.setText(com.belman.presentation.providers.PhotoTemplateLabelProvider.getDisplayLabel(item.getTemplate()));
-
-                // Load the image
-                try {
-                    File file = new File(item.getImagePath().path());
-                    if (file.exists()) {
-                        Image image = new Image(new FileInputStream(file), 120, 90, true, true);
-                        imageView.setImage(image);
-                    } else {
-                        imageView.setImage(null);
-                        templateLabel.setText(com.belman.presentation.providers.PhotoTemplateLabelProvider.getDisplayLabel(item.getTemplate()) + " (Image not found)");
-                    }
-                } catch (FileNotFoundException e) {
-                    imageView.setImage(null);
-                    templateLabel.setText(com.belman.presentation.providers.PhotoTemplateLabelProvider.getDisplayLabel(item.getTemplate()) + " (Error loading image)");
-                }
-
-                setGraphic(container);
-                setText(null);
-            }
-        }
-    }
 }

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  */
 public class MockCameraImageProvider implements CameraImageProvider {
 
-    private static final String MOCK_CAMERA_PATH = "src/main/resources/mock/camera";
+    private static final String MOCK_CAMERA_PATH = "src/main/resources/photos";
     private final LoggerFactory loggerFactory;
 
     /**
@@ -230,6 +230,7 @@ public class MockCameraImageProvider implements CameraImageProvider {
 
             if (!rootImages.isEmpty()) {
                 // Return the first image found
+                System.out.println("[DEBUG_LOG] Found image in photos directory: " + rootImages.get(0).getFileName() + " (path: " + MOCK_CAMERA_PATH + ")");
                 return Optional.of(rootImages.get(0).toFile());
             }
 

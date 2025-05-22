@@ -98,37 +98,63 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
                 SessionContext.getCurrentUser().ifPresentOrElse(
                     user -> {
                         try {
-                            // Get all orders and find the first one for the current user
-                            List<OrderBusiness> orders = orderService.getAllOrders();
+                            // Get the assigned order for the current user using WorkerService
+                            Optional<OrderBusiness> assignedOrderOpt = workerService.getAssignedOrder(user);
 
-                            if (orders.isEmpty()) {
-                                errorMessage.set("No orders found in the system. Please contact your supervisor to create an order.");
-                                loading.set(false);
-                                return;
+                            if (assignedOrderOpt.isEmpty()) {
+                                // If no assigned order is found, try to get all orders as a fallback
+                                List<OrderBusiness> orders = orderService.getAllOrders();
+
+                                if (orders.isEmpty()) {
+                                    errorMessage.set("No orders found in the system. Please contact your supervisor to create an order.");
+                                    loading.set(false);
+                                    return;
+                                }
+
+                                // Log that we're falling back to created orders
+                                System.out.println("[DEBUG_LOG] No assigned orders found for user: " + user.getUsername().value() + ", falling back to created orders");
+
+                                // Filter orders created by the current user as a fallback
+                                List<OrderBusiness> userOrders = orders.stream()
+                                    .filter(o -> o.getCreatedBy() != null && 
+                                           o.getCreatedBy().id().equals(user.getId()))
+                                    .toList();
+
+                                if (userOrders.isEmpty()) {
+                                    errorMessage.set("No active orders assigned to you. Please contact your supervisor to assign an order for documentation.");
+                                    loading.set(false);
+                                    return;
+                                }
+
+                                // Set the current order to the first order created by the user
+                                OrderBusiness userOrder = userOrders.get(0);
+                                currentOrder.set(userOrder);
+                                orderNumber.set(userOrder.getOrderNumber().toString());
+
+                                // Store the order in the WorkerFlowContext for future use
+                                WorkerFlowContext.setCurrentOrder(userOrder);
+
+                                // Load the photos for this order
+                                loadPhotosForOrder(userOrder.getId());
+                            } else {
+                                // Use the assigned order
+                                OrderBusiness assignedOrder = assignedOrderOpt.get();
+                                System.out.println("[DEBUG_LOG] Found assigned order for user: " + user.getUsername().value() + 
+                                    " - Order ID: " + assignedOrder.getId().id() + 
+                                    ", Order Number: " + (assignedOrder.getOrderNumber() != null ? assignedOrder.getOrderNumber().value() : "null"));
+
+                                currentOrder.set(assignedOrder);
+
+                                // Format the order number in a user-friendly way (e.g., "Order #123" instead of technical format)
+                                String friendlyOrderNumber = assignedOrder.getOrderNumber().toString().replace("ORD-", "Order #");
+                                orderNumber.set(friendlyOrderNumber);
+
+                                // Store the order in the WorkerFlowContext for future use
+                                WorkerFlowContext.setCurrentOrder(assignedOrder);
+
+                                // Load the photos for this order
+                                loadPhotosForOrder(assignedOrder.getId());
                             }
-
-                            // Filter orders for the current user
-                            List<OrderBusiness> userOrders = orders.stream()
-                                .filter(o -> o.getCreatedBy() != null && 
-                                       o.getCreatedBy().id().equals(user.getId()))
-                                .toList();
-
-                            if (userOrders.isEmpty()) {
-                                errorMessage.set("No active orders assigned to you. Please contact your supervisor to assign an order for documentation.");
-                                loading.set(false);
-                                return;
-                            }
-
-                            // Set the current order to the first order for the user
-                            OrderBusiness userOrder = userOrders.get(0);
-                            currentOrder.set(userOrder);
-                            orderNumber.set(userOrder.getOrderNumber().toString());
-
-                            // Store the order in the WorkerFlowContext for future use
-                            WorkerFlowContext.setCurrentOrder(userOrder);
-
-                            // Load the photos for this order
-                            loadPhotosForOrder(userOrder.getId());
                         } catch (Exception e) {
                             errorMessage.set("Error loading orders: " + e.getMessage() + ". Please try again or contact support.");
                             loading.set(false);
@@ -142,7 +168,10 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
             } else {
                 // Use the order from the WorkerFlowContext
                 currentOrder.set(order);
-                orderNumber.set(order.getOrderNumber().toString());
+
+                // Format the order number in a user-friendly way
+                String friendlyOrderNumber = order.getOrderNumber().toString().replace("ORD-", "Order #");
+                orderNumber.set(friendlyOrderNumber);
 
                 // Load the photos for this order
                 loadPhotosForOrder(order.getId());
@@ -184,12 +213,42 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
             photosCompleted.set(photos.size());
 
             // Get available templates from the WorkerService
+            System.out.println("[DEBUG_LOG] Getting available templates for order ID: " + orderId.id());
             requiredTemplates = workerService.getAvailableTemplates(orderId);
+            System.out.println("[DEBUG_LOG] Found " + requiredTemplates.size() + " templates for order ID: " + orderId.id());
+
+            // Log template details for debugging
+            if (!requiredTemplates.isEmpty()) {
+                System.out.println("[DEBUG_LOG] Template details for order ID: " + orderId.id());
+                for (int i = 0; i < requiredTemplates.size(); i++) {
+                    PhotoTemplate template = requiredTemplates.get(i);
+                    System.out.println("[DEBUG_LOG]   Template " + (i+1) + ": " + 
+                        "Name=" + template.name() + 
+                        ", Description=" + template.description() + 
+                        ", RequiredFields=" + template.requiredFields());
+                }
+            }
 
             // If no templates are available, show a clear non-technical message
             if (requiredTemplates.isEmpty()) {
-                errorMessage.set("No photo checklist defined for this order. Please contact QA team.");
-                statusMessage.set("No photo templates found. Please contact QA team for assistance.");
+                System.out.println("[DEBUG_LOG] No templates found for order ID: " + orderId.id() + " - showing error message");
+
+                // Try to get the order details for better error reporting
+                String orderDetails = "";
+                try {
+                    Optional<OrderBusiness> orderOpt = orderService.getOrderById(orderId);
+                    if (orderOpt.isPresent()) {
+                        OrderBusiness order = orderOpt.get();
+                        if (order.getOrderNumber() != null) {
+                            orderDetails = " for " + order.getOrderNumber().toString().replace("ORD-", "Order #");
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("[DEBUG_LOG] Error getting order details: " + e.getMessage());
+                }
+
+                errorMessage.set("No photo templates available" + orderDetails + ". Please contact your supervisor to set up templates.");
+                statusMessage.set("Waiting for templates to be assigned. Please refresh or contact your supervisor.");
                 loading.set(false);
                 return;
             }
@@ -398,7 +457,7 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
             Optional<File> capturedPhotoFile = cameraImageProvider.takePhoto(template, orderId);
 
             if (capturedPhotoFile.isEmpty()) {
-                errorMessage.set("Failed to capture photo or operation was cancelled. Please try again.");
+                errorMessage.set("Unable to save photo. Please check camera permissions and try again.");
                 captureInProgress.set(false);
                 return;
             }
@@ -1044,14 +1103,15 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
                     return new Image(photoFile.toURI().toString(), true); // Use background loading
                 } 
 
-                // Try to load from mock camera directory
-                File mockCameraFile = new File("src/main/resources/mock/camera/" + photoFile.getName());
+                // Try to load from photos directory
+                File mockCameraFile = new File("src/main/resources/photos/" + photoFile.getName());
                 if (mockCameraFile.exists()) {
+                    System.out.println("[DEBUG_LOG] Found image in photos directory: " + mockCameraFile.getName());
                     return new Image(mockCameraFile.toURI().toString(), true); // Use background loading
                 }
 
-                // Try to load from mock camera dev-simulated directory
-                File mockDevFile = new File("src/main/resources/mock/camera/dev-simulated/" + photoFile.getName());
+                // Try to load from photos dev-simulated directory
+                File mockDevFile = new File("src/main/resources/photos/dev-simulated/" + photoFile.getName());
                 if (mockDevFile.exists()) {
                     return new Image(mockDevFile.toURI().toString(), true); // Use background loading
                 }
@@ -1087,8 +1147,8 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
                 return new Image(inputStream);
             }
 
-            // Try to load any image from mock camera directory
-            File mockCameraDir = new File("src/main/resources/mock/camera");
+            // Try to load any image from photos directory
+            File mockCameraDir = new File("src/main/resources/photos");
             if (mockCameraDir.exists() && mockCameraDir.isDirectory()) {
                 File[] imageFiles = mockCameraDir.listFiles((dir, name) -> 
                     name.toLowerCase().endsWith(".jpg") || 

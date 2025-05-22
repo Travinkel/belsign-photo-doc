@@ -160,11 +160,18 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
 
         // Progress is now only shown in the top bar
 
+        // Create a custom binding for the percentage calculation
         topProgressLabel.textProperty().bind(
-            getViewModel().photosCompletedProperty().asString()
-                .concat("/")
-                .concat(getViewModel().totalPhotosRequiredProperty().asString())
-                .concat(" photos")
+            javafx.beans.binding.Bindings.createStringBinding(
+                () -> {
+                    int completed = getViewModel().photosCompletedProperty().get();
+                    int total = getViewModel().totalPhotosRequiredProperty().get();
+                    int percentage = total > 0 ? (completed * 100) / total : 0;
+                    return completed + "/" + total + " photos (" + percentage + "%)";
+                },
+                getViewModel().photosCompletedProperty(),
+                getViewModel().totalPhotosRequiredProperty()
+            )
         );
 
         // Initialize stepped progress bar when photos completed or total photos change
@@ -240,12 +247,20 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
                     HBox cellContent = new HBox(10);
                     cellContent.getStyleClass().add("template-cell");
 
+                    // Required/Optional indicator
+                    Label requiredIndicator = new Label(item.isRequired() ? "★" : "☆");
+                    requiredIndicator.getStyleClass().add(item.isRequired() ? "required-indicator" : "optional-indicator");
+                    requiredIndicator.setTooltip(new Tooltip(item.isRequired() ? 
+                        "Required: This photo must be taken to complete the documentation" : 
+                        "Optional: This photo is recommended but not required"));
+
                     // Template name with user-friendly label
                     Label nameLabel = new Label(PhotoTemplateLabelProvider.getDisplayLabel(item.getTemplate()));
                     nameLabel.getStyleClass().add("template-name");
 
                     // Add tooltip with detailed instructions
                     Tooltip tooltip = new Tooltip(PhotoTemplateLabelProvider.getTooltip(item.getTemplate()));
+                    tooltip.getStyleClass().add("template-tooltip");
                     Tooltip.install(nameLabel, tooltip);
 
                     // Status indicator
@@ -253,7 +268,7 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
                     statusLabel.getStyleClass().add(item.getStatusStyleClass());
 
                     // Add to cell
-                    cellContent.getChildren().addAll(nameLabel, statusLabel);
+                    cellContent.getChildren().addAll(requiredIndicator, nameLabel, statusLabel);
 
                     // Set the cell content
                     setText(null);
@@ -448,10 +463,27 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
         // Clear existing steps
         steppedProgressContainer.getChildren().clear();
 
+        // Calculate percentage for tooltip
+        int percentage = totalSteps > 0 ? (completedSteps * 100) / totalSteps : 0;
+
+        // Add percentage indicator at the beginning
+        Label percentLabel = new Label(percentage + "%");
+        percentLabel.getStyleClass().add("progress-percent");
+        percentLabel.setTooltip(new Tooltip(completedSteps + " of " + totalSteps + " photos completed"));
+        steppedProgressContainer.getChildren().add(percentLabel);
+
         // Create step indicators
         for (int i = 0; i < totalSteps; i++) {
             StackPane step = new StackPane();
             step.getStyleClass().add("progress-step");
+
+            // Set a fixed size for consistent appearance
+            step.setPrefWidth(12);
+            step.setPrefHeight(12);
+
+            // Add tooltip showing step number
+            Tooltip stepTooltip = new Tooltip("Step " + (i + 1) + " of " + totalSteps);
+            Tooltip.install(step, stepTooltip);
 
             // Mark completed steps
             if (i < completedSteps) {

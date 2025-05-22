@@ -127,6 +127,10 @@ public class DefaultAuthenticationService extends BaseService implements Extende
 
                     logInfo(LOG_USER_AUTHENTICATED, username);
                     AuthLoggingService.logAuth("DefaultAuthenticationService", "Authentication successful for user: " + username + ", ID: " + user.getId().id() + ", Roles: " + user.getRoles());
+
+                    // Add prominent debug log for current user and role during login
+                    System.out.println("[DEBUG_LOG] User logged in: " + username + " with roles: " + user.getRoles());
+
                     return Optional.of(user);
                 } else {
                     // Record failed login attempt

@@ -131,15 +131,18 @@
 
                 <!-- Right Panel: Template List -->
                 <VBox spacing="10.0" styleClass="template-list-panel" HBox.hgrow="ALWAYS" maxWidth="400.0">
-                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <HBox alignment="CENTER" spacing="10.0">
                         <Label text="Required Photos" styleClass="panel-title" HBox.hgrow="ALWAYS"/>
 
                         <!-- Show Remaining Only Toggle -->
-                        <HBox styleClass="toggle-container" alignment="CENTER_RIGHT">
+                        <HBox styleClass="toggle-container" alignment="CENTER">
                             <Label text="Show remaining only" styleClass="toggle-label"/>
                             <CheckBox fx:id="showRemainingToggle" styleClass="toggle-switch" 
                                      onAction="#handleShowRemainingToggle"/>
                         </HBox>
+                        <padding>
+                            <Insets bottom="5.0"/>
+                        </padding>
                     </HBox>
 
                     <!-- Template List -->

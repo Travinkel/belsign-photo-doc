@@ -7,11 +7,18 @@ import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.order.OrderNumber;
 import com.belman.domain.order.OrderRepository;
 import com.belman.domain.order.OrderStatus;
+import com.belman.domain.photo.PhotoAnnotation;
 import com.belman.domain.photo.PhotoDocument;
 import com.belman.domain.photo.PhotoRepository;
 import com.belman.domain.user.UserReference;
 import com.belman.presentation.base.BaseViewModel;
 import com.belman.presentation.navigation.Router;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -22,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * ViewModel for the photo review view.
@@ -33,6 +41,17 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
     private final StringProperty comment = new SimpleStringProperty("");
     private final StringProperty errorMessage = new SimpleStringProperty("");
     private final ObservableList<PhotoDocument> photos = FXCollections.observableArrayList();
+
+    // Zoom properties
+    private final DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
+    private final BooleanProperty panEnabled = new SimpleBooleanProperty(true);
+
+    // Annotation properties
+    private final BooleanProperty annotationMode = new SimpleBooleanProperty(false);
+    private final ObjectProperty<PhotoAnnotation.AnnotationType> selectedAnnotationType = 
+            new SimpleObjectProperty<>(PhotoAnnotation.AnnotationType.NOTE);
+    private final ObservableList<PhotoAnnotation> annotations = FXCollections.observableArrayList();
+    private final ObjectProperty<PhotoAnnotation> selectedAnnotation = new SimpleObjectProperty<>();
 
     @Inject
     private OrderRepository orderRepository;
@@ -94,13 +113,15 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
     }
 
     /**
-     * Selects a photo for review.
+     * Selects a photo for review and loads its annotations.
      *
      * @param photo the photo to select
      */
     public void selectPhoto(PhotoDocument photo) {
         this.selectedPhoto = photo;
+        refreshAnnotations();
     }
+
 
     /**
      * Approves the currently selected photo.
@@ -371,6 +392,228 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
     public ObservableList<PhotoDocument> getPhotos() {
         return photos;
     }
+
+    /**
+     * Gets the zoom factor property.
+     *
+     * @return the zoom factor property
+     */
+    public DoubleProperty zoomFactorProperty() {
+        return zoomFactor;
+    }
+
+    /**
+     * Gets the current zoom factor.
+     *
+     * @return the current zoom factor
+     */
+    public double getZoomFactor() {
+        return zoomFactor.get();
+    }
+
+    /**
+     * Sets the zoom factor.
+     *
+     * @param factor the new zoom factor
+     */
+    public void setZoomFactor(double factor) {
+        // Clamp the zoom factor between 1.0 and 5.0
+        double clampedFactor = Math.max(1.0, Math.min(5.0, factor));
+        zoomFactor.set(clampedFactor);
+    }
+
+    /**
+     * Increases the zoom factor by the specified amount.
+     *
+     * @param amount the amount to increase the zoom factor by
+     */
+    public void zoomIn(double amount) {
+        setZoomFactor(getZoomFactor() + amount);
+    }
+
+    /**
+     * Decreases the zoom factor by the specified amount.
+     *
+     * @param amount the amount to decrease the zoom factor by
+     */
+    public void zoomOut(double amount) {
+        setZoomFactor(getZoomFactor() - amount);
+    }
+
+    /**
+     * Resets the zoom factor to 1.0.
+     */
+    public void resetZoom() {
+        zoomFactor.set(1.0);
+    }
+
+    /**
+     * Gets the pan enabled property.
+     *
+     * @return the pan enabled property
+     */
+    public BooleanProperty panEnabledProperty() {
+        return panEnabled;
+    }
+
+    /**
+     * Gets the annotation mode property.
+     *
+     * @return the annotation mode property
+     */
+    public BooleanProperty annotationModeProperty() {
+        return annotationMode;
+    }
+
+    /**
+     * Gets the selected annotation type property.
+     *
+     * @return the selected annotation type property
+     */
+    public ObjectProperty<PhotoAnnotation.AnnotationType> selectedAnnotationTypeProperty() {
+        return selectedAnnotationType;
+    }
+
+    /**
+     * Gets the annotations list.
+     *
+     * @return the annotations list
+     */
+    public ObservableList<PhotoAnnotation> getAnnotations() {
+        return annotations;
+    }
+
+    /**
+     * Gets the selected annotation property.
+     *
+     * @return the selected annotation property
+     */
+    public ObjectProperty<PhotoAnnotation> selectedAnnotationProperty() {
+        return selectedAnnotation;
+    }
+
+    /**
+     * Creates a new annotation at the specified coordinates.
+     *
+     * @param x the x-coordinate (as percentage of image width, 0.0-1.0)
+     * @param y the y-coordinate (as percentage of image height, 0.0-1.0)
+     * @param text the text content of the annotation
+     * @return the created annotation, or null if creation failed
+     */
+    public PhotoAnnotation createAnnotation(double x, double y, String text) {
+        try {
+            if (selectedPhoto == null) {
+                errorMessage.set("No photo selected");
+                return null;
+            }
+
+            // Create a new annotation
+            String annotationId = UUID.randomUUID().toString();
+            PhotoAnnotation annotation = new PhotoAnnotation(
+                    annotationId,
+                    x,
+                    y,
+                    text,
+                    selectedAnnotationType.get()
+            );
+
+            // Add the annotation to the photo document
+            boolean added = selectedPhoto.addAnnotation(annotation);
+            if (!added) {
+                errorMessage.set("Failed to add annotation to photo");
+                return null;
+            }
+
+            // Save the photo document
+            photoRepository.save(selectedPhoto);
+
+            // Refresh the annotations list
+            refreshAnnotations();
+
+            return annotation;
+        } catch (Exception e) {
+            errorMessage.set("Error creating annotation: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Updates an existing annotation.
+     *
+     * @param annotation the annotation to update
+     * @return true if the annotation was updated successfully, false otherwise
+     */
+    public boolean updateAnnotation(PhotoAnnotation annotation) {
+        try {
+            if (selectedPhoto == null) {
+                errorMessage.set("No photo selected");
+                return false;
+            }
+
+            // Update the annotation in the photo document
+            boolean updated = selectedPhoto.updateAnnotation(annotation);
+            if (!updated) {
+                errorMessage.set("Failed to update annotation");
+                return false;
+            }
+
+            // Save the photo document
+            photoRepository.save(selectedPhoto);
+
+            // Refresh the annotations list
+            refreshAnnotations();
+
+            return true;
+        } catch (Exception e) {
+            errorMessage.set("Error updating annotation: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Deletes the specified annotation.
+     *
+     * @param annotation the annotation to delete
+     * @return true if the annotation was deleted successfully, false otherwise
+     */
+    public boolean deleteAnnotation(PhotoAnnotation annotation) {
+        try {
+            if (selectedPhoto == null) {
+                errorMessage.set("No photo selected");
+                return false;
+            }
+
+            // Remove the annotation from the photo document
+            boolean removed = selectedPhoto.removeAnnotation(annotation.getId());
+            if (!removed) {
+                errorMessage.set("Failed to remove annotation");
+                return false;
+            }
+
+            // Save the photo document
+            photoRepository.save(selectedPhoto);
+
+            // Refresh the annotations list
+            refreshAnnotations();
+
+            return true;
+        } catch (Exception e) {
+            errorMessage.set("Error deleting annotation: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Refreshes the annotations list from the selected photo.
+     */
+    private void refreshAnnotations() {
+        if (selectedPhoto != null) {
+            annotations.setAll(selectedPhoto.getAnnotations());
+        } else {
+            annotations.clear();
+        }
+    }
+
 
     /**
      * Navigates back to the previous view.

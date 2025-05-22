@@ -380,13 +380,20 @@
 
 /* Show remaining only toggle */
 .progressive-capture-dashboard .toggle-container {
-    -fx-padding: 5px 0;
+    -fx-padding: 5px 10px;
     -fx-alignment: center-right;
+    -fx-background-color: -belman-grey-07;
+    -fx-background-radius: 4px;
+    -fx-border-color: -belman-grey-20;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-spacing: 8px;
 }
 
 .progressive-capture-dashboard .toggle-label {
     -fx-font-size: 14px;
     -fx-text-fill: -belman-grey-80;
+    -fx-font-weight: normal;
 }
 
 .progressive-capture-dashboard .toggle-switch {
