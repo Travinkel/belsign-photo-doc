@@ -48,7 +48,9 @@ public class AssignedOrderViewController extends BaseController<AssignedOrderVie
     private Button logoutButton;
 
     @FXML
-    private ListView<PhotoTemplate> photoTemplateListView;
+    private Button createOrderButton;
+
+    // Photo template ListView removed - templates now shown in PhotoCubeView
 
     // Error handling elements
     @FXML
@@ -96,23 +98,7 @@ public class AssignedOrderViewController extends BaseController<AssignedOrderVie
             photoCountLabel.textProperty().bind(getViewModel().photoCountProperty());
         }
 
-        // Set up photo template list view if available
-        if (photoTemplateListView != null) {
-            photoTemplateListView.itemsProperty().bind(getViewModel().photoTemplatesProperty());
-
-            // Set cell factory to display template names
-            photoTemplateListView.setCellFactory(lv -> new ListCell<PhotoTemplate>() {
-                @Override
-                protected void updateItem(PhotoTemplate item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                    } else {
-                        setText(item.name() != null ? item.name() : "Unnamed Template");
-                    }
-                }
-            });
-        }
+        // Photo template list view code removed - templates now shown in PhotoCubeView
 
         // Bind error handling elements
         if (statusLabel != null) {
@@ -154,6 +140,22 @@ public class AssignedOrderViewController extends BaseController<AssignedOrderVie
         if (logoutButton != null) {
             logoutButton.setOnAction(e -> getViewModel().logout());
         }
+
+        // Set up the create order button (dev mode only)
+        if (createOrderButton != null) {
+            // Bind visibility to dev mode
+            createOrderButton.visibleProperty().bind(getViewModel().devModeProperty());
+
+            // Set action handler
+            createOrderButton.setOnAction(e -> handleCreateTestOrder());
+
+            // Disable the button when loading or when there's an error
+            createOrderButton.disableProperty().bind(
+                getViewModel().loadingProperty().or(
+                    getViewModel().errorMessageProperty().isNotEmpty()
+                )
+            );
+        }
     }
 
     @Override
@@ -166,10 +168,19 @@ public class AssignedOrderViewController extends BaseController<AssignedOrderVie
      * This method is called when the user clicks the start button.
      */
     private void handleStartPhotoProcess() {
-        // Store the current order in the WorkerFlowContext
-        WorkerFlowContext.setCurrentOrder(getViewModel().getCurrentOrder());
-
-        // Start the photo process
+        // Delegate to the ViewModel to start the photo process
+        // The ViewModel will handle storing the order in the WorkerFlowContext
         getViewModel().startPhotoProcess();
+    }
+
+    // handleRefreshTemplates method removed - templates now managed in PhotoCubeView
+
+    /**
+     * Handles the "Create Test Order" button click.
+     * This method is called when the user clicks the create test order button in development mode.
+     */
+    private void handleCreateTestOrder() {
+        // Call the view model to create a test order
+        getViewModel().createTestOrder();
     }
 }

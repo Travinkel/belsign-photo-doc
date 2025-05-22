@@ -13,16 +13,19 @@ public final class ReportId implements ValueObject {
 
     /**
      * Creates a new ReportId with the specified value.
+     * The value is normalized to lowercase to ensure consistent comparison across all storage backends.
      *
      * @param value the string value of the report ID
      * @throws NullPointerException     if value is null
      * @throws IllegalArgumentException if value is empty
      */
     public ReportId(String value) {
-        this.value = Objects.requireNonNull(value, "Report ID must not be null");
+        Objects.requireNonNull(value, "Report ID must not be null");
         if (value.isEmpty()) {
             throw new IllegalArgumentException("Report ID must not be empty");
         }
+        // Normalize UUID to lowercase for consistent comparison
+        this.value = value.toLowerCase();
     }
 
     /**

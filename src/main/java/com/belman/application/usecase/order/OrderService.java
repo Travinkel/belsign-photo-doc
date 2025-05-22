@@ -81,4 +81,12 @@ public interface OrderService {
      * @return true if the order was completed, false if the order was not found or cannot be completed
      */
     boolean completeOrder(OrderId orderId, UserBusiness completedBy);
+
+    /**
+     * Saves an order.
+     *
+     * @param order the order to save
+     * @return the saved order
+     */
+    OrderBusiness saveOrder(OrderBusiness order);
 }

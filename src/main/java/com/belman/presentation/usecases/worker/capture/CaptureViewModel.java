@@ -8,13 +8,17 @@ import com.belman.domain.photo.PhotoDocument;
 import com.belman.domain.photo.PhotoTemplate;
 import com.belman.domain.services.PhotoService;
 import com.belman.application.usecase.photo.CameraService;
+import com.belman.application.usecase.photo.SimulatedCameraService;
 import com.belman.presentation.base.BaseViewModel;
 import com.belman.presentation.navigation.Router;
 import com.belman.presentation.usecases.worker.WorkerFlowContext;
 import com.belman.presentation.usecases.worker.photocube.PhotoCubeView;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -23,7 +27,8 @@ import java.util.Optional;
  */
 public class CaptureViewModel extends BaseViewModel<CaptureViewModel> {
 
-    private final CameraService cameraService = ServiceLocator.getService(CameraService.class);
+    private final SimulatedCameraService simulatedCameraService;
+    private final CameraService cameraService;
 
     @Inject
     private PhotoService photoService;
@@ -38,16 +43,60 @@ public class CaptureViewModel extends BaseViewModel<CaptureViewModel> {
     private final StringProperty templateDescription = new SimpleStringProperty("");
     private final ObjectProperty<File> capturedPhotoFile = new SimpleObjectProperty<>();
 
+    // Properties for mock image selection
+    private final ObservableList<File> availableMockImages = FXCollections.observableArrayList();
+    private final BooleanProperty mockImagesLoaded = new SimpleBooleanProperty(false);
+
+    public CaptureViewModel() {
+        // Try to get the SimulatedCameraService, fall back to regular CameraService if not available
+        SimulatedCameraService simService = null;
+        try {
+            simService = ServiceLocator.getService(SimulatedCameraService.class);
+        } catch (Exception e) {
+            // Service not registered, create a new instance
+            simService = new SimulatedCameraService();
+            // Register it for future use
+            ServiceLocator.registerService(SimulatedCameraService.class, simService);
+        }
+
+        this.simulatedCameraService = simService;
+        this.cameraService = ServiceLocator.getService(CameraService.class);
+    }
+
     @Override
     public void onShow() {
         // Load the selected template from the worker flow context
         loadSelectedTemplate();
 
-        // Check if camera is available
-        if (!cameraService.isCameraAvailable()) {
-            errorMessage.set("Camera is not available on this device.");
+        // Load mock images
+        loadMockImages();
+    }
+
+    /**
+     * Loads the mock images from the simulated camera service.
+     */
+    private void loadMockImages() {
+        loading.set(true);
+        statusMessage.set("Loading mock images...");
+
+        // Clear the current list
+        availableMockImages.clear();
+
+        // Get the mock images from the simulated camera service
+        List<File> mockImages = simulatedCameraService.getAvailableMockImages();
+
+        if (mockImages.isEmpty()) {
+            errorMessage.set("No mock images available.");
+            loading.set(false);
             return;
         }
+
+        // Add the mock images to the observable list
+        availableMockImages.addAll(mockImages);
+        mockImagesLoaded.set(true);
+
+        loading.set(false);
+        statusMessage.set("Select a mock image to simulate taking a photo.");
     }
 
     /**
@@ -61,13 +110,14 @@ public class CaptureViewModel extends BaseViewModel<CaptureViewModel> {
         }
 
         currentTemplate.set(template);
-        templateName.set(template.name());
+        templateName.set(com.belman.presentation.providers.PhotoTemplateLabelProvider.getDisplayLabel(template));
         templateDescription.set(template.description());
-        statusMessage.set("Ready to take photo for " + template.name());
+        statusMessage.set("Ready to take photo for " + com.belman.presentation.providers.PhotoTemplateLabelProvider.getDisplayLabel(template));
     }
 
     /**
      * Takes a photo using the device camera.
+     * This method is kept for backward compatibility but is not used in the simulated camera UI.
      */
     public void takePhoto() {
         if (currentTemplate.get() == null) {
@@ -75,30 +125,39 @@ public class CaptureViewModel extends BaseViewModel<CaptureViewModel> {
             return;
         }
 
-        if (!cameraService.isCameraAvailable()) {
-            errorMessage.set("Camera is not available.");
+        // In the simulated camera UI, we don't actually take a photo
+        // Instead, the user selects a mock image from the grid
+        statusMessage.set("Please select a mock image from the grid.");
+    }
+
+    /**
+     * Selects a mock image to simulate taking a photo.
+     * 
+     * @param selectedImage the selected mock image
+     */
+    public void selectMockImage(File selectedImage) {
+        if (currentTemplate.get() == null) {
+            errorMessage.set("No template selected. Please go back and select a template before taking a photo.");
+            statusMessage.set("Error: No template selected");
+            return;
+        }
+
+        if (selectedImage == null) {
+            errorMessage.set("No image selected.");
             return;
         }
 
         loading.set(true);
-        statusMessage.set("Taking photo...");
+        statusMessage.set("Processing selected image...");
 
-        // Take the photo
-        Optional<File> photoFile = cameraService.takePhoto();
+        // Set the selected image in the simulated camera service
+        simulatedCameraService.setSelectedImage(selectedImage);
 
-        photoFile.ifPresentOrElse(
-            file -> {
-                capturedPhotoFile.set(file);
-                photoTaken.set(true);
-                loading.set(false);
-                statusMessage.set("Photo taken. Review or retake.");
-            },
-            () -> {
-                // User cancelled
-                loading.set(false);
-                statusMessage.set("Photo capture cancelled.");
-            }
-        );
+        // Set the captured photo file
+        capturedPhotoFile.set(selectedImage);
+        photoTaken.set(true);
+        loading.set(false);
+        statusMessage.set("Image selected. Review or select another.");
     }
 
     /**
@@ -107,6 +166,12 @@ public class CaptureViewModel extends BaseViewModel<CaptureViewModel> {
     public void confirmPhoto() {
         if (capturedPhotoFile.get() == null) {
             errorMessage.set("No photo has been taken.");
+            return;
+        }
+
+        if (currentTemplate.get() == null) {
+            errorMessage.set("No template selected. Please go back and select a template before confirming a photo.");
+            statusMessage.set("Error: No template selected");
             return;
         }
 
@@ -173,7 +238,8 @@ public class CaptureViewModel extends BaseViewModel<CaptureViewModel> {
      * Cancels the photo capture and navigates back to the photo cube view.
      */
     public void cancel() {
-        Router.navigateBack();
+        // Use ViewStackManager directly instead of Router to ensure proper back navigation
+        com.belman.presentation.core.ViewStackManager.getInstance().navigateBack();
     }
 
     // Getters for properties
@@ -208,5 +274,23 @@ public class CaptureViewModel extends BaseViewModel<CaptureViewModel> {
 
     public ObjectProperty<File> capturedPhotoFileProperty() {
         return capturedPhotoFile;
+    }
+
+    /**
+     * Gets the observable list of available mock images.
+     * 
+     * @return the observable list of available mock images
+     */
+    public ObservableList<File> getAvailableMockImages() {
+        return availableMockImages;
+    }
+
+    /**
+     * Gets the property indicating whether mock images have been loaded.
+     * 
+     * @return the property indicating whether mock images have been loaded
+     */
+    public BooleanProperty mockImagesLoadedProperty() {
+        return mockImagesLoaded;
     }
 }

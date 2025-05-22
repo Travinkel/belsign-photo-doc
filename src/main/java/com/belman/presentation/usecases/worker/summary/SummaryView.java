@@ -13,7 +13,8 @@ public class SummaryView extends BaseView<SummaryViewModel> {
 
     @Override
     public void updateAppBar(AppBar appBar) {
-        appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> Router.navigateBack()));
+        // Use ViewStackManager directly instead of Router to ensure proper back navigation
+        appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> com.belman.presentation.core.ViewStackManager.getInstance().navigateBack()));
         appBar.setTitleText("Photo Summary");
     }
 }

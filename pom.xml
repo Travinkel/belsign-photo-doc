@@ -226,6 +226,7 @@
                     <include>**/*.css</include>
                     <include>**/*.json</include>
                     <include>**/*.png</include>
+                    <include>**/*.sql</include>
                     <include>**/*.fxml</include>
                     <include>**/*.properties</include>
                     <include>META-INF/native-image/**</include>

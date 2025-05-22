@@ -62,7 +62,9 @@ public class SummaryViewModel extends BaseViewModel<SummaryViewModel> {
             }
 
             currentOrder.set(order);
-            orderNumber.set(order.getOrderNumber().toString());
+            // Format the order number in a user-friendly way (e.g., "Order #123" instead of technical format)
+            String friendlyOrderNumber = order.getOrderNumber().toString().replace("ORD-", "Order #");
+            orderNumber.set(friendlyOrderNumber);
 
             // Get the taken photos from the worker flow context
             List<PhotoDocument> photos = WorkerFlowContext.getTakenPhotos();
@@ -91,7 +93,7 @@ public class SummaryViewModel extends BaseViewModel<SummaryViewModel> {
                     if (i > 0) {
                         message.append(", ");
                     }
-                    message.append(missing.get(i).name());
+                    message.append(com.belman.presentation.providers.PhotoTemplateLabelProvider.getDisplayLabel(missing.get(i)));
                 }
                 errorMessage.set(message.toString());
                 statusMessage.set("Review your photos before submission. " + photos.size() + " of " + 
@@ -130,7 +132,7 @@ public class SummaryViewModel extends BaseViewModel<SummaryViewModel> {
                 if (i > 0) {
                     message.append(", ");
                 }
-                message.append(missingTemplates.get(i).name());
+                message.append(com.belman.presentation.providers.PhotoTemplateLabelProvider.getDisplayLabel(missingTemplates.get(i)));
             }
             errorMessage.set(message.toString());
             return;
@@ -186,7 +188,8 @@ public class SummaryViewModel extends BaseViewModel<SummaryViewModel> {
      * Navigates back to the photo cube view.
      */
     public void goBack() {
-        Router.navigateBack();
+        // Use ViewStackManager directly instead of Router to ensure proper back navigation
+        com.belman.presentation.core.ViewStackManager.getInstance().navigateBack();
     }
 
     // Getters for properties

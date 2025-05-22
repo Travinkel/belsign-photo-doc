@@ -88,8 +88,7 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
      */
     @FXML
     private void handleGenerateReport() {
-        // This functionality is not implemented yet
-        errorLabel.setText("Report generation is not implemented yet");
+        getViewModel().generateReportPreview();
     }
 
     /**

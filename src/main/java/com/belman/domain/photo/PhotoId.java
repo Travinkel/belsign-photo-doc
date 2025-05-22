@@ -10,6 +10,7 @@ public record PhotoId(String id) {
 
     /**
      * Creates a new PhotoId with the specified ID.
+     * The ID is normalized to lowercase to ensure consistent comparison across all storage backends.
      *
      * @param id the ID value
      * @throws IllegalArgumentException if the ID is null or empty
@@ -18,6 +19,8 @@ public record PhotoId(String id) {
         if (id == null || id.isBlank()) {
             throw new IllegalArgumentException("Photo ID must not be null or blank");
         }
+        // Normalize UUID to lowercase for consistent comparison
+        id = id.toLowerCase();
     }
 
     /**

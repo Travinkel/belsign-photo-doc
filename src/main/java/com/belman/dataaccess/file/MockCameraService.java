@@ -66,21 +66,17 @@ public class MockCameraService implements CameraService {
      */
     private Optional<File> getRandomImageFile() {
         try {
-            // Get all order directories
+            // First try to get images from order directories
             List<Path> orderDirs = Files.list(Paths.get(MOCK_CAMERA_PATH))
                     .filter(Files::isDirectory)
                     .collect(Collectors.toList());
 
-            if (orderDirs.isEmpty()) {
-                logError("No order directories found in mock camera path", null);
-                return Optional.empty();
-            }
+            if (!orderDirs.isEmpty()) {
+                // Select a random order directory
+                Path orderDir = orderDirs.get(random.nextInt(orderDirs.size()));
 
-            // Select a random order directory
-            Path orderDir = orderDirs.get(random.nextInt(orderDirs.size()));
-
-            // Get all image files in the order directory
-            List<Path> imageFiles = Files.list(orderDir)
+                // Get all image files in the order directory
+                List<Path> imageFiles = Files.list(orderDir)
                     .filter(path -> {
                         String fileName = path.getFileName().toString().toLowerCase();
                         return fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || 
@@ -88,13 +84,34 @@ public class MockCameraService implements CameraService {
                     })
                     .collect(Collectors.toList());
 
-            if (imageFiles.isEmpty()) {
-                logError("No image files found in order directory: " + orderDir, null);
+                if (!imageFiles.isEmpty()) {
+                    // Select a random image file
+                    Path imageFile = imageFiles.get(random.nextInt(imageFiles.size()));
+                    return Optional.of(imageFile.toFile());
+                } else {
+                    logInfo("No image files found in order directory: " + orderDir + ", falling back to root directory");
+                }
+            } else {
+                logInfo("No order directories found in mock camera path, checking for images directly in the directory");
+            }
+
+            // If no images found in order directories, check for images directly in the mock camera directory
+            List<Path> rootImageFiles = Files.list(Paths.get(MOCK_CAMERA_PATH))
+                .filter(path -> {
+                    String fileName = path.getFileName().toString().toLowerCase();
+                    return fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || 
+                           fileName.endsWith(".png") || fileName.endsWith(".gif");
+                })
+                .collect(Collectors.toList());
+
+            if (rootImageFiles.isEmpty()) {
+                logError("No image files found in mock camera directory", null);
                 return Optional.empty();
             }
 
             // Select a random image file
-            Path imageFile = imageFiles.get(random.nextInt(imageFiles.size()));
+            Path imageFile = rootImageFiles.get(random.nextInt(rootImageFiles.size()));
+            logInfo("Using image file from root directory: " + imageFile.getFileName());
             return Optional.of(imageFile.toFile());
         } catch (IOException e) {
             logError("Error accessing mock camera directory", e);

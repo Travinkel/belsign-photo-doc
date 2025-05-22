@@ -13,7 +13,8 @@ public class CompletedView extends BaseView<CompletedViewModel> {
 
     @Override
     public void updateAppBar(AppBar appBar) {
-        appBar.setNavIcon(MaterialDesignIcon.HOME.button(e -> Router.navigateBack()));
+        // Use ViewStackManager directly instead of Router to ensure proper back navigation
+        appBar.setNavIcon(MaterialDesignIcon.HOME.button(e -> com.belman.presentation.core.ViewStackManager.getInstance().navigateBack()));
         appBar.setTitleText("Order Completed");
     }
 }

@@ -1,7 +1,7 @@
 package com.belman.bootstrap;
 
 import com.belman.bootstrap.config.ApplicationBootstrapper;
-import com.belman.bootstrap.config.DevModeConfig;
+import com.belman.bootstrap.config.StorageTypeConfig;
 import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.bootstrap.di.ServiceRegistry;
 import com.belman.bootstrap.hacks.GluonInternalClassesFix;
@@ -58,36 +58,32 @@ public class Main extends Application {
      * @param args command line arguments
      */
     public static void main(String[] args) {
-        // Check for dev mode flag in command line arguments or system properties
-        boolean devMode = false;
-        for (String arg : args) {
-            if (arg.equals("--dev")) {
-                devMode = true;
-                break;
-            }
+        try {
+            logger.info("Starting BelSign Photo Documentation application");
+
+            // Log Java version and environment
+            logger.debug("Java version: " + System.getProperty("java.version"));
+            logger.debug("JavaFX version: " + System.getProperty("javafx.version"));
+            logger.debug("OS: " + System.getProperty("os.name") + " " + System.getProperty("os.version"));
+
+            // Initialize storage type configuration
+            logger.debug("Initializing storage type configuration...");
+            StorageTypeConfig.initialize();
+            logger.debug("Storage type configuration initialized successfully");
+
+            // Launch JavaFX application
+            logger.debug("Launching JavaFX application...");
+            Application.launch(args);
+        } catch (Exception e) {
+            logger.error("Error in main method", e);
+            throw new RuntimeException("Failed to start application", e);
         }
-
-        // Also check system property
-        if (!devMode && "true".equals(System.getProperty("belsign.devMode"))) {
-            devMode = true;
-        }
-
-        // Initialize dev mode configuration
-        DevModeConfig.initialize(devMode);
-
-        // Generate a hashed password for testing (this should be removed in production)
-        if (DevModeConfig.isDevMode()) {
-            String password = "pass1234";
-            String hashed = BCrypt.hashpw(password, BCrypt.gensalt(10));
-            System.out.println("Hashed password: " + hashed);
-        }
-
-        Application.launch(args);
     }
 
     @Override
     public void init() throws Exception {
         try {
+            logger.debug("Starting JavaFX init() method");
             super.init();
 
             // Initialize application
@@ -98,12 +94,25 @@ public class Main extends Application {
         }
 
         // Initialize Gluon internal classes fixes (DAL)
-        logger.debug("Initializing Gluon internal classes fixes");
-        GluonInternalClassesFix.initialize();
+        try {
+            logger.debug("Initializing Gluon internal classes fixes");
+            GluonInternalClassesFix.initialize();
+            logger.debug("Gluon internal classes fixes initialized successfully");
+        } catch (Exception e) {
+            logger.error("Error initializing Gluon internal classes fixes", e);
+            // Continue despite error, as this might not be critical
+        }
 
         // Bootstrap the application (DAL)
-        logger.startup("Bootstrapping the application");
-        ApplicationBootstrapper.initialize();
+        try {
+            logger.startup("Bootstrapping the application");
+            logger.debug("Current storage type: " + StorageTypeConfig.getStorageType());
+            ApplicationBootstrapper.initialize();
+            logger.debug("Application bootstrapping completed successfully");
+        } catch (Exception e) {
+            logger.error("Error bootstrapping application", e);
+            throw new RuntimeException("Error bootstrapping application", e);
+        }
 
         // Initialize error handling (BLL)
         logger.debug("Initializing error handling");
@@ -228,6 +237,7 @@ public class Main extends Application {
      * @param scene the JavaFX scene
      */
     private void loadCss(Scene scene) {
+        // Load main application CSS
         var css = getClass().getResource("/com/belman/styles/app.css");
         logger.debug("Loading app.css from: " + css);
 
@@ -236,6 +246,17 @@ public class Main extends Application {
             logger.info("✅ Loaded app.css from: " + css);
         } else {
             logger.warn("⚠️ Could not find app.css at /com/belman/styles/app.css");
+        }
+
+        // Load Progressive Capture Dashboard CSS
+        var dashboardCss = getClass().getResource("/com/belman/styles/progressive-capture-dashboard.css");
+        logger.debug("Loading progressive-capture-dashboard.css from: " + dashboardCss);
+
+        if (dashboardCss != null) {
+            scene.getStylesheets().add(dashboardCss.toExternalForm());
+            logger.info("✅ Loaded progressive-capture-dashboard.css from: " + dashboardCss);
+        } else {
+            logger.warn("⚠️ Could not find progressive-capture-dashboard.css at /com/belman/styles/progressive-capture-dashboard.css");
         }
     }
 }

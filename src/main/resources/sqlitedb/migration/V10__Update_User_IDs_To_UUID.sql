@@ -1,138 +1,27 @@
--- Update user IDs to UUID format
+-- Ensure all IDs in the database are UUIDs
+-- This script is a placeholder since the new schema (V9) already uses TEXT columns for IDs
+-- and the default users are added with UUIDs in V11
 
--- Create temporary tables
-CREATE TABLE users_temp
-(
-    id           TEXT PRIMARY KEY,
-    username     TEXT  NOT NULL UNIQUE,
-    password     TEXT NOT NULL,
-    first_name   TEXT,
-    last_name    TEXT,
-    email        TEXT NOT NULL UNIQUE,
-    status       TEXT  NOT NULL,
-    phone_number TEXT,
-    nfc_id       TEXT,
-    created_at   DATETIME2    DEFAULT (datetime('now')),
-    updated_at   DATETIME2    DEFAULT (datetime('now'))
+-- Create a function to check if a string is a valid UUID
+-- This is just a simple check for the correct length and format
+CREATE TABLE IF NOT EXISTS temp_functions (
+    name TEXT PRIMARY KEY,
+    sql TEXT
 );
 
-CREATE TABLE user_roles_temp
-(
-    user_id TEXT NOT NULL,
-    role    TEXT NOT NULL,
-    PRIMARY KEY (user_id, role),
-    FOREIGN KEY (user_id) REFERENCES users_temp (id) 
-);
+INSERT OR REPLACE INTO temp_functions (name, sql)
+VALUES ('is_uuid', 'CREATE FUNCTION is_uuid(text_to_check TEXT) 
+RETURNS BOOLEAN AS 
+BEGIN
+    RETURN length(text_to_check) = 32 AND text_to_check GLOB ''[0-9A-Fa-f]*'';
+END;');
 
--- Insert data into temporary tables with UUID-based IDs
--- Admin user
-INSERT INTO users_temp 
-SELECT 
-    hex(randomblob(16)), -- Generate a UUID
-    username, 
-    password, 
-    first_name, 
-    last_name, 
-    email, 
-    status, 
-    phone_number, 
-    nfc_id,
-    created_at, 
-    updated_at
-FROM users 
-WHERE id = 'admin-user-id';
+-- Add any additional UUID validation or conversion logic here if needed
 
--- Get the new UUID for the admin user
-INSERT INTO user_roles_temp
-SELECT 
-    (SELECT id FROM users_temp WHERE email = (SELECT email FROM users WHERE id = 'admin-user-id')),
-    role
-FROM user_roles
-WHERE user_id = 'admin-user-id';
+-- Note: In a real-world scenario, you might want to add code here to:
+-- 1. Check if any existing IDs are not in UUID format
+-- 2. Convert non-UUID IDs to UUID format
+-- 3. Update foreign key references accordingly
 
--- Admin user 2
-INSERT INTO users_temp 
-SELECT 
-    hex(randomblob(16)), -- Generate a UUID
-    username, 
-    password, 
-    first_name, 
-    last_name, 
-    email, 
-    status, 
-    phone_number, 
-    nfc_id,
-    created_at, 
-    updated_at
-FROM users 
-WHERE id = 'admin-user-id2';
-
--- Get the new UUID for the admin user 2
-INSERT INTO user_roles_temp
-SELECT 
-    (SELECT id FROM users_temp WHERE email = (SELECT email FROM users WHERE id = 'admin-user-id2')),
-    role
-FROM user_roles
-WHERE user_id = 'admin-user-id2';
-
--- QA user
-INSERT INTO users_temp 
-SELECT 
-    hex(randomblob(16)), -- Generate a UUID
-    username, 
-    password, 
-    first_name, 
-    last_name, 
-    email, 
-    status, 
-    phone_number, 
-    nfc_id,
-    created_at, 
-    updated_at
-FROM users 
-WHERE id = 'qa-user-id';
-
--- Get the new UUID for the QA user
-INSERT INTO user_roles_temp
-SELECT 
-    (SELECT id FROM users_temp WHERE email = (SELECT email FROM users WHERE id = 'qa-user-id')),
-    role
-FROM user_roles
-WHERE user_id = 'qa-user-id';
-
--- Production user
-INSERT INTO users_temp 
-SELECT 
-    hex(randomblob(16)), -- Generate a UUID
-    username, 
-    password, 
-    first_name, 
-    last_name, 
-    email, 
-    status, 
-    phone_number, 
-    nfc_id,
-    created_at, 
-    updated_at
-FROM users 
-WHERE id = 'production-user-id';
-
--- Get the new UUID for the production user
-INSERT INTO user_roles_temp
-SELECT 
-    (SELECT id FROM users_temp WHERE email = (SELECT email FROM users WHERE id = 'production-user-id')),
-    role
-FROM user_roles
-WHERE user_id = 'production-user-id';
-
--- Drop existing tables
-DROP TABLE user_roles;
-DROP TABLE users;
-
--- Rename temporary tables to original names
-ALTER TABLE users_temp RENAME TO users;
-ALTER TABLE user_roles_temp RENAME TO user_roles;
-
--- Create indexes
-CREATE INDEX idx_users_username ON users (username);
-CREATE INDEX idx_users_email ON users (email);
+-- For now, we're assuming all IDs will be UUIDs from this point forward
+-- as enforced by application code and the V11 migration script

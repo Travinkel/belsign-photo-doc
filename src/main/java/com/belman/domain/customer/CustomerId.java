@@ -12,6 +12,7 @@ public record CustomerId(String id) implements ValueObject {
 
     /**
      * Creates a new CustomerId with the specified ID.
+     * The ID is normalized to lowercase to ensure consistent comparison across all storage backends.
      *
      * @param id the ID value
      * @throws IllegalArgumentException if the ID is null or empty
@@ -20,6 +21,8 @@ public record CustomerId(String id) implements ValueObject {
         if (id == null || id.isBlank()) {
             throw new IllegalArgumentException("Customer ID must not be null or blank");
         }
+        // Normalize UUID to lowercase for consistent comparison
+        id = id.toLowerCase();
     }
 
     /**

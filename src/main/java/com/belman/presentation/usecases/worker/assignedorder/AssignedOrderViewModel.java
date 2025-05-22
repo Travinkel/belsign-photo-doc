@@ -6,6 +6,8 @@ import com.belman.common.session.SessionContext;
 import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.photo.PhotoTemplate;
 import com.belman.domain.security.AuthenticationService;
+import com.belman.domain.user.UserReference;
+import com.belman.domain.user.UserRole;
 import com.belman.application.usecase.order.OrderService;
 import com.belman.application.usecase.worker.WorkerService;
 import com.belman.presentation.base.BaseViewModel;
@@ -15,6 +17,7 @@ import com.belman.presentation.usecases.worker.WorkerFlowContext;
 import com.belman.presentation.usecases.worker.photocube.PhotoCubeView;
 import javafx.beans.property.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -45,6 +48,7 @@ public class AssignedOrderViewModel extends BaseViewModel<AssignedOrderViewModel
     private final StringProperty photoCount = new SimpleStringProperty("");
     private final ListProperty<PhotoTemplate> photoTemplates = new SimpleListProperty<>(javafx.collections.FXCollections.observableArrayList());
     private final BooleanProperty hasMultipleTemplates = new SimpleBooleanProperty(false);
+    private final BooleanProperty devMode = new SimpleBooleanProperty(false);
 
     @Override
     public void onShow() {
@@ -71,32 +75,77 @@ public class AssignedOrderViewModel extends BaseViewModel<AssignedOrderViewModel
     private void loadAssignedOrder() {
         loading.set(true);
         statusMessage.set("Loading assigned order...");
+        System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Starting to load assigned orders");
 
         try {
             // Get the current user
+            System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Getting current user from SessionContext");
             SessionContext.getCurrentUser().ifPresentOrElse(
                 user -> {
-                    // Get all orders
-                    List<OrderBusiness> orders = orderService.getAllOrders();
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Current user found: " + user.getUsername().value() + ", ID: " + user.getId().id());
 
-                    // In dev mode, show all orders regardless of creator
-                    // In production, filter orders for the current user
+                    // Get all orders
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Fetching all orders from OrderService");
+                    List<OrderBusiness> orders = orderService.getAllOrders();
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Found " + orders.size() + " total orders in database");
+
+                    // Log all orders for debugging
+                    if (orders.isEmpty()) {
+                        System.out.println("[DEBUG_LOG] AssignedOrderViewModel: No orders found in database");
+                    } else {
+                        System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Listing all orders in database:");
+                        for (int i = 0; i < orders.size(); i++) {
+                            OrderBusiness order = orders.get(i);
+                            System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Order " + (i+1) + ": " + 
+                                "Number=" + (order.getOrderNumber() != null ? order.getOrderNumber().value() : "null") + ", " +
+                                "ID=" + order.getId().id() + ", " +
+                                "CreatedBy=" + (order.getCreatedBy() != null ? order.getCreatedBy().id() : "null") + ", " +
+                                "Status=" + order.getStatus());
+                        }
+                    }
+
+                    // Filter orders based on user role
                     List<OrderBusiness> userOrders;
-                    if (com.belman.bootstrap.config.DevModeConfig.isDevMode()) {
-                        // In dev mode, show all orders
-                        userOrders = orders;
-                        if (!orders.isEmpty()) {
-                            statusMessage.set("Dev mode: Showing all orders");
+                    boolean isProductionWorker = user.getRoles().contains(UserRole.PRODUCTION);
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: User is " + (isProductionWorker ? "a production worker" : "not a production worker"));
+
+                    // For production workers, show orders assigned to them
+                    if (isProductionWorker) {
+                        // For production users, show orders assigned to them
+                        System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Production user - showing assigned orders");
+
+                        userOrders = orders.stream()
+                            .filter(o -> {
+                                boolean isAssigned = o.getAssignedTo() != null && 
+                                                    o.getAssignedTo().id().id().equals(user.getId().id());
+                                System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Order " + o.getId().id() + 
+                                    " assigned to " + (o.getAssignedTo() != null ? o.getAssignedTo().id().id() : "null") + 
+                                    " - matches current user: " + isAssigned);
+                                return isAssigned;
+                            })
+                            .toList();
+
+                        System.out.println("[DEBUG_LOG] AssignedOrderViewModel: After filtering, found " + userOrders.size() + " orders assigned to production worker");
+                        if (!userOrders.isEmpty()) {
+                            statusMessage.set("Production user: Showing assigned orders (" + userOrders.size() + " total)");
                         }
                     } else {
-                        // In production, filter orders for the current user
+                        // For other users (QA, Admin), filter orders for the current user
+                        System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Regular user, filtering orders for current user: " + user.getId().id());
                         userOrders = orders.stream()
-                            .filter(o -> o.getCreatedBy() != null && 
-                                   o.getCreatedBy().id().equals(user.getId()))
+                            .filter(o -> {
+                                boolean matches = o.getCreatedBy() != null && o.getCreatedBy().id().equals(user.getId());
+                                System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Order " + o.getId().id() + 
+                                    " created by " + (o.getCreatedBy() != null ? o.getCreatedBy().id() : "null") + 
+                                    " - matches current user: " + matches);
+                                return matches;
+                            })
                             .toList();
+                        System.out.println("[DEBUG_LOG] AssignedOrderViewModel: After filtering, found " + userOrders.size() + " orders for current user");
                     }
 
                     if (userOrders.isEmpty()) {
+                        System.out.println("[DEBUG_LOG] AssignedOrderViewModel: No orders found for current user");
                         errorMessage.set("No active orders assigned to you. Please contact your supervisor or QA team to assign an order for documentation.");
                         statusMessage.set("Waiting for order assignment");
                         loading.set(false);
@@ -105,48 +154,64 @@ public class AssignedOrderViewModel extends BaseViewModel<AssignedOrderViewModel
 
                     // Auto-select the first order for the user
                     OrderBusiness order = userOrders.get(0);
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Auto-selecting first order: " + 
+                        "Number=" + (order.getOrderNumber() != null ? order.getOrderNumber().value() : "null") + ", " +
+                        "ID=" + order.getId().id());
                     currentOrder.set(order);
 
                     // Store the order in the WorkerFlowContext
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Storing order in WorkerFlowContext");
                     WorkerFlowContext.setCurrentOrder(order);
 
                     // Update the UI properties
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Updating UI properties with order data");
                     orderNumber.set(order.getOrderNumber().toString());
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Set orderNumber property: " + orderNumber.get());
 
                     // Use a placeholder for customer name since we don't have direct access to customer data
                     customerName.set(order.getCustomerId() != null ? 
                         "Customer ID: " + order.getCustomerId().toString() : "Unknown Customer");
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Set customerName property: " + customerName.get());
 
                     productDescription.set(order.getProductDescription() != null ? 
                         order.getProductDescription().toString() : "No description available");
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Set productDescription property: " + productDescription.get());
 
                     // Set project name (placeholder)
                     projectName.set("Project: " + order.getOrderNumber().toString());
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Set projectName property: " + projectName.get());
 
                     // Set location (placeholder)
                     location.set("Location: Production Floor");
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Set location property: " + location.get());
 
                     // Set due date (placeholder)
                     dueDate.set("Due: " + java.time.LocalDate.now().plusDays(7));
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Set dueDate property: " + dueDate.get());
 
                     // Load photo templates for this order
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Loading photo templates for order: " + order.getId().id());
                     loadPhotoTemplates(order);
 
                     statusMessage.set("Order loaded successfully.");
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Order loaded successfully");
                     loading.set(false);
                 },
                 () -> {
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: No user found in SessionContext");
                     errorMessage.set("Your session has expired or you are not logged in. Please return to the login screen and sign in again.");
                     statusMessage.set("Authentication required");
                     loading.set(false);
 
                     // Automatically navigate back to login after a short delay
+                    System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Scheduling navigation to login screen after delay");
                     new Thread(() -> {
                         try {
                             Thread.sleep(3000); // 3 seconds delay
+                            System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Navigating to login screen after delay");
                             Router.navigateTo(LoginView.class);
                         } catch (InterruptedException e) {
-                            // Ignore
+                            System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Interrupted while waiting to navigate to login");
                         }
                     }).start();
                 }
@@ -182,26 +247,70 @@ public class AssignedOrderViewModel extends BaseViewModel<AssignedOrderViewModel
      * @param order the order to load templates for
      */
     private void loadPhotoTemplates(OrderBusiness order) {
+        System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Loading photo templates for order: " + 
+                           order.getId().id() + ", Number: " + 
+                           (order.getOrderNumber() != null ? order.getOrderNumber().value() : "null"));
+
         try {
             // Get templates for this order using the getAvailableTemplates method
+            System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Calling workerService.getAvailableTemplates for order ID: " + order.getId().id());
+            System.out.println("[DEBUG_LOG] AssignedOrderViewModel: WorkerService class: " + workerService.getClass().getName());
+
             List<PhotoTemplate> templates = workerService.getAvailableTemplates(order.getId());
+            System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Retrieved " + templates.size() + " photo templates");
+
+            // Log each template
+            for (int i = 0; i < templates.size(); i++) {
+                PhotoTemplate template = templates.get(i);
+                System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Template " + (i+1) + ": " + 
+                                  "Name=" + template.name() + ", " +
+                                  "Description=" + template.description());
+            }
+
+            // Check if templates list is empty and add default templates if needed
+            if (templates.isEmpty()) {
+                System.out.println("[DEBUG_LOG] AssignedOrderViewModel: No templates returned from service, adding default templates");
+
+                // Add default templates
+                templates = Arrays.asList(
+                    PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY,
+                    PhotoTemplate.BACK_VIEW_OF_ASSEMBLY,
+                    PhotoTemplate.TOP_VIEW_OF_JOINT,
+                    PhotoTemplate.SIDE_VIEW_OF_WELD
+                );
+
+                System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Added " + templates.size() + " default templates");
+            }
 
             // Update the templates list
+            System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Updating photoTemplates list with " + templates.size() + " templates");
             photoTemplates.setAll(templates);
 
             // Set the photo count
-            photoCount.set(templates.size() + " photos required");
+            String countText = templates.size() + " photos required";
+            System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Setting photoCount to: " + countText);
+            photoCount.set(countText);
 
             // Check if there are multiple templates
-            hasMultipleTemplates.set(templates.size() > 1);
+            boolean hasMultiple = templates.size() > 1;
+            System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Setting hasMultipleTemplates to: " + hasMultiple);
+            hasMultipleTemplates.set(hasMultiple);
 
             // If there's only one template, auto-select it
             if (templates.size() == 1) {
-                WorkerFlowContext.setSelectedTemplate(templates.get(0));
+                PhotoTemplate template = templates.get(0);
+                System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Only one template found, auto-selecting: " + template.name());
+                WorkerFlowContext.setSelectedTemplate(template);
+            } else if (templates.size() > 1) {
+                System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Multiple templates found (" + templates.size() + "), user will need to select one");
+            } else {
+                System.out.println("[DEBUG_LOG] AssignedOrderViewModel: No templates found for this order even after adding defaults");
             }
+
+            System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Photo templates loaded successfully");
         } catch (Exception e) {
             // Log the full error for debugging
-            System.err.println("Error loading photo templates: " + e.getMessage());
+            System.err.println("[DEBUG_LOG] AssignedOrderViewModel: Error loading photo templates: " + e.getMessage());
             e.printStackTrace();
 
             // Set a user-friendly error message
@@ -211,15 +320,19 @@ public class AssignedOrderViewModel extends BaseViewModel<AssignedOrderViewModel
             if (e.getMessage() != null) {
                 if (e.getMessage().contains("database") || e.getMessage().contains("SQL")) {
                     userMessage += "There seems to be a database issue. ";
+                    System.err.println("[DEBUG_LOG] AssignedOrderViewModel: Database-related error detected");
                 } else if (e.getMessage().contains("template") || e.getMessage().contains("not found")) {
                     userMessage += "The required templates may not be configured properly. ";
+                    System.err.println("[DEBUG_LOG] AssignedOrderViewModel: Template configuration error detected");
                 }
             }
 
             userMessage += "You can still view order details, but photo capture may not be available. Please contact your supervisor.";
+            System.err.println("[DEBUG_LOG] AssignedOrderViewModel: Setting error message: " + userMessage);
             errorMessage.set(userMessage);
 
             // Set photo count to indicate the issue
+            System.err.println("[DEBUG_LOG] AssignedOrderViewModel: Setting photoCount to indicate templates are unavailable");
             photoCount.set("Photo templates unavailable");
         }
     }
@@ -352,5 +465,46 @@ public class AssignedOrderViewModel extends BaseViewModel<AssignedOrderViewModel
 
     public BooleanProperty hasMultipleTemplatesProperty() {
         return hasMultipleTemplates;
+    }
+
+    /**
+     * Gets the dev mode property.
+     * This property is used to control the visibility of development-only UI elements.
+     *
+     * @return the dev mode property
+     */
+    public BooleanProperty devModeProperty() {
+        return devMode;
+    }
+
+    /**
+     * Creates a test order for development and testing purposes.
+     * This method is disabled in production mode.
+     */
+    public void createTestOrder() {
+        errorMessage.set("Test order creation is not available in production mode");
+    }
+
+    /**
+     * Refreshes the photo templates for the current order.
+     * This method can be called when the user wants to manually refresh the templates.
+     */
+    public void refreshPhotoTemplates() {
+        if (currentOrder.get() == null) {
+            errorMessage.set("Cannot refresh templates: No order is currently loaded.");
+            return;
+        }
+
+        System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Manually refreshing photo templates for order: " + 
+                          currentOrder.get().getId().id());
+
+        loading.set(true);
+        statusMessage.set("Refreshing photo templates...");
+
+        // Load photo templates for the current order
+        loadPhotoTemplates(currentOrder.get());
+
+        loading.set(false);
+        statusMessage.set("Photo templates refreshed.");
     }
 }

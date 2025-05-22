@@ -12,6 +12,7 @@ public record OrderId(String id) implements ValueObject {
 
     /**
      * Creates a new OrderId with the specified ID.
+     * The ID is normalized to lowercase to ensure consistent comparison across all storage backends.
      *
      * @param id the ID value
      * @throws IllegalArgumentException if the ID is null or empty
@@ -20,6 +21,8 @@ public record OrderId(String id) implements ValueObject {
         if (id == null || id.isBlank()) {
             throw new IllegalArgumentException("OrderBusiness ID must not be null or blank");
         }
+        // Normalize UUID to lowercase for consistent comparison
+        id = id.toLowerCase();
     }
 
     /**

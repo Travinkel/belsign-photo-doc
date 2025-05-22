@@ -2,15 +2,14 @@ package com.belman.bootstrap.config;
 
 import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.bootstrap.di.ServiceRegistry;
-import com.belman.bootstrap.persistence.DatabaseConfig;
-import com.belman.bootstrap.persistence.SqliteDatabaseConfig;
-import com.belman.bootstrap.config.DevModeConfig;
+import com.belman.bootstrap.config.StorageTypeManager;
 import com.belman.common.logging.EmojiLogger;
 import com.belman.common.session.SessionContext;
 import com.belman.common.session.SimpleSessionContext;
 import com.belman.domain.services.LoggerFactory;
 import com.belman.domain.order.OrderRepository;
 import com.belman.domain.photo.PhotoRepository;
+import com.belman.domain.photo.PhotoTemplateRepository;
 import com.belman.domain.report.ReportRepository;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.security.PasswordHasher;
@@ -33,14 +32,16 @@ import com.belman.application.usecase.user.DefaultUserService;
 import com.belman.application.usecase.user.UserService;
 import com.belman.application.usecase.worker.DefaultWorkerService;
 import com.belman.application.usecase.worker.WorkerService;
+import com.belman.application.usecase.photo.PhotoCaptureService;
+import com.belman.application.usecase.photo.DefaultPhotoCaptureService;
+import com.belman.application.usecase.photo.PhotoTemplateService;
+import com.belman.application.usecase.photo.DefaultPhotoTemplateService;
+import com.belman.application.usecase.order.OrderProgressService;
+import com.belman.application.usecase.order.DefaultOrderProgressService;
 import com.belman.application.usecase.photo.CameraService;
-import com.belman.application.usecase.order.OrderIntakeService;
 import com.belman.dataaccess.file.CameraServiceFactory;
-import com.belman.dataaccess.provider.MockFolderOrderProvider;
-import com.belman.dataaccess.provider.OrderProvider;
 
 import javax.sql.DataSource;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Initializes the application's services and repositories.
@@ -67,44 +68,31 @@ public class ApplicationInitializer {
         logger.startup("Starting application initialization");
 
         try {
-            // Initialize database connection pool
-            logger.database("Initializing database connection pool");
-            DatabaseConfig.initialize();
-            logger.success("Database connection pool initialized successfully");
+            // Initialize the storage type manager to determine which database to use
+            logger.database("Initializing storage type manager");
+            StorageTypeManager.initialize();
+            DataSource dataSource = StorageTypeManager.getActiveDataSource();
+
+            if (dataSource != null) {
+                logger.success("Database connection pool initialized successfully");
+            } else {
+                logger.info("Using in-memory repositories");
+            }
 
             // Create repositories
             UserRepository userRepository;
             OrderRepository orderRepository;
             logger.debug("Creating repositories");
 
-            // Try to use SQL-based repositories if database is available
-            DataSource dataSource = DatabaseConfig.getDataSource();
-
-            // If main database is not available, try SQLite database
-            if (dataSource == null) {
-                logger.database("Main database not available, trying SQLite database");
-                SqliteDatabaseConfig.initialize();
-                dataSource = SqliteDatabaseConfig.getDataSource();
-                if (dataSource != null) {
-                    logger.success("SQLite database connection pool initialized successfully");
-                } else {
-                    logger.warn("SQLite database not available, falling back to in-memory repositories. SQL Server offline and SQLite not configured.");
-                }
-            }
-
-            // Initialize repositories based on dev mode
+            // Initialize repositories
             Object[] repositories;
-            if (DevModeConfig.isDevMode()) {
-                logger.info("🛠️ Development mode enabled - using hybrid repository configuration");
-                repositories = RepositoryInitializer.initializeDevModeRepositories(dataSource);
-            } else {
-                repositories = RepositoryInitializer.initializeRepositories(dataSource);
-            }
+            repositories = RepositoryInitializer.initializeRepositories(dataSource);
 
             userRepository = (UserRepository) repositories[0];
             orderRepository = (OrderRepository) repositories[1];
             PhotoRepository photoRepository = (PhotoRepository) repositories[2];
-            ReportRepository reportRepository = (ReportRepository) repositories[3];
+            PhotoTemplateRepository photoTemplateRepository = (PhotoTemplateRepository) repositories[3];
+            ReportRepository reportRepository = (ReportRepository) repositories[4];
 
             // Initialize PhotoService
             logger.database("Creating DefaultPhotoService");
@@ -118,22 +106,40 @@ public class ApplicationInitializer {
             ServiceRegistry.registerService(qaService);
             logger.success("Using DefaultQAService");
 
+            // Initialize PhotoCaptureService
+            logger.database("Creating DefaultPhotoCaptureService");
+            PhotoCaptureService photoCaptureService = new DefaultPhotoCaptureService(photoRepository, ServiceLocator.getService(LoggerFactory.class));
+            ServiceRegistry.registerService(photoCaptureService);
+            logger.success("Using DefaultPhotoCaptureService");
+
+            // Initialize PhotoTemplateService
+            logger.database("Creating DefaultPhotoTemplateService");
+            PhotoTemplateService photoTemplateService = new DefaultPhotoTemplateService(orderRepository, photoRepository, photoTemplateRepository, userRepository, ServiceLocator.getService(LoggerFactory.class));
+            ServiceRegistry.registerService(photoTemplateService);
+            logger.success("Using DefaultPhotoTemplateService");
+
+            // Initialize OrderProgressService
+            logger.database("Creating DefaultOrderProgressService");
+            OrderProgressService orderProgressService = new DefaultOrderProgressService(orderRepository, photoTemplateService, ServiceLocator.getService(LoggerFactory.class));
+            ServiceRegistry.registerService(orderProgressService);
+            logger.success("Using DefaultOrderProgressService");
+
             // Initialize WorkerService
             logger.database("Creating DefaultWorkerService");
-            WorkerService workerService = new DefaultWorkerService(orderRepository, photoRepository);
+            WorkerService workerService = new DefaultWorkerService(photoCaptureService, photoTemplateService, orderProgressService, ServiceLocator.getService(LoggerFactory.class));
             ServiceRegistry.registerService(workerService);
             logger.success("Using DefaultWorkerService");
 
             // Initialize OrderService
             logger.database("Creating DefaultOrderService");
-            OrderService orderService = new DefaultOrderService(orderRepository);
+            OrderService orderService = new DefaultOrderService(orderRepository, ServiceLocator.getService(LoggerFactory.class));
             ServiceRegistry.registerService(orderService);
             logger.success("Using DefaultOrderService");
 
             // Initialize UserService
             logger.database("Creating DefaultUserService");
             PasswordHasher passwordHasher = new BCryptPasswordHasher();
-            UserService userService = new DefaultUserService(userRepository, passwordHasher);
+            UserService userService = new DefaultUserService(userRepository, passwordHasher, ServiceLocator.getService(LoggerFactory.class));
             ServiceRegistry.registerService(userService);
             logger.success("Using DefaultUserService");
 
@@ -160,31 +166,13 @@ public class ApplicationInitializer {
             ServiceRegistry.registerService(cameraService);
             logger.success("Using MockCameraService");
 
-            // Initialize MockFolderOrderProvider
-            logger.database("Creating MockFolderOrderProvider");
-            OrderProvider orderProvider = new MockFolderOrderProvider(ServiceLocator.getService(LoggerFactory.class));
-            ServiceRegistry.registerService(orderProvider);
-            logger.success("Using MockFolderOrderProvider");
-
-            // Initialize OrderIntakeService
-            logger.database("Creating OrderIntakeService");
-            // Get a default user for creating orders
-            UserBusiness defaultUser = userRepository.findAll().stream()
-                    .filter(user -> user.getRoles().contains(UserRole.ADMIN))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("No admin user found for OrderIntakeService"));
-            OrderIntakeService orderIntakeService = new OrderIntakeService(
-                    ServiceLocator.getService(LoggerFactory.class),
-                    orderProvider,
-                    orderService,
-                    defaultUser);
-            ServiceRegistry.registerService(orderIntakeService);
-            logger.success("Using OrderIntakeService");
-
-            // Start the OrderIntakeService
-            logger.database("Starting OrderIntakeService");
-            orderIntakeService.start(5, 30, TimeUnit.SECONDS);
-            logger.success("OrderIntakeService started");
+            // Log which repositories are active
+            logger.database("Active repositories:");
+            logger.database("- UserRepository: " + userRepository.getClass().getSimpleName());
+            logger.database("- OrderRepository: " + orderRepository.getClass().getSimpleName());
+            logger.database("- PhotoRepository: " + photoRepository.getClass().getSimpleName());
+            logger.database("- PhotoTemplateRepository: " + photoTemplateRepository.getClass().getSimpleName());
+            logger.database("- ReportRepository: " + reportRepository.getClass().getSimpleName());
 
             // Create services
             logger.debug("Creating extended authentication service");
@@ -226,11 +214,6 @@ public class ApplicationInitializer {
             logger.success("RoleBasedAccessControlFactory initialized successfully");
             */
 
-            // Log the state of critical services if in dev mode
-            if (DevModeConfig.isDevMode()) {
-                logCriticalServicesState();
-            }
-
             initialized = true;
             logger.startup("Application initialized successfully ✨");
         } catch (Exception e) {
@@ -240,39 +223,6 @@ public class ApplicationInitializer {
         }
     }
 
-    /**
-     * Logs the state of critical services.
-     * This method is called during application startup in development mode.
-     */
-    private static void logCriticalServicesState() {
-        logger.info("📊 Logging state of critical services for development mode");
-
-        try {
-            // Check AuthenticationService
-            AuthenticationService authService = ServiceLocator.getService(AuthenticationService.class);
-            logger.info("🔑 AuthenticationService: {}", authService.getClass().getSimpleName());
-
-            // Check SessionContext
-            SessionContext sessionContext = ServiceLocator.getService(SessionContext.class);
-            logger.info("👤 SessionContext: {}", sessionContext.getClass().getSimpleName());
-
-            // Check RoleBasedNavigationService
-            RoleBasedNavigationService navigationService = ServiceLocator.getService(RoleBasedNavigationService.class);
-            logger.info("🧭 RoleBasedNavigationService: {}", navigationService.getClass().getSimpleName());
-
-            // Check OrderService
-            OrderService orderService = ServiceLocator.getService(OrderService.class);
-            logger.info("📋 OrderService: {}", orderService.getClass().getSimpleName());
-
-            // Check PhotoService
-            PhotoService photoService = ServiceLocator.getService(PhotoService.class);
-            logger.info("📷 PhotoService: {}", photoService.getClass().getSimpleName());
-
-            logger.success("✅ All critical services are available");
-        } catch (Exception e) {
-            logger.error("❌ Error checking critical services", e);
-        }
-    }
 
     /**
      * Shuts down the application's services and resources.
@@ -287,11 +237,10 @@ public class ApplicationInitializer {
         logger.shutdown("Starting application shutdown");
 
         try {
-            // Shutdown database connection pools
-            logger.database("Shutting down database connection pools");
-            DatabaseConfig.shutdown();
-            SqliteDatabaseConfig.shutdown();
-            logger.success("Database connection pools shut down successfully");
+            // Shutdown storage type manager
+            logger.database("Shutting down storage type manager");
+            StorageTypeManager.shutdown();
+            logger.success("Storage type manager shut down successfully");
 
             initialized = false;
             logger.shutdown("Application shut down successfully 👋");

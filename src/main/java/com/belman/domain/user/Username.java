@@ -16,8 +16,8 @@ public record Username(String value) {
             throw new IllegalArgumentException("Username must not be null or blank");
         }
 
-        if (value.length() < 3) {
-            throw new IllegalArgumentException("Username must be at least 3 characters long");
+        if (value.length() < 2) {
+            throw new IllegalArgumentException("Username must be at least 2 characters long");
         }
     }
 }

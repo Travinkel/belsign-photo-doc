@@ -9,8 +9,8 @@ CREATE TABLE users
     email        TEXT NOT NULL UNIQUE,
     status       TEXT  NOT NULL,
     phone_number TEXT,
-    created_at   DATETIME2    DEFAULT (datetime('now')),
-    updated_at   DATETIME2    DEFAULT (datetime('now'))
+    created_at   TEXT    DEFAULT (datetime('now')),
+    updated_at   TEXT    DEFAULT (datetime('now'))
 );
 
 -- Create User Roles Table

@@ -4,8 +4,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.geometry.Insets?>
@@ -15,7 +17,7 @@
            fx:controller="com.belman.presentation.usecases.worker.capture.CaptureViewController"
            prefHeight="600.0" prefWidth="400.0"
            styleClass="capture-view">
-    
+
     <BorderPane>
         <!-- Header -->
         <top>
@@ -23,74 +25,86 @@
                 <padding>
                     <Insets top="10.0" right="10.0" bottom="5.0" left="10.0"/>
                 </padding>
-                
+
                 <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="header">
                     <Button fx:id="backButton" text="Back" styleClass="back-button"/>
                     <Label text="Capture Photo" styleClass="title-label"/>
                 </HBox>
-                
+
                 <!-- Photo Info -->
                 <HBox spacing="10.0" styleClass="photo-info">
                     <Label text="Photo:" styleClass="photo-label"/>
                     <Label fx:id="photoTypeLabel" text="Before Work" styleClass="photo-type"/>
                 </HBox>
+
+                <!-- Template Info -->
+                <HBox spacing="10.0" styleClass="template-info">
+                    <Label text="Template:" styleClass="template-label"/>
+                    <Label fx:id="templateNameLabel" text="" styleClass="template-name"/>
+                </HBox>
+
+                <!-- Template Description -->
+                <Label fx:id="templateDescriptionLabel" text="" styleClass="template-description" wrapText="true"/>
+
+                <!-- Status and Error Messages -->
+                <Label fx:id="statusLabel" text="" styleClass="status-label"/>
+                <Label fx:id="errorLabel" text="" styleClass="error-label" visible="false"/>
             </VBox>
         </top>
-        
-        <!-- Camera Preview -->
+
+        <!-- Mock Images Grid -->
         <center>
-            <StackPane styleClass="camera-preview-container">
-                <!-- Camera Preview -->
-                <ImageView fx:id="cameraPreview" fitWidth="400.0" fitHeight="400.0" preserveRatio="false"/>
-                
-                <!-- Camera Overlay -->
-                <StackPane styleClass="camera-overlay">
-                    <!-- Guide Lines -->
-                    <VBox alignment="CENTER" spacing="0" styleClass="guide-lines-vertical">
-                        <HBox alignment="CENTER" spacing="0" styleClass="guide-lines-horizontal"/>
-                    </VBox>
-                    
-                    <!-- Camera Status -->
-                    <VBox alignment="TOP_CENTER">
+            <StackPane styleClass="mock-images-container">
+                <!-- Mock Images Grid -->
+                <ScrollPane fx:id="mockImagesScrollPane" fitToWidth="true" fitToHeight="true" styleClass="mock-images-scroll">
+                    <content>
+                        <GridPane fx:id="mockImagesGrid" hgap="10" vgap="10" styleClass="mock-images-grid">
+                            <padding>
+                                <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                            </padding>
+                        </GridPane>
+                    </content>
+                </ScrollPane>
+
+                <!-- Image Preview (when an image is selected) -->
+                <StackPane fx:id="imagePreviewPane" visible="false" styleClass="image-preview-pane">
+                    <ImageView fx:id="previewImageView" fitWidth="400.0" fitHeight="400.0" preserveRatio="true"/>
+
+                    <!-- Back to Grid Button -->
+                    <VBox alignment="TOP_LEFT">
                         <padding>
-                            <Insets top="10.0"/>
+                            <Insets top="10.0" left="10.0"/>
                         </padding>
-                        <Label fx:id="cameraStatusLabel" text="Camera Ready" styleClass="camera-status-label"/>
+                        <Button fx:id="backToGridButton" text="Back to Grid" styleClass="back-to-grid-button"/>
                     </VBox>
-                    
-                    <!-- Template Overlay -->
-                    <ImageView fx:id="templateOverlay" opacity="0.3" visible="false"/>
-                    
-                    <!-- Loading Indicator -->
-                    <StackPane fx:id="loadingIndicator" visible="false" styleClass="loading-indicator">
-                        <Label text="Processing..." styleClass="loading-text"/>
-                    </StackPane>
+                </StackPane>
+
+                <!-- Loading Indicator -->
+                <StackPane fx:id="loadingIndicator" visible="false" styleClass="loading-indicator">
+                    <Label text="Processing..." styleClass="loading-text"/>
                 </StackPane>
             </StackPane>
         </center>
-        
+
         <!-- Camera Controls -->
         <bottom>
             <VBox spacing="10.0">
                 <padding>
                     <Insets top="10.0" right="10.0" bottom="15.0" left="10.0"/>
                 </padding>
-                
+
                 <!-- Photo Description -->
-                <Label fx:id="photoDescriptionLabel" text="Capture the area before any welding work begins." 
+                <Label fx:id="photoDescriptionLabel" text="Select a mock image to simulate taking a photo." 
                        wrapText="true" styleClass="photo-description"/>
-                
-                <!-- Camera Controls -->
-                <HBox alignment="CENTER" spacing="20.0" styleClass="camera-controls">
-                    <Button fx:id="flashButton" text="Flash" styleClass="flash-button"/>
-                    <Button fx:id="captureButton" text="Capture" styleClass="capture-button"/>
-                    <Button fx:id="switchCameraButton" text="Switch" styleClass="switch-camera-button"/>
-                </HBox>
-                
+
+                <!-- Mock Image Selection Instructions -->
+                <Label text="Click on an image in the grid above to select it." 
+                       wrapText="true" styleClass="mock-image-instructions"/>
+
                 <!-- Preview Controls (initially hidden) -->
                 <HBox fx:id="previewControls" alignment="CENTER" spacing="20.0" styleClass="preview-controls" visible="false">
-                    <Button fx:id="retakeButton" text="Retake" styleClass="retake-button"/>
-                    <Button fx:id="acceptButton" text="Accept" styleClass="accept-button"/>
+                    <Button fx:id="selectAnotherButton" text="Select Another" styleClass="select-another-button"/>
+                    <Button fx:id="confirmButton" text="Confirm Selection" styleClass="confirm-button"/>
                 </HBox>
             </VBox>
         </bottom>

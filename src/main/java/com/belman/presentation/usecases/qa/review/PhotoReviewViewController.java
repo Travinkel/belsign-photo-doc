@@ -47,6 +47,12 @@ public class PhotoReviewViewController extends BaseController<PhotoReviewViewMod
     private Button rejectButton;
 
     @FXML
+    private Button approvePhotoButton;
+
+    @FXML
+    private Button rejectPhotoButton;
+
+    @FXML
     private StackPane loadingPane;
 
     @Override
@@ -65,8 +71,35 @@ public class PhotoReviewViewController extends BaseController<PhotoReviewViewMod
             if (newVal != null) {
                 getViewModel().selectPhoto(newVal);
                 displayPhoto(newVal);
+                updatePhotoButtons(newVal);
             }
         });
+
+        // Set up event handlers for photo approval/rejection buttons
+        approvePhotoButton.setOnAction(event -> handleApprovePhoto());
+        rejectPhotoButton.setOnAction(event -> handleRejectPhoto());
+
+        // Initially disable the photo buttons until a photo is selected
+        approvePhotoButton.setDisable(true);
+        rejectPhotoButton.setDisable(true);
+    }
+
+    /**
+     * Updates the state of the photo approval/rejection buttons based on the selected photo.
+     * 
+     * @param photo the selected photo
+     */
+    private void updatePhotoButtons(PhotoDocument photo) {
+        if (photo == null) {
+            approvePhotoButton.setDisable(true);
+            rejectPhotoButton.setDisable(true);
+            return;
+        }
+
+        // Enable/disable buttons based on photo status
+        boolean isPending = photo.getStatus() == PhotoDocument.ApprovalStatus.PENDING;
+        approvePhotoButton.setDisable(!isPending);
+        rejectPhotoButton.setDisable(!isPending);
     }
 
     /**
@@ -117,6 +150,34 @@ public class PhotoReviewViewController extends BaseController<PhotoReviewViewMod
     @FXML
     private void handleRejectOrder() {
         getViewModel().rejectOrder();
+    }
+
+    /**
+     * Handles the approve photo button click.
+     */
+    private void handleApprovePhoto() {
+        boolean success = getViewModel().approveSelectedPhoto();
+        if (success) {
+            // Update the UI to reflect the change
+            PhotoDocument selectedPhoto = photoListView.getSelectionModel().getSelectedItem();
+            if (selectedPhoto != null) {
+                updatePhotoButtons(selectedPhoto);
+            }
+        }
+    }
+
+    /**
+     * Handles the reject photo button click.
+     */
+    private void handleRejectPhoto() {
+        boolean success = getViewModel().rejectSelectedPhoto();
+        if (success) {
+            // Update the UI to reflect the change
+            PhotoDocument selectedPhoto = photoListView.getSelectionModel().getSelectedItem();
+            if (selectedPhoto != null) {
+                updatePhotoButtons(selectedPhoto);
+            }
+        }
     }
 
     /**

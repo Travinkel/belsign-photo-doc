@@ -85,16 +85,12 @@
                         <Label fx:id="descriptionLabel" text="Document welding work on the main support beams. Ensure all safety protocols are followed and capture before/after photos." wrapText="true"/>
                     </VBox>
 
-                    <!-- Required Photos -->
-                    <VBox spacing="8.0" styleClass="required-photos">
-                        <Label text="Required Photos" styleClass="section-title"/>
+                    <!-- Photo Session Info -->
+                    <VBox spacing="8.0" styleClass="photo-session-info">
+                        <Label text="Photo Documentation" styleClass="section-title"/>
                         <Label fx:id="photoCountLabel" text="5 photos required" styleClass="photo-count"/>
-
-                        <ListView fx:id="photoTemplateListView" prefHeight="150.0">
-                            <placeholder>
-                                <Label text="No photo templates available"/>
-                            </placeholder>
-                        </ListView>
+                        <Label text="Click 'Start Photo Session' to begin documenting this order with photos." 
+                               wrapText="true" styleClass="photo-session-description"/>
                     </VBox>
                 </VBox>
             </ScrollPane>
@@ -113,6 +109,9 @@
                     <padding>
                         <Insets top="15.0" right="15.0" bottom="20.0" left="15.0"/>
                     </padding>
+
+                    <!-- Dev mode button for manual order intake -->
+                    <Button fx:id="createOrderButton" text="Create Test Order" styleClass="dev-button" visible="false"/>
 
                     <Button fx:id="startButton" text="Start Photo Session" styleClass="start-button"/>
                 </HBox>

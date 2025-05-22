@@ -2,18 +2,25 @@ package com.belman.presentation.usecases.worker.photocube;
 
 import com.belman.domain.photo.PhotoTemplate;
 import com.belman.presentation.base.BaseController;
+import com.belman.presentation.providers.PhotoTemplateLabelProvider;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-
-import java.util.HashMap;
-import java.util.Map;
+import javafx.scene.layout.VBox;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  * Controller for the PhotoCubeView.
- * Handles UI interactions for the unfolded cube layout.
+ * Handles UI interactions for the Progressive Capture Dashboard.
  */
 public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> {
 
@@ -27,25 +34,32 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
     private Label errorLabel;
 
     @FXML
-    private GridPane cubeGridPane;
+    private HBox errorContainer;
 
     @FXML
-    private Button topButton;
+    private ImageView photoPreviewImageView;
 
     @FXML
-    private Button frontButton;
+    private VBox noPhotoPlaceholder;
 
     @FXML
-    private Button backButton;
+    private VBox cameraActiveIndicator;
 
     @FXML
-    private Button leftButton;
+    private Button startCameraButton;
 
     @FXML
-    private Button rightButton;
+    private Button captureButton;
 
     @FXML
-    private Button bottomButton;
+    private Label selectedTemplateLabel;
+
+    @FXML
+    private Label templateDescriptionLabel;
+
+    @FXML
+    private Label topProgressLabel;
+
 
     @FXML
     private Button summaryButton;
@@ -53,8 +67,23 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
     @FXML
     private StackPane loadingPane;
 
-    // Map to store template buttons
-    private final Map<PhotoTemplate, Button> templateButtons = new HashMap<>();
+    @FXML
+    private ListView<PhotoTemplateStatusViewModel> templateListView;
+
+    @FXML
+    private CheckBox showRemainingToggle;
+
+    @FXML
+    private HBox centerContainer;
+
+    @FXML
+    private HBox steppedProgressContainer;
+
+    @FXML
+    private VBox photoOverlay;
+
+    @FXML
+    private Label overlayTemplateNameLabel;
 
     @Override
     protected void setupBindings() {
@@ -63,6 +92,101 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
         statusLabel.textProperty().bind(getViewModel().statusMessageProperty());
         errorLabel.textProperty().bind(getViewModel().errorMessageProperty());
         loadingPane.visibleProperty().bind(getViewModel().loadingProperty());
+
+        // Add listener for window width changes after scene is set
+        centerContainer.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obs2, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        newWindow.widthProperty().addListener((obs3, oldWidth, newWidth) -> {
+                            if (newWidth.doubleValue() < 800) {
+                                // Apply narrow layout for screens < 800px wide
+                                centerContainer.getParent().getStyleClass().add("narrow-layout");
+                            } else {
+                                // Remove narrow layout for screens >= 800px wide
+                                centerContainer.getParent().getStyleClass().remove("narrow-layout");
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        // Show error container when there's an error
+        errorContainer.visibleProperty().bind(errorLabel.textProperty().isNotEmpty());
+
+        // Bind photo preview
+        photoPreviewImageView.imageProperty().bind(getViewModel().currentPhotoPreviewProperty());
+
+        // Show/hide placeholders based on camera state
+        noPhotoPlaceholder.visibleProperty().bind(
+            getViewModel().currentPhotoPreviewProperty().isNull()
+                .and(getViewModel().cameraActiveProperty().not())
+        );
+
+        cameraActiveIndicator.visibleProperty().bind(getViewModel().cameraActiveProperty());
+
+        // Show photo overlay when a photo is captured
+        photoOverlay.visibleProperty().bind(
+            getViewModel().currentPhotoPreviewProperty().isNotNull()
+                .and(getViewModel().cameraActiveProperty().not())
+        );
+
+        // Add visible style class when overlay is visible
+        photoOverlay.visibleProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal) {
+                photoOverlay.getStyleClass().add("visible");
+            } else {
+                photoOverlay.getStyleClass().remove("visible");
+            }
+        });
+
+        // Bind overlay template name with user-friendly label
+        getViewModel().selectedTemplateProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                overlayTemplateNameLabel.setText(PhotoTemplateLabelProvider.getDisplayLabel(newVal));
+            } else {
+                overlayTemplateNameLabel.setText("");
+            }
+        });
+
+        // Enable/disable buttons based on state
+        captureButton.disableProperty().bind(getViewModel().cameraActiveProperty().not());
+        startCameraButton.disableProperty().bind(
+            getViewModel().loadingProperty()
+                .or(getViewModel().selectedTemplateProperty().isNull())
+                .or(getViewModel().cameraActiveProperty())
+        );
+
+        // Progress is now only shown in the top bar
+
+        topProgressLabel.textProperty().bind(
+            getViewModel().photosCompletedProperty().asString()
+                .concat("/")
+                .concat(getViewModel().totalPhotosRequiredProperty().asString())
+                .concat(" photos")
+        );
+
+        // Initialize stepped progress bar when photos completed or total photos change
+        getViewModel().photosCompletedProperty().addListener((obs, oldVal, newVal) -> {
+            initializeSteppedProgressBar(
+                getViewModel().totalPhotosRequiredProperty().get(),
+                newVal.intValue()
+            );
+        });
+
+        getViewModel().totalPhotosRequiredProperty().addListener((obs, oldVal, newVal) -> {
+            initializeSteppedProgressBar(
+                newVal.intValue(),
+                getViewModel().photosCompletedProperty().get()
+            );
+        });
+
+        // Initialize stepped progress bar with current values
+        initializeSteppedProgressBar(
+            getViewModel().totalPhotosRequiredProperty().get(),
+            getViewModel().photosCompletedProperty().get()
+        );
 
         // Disable the summary button when loading or when not all photos are taken
         summaryButton.disableProperty().bind(
@@ -73,95 +197,144 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
             )
         );
 
-        // Initialize the template buttons map
-        initializeTemplateButtons();
+        // Bind selected template info with user-friendly label
+        getViewModel().selectedTemplateProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                selectedTemplateLabel.setText(PhotoTemplateLabelProvider.getDisplayLabel(newVal));
+                templateDescriptionLabel.setText(newVal.description());
 
-        // Update button states based on completion status
-        getViewModel().templateCompletionStatusProperty().addListener((obs, oldVal, newVal) -> {
-            updateButtonStates();
-        });
-    }
-
-    /**
-     * Initializes the template buttons map.
-     */
-    private void initializeTemplateButtons() {
-        templateButtons.put(PhotoTemplate.TOP_VIEW_OF_JOINT, topButton);
-        templateButtons.put(PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY, frontButton);
-        templateButtons.put(PhotoTemplate.BACK_VIEW_OF_ASSEMBLY, backButton);
-        templateButtons.put(PhotoTemplate.LEFT_VIEW_OF_ASSEMBLY, leftButton);
-        templateButtons.put(PhotoTemplate.RIGHT_VIEW_OF_ASSEMBLY, rightButton);
-        templateButtons.put(PhotoTemplate.BOTTOM_VIEW_OF_ASSEMBLY, bottomButton);
-    }
-
-    /**
-     * Updates the button states based on the completion status.
-     */
-    private void updateButtonStates() {
-        for (Map.Entry<PhotoTemplate, Button> entry : templateButtons.entrySet()) {
-            PhotoTemplate template = entry.getKey();
-            Button button = entry.getValue();
-
-            // Get the completion status for this template
-            Boolean isCompleted = getViewModel().templateCompletionStatusProperty().get(template);
-
-            // Update the button style based on completion status
-            if (isCompleted != null && isCompleted) {
-                button.getStyleClass().add("template-completed");
-                button.getStyleClass().remove("template-pending");
+                // Add tooltip with detailed instructions
+                Tooltip tooltip = new Tooltip(PhotoTemplateLabelProvider.getTooltip(newVal));
+                Tooltip.install(selectedTemplateLabel, tooltip);
             } else {
-                button.getStyleClass().add("template-pending");
-                button.getStyleClass().remove("template-completed");
+                selectedTemplateLabel.setText("None selected");
+                templateDescriptionLabel.setText("");
+                Tooltip.uninstall(selectedTemplateLabel, null);
             }
+        });
+
+        // Set up the template list view
+        setupTemplateListView();
+    }
+
+    /**
+     * Sets up the template list view with the template status view models.
+     */
+    private void setupTemplateListView() {
+        // Bind the list view to the template status list in the view model
+        templateListView.itemsProperty().bind(getViewModel().templateStatusListProperty());
+
+        // Set cell factory to display template status
+        templateListView.setCellFactory(lv -> new ListCell<PhotoTemplateStatusViewModel>() {
+            @Override
+            protected void updateItem(PhotoTemplateStatusViewModel item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    getStyleClass().removeAll("status-completed", "status-captured", 
+                                             "status-required", "status-optional");
+                } else {
+                    // Create a layout for the cell
+                    HBox cellContent = new HBox(10);
+                    cellContent.getStyleClass().add("template-cell");
+
+                    // Template name with user-friendly label
+                    Label nameLabel = new Label(PhotoTemplateLabelProvider.getDisplayLabel(item.getTemplate()));
+                    nameLabel.getStyleClass().add("template-name");
+
+                    // Add tooltip with detailed instructions
+                    Tooltip tooltip = new Tooltip(PhotoTemplateLabelProvider.getTooltip(item.getTemplate()));
+                    Tooltip.install(nameLabel, tooltip);
+
+                    // Status indicator
+                    Label statusLabel = new Label(item.getStatusText());
+                    statusLabel.getStyleClass().add(item.getStatusStyleClass());
+
+                    // Add to cell
+                    cellContent.getChildren().addAll(nameLabel, statusLabel);
+
+                    // Set the cell content
+                    setText(null);
+                    setGraphic(cellContent);
+
+                    // Add style class based on status
+                    getStyleClass().removeAll("status-completed", "status-captured", 
+                                             "status-required", "status-optional");
+                    getStyleClass().add(item.getStatusStyleClass());
+
+                    // Apply visual effects for completed templates
+                    if (item.isCaptured()) {
+                        // Add checkmark to completed templates
+                        Label checkmark = new Label("✓");
+                        checkmark.getStyleClass().add("template-checkmark");
+                        cellContent.getChildren().add(checkmark);
+
+                        // Apply fade effect to completed templates
+                        cellContent.setOpacity(0.8);
+                    } else {
+                        cellContent.setOpacity(1.0);
+                    }
+
+                    // Add selected style if this template is selected
+                    if (item.isSelected()) {
+                        getStyleClass().add("selected-template");
+                    } else {
+                        getStyleClass().remove("selected-template");
+                    }
+                }
+            }
+        });
+
+        // Handle selection
+        try {
+            // First check if the selection model is not null
+            if (templateListView.getSelectionModel() != null) {
+                templateListView.getSelectionModel().selectedItemProperty().addListener(
+                    (obs, oldVal, newVal) -> {
+                        if (newVal != null) {
+                            try {
+                                // First check if this is the last remaining template
+                                boolean isLastRemaining = getViewModel().isLastRemainingTemplate(newVal.getTemplate());
+
+                                // Select the template
+                                getViewModel().selectTemplate(newVal.getTemplate());
+
+                                // If this was the last remaining template and showRemainingOnly is true,
+                                // the list might be empty now, so don't try to clear the selection
+                                if (!isLastRemaining) {
+                                    // Use the safe method to clear selection
+                                    safelyClearSelection();
+                                }
+                            } catch (Exception e) {
+                                System.err.println("Error selecting template: " + e.getMessage());
+                            }
+                        }
+                    }
+                );
+            } else {
+                System.err.println("Warning: templateListView.getSelectionModel() is null");
+            }
+        } catch (Exception e) {
+            System.err.println("Error setting up template selection listener: " + e.getMessage());
         }
     }
 
     /**
-     * Handles the top button click.
+     * Handles the start camera button click.
      */
     @FXML
-    private void handleTopButtonClick() {
-        getViewModel().selectTemplate(PhotoTemplate.TOP_VIEW_OF_JOINT);
+    private void handleStartCameraClick() {
+        getViewModel().startCameraPreview();
     }
 
     /**
-     * Handles the front button click.
+     * Handles the capture photo button click.
      */
     @FXML
-    private void handleFrontButtonClick() {
-        getViewModel().selectTemplate(PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY);
-    }
-
-    /**
-     * Handles the back button click.
-     */
-    @FXML
-    private void handleBackButtonClick() {
-        getViewModel().selectTemplate(PhotoTemplate.BACK_VIEW_OF_ASSEMBLY);
-    }
-
-    /**
-     * Handles the left button click.
-     */
-    @FXML
-    private void handleLeftButtonClick() {
-        getViewModel().selectTemplate(PhotoTemplate.LEFT_VIEW_OF_ASSEMBLY);
-    }
-
-    /**
-     * Handles the right button click.
-     */
-    @FXML
-    private void handleRightButtonClick() {
-        getViewModel().selectTemplate(PhotoTemplate.RIGHT_VIEW_OF_ASSEMBLY);
-    }
-
-    /**
-     * Handles the bottom button click.
-     */
-    @FXML
-    private void handleBottomButtonClick() {
-        getViewModel().selectTemplate(PhotoTemplate.BOTTOM_VIEW_OF_ASSEMBLY);
+    private void handleCapturePhotoClick() {
+        getViewModel().capturePhoto();
     }
 
     /**
@@ -178,5 +351,120 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
     @FXML
     private void handleNavigateBackClick() {
         getViewModel().goBack();
+    }
+
+    /**
+     * Handles the refresh templates button click.
+     * This method is called when the user clicks the refresh button when no templates are available.
+     */
+    @FXML
+    private void handleRefreshTemplates() {
+        // Reload the current order and its photos
+        getViewModel().onShow();
+    }
+
+    /**
+     * Handles the "Show remaining only" toggle.
+     * This method is called when the user toggles the "Show remaining only" checkbox.
+     */
+    @FXML
+    private void handleShowRemainingToggle() {
+        // Get the checkbox state
+        boolean showRemainingOnly = showRemainingToggle.isSelected();
+
+        // Clear the selection before updating the filtered list
+        // This prevents IndexOutOfBoundsException when the filtered list becomes empty
+        safelyClearSelection();
+
+        // Update the view model - wrap in try/catch to prevent any exceptions
+        try {
+            getViewModel().setShowRemainingOnly(showRemainingOnly);
+        } catch (Exception e) {
+            System.err.println("Error updating showRemainingOnly in view model: " + e.getMessage());
+            // Try to recover by resetting the checkbox to its previous state
+            try {
+                showRemainingToggle.setSelected(!showRemainingOnly);
+            } catch (Exception ex) {
+                // Ignore if we can't reset the checkbox
+            }
+        }
+    }
+
+    /**
+     * Safely clears the selection in the template list view.
+     * This method adds additional checks to prevent IndexOutOfBoundsException.
+     */
+    private void safelyClearSelection() {
+        try {
+            // First check if the ListView is not null
+            if (templateListView != null) {
+                // Check if the selection model is not null
+                if (templateListView.getSelectionModel() != null) {
+                    // Check if the ListView has items
+                    if (templateListView.getItems() != null) {
+                        // Check if the ListView is empty
+                        if (templateListView.getItems().isEmpty()) {
+                            // If the list is empty, there's nothing to clear
+                            System.out.println("ListView is empty, nothing to clear");
+                            return;
+                        }
+
+                        // Get the current selection index
+                        int selectedIndex = templateListView.getSelectionModel().getSelectedIndex();
+
+                        // Only clear if there's a valid selection
+                        if (selectedIndex >= 0 && selectedIndex < templateListView.getItems().size()) {
+                            try {
+                                // Use a try-catch block to catch any IndexOutOfBoundsException
+                                templateListView.getSelectionModel().clearSelection();
+                            } catch (IndexOutOfBoundsException e) {
+                                System.err.println("Prevented IndexOutOfBoundsException when clearing selection: " + e.getMessage());
+                            }
+                        } else {
+                            System.out.println("No valid selection to clear (index: " + selectedIndex + ", size: " + templateListView.getItems().size() + ")");
+                        }
+                    } else {
+                        System.out.println("ListView items are null, nothing to clear");
+                    }
+                } else {
+                    System.out.println("Selection model is null, cannot clear selection");
+                }
+            } else {
+                System.err.println("Warning: templateListView is null when trying to clear selection");
+            }
+        } catch (Exception e) {
+            System.err.println("Error clearing selection: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Initializes the stepped progress bar.
+     * This method creates step indicators based on the number of templates.
+     * 
+     * @param totalSteps the total number of steps
+     * @param completedSteps the number of completed steps
+     */
+    private void initializeSteppedProgressBar(int totalSteps, int completedSteps) {
+        // Clear existing steps
+        steppedProgressContainer.getChildren().clear();
+
+        // Create step indicators
+        for (int i = 0; i < totalSteps; i++) {
+            StackPane step = new StackPane();
+            step.getStyleClass().add("progress-step");
+
+            // Mark completed steps
+            if (i < completedSteps) {
+                step.getStyleClass().add("completed");
+            }
+
+            // Mark current step
+            if (i == completedSteps && i < totalSteps) {
+                step.getStyleClass().add("current");
+            }
+
+            // Add to container
+            steppedProgressContainer.getChildren().add(step);
+        }
     }
 }

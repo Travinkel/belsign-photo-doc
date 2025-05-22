@@ -110,7 +110,7 @@ public class DefaultAuthenticationService extends BaseService implements Extende
                 // Check if the password matches the user's password
                 HashedPassword hashedPassword = user.getPassword();
                 AuthLoggingService.logAuth("DefaultAuthenticationService", "Checking password for user: " + username);
-                boolean isValid = hashedPassword.matches(password, passwordHasher);
+                boolean isValid = org.mindrot.jbcrypt.BCrypt.checkpw(password, user.getPassword().value());
 
                 if (isValid) {
                     // Reset failed login attempts

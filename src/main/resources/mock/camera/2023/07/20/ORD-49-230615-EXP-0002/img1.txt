@@ -1,2 +1,0 @@
-This is a placeholder for an image file.
-In a real application, this would be a JPEG image of an expansion joint (front view).

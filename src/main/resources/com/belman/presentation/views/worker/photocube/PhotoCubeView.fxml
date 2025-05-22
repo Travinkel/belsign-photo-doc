@@ -5,22 +5,26 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
 
 <StackPane xmlns="http://javafx.com/javafx"
            xmlns:fx="http://javafx.com/fxml"
            fx:controller="com.belman.presentation.usecases.worker.photocube.PhotoCubeViewController"
-           prefHeight="600.0" prefWidth="400.0"
-           styleClass="photo-cube-view">
-    
+           prefHeight="600.0" prefWidth="1024.0"
+           styleClass="progressive-capture-dashboard">
+
     <BorderPane>
         <!-- Header -->
         <top>
@@ -28,90 +32,150 @@
                 <padding>
                     <Insets top="15.0" right="15.0" bottom="10.0" left="15.0"/>
                 </padding>
-                
+
                 <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="header">
-                    <Button fx:id="backButton" text="Back" styleClass="back-button"/>
-                    <Label text="Photo Session" styleClass="title-label"/>
-                </HBox>
-                
-                <!-- Order Info -->
-                <HBox spacing="10.0" styleClass="order-info">
+                    <Button fx:id="navigateBackButton" text="Back" styleClass="back-button" onAction="#handleNavigateBackClick"/>
+                    <Label text="Photo Documentation" styleClass="title-label"/>
+                    <HBox HBox.hgrow="ALWAYS" />
                     <Label text="Order:" styleClass="order-label"/>
                     <Label fx:id="orderNumberLabel" text="ORD-123-230615-WLD-0001" styleClass="order-number"/>
-                </HBox>
-                
-                <!-- Progress -->
-                <VBox spacing="5.0">
-                    <HBox spacing="10.0" alignment="CENTER_LEFT">
-                        <Label text="Progress:" styleClass="progress-label"/>
-                        <Label fx:id="progressLabel" text="1/5 photos" styleClass="progress-value"/>
+                    <HBox alignment="CENTER" spacing="5.0" styleClass="progress-indicator">
+                        <Label fx:id="topProgressLabel" text="1/5 photos" styleClass="progress-value"/>
                     </HBox>
-                    <ProgressBar fx:id="progressBar" progress="0.2" prefWidth="Infinity"/>
-                </VBox>
+                </HBox>
+
+                <!-- Status and Progress Bar -->
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="status-progress-bar">
+                    <HBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                        <Label text="Status:" styleClass="status-label"/>
+                        <Label fx:id="statusLabel" text="Ready" styleClass="status-value" wrapText="true"/>
+                    </HBox>
+
+                    <!-- Stepped Progress Bar -->
+                    <HBox fx:id="steppedProgressContainer" styleClass="progress-step-container" alignment="CENTER" spacing="5.0">
+                        <!-- Steps will be added here programmatically -->
+                    </HBox>
+
+                    <Button fx:id="summaryButton" text="Go to Summary" styleClass="summary-button" 
+                            onAction="#handleSummaryButtonClick"/>
+                </HBox>
+
+                <!-- Error Message (Visible only when there's an error) -->
+                <HBox fx:id="errorContainer" spacing="10.0" styleClass="error-container" visible="false">
+                    <padding>
+                        <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                    </padding>
+                    <Label text="⚠️" styleClass="error-icon"/>
+                    <Label fx:id="errorLabel" text="" styleClass="error-message" wrapText="true"/>
+                </HBox>
             </VBox>
         </top>
-        
-        <!-- Main Content -->
+
+        <!-- Main Content - Three-Panel Layout -->
         <center>
-            <ScrollPane fitToWidth="true" styleClass="content-scroll">
-                <VBox spacing="15.0">
-                    <padding>
-                        <Insets top="15.0" right="15.0" bottom="15.0" left="15.0"/>
-                    </padding>
-                    
-                    <!-- Current Photo Template -->
-                    <VBox spacing="10.0" styleClass="current-template">
-                        <Label text="Current Photo" styleClass="section-title"/>
-                        
-                        <HBox spacing="10.0">
-                            <Label text="Type:" styleClass="template-label"/>
-                            <Label fx:id="photoTypeLabel" text="Before Work" styleClass="template-value"/>
-                        </HBox>
-                        
-                        <Label fx:id="photoDescriptionLabel" text="Capture the area before any welding work begins. Ensure the entire support beam is visible." wrapText="true"/>
-                        
-                        <!-- Template Image -->
-                        <StackPane styleClass="template-image-container">
-                            <ImageView fx:id="templateImageView" fitWidth="350.0" preserveRatio="true"/>
-                            <Label fx:id="noImageLabel" text="No template image available" visible="false"/>
-                        </StackPane>
-                    </VBox>
-                    
-                    <!-- Checklist -->
-                    <VBox spacing="10.0" styleClass="checklist">
-                        <Label text="Photo Checklist" styleClass="section-title"/>
-                        
-                        <VBox spacing="5.0" styleClass="checklist-items">
-                            <CheckBox fx:id="checkItem1" text="Area is well lit" selected="false"/>
-                            <CheckBox fx:id="checkItem2" text="Subject is clearly visible" selected="false"/>
-                            <CheckBox fx:id="checkItem3" text="Photo is in focus" selected="false"/>
-                            <CheckBox fx:id="checkItem4" text="Required elements are included" selected="false"/>
-                            <CheckBox fx:id="checkItem5" text="Safety equipment is visible" selected="false"/>
+            <HBox fx:id="centerContainer" spacing="15.0" styleClass="center-container">
+                <padding>
+                    <Insets top="15.0" right="15.0" bottom="15.0" left="15.0"/>
+                </padding>
+
+                <!-- Left Panel: Photo Preview -->
+                <VBox spacing="10.0" styleClass="photo-preview-panel" HBox.hgrow="ALWAYS" maxWidth="400.0">
+                    <Label text="Photo Preview" styleClass="panel-title"/>
+
+                    <!-- Preview Container -->
+                    <StackPane styleClass="preview-container" VBox.vgrow="ALWAYS">
+                        <!-- Camera Preview or Last Taken Photo -->
+                        <ImageView fx:id="photoPreviewImageView" fitWidth="380.0" preserveRatio="true" 
+                                  styleClass="photo-preview"/>
+
+                        <!-- Placeholder when no photo is available -->
+                        <VBox fx:id="noPhotoPlaceholder" alignment="CENTER" spacing="15.0" styleClass="no-photo-placeholder">
+                            <Label text="📷" style="-fx-font-size: 48px;"/>
+                            <Label text="No photo taken yet" styleClass="placeholder-text"/>
+                            <Label text="Select a template from the list and click 'Start Camera'" 
+                                   wrapText="true" textAlignment="CENTER" styleClass="placeholder-instruction"/>
                         </VBox>
-                    </VBox>
-                    
-                    <!-- Instructions -->
-                    <VBox spacing="10.0" styleClass="instructions">
-                        <Label text="Instructions" styleClass="section-title"/>
-                        
-                        <Label text="1. Ensure all checklist items are met" wrapText="true"/>
-                        <Label text="2. Position camera according to template" wrapText="true"/>
-                        <Label text="3. Hold steady and tap 'Capture Photo'" wrapText="true"/>
-                        <Label text="4. Review the photo before proceeding" wrapText="true"/>
+
+                        <!-- Camera Active Indicator -->
+                        <VBox fx:id="cameraActiveIndicator" alignment="CENTER" visible="false" 
+                              styleClass="camera-active-indicator">
+                            <Label text="Camera Active" styleClass="camera-active-text"/>
+                            <Label text="Position the subject and tap 'Capture'" 
+                                   wrapText="true" textAlignment="CENTER" styleClass="camera-instruction"/>
+                        </VBox>
+
+                        <!-- Photo Overlay (visible when photo is taken) -->
+                        <VBox fx:id="photoOverlay" alignment="CENTER" spacing="10.0" styleClass="photo-overlay">
+                            <Label text="✓" styleClass="overlay-checkmark"/>
+                            <Label fx:id="overlayTemplateNameLabel" text="" styleClass="overlay-template-name"/>
+                        </VBox>
+                    </StackPane>
+
+                    <!-- Camera Controls -->
+                    <HBox spacing="10.0" alignment="CENTER">
+                        <Button fx:id="startCameraButton" text="Start Camera" styleClass="camera-button" 
+                                onAction="#handleStartCameraClick"/>
+                        <Button fx:id="captureButton" text="Capture Photo" styleClass="capture-button" 
+                                onAction="#handleCapturePhotoClick" disable="true"/>
+                    </HBox>
+
+                    <!-- Template Info -->
+                    <VBox spacing="5.0" styleClass="template-info">
+                        <Label text="Selected Template:" styleClass="info-label"/>
+                        <Label fx:id="selectedTemplateLabel" text="None selected" styleClass="template-name"/>
+                        <Label fx:id="templateDescriptionLabel" text="" wrapText="true" 
+                               styleClass="template-description"/>
                     </VBox>
                 </VBox>
-            </ScrollPane>
-        </center>
-        
-        <!-- Footer -->
-        <bottom>
-            <HBox alignment="CENTER" spacing="20.0">
-                <padding>
-                    <Insets top="15.0" right="15.0" bottom="20.0" left="15.0"/>
-                </padding>
-                
-                <Button fx:id="captureButton" text="Capture Photo" styleClass="capture-button"/>
+
+
+                <!-- Right Panel: Template List -->
+                <VBox spacing="10.0" styleClass="template-list-panel" HBox.hgrow="ALWAYS" maxWidth="400.0">
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Label text="Required Photos" styleClass="panel-title" HBox.hgrow="ALWAYS"/>
+
+                        <!-- Show Remaining Only Toggle -->
+                        <HBox styleClass="toggle-container" alignment="CENTER_RIGHT">
+                            <Label text="Show remaining only" styleClass="toggle-label"/>
+                            <CheckBox fx:id="showRemainingToggle" styleClass="toggle-switch" 
+                                     onAction="#handleShowRemainingToggle"/>
+                        </HBox>
+                    </HBox>
+
+                    <!-- Template List -->
+                    <ListView fx:id="templateListView" VBox.vgrow="ALWAYS" styleClass="template-list">
+                        <placeholder>
+                            <VBox alignment="CENTER" spacing="15.0" styleClass="empty-state-container">
+                                <padding>
+                                    <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
+                                </padding>
+                                <Label text="📷" style="-fx-font-size: 48px;" styleClass="empty-state-icon"/>
+                                <Label text="No Photo Templates Available" styleClass="empty-state-title"/>
+                                <Label text="This order doesn't have any photo templates defined yet. Please contact your supervisor or QA team to set up templates for documentation." 
+                                       wrapText="true" styleClass="empty-state-message"/>
+                                <Button text="Refresh" onAction="#handleRefreshTemplates" styleClass="refresh-button"/>
+                            </VBox>
+                        </placeholder>
+                    </ListView>
+
+                    <!-- Help Text -->
+                    <VBox styleClass="help-container">
+                        <Label text="Instructions:" styleClass="help-title"/>
+                        <Label text="1. Select a template from the list" wrapText="true" styleClass="help-text"/>
+                        <Label text="2. Click 'Start Camera' to preview" wrapText="true" styleClass="help-text"/>
+                        <Label text="3. Position the subject and tap 'Capture'" wrapText="true" styleClass="help-text"/>
+                        <Label text="4. Repeat for all required templates" wrapText="true" styleClass="help-text"/>
+                    </VBox>
+                </VBox>
             </HBox>
-        </bottom>
+        </center>
     </BorderPane>
+
+    <!-- Loading Overlay -->
+    <StackPane fx:id="loadingPane" visible="false" styleClass="loading-overlay">
+        <VBox alignment="CENTER" spacing="20.0">
+            <ProgressBar styleClass="loading-progress" progress="-1.0"/>
+            <Label text="Loading..." styleClass="loading-text"/>
+        </VBox>
+    </StackPane>
 </StackPane>

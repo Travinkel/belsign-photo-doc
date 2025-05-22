@@ -3,10 +3,15 @@ package com.belman.presentation.usecases.qa.dashboard;
 import com.belman.common.di.Inject;
 import com.belman.common.session.SessionContext;
 import com.belman.domain.order.OrderBusiness;
+import com.belman.domain.order.OrderId;
 import com.belman.domain.order.OrderRepository;
 import com.belman.domain.order.OrderStatus;
+import com.belman.domain.report.ReportFormat;
+import com.belman.domain.report.ReportType;
 import com.belman.domain.specification.OrderStatusSpecification;
+import com.belman.application.usecase.report.ReportService;
 import com.belman.presentation.base.BaseViewModel;
+import com.belman.presentation.flow.commands.GenerateReportPreviewCommand;
 import com.belman.presentation.navigation.Router;
 import com.belman.presentation.usecases.qa.review.PhotoReviewView;
 import javafx.beans.property.SimpleStringProperty;
@@ -37,7 +42,11 @@ public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
     @Inject
     private SessionContext sessionContext;
 
+    @Inject
+    private ReportService reportService;
+
     private String selectedOrder;
+    private OrderId selectedOrderId;
 
     /**
      * Default constructor for use by the ViewLoader.
@@ -120,6 +129,70 @@ public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
      */
     public void selectOrder(String orderNumber) {
         this.selectedOrder = orderNumber;
+
+        // Find the order by order number to get its ID
+        try {
+            OrderBusiness order = orderRepository.findAll().stream()
+                    .filter(o -> o.getOrderNumber().toString().equals(orderNumber))
+                    .findFirst()
+                    .orElse(null);
+
+            if (order != null) {
+                this.selectedOrderId = order.getId();
+            } else {
+                errorMessage.set("Order not found: " + orderNumber);
+            }
+        } catch (Exception e) {
+            errorMessage.set("Error selecting order: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Generates a report preview for the selected order and saves it to a temporary file.
+     * The file is then opened using the system's default PDF viewer.
+     */
+    public void generateReportPreview() {
+        try {
+            if (selectedOrderId == null) {
+                errorMessage.set("No order selected");
+                return;
+            }
+
+            // Create a command to generate the report preview
+            GenerateReportPreviewCommand command = new GenerateReportPreviewCommand(
+                    selectedOrderId, 
+                    ReportType.PHOTO_DOCUMENTATION, 
+                    ReportFormat.PDF);
+
+            // Execute the command to get the report preview
+            command.execute().thenAccept(reportBytes -> {
+                if (reportBytes != null && reportBytes.length > 0) {
+                    try {
+                        // Create a temporary file for the PDF
+                        java.io.File tempFile = java.io.File.createTempFile("report_preview_", ".pdf");
+                        tempFile.deleteOnExit(); // Delete the file when the JVM exits
+
+                        // Write the report bytes to the file
+                        java.nio.file.Files.write(tempFile.toPath(), reportBytes);
+
+                        // Open the file with the system's default PDF viewer
+                        java.awt.Desktop.getDesktop().open(tempFile);
+
+                        // Show a success message
+                        errorMessage.set("Report preview generated successfully");
+                    } catch (Exception e) {
+                        errorMessage.set("Error opening report preview: " + e.getMessage());
+                    }
+                } else {
+                    errorMessage.set("Failed to generate report preview");
+                }
+            }).exceptionally(ex -> {
+                errorMessage.set("Error generating report preview: " + ex.getMessage());
+                return null;
+            });
+        } catch (Exception e) {
+            errorMessage.set("Error generating report preview: " + e.getMessage());
+        }
     }
 
     /**

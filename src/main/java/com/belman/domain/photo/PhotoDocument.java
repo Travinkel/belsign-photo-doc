@@ -44,6 +44,7 @@ public class PhotoDocument extends BusinessComponent<PhotoId> {
     private final Timestamp uploadedAt;
     private final PhotoId photoId;
     private final ReportType type;
+    private PhotoMetadata metadata;
     private OrderId orderId;
     private ApprovalStatus status;
     private UserReference reviewedBy;
@@ -60,6 +61,7 @@ public class PhotoDocument extends BusinessComponent<PhotoId> {
         this.uploadedAt = Objects.requireNonNull(builder.uploadedAt, "uploadedAt must not be null");
         this.status = ApprovalStatus.PENDING;
         this.orderId = builder.orderId;
+        this.metadata = builder.metadata;
         this.type = ReportType.PHOTO_DOCUMENTATION;
     }
 
@@ -265,6 +267,97 @@ public class PhotoDocument extends BusinessComponent<PhotoId> {
     }
 
     /**
+     * Returns the metadata associated with this photo document.
+     * This includes technical information about the photo such as resolution,
+     * file size, and image format.
+     *
+     * @return the photo metadata, or null if not set
+     */
+    public PhotoMetadata getMetadata() {
+        return metadata;
+    }
+
+    /**
+     * Sets the metadata for this photo document.
+     * This is typically called after the photo is processed and its
+     * technical characteristics are extracted.
+     *
+     * @param metadata the photo metadata to set
+     * @return a list of validation errors, or an empty list if the photo meets all quality standards
+     * @throws NullPointerException if metadata is null
+     */
+    public List<String> setMetadata(PhotoMetadata metadata) {
+        Objects.requireNonNull(metadata, "metadata must not be null");
+        this.metadata = metadata;
+        updateLastModifiedAt();
+
+        // Validate photo quality
+        return PhotoQualityValidator.validate(metadata);
+    }
+
+    /**
+     * Checks if this photo document meets all quality standards based on its metadata.
+     * 
+     * @return true if the photo meets all quality standards, false if it doesn't or if metadata is not set
+     */
+    public boolean meetsQualityStandards() {
+        return metadata != null && PhotoQualityValidator.isValid(metadata);
+    }
+
+    /**
+     * Adds a new annotation to this photo document.
+     *
+     * @param annotation the annotation to add
+     * @throws NullPointerException if annotation is null
+     * @return true if the annotation was added successfully
+     */
+    public boolean addAnnotation(PhotoAnnotation annotation) {
+        Objects.requireNonNull(annotation, "annotation must not be null");
+        boolean added = this.annotations.add(annotation);
+        if (added) {
+            updateLastModifiedAt();
+        }
+        return added;
+    }
+
+    /**
+     * Removes an annotation from this photo document.
+     *
+     * @param annotationId the ID of the annotation to remove
+     * @return true if an annotation was removed, false if no annotation with the given ID was found
+     */
+    public boolean removeAnnotation(String annotationId) {
+        Objects.requireNonNull(annotationId, "annotationId must not be null");
+        boolean removed = this.annotations.removeIf(a -> a.getId().equals(annotationId));
+        if (removed) {
+            updateLastModifiedAt();
+        }
+        return removed;
+    }
+
+    /**
+     * Updates an existing annotation with a new one having the same ID.
+     *
+     * @param updatedAnnotation the updated annotation
+     * @throws NullPointerException if updatedAnnotation is null
+     * @return true if an annotation was updated, false if no annotation with the given ID was found
+     */
+    public boolean updateAnnotation(PhotoAnnotation updatedAnnotation) {
+        Objects.requireNonNull(updatedAnnotation, "updatedAnnotation must not be null");
+        String annotationId = updatedAnnotation.getId();
+
+        for (int i = 0; i < annotations.size(); i++) {
+            if (annotations.get(i).getId().equals(annotationId)) {
+                annotations.set(i, updatedAnnotation);
+                updateLastModifiedAt();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Represents the approval status of a photo document in the quality control process.
      * <p>
      * The approval status tracks the photo document's position in the QA workflow:
@@ -304,6 +397,7 @@ public class PhotoDocument extends BusinessComponent<PhotoId> {
         private UserBusiness uploadedBy;
         private Timestamp uploadedAt;
         private OrderId orderId;
+        private PhotoMetadata metadata;
         private List<PhotoAnnotation> annotations = new ArrayList<>();
 
         private Builder() {
@@ -346,6 +440,11 @@ public class PhotoDocument extends BusinessComponent<PhotoId> {
 
         public Builder orderId(OrderId orderId) {
             this.orderId = orderId;
+            return this;
+        }
+
+        public Builder metadata(PhotoMetadata metadata) {
+            this.metadata = metadata;
             return this;
         }
 

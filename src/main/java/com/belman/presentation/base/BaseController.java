@@ -1,5 +1,6 @@
 package com.belman.presentation.base;
 
+import com.belman.presentation.core.FlowViewController;
 import com.belman.presentation.lifecycle.ControllerLifecycle;
 import javafx.application.Platform;
 import javafx.fxml.Initializable;
@@ -23,7 +24,7 @@ import java.util.ResourceBundle;
  *
  * @param <T> the type of ViewModel this controller works with
  */
-public abstract class BaseController<T extends BaseViewModel<?>> implements Initializable, ControllerLifecycle {
+public abstract class BaseController<T extends BaseViewModel<?>> implements Initializable, ControllerLifecycle, FlowViewController {
 
     /**
      * The ViewModel associated with this controller.
@@ -153,6 +154,34 @@ public abstract class BaseController<T extends BaseViewModel<?>> implements Init
     @Override
     public String getControllerName() {
         return this.getClass().getSimpleName();
+    }
+
+    /**
+     * Called before the view is shown.
+     * This method delegates to the onShow() method for backward compatibility.
+     */
+    @Override
+    public void beforeShow() {
+        onShow();
+
+        // Also notify the ViewModel
+        if (viewModel != null) {
+            viewModel.onShow();
+        }
+    }
+
+    /**
+     * Called after the view is hidden.
+     * This method delegates to the onHide() method for backward compatibility.
+     */
+    @Override
+    public void afterHide() {
+        onHide();
+
+        // Also notify the ViewModel
+        if (viewModel != null) {
+            viewModel.onHide();
+        }
     }
 
     /**

@@ -265,6 +265,11 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View implemen
 
         // Call the lifecycle method
         onShow();
+
+        // Call beforeShow on the controller if it implements FlowViewController
+        if (controller instanceof com.belman.presentation.core.FlowViewController) {
+            ((com.belman.presentation.core.FlowViewController) controller).beforeShow();
+        }
     }
 
     /**
@@ -280,6 +285,11 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View implemen
 
         // Call the lifecycle method
         onHide();
+
+        // Call afterHide on the controller if it implements FlowViewController
+        if (controller instanceof com.belman.presentation.core.FlowViewController) {
+            ((com.belman.presentation.core.FlowViewController) controller).afterHide();
+        }
     }
 
     /**

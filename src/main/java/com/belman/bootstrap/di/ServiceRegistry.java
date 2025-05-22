@@ -1,7 +1,6 @@
 package com.belman.bootstrap.di;
 
 
-import com.belman.bootstrap.config.DevModeConfig;
 import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
 import com.belman.application.base.BaseService;
@@ -124,20 +123,16 @@ public class ServiceRegistry {
         }
 
         Class<?> serviceClass = service.getClass();
-        if (logger != null) {
-            if (DevModeConfig.isDevMode()) {
-                // More detailed logging in dev mode
-                logger.info("🔌 Registering service: {}", serviceClass.getName());
-            } else {
-                logger.debug("Registering service: {}", serviceClass.getName());
-            }
-        }
 
         // Register the service under its class
         try {
-            ServiceLocator.registerService((Class<Object>) serviceClass, service);
+            boolean registered = ServiceLocator.registerServiceIfAbsent((Class<Object>) serviceClass, service);
             if (logger != null) {
-                logger.debug("Registered service under class: {}", serviceClass.getName());
+                if (registered) {
+                    logger.debug("Registered service under class: {}", serviceClass.getName());
+                } else {
+                    logger.debug("Service already registered under class: {}", serviceClass.getName());
+                }
             }
         } catch (Exception e) {
             if (logger != null) {
@@ -156,9 +151,13 @@ public class ServiceRegistry {
             }
 
             try {
-                ServiceLocator.registerService((Class<Object>) interfaceClass, service);
+                boolean registered = ServiceLocator.registerServiceIfAbsent((Class<Object>) interfaceClass, service);
                 if (logger != null) {
-                    logger.debug("Registered service under interface: {}", interfaceClass.getName());
+                    if (registered) {
+                        logger.debug("Registered service under interface: {}", interfaceClass.getName());
+                    } else {
+                        logger.debug("Service already registered under interface: {}", interfaceClass.getName());
+                    }
                 }
             } catch (Exception e) {
                 if (logger != null) {
