@@ -31,7 +31,7 @@ public class ViewLoader {
         try {
             System.out.println("Loading view: " + viewClass.getSimpleName());
 
-            // Load the FXML file
+            // Load the FXML file - first look in the same package as the view class
             String path = "/" + viewClass.getPackageName().replace('.', '/') + "/" + viewClass.getSimpleName() +
                           ".fxml";
             URL fxmlUrl = viewClass.getResource(viewClass.getSimpleName() + ".fxml");
@@ -41,49 +41,31 @@ public class ViewLoader {
             if (fxmlUrl == null) {
                 System.out.println("FXML not found in view class package, trying constructed path: " + path);
                 fxmlUrl = ViewLoader.class.getResource(path);
-
-                // If still null, try another approach
-                if (fxmlUrl == null) {
-                    path = "/com/belman/presentation/views/" + viewClass.getSimpleName().toLowerCase().replace("view", "") + "/" +
-                           viewClass.getSimpleName() + ".fxml";
-                    System.out.println("Still not found, trying convention-based path: " + path);
-                    fxmlUrl = ViewLoader.class.getResource(path);
-                }
-
-                // Try with worker subdirectory
-                if (fxmlUrl == null) {
-                    path = "/com/belman/presentation/views/worker/" + viewClass.getSimpleName().toLowerCase().replace("view", "") + "/" +
-                           viewClass.getSimpleName() + ".fxml";
-                    System.out.println("Still not found, trying worker subdirectory path: " + path);
-                    fxmlUrl = ViewLoader.class.getResource(path);
-                }
-
-                // Try one more approach - look in the usecases directory
-                if (fxmlUrl == null) {
-                    path = "/com/belman/presentation/usecases/" + viewClass.getSimpleName().toLowerCase().replace("view", "") + "/" +
-                           viewClass.getSimpleName() + ".fxml";
-                    System.out.println("Still not found, trying usecases path: " + path);
-                    fxmlUrl = ViewLoader.class.getResource(path);
-                }
-
-                // Try with direct resources path
-                if (fxmlUrl == null) {
-                    path = "/views/worker/" + viewClass.getSimpleName().toLowerCase().replace("view", "") + "/" +
-                           viewClass.getSimpleName() + ".fxml";
-                    System.out.println("Still not found, trying direct resources path: " + path);
-                    fxmlUrl = ViewLoader.class.getResource(path);
-                }
             }
+
+            // Special case for login package in usecases (backward compatibility)
+            if (fxmlUrl == null && path.contains("/presentation/usecases/login/")) {
+                String authLoginPath = path.replace("/presentation/usecases/login/", "/presentation/usecases/authentication/login/");
+                System.out.println("FXML not found in login path, trying authentication.login path: " + authLoginPath);
+                fxmlUrl = ViewLoader.class.getResource(authLoginPath);
+            }
+
+            // Special case for authentication.login package in usecases (backward compatibility)
+            if (fxmlUrl == null && path.contains("/presentation/usecases/authentication/login/")) {
+                String loginPath = path.replace("/presentation/usecases/authentication/login/", "/presentation/usecases/login/");
+                System.out.println("FXML not found in authentication.login path, trying login path: " + loginPath);
+                fxmlUrl = ViewLoader.class.getResource(loginPath);
+            }
+
 
             if (fxmlUrl == null) {
                 String errorMessage = "Failed to load view: " + viewClass.getSimpleName() + " - Error: FXML file not found: " + path;
                 System.err.println(errorMessage);
-                System.err.println("Please ensure the FXML file exists at one of these locations:");
-                System.err.println("1. In the same package as the view class: " + viewClass.getPackageName());
-                System.err.println("2. In the conventional path: /com/belman/presentation/views/" + viewClass.getSimpleName().toLowerCase().replace("view", "") + "/");
-                System.err.println("3. In the worker path: /com/belman/presentation/views/worker/" + viewClass.getSimpleName().toLowerCase().replace("view", "") + "/");
-                System.err.println("4. In the usecases path: /com/belman/presentation/usecases/" + viewClass.getSimpleName().toLowerCase().replace("view", "") + "/");
-                System.err.println("5. In the direct resources path: /views/worker/" + viewClass.getSimpleName().toLowerCase().replace("view", "") + "/");
+                System.err.println("Please ensure the FXML file exists in the same package as the view class: " + viewClass.getPackageName());
+
+                if (path.contains("/presentation/usecases/authentication/login/")) {
+                    System.err.println("Or in the login package: " + path.replace("/presentation/usecases/authentication/login/", "/presentation/usecases/login/"));
+                }
 
                 // Log the error for debugging
                 java.util.logging.Logger.getLogger(ViewLoader.class.getName()).severe(errorMessage);
@@ -190,21 +172,31 @@ public class ViewLoader {
             titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #721c24;");
 
             // Create a more detailed error message
-            String detailedError = "Failed to load view: " + viewClass.getSimpleName() + "\n\n" +
-                                  "Possible causes:\n" +
-                                  "• FXML file not found\n" +
-                                  "• FXML file contains errors\n" +
-                                  "• Missing fx:id references in FXML\n" +
-                                  "• Controller class not properly defined\n\n" +
-                                  "Searched in:\n" +
-                                  "• " + viewClass.getPackageName() + "\n" +
-                                  "• /com/belman/presentation/views/...\n" +
-                                  "• /com/belman/presentation/views/worker/...\n" +
-                                  "• /com/belman/presentation/usecases/...\n" +
-                                  "• /views/worker/...\n\n" +
-                                  "Please check the console for more details.";
+            StringBuilder detailedError = new StringBuilder();
+            detailedError.append("Failed to load view: ").append(viewClass.getSimpleName()).append("\n\n");
+            detailedError.append("Possible causes:\n");
+            detailedError.append("• FXML file not found\n");
+            detailedError.append("• FXML file contains errors\n");
+            detailedError.append("• Missing fx:id references in FXML\n");
+            detailedError.append("• Controller class not properly defined\n\n");
+            detailedError.append("Searched in:\n");
+            detailedError.append("• ").append(viewClass.getPackageName()).append("\n");
 
-            javafx.scene.control.TextArea messageArea = new javafx.scene.control.TextArea(detailedError);
+            String packageName = viewClass.getPackageName();
+            if (packageName.contains("presentation.usecases.authentication.login")) {
+                detailedError.append("• ").append(packageName.replace("presentation.usecases.authentication.login", "presentation.usecases.login")).append("\n");
+            }
+
+            if (packageName.contains("presentation.usecases.login")) {
+                detailedError.append("• ").append(packageName.replace("presentation.usecases.login", "presentation.usecases.authentication.login")).append("\n");
+            }
+
+
+            detailedError.append("\nPlease check the console for more details.");
+
+            String detailedErrorStr = detailedError.toString();
+
+            javafx.scene.control.TextArea messageArea = new javafx.scene.control.TextArea(detailedErrorStr);
             messageArea.setEditable(false);
             messageArea.setWrapText(true);
             messageArea.setPrefRowCount(10);

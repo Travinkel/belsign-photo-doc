@@ -350,7 +350,7 @@
 
 /* Login View Styles */
 .login-view {
-    -fx-background-image: url('com/belman/images/loginBackground.png');
+    -fx-background-image: url('/com/belman/images/loginBackground.png');
     -fx-background-size: cover;
     -fx-background-position: center center;
     -fx-background-repeat: no-repeat;
@@ -371,10 +371,11 @@
 .login-card {
     -fx-background-color: white;
     -fx-background-radius: 20px;
-    -fx-padding: 30px 25px;
-    -fx-spacing: 18px;
+    -fx-padding: 25px 30px;
+    -fx-spacing: 20px;
     -fx-alignment: center;
-    -fx-max-width: 450px;
+    -fx-max-width: 550px;
+    -fx-min-width: 500px;
     /* Enhanced card elevation with stronger shadow */
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 20, 0, 0, 6);
     /* Improved border to enhance card appearance */
@@ -396,18 +397,20 @@
 }
 
 .login-title {
-    -fx-font-size: 24px;
+    -fx-font-size: 28px;
     -fx-font-weight: bold;
     -fx-text-fill: -belman-blue;
-    -fx-padding: 5px 0 10px 0;
+    -fx-padding: 5px 0 15px 0;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 1, 0, 0, 1);
+    -fx-alignment: center;
 }
 
 .login-form {
-    -fx-spacing: 14px;
-    -fx-padding: 5px 0;
-    -fx-max-width: 350px;
-    -fx-min-width: 250px;
+    -fx-spacing: 16px;
+    -fx-padding: 10px 0;
+    -fx-max-width: 450px;
+    -fx-min-width: 400px;
+    -fx-alignment: center;
 }
 
 /* Input container for validation icons */
@@ -420,13 +423,20 @@
     -fx-opacity: 0.8;
 }
 
+.field-label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+    -fx-padding: 5px 0;
+}
+
 .login-field {
     -fx-background-radius: 8px;
     -fx-border-color: -belman-grey-30;
     -fx-border-width: 1px;
     -fx-border-radius: 8px;
-    -fx-padding: 14px;
-    -fx-font-size: 16px;
+    -fx-padding: 16px;
+    -fx-font-size: 18px;
     -fx-background-color: rgba(255, 255, 255, 0.8);
     -fx-transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
 }
@@ -494,10 +504,11 @@
 .login-button {
     -fx-background-color: -belman-blue;
     -fx-text-fill: white;
-    -fx-font-size: 16px;
-    -fx-padding: 12px 24px;
+    -fx-font-size: 20px;
+    -fx-padding: 16px 32px;
     -fx-background-radius: 8px;
     -fx-cursor: hand;
+    -fx-min-width: 200px;
     -fx-transition: background-color 0.2s ease-in-out, scale 0.1s ease-in-out;
 }
 
@@ -518,10 +529,11 @@
 .nfc-button {
     -fx-background-color: -belman-green;
     -fx-text-fill: white;
-    -fx-font-size: 16px;
-    -fx-padding: 12px 24px;
+    -fx-font-size: 20px;
+    -fx-padding: 16px 32px;
     -fx-background-radius: 8px;
     -fx-cursor: hand;
+    -fx-min-width: 200px;
     -fx-transition: background-color 0.2s ease-in-out, scale 0.1s ease-in-out;
 }
 
@@ -543,16 +555,17 @@
 .dev-helper-button {
     -fx-background-color: rgba(200, 200, 200, 0.2);
     -fx-text-fill: -belman-grey-50;
-    -fx-font-size: 12px;
-    -fx-padding: 8px 12px;
+    -fx-font-size: 14px;
+    -fx-padding: 10px 16px;
     -fx-background-radius: 4px;
     -fx-border-color: rgba(200, 200, 200, 0.3);
     -fx-border-width: 1px;
     -fx-border-radius: 4px;
     -fx-cursor: hand;
-    -fx-margin-top: 10px;
+    -fx-margin-top: 15px;
     -fx-opacity: 0.7;
     -fx-transition: opacity 0.2s ease-in-out;
+    -fx-min-width: 180px;
 }
 
 .dev-helper-button:hover {

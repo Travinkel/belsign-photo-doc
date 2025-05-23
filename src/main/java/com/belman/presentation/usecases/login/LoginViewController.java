@@ -1,4 +1,4 @@
-package com.belman.presentation.usecases.authentication.login;
+package com.belman.presentation.usecases.login;
 
 import com.belman.presentation.base.BaseController;
 import javafx.application.Platform;

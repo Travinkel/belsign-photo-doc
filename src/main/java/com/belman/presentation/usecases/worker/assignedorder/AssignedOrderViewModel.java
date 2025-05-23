@@ -12,7 +12,7 @@ import com.belman.application.usecase.order.OrderService;
 import com.belman.application.usecase.worker.WorkerService;
 import com.belman.presentation.base.BaseViewModel;
 import com.belman.presentation.navigation.Router;
-import com.belman.presentation.usecases.authentication.login.LoginView;
+import com.belman.presentation.usecases.login.LoginView;
 import com.belman.presentation.usecases.worker.WorkerFlowContext;
 import com.belman.presentation.usecases.worker.photocube.PhotoCubeView;
 import javafx.beans.property.*;

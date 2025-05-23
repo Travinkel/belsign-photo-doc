@@ -5,7 +5,7 @@ import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.user.UserBusiness;
 import com.belman.presentation.navigation.RoleBasedNavigationService;
 import com.belman.presentation.navigation.Router;
-import com.belman.presentation.usecases.authentication.login.LoginView;
+import com.belman.presentation.usecases.login.LoginView;
 
 import java.util.Optional;
 import java.util.logging.Logger;

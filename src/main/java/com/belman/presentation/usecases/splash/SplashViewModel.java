@@ -3,7 +3,7 @@ package com.belman.presentation.usecases.splash;
 
 import com.belman.presentation.base.BaseViewModel;
 import com.belman.presentation.navigation.Router;
-import com.belman.presentation.usecases.authentication.login.LoginView;
+import com.belman.presentation.usecases.login.LoginView;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 

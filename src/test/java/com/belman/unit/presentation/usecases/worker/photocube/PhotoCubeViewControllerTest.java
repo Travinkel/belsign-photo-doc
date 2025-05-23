@@ -1,10 +1,12 @@
 package com.belman.unit.presentation.usecases.worker.photocube;
 
+import com.belman.application.usecase.order.OrderProgressService;
 import com.belman.application.usecase.order.OrderService;
 import com.belman.application.usecase.photo.CameraImageProvider;
 import com.belman.application.usecase.photo.CameraImageProviderFactory;
+import com.belman.application.usecase.photo.PhotoCaptureService;
 import com.belman.application.usecase.photo.PhotoService;
-import com.belman.application.usecase.worker.WorkerService;
+import com.belman.application.usecase.photo.PhotoTemplateService;
 import com.belman.domain.photo.PhotoTemplate;
 import com.belman.presentation.usecases.worker.photocube.PhotoCubeViewController;
 import com.belman.presentation.usecases.worker.photocube.PhotoCubeViewModel;
@@ -46,7 +48,13 @@ public class PhotoCubeViewControllerTest {
     private PhotoService photoService;
 
     @Mock
-    private WorkerService workerService;
+    private PhotoTemplateService photoTemplateService;
+
+    @Mock
+    private PhotoCaptureService photoCaptureService;
+
+    @Mock
+    private OrderProgressService orderProgressService;
 
     @Mock
     private CameraImageProvider cameraImageProvider;
@@ -101,7 +109,9 @@ public class PhotoCubeViewControllerTest {
         // Inject the mocked dependencies into the viewModel using reflection
         injectDependency(viewModel, "orderService", orderService);
         injectDependency(viewModel, "photoService", photoService);
-        injectDependency(viewModel, "workerService", workerService);
+        injectDependency(viewModel, "photoTemplateService", photoTemplateService);
+        injectDependency(viewModel, "photoCaptureService", photoCaptureService);
+        injectDependency(viewModel, "orderProgressService", orderProgressService);
 
         // Set up the mocked ListView and its selection model
         when(templateListView.getSelectionModel()).thenReturn(selectionModel);

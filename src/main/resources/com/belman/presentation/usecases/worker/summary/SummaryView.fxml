@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.belman.presentation.usecases.worker.summary.SummaryViewController"
+           fx:id="rootPane"
+           prefHeight="600.0" prefWidth="400.0"
+           styleClass="summary-view">
+
+    <BorderPane>
+        <!-- Header -->
+        <top>
+            <VBox spacing="10.0">
+                <padding>
+                    <Insets top="15.0" right="15.0" bottom="10.0" left="15.0"/>
+                </padding>
+
+                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="header">
+                    <Button fx:id="backButton" text="Back" styleClass="back-button"/>
+                    <Label text="Photo Summary" styleClass="title-label"/>
+                </HBox>
+
+                <!-- Order Info -->
+                <HBox spacing="10.0" styleClass="order-info">
+                    <Label text="Order:" styleClass="order-label"/>
+                    <Label fx:id="orderNumberLabel" text="ORD-123-230615-WLD-0001" styleClass="order-number"/>
+                </HBox>
+            </VBox>
+        </top>
+
+        <!-- Main Content -->
+        <center>
+            <ScrollPane fitToWidth="true" styleClass="content-scroll">
+                <VBox spacing="15.0">
+                    <padding>
+                        <Insets top="15.0" right="15.0" bottom="15.0" left="15.0"/>
+                    </padding>
+
+                    <!-- Photo Summary -->
+                    <VBox spacing="10.0" styleClass="photo-summary">
+                        <Label text="Photos Captured" styleClass="section-title"/>
+
+                        <HBox spacing="10.0">
+                            <Label text="Total Photos:" styleClass="summary-label"/>
+                            <Label fx:id="photoCountLabel" text="5" styleClass="summary-value"/>
+                        </HBox>
+
+                        <!-- Photo Gallery -->
+                        <VBox spacing="10.0">
+                            <StackPane fx:id="photoGalleryContainer" prefHeight="200.0">
+                                <!-- The PhotoGalleryComponent will be added here programmatically -->
+                            </StackPane>
+
+                            <!-- Photo Actions -->
+                            <HBox spacing="10.0" alignment="CENTER">
+                                <Button fx:id="retakePhotoButton" text="Retake Selected Photo" 
+                                        styleClass="retake-button" onAction="#handleRetakePhotoClick" disable="true"/>
+                            </HBox>
+                        </VBox>
+                    </VBox>
+
+                    <!-- Simplified Metadata -->
+                    <VBox spacing="10.0" styleClass="metadata">
+                        <Label text="Basic Information (Optional)" styleClass="section-title"/>
+                        <Label text="These fields are optional. Fill in only what you know." styleClass="help-text"/>
+
+                        <GridPane hgap="10.0" vgap="10.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="NEVER" minWidth="100.0" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                            </columnConstraints>
+
+                            <Label text="Where:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="metadata-label"/>
+                            <TextField fx:id="locationField" promptText="Example: Assembly Hall, Station 3" 
+                                      GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="metadata-field"/>
+
+                            <Label text="What:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="metadata-label"/>
+                            <TextField fx:id="workTypeField" promptText="Example: Welding, Assembly, Inspection" 
+                                      GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="metadata-field"/>
+
+                            <!-- Date field will be set in the controller -->
+                            <Label text="Date:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="metadata-label"/>
+                            <TextField fx:id="dateField" promptText="Today's date will be filled automatically" 
+                                      GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="metadata-field"/>
+                        </GridPane>
+                    </VBox>
+
+                    <!-- Notes -->
+                    <VBox spacing="10.0" styleClass="notes">
+                        <Label text="Additional Notes" styleClass="section-title"/>
+                        <TextArea fx:id="notesTextArea" promptText="Enter any additional notes or comments about the photos..." 
+                                 prefHeight="100.0" wrapText="true" styleClass="notes-field"/>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+        </center>
+
+        <!-- Footer -->
+        <bottom>
+            <HBox alignment="CENTER" spacing="20.0">
+                <padding>
+                    <Insets top="15.0" right="15.0" bottom="20.0" left="15.0"/>
+                </padding>
+
+                <Button fx:id="submitButton" text="Submit Photos" styleClass="submit-button"/>
+            </HBox>
+        </bottom>
+    </BorderPane>
+</StackPane>

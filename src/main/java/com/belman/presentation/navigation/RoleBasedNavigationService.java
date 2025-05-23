@@ -6,7 +6,7 @@ import com.belman.domain.user.UserRole;
 import com.belman.common.session.SessionContext;
 import com.belman.presentation.usecases.admin.dashboard.AdminDashboardView;
 import com.belman.presentation.usecases.admin.usermanagement.UserManagementView;
-import com.belman.presentation.usecases.authentication.login.LoginView;
+import com.belman.presentation.usecases.login.LoginView;
 import com.belman.presentation.usecases.qa.dashboard.QADashboardView;
 import com.belman.presentation.usecases.worker.assignedorder.AssignedOrderView;
 

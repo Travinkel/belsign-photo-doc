@@ -16,6 +16,8 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
+import java.io.IOException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,6 +31,9 @@ import java.util.List;
  * Handles UI interactions for displaying a summary of all photos taken for an order.
  */
 public class SummaryViewController extends BaseController<SummaryViewModel> {
+
+    @FXML
+    private StackPane rootPane;
 
     @FXML
     private Label orderNumberLabel;
@@ -50,6 +55,9 @@ public class SummaryViewController extends BaseController<SummaryViewModel> {
 
     @FXML
     private Button backButton;
+
+    @FXML
+    private Button retakePhotoButton;
 
     @FXML
     private StackPane loadingPane;
@@ -179,11 +187,16 @@ public class SummaryViewController extends BaseController<SummaryViewModel> {
      * @param item the selected photo item
      */
     private void handlePhotoSelected(PhotoItem item) {
-        // This method can be used to show details about the selected photo
-        // or to enable actions like retaking the photo
+        // Enable/disable the retake button based on whether a photo is selected
         if (item != null && item.getUserData() instanceof PhotoDocument) {
             PhotoDocument doc = (PhotoDocument) item.getUserData();
             System.out.println("Selected photo: " + doc.getTemplate());
+
+            // Enable the retake button
+            retakePhotoButton.setDisable(false);
+        } else {
+            // Disable the retake button if no photo is selected
+            retakePhotoButton.setDisable(true);
         }
     }
 
@@ -202,7 +215,27 @@ public class SummaryViewController extends BaseController<SummaryViewModel> {
      */
     @FXML
     private void handleSubmitClick() {
-        getViewModel().submitPhotos();
+        try {
+            // Show a confirmation dialog before submitting photos
+            UIComponentUtils.showConfirmation(
+                rootPane,
+                "Submit Photos",
+                "Are you sure you want to submit these photos? This action cannot be undone.\n\n" +
+                "After submission, the photos will be sent to the Quality Assurance team for review.",
+                "Submit",
+                "Cancel",
+                confirmed -> {
+                    if (confirmed) {
+                        // User confirmed, submit the photos
+                        getViewModel().submitPhotos();
+                    }
+                }
+            );
+        } catch (IOException e) {
+            System.err.println("Error showing confirmation dialog: " + e.getMessage());
+            // Fallback to direct submission if the dialog fails
+            getViewModel().submitPhotos();
+        }
     }
 
     /**
@@ -211,6 +244,27 @@ public class SummaryViewController extends BaseController<SummaryViewModel> {
     @FXML
     private void handleBackClick() {
         getViewModel().goBack();
+    }
+
+    /**
+     * Handles the retake photo button click.
+     * This method is called when the user clicks the "Retake Selected Photo" button.
+     */
+    @FXML
+    private void handleRetakePhotoClick() {
+        // Get the selected photo from the photo gallery
+        PhotoItem selectedItem = photoGallery.getSelectedPhoto();
+
+        if (selectedItem == null || !(selectedItem.getUserData() instanceof PhotoDocument)) {
+            // No photo selected or invalid user data
+            return;
+        }
+
+        // Get the photo document from the selected item
+        PhotoDocument photoDocument = (PhotoDocument) selectedItem.getUserData();
+
+        // Call the view model to handle retaking the photo
+        getViewModel().retakePhoto(photoDocument);
     }
 
 }

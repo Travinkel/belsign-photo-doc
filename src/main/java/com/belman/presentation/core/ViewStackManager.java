@@ -2,7 +2,7 @@ package com.belman.presentation.core;
 
 import com.belman.common.logging.EmojiLogger;
 import com.belman.presentation.di.ViewDependencies;
-import com.belman.presentation.usecases.authentication.login.LoginViewFactory;
+import com.belman.presentation.usecases.login.LoginViewFactory;
 import com.belman.presentation.usecases.splash.SplashViewFactory;
 import com.belman.presentation.usecases.worker.assignedorder.AssignedOrderViewFactory;
 import com.belman.presentation.usecases.worker.photocube.PhotoCubeViewFactory;

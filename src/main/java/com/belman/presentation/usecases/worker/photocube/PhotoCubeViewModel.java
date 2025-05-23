@@ -1,5 +1,8 @@
 package com.belman.presentation.usecases.worker.photocube;
 
+import com.belman.application.usecase.order.OrderService;
+import com.belman.application.usecase.photo.CameraImageProvider;
+import com.belman.application.usecase.photo.CameraImageProviderFactory;
 import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.common.di.Inject;
 import com.belman.common.session.SessionContext;
@@ -9,72 +12,107 @@ import com.belman.domain.photo.Photo;
 import com.belman.domain.photo.PhotoDocument;
 import com.belman.domain.photo.PhotoTemplate;
 import com.belman.application.usecase.photo.PhotoService;
-import com.belman.application.usecase.order.OrderService;
-import com.belman.application.usecase.photo.CameraService;
-import com.belman.application.usecase.photo.CameraImageProvider;
-import com.belman.application.usecase.photo.CameraImageProviderFactory;
-import com.belman.application.usecase.worker.WorkerService;
-import com.belman.presentation.providers.PhotoTemplateLabelProvider;
 import com.belman.presentation.base.BaseViewModel;
 import com.belman.presentation.navigation.Router;
+import com.belman.presentation.providers.PhotoTemplateLabelProvider;
 import com.belman.presentation.usecases.worker.WorkerFlowContext;
+import com.belman.presentation.usecases.worker.photocube.managers.OrderManager;
+import com.belman.presentation.usecases.worker.photocube.managers.PhotoCaptureManager;
+import com.belman.presentation.usecases.worker.photocube.managers.TemplateManager;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
 
 import java.io.File;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * ViewModel for the PhotoCubeView.
  * Manages the state and logic for displaying the unfolded cube layout
  * and selecting photo templates.
+ * 
+ * This class has been refactored to use manager classes for better separation of concerns:
+ * - OrderManager: Handles order loading and management
+ * - PhotoCaptureManager: Handles photo capture and camera interactions
+ * - TemplateManager: Handles template management and status tracking
  */
 public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
 
     @Inject
-    private OrderService orderService;
-
-    @Inject
     private PhotoService photoService;
 
-    @Inject
-    private WorkerService workerService;
-
-    private final CameraImageProvider cameraImageProvider = CameraImageProviderFactory.getInstance();
+    // Managers for different responsibilities
+    private final OrderManager orderManager;
+    private final PhotoCaptureManager photoCaptureManager;
+    private final TemplateManager templateManager;
 
     // Properties for UI binding
     private final StringProperty errorMessage = new SimpleStringProperty("");
     private final StringProperty statusMessage = new SimpleStringProperty("Loading...");
     private final BooleanProperty loading = new SimpleBooleanProperty(false);
-    private final ObjectProperty<OrderBusiness> currentOrder = new SimpleObjectProperty<>();
-    private final StringProperty orderNumber = new SimpleStringProperty("");
+    private final ObjectProperty<PhotoCubeState> state = new SimpleObjectProperty<>(PhotoCubeState.LOADING);
 
-    // Properties for the Progressive Capture Dashboard
-    private final ObjectProperty<PhotoTemplate> selectedTemplate = new SimpleObjectProperty<>();
-    private final MapProperty<PhotoTemplate, Boolean> templateCompletionStatus = new SimpleMapProperty<>(FXCollections.observableHashMap());
-    private final ListProperty<PhotoDocument> takenPhotos = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final IntegerProperty photosCompleted = new SimpleIntegerProperty(0);
-    private final IntegerProperty totalPhotosRequired = new SimpleIntegerProperty(0);
+    /**
+     * Creates a new PhotoCubeViewModel.
+     */
+    public PhotoCubeViewModel() {
+        // Initialize managers
+        orderManager = ServiceLocator.getService(OrderManager.class);
+        photoCaptureManager = ServiceLocator.getService(PhotoCaptureManager.class);
+        templateManager = ServiceLocator.getService(TemplateManager.class);
 
-    // New properties for the Progressive Capture Dashboard
-    private final ObjectProperty<Image> currentPhotoPreview = new SimpleObjectProperty<>();
-    private final BooleanProperty cameraActive = new SimpleBooleanProperty(false);
-    private final ListProperty<PhotoTemplateStatusViewModel> templateStatusList = 
-        new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final BooleanProperty captureInProgress = new SimpleBooleanProperty(false);
+        // Set up property bindings between managers and this view model
+        setupPropertyBindings();
+    }
 
-    // Property for the "Show remaining only" toggle
-    private final BooleanProperty showRemainingOnly = new SimpleBooleanProperty(false);
+    /**
+     * Sets up property bindings between managers and this view model.
+     */
+    private void setupPropertyBindings() {
+        // Bind error messages from managers to this view model
+        orderManager.errorMessageProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.isEmpty()) {
+                errorMessage.set(newVal);
+            }
+        });
 
-    // Filtered list of templates (when showRemainingOnly is true)
-    private final ListProperty<PhotoTemplateStatusViewModel> filteredTemplateStatusList = 
-        new SimpleListProperty<>(FXCollections.observableArrayList());
+        photoCaptureManager.errorMessageProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.isEmpty()) {
+                errorMessage.set(newVal);
+            }
+        });
 
-    // Templates for the dashboard - will be loaded from WorkerService
-    private List<PhotoTemplate> requiredTemplates = new ArrayList<>();
+        templateManager.errorMessageProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.isEmpty()) {
+                errorMessage.set(newVal);
+            }
+        });
+
+        // Bind status messages from managers to this view model
+        orderManager.statusMessageProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.isEmpty()) {
+                statusMessage.set(newVal);
+            }
+        });
+
+        photoCaptureManager.statusMessageProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.isEmpty()) {
+                statusMessage.set(newVal);
+            }
+        });
+
+        templateManager.statusMessageProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.isEmpty()) {
+                statusMessage.set(newVal);
+            }
+        });
+    }
 
     @Override
     public void onShow() {
@@ -83,99 +121,31 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
     }
 
     /**
-     * Loads the current order from the WorkerFlowContext.
+     * Loads the current order and its photos.
      */
     private void loadCurrentOrder() {
         loading.set(true);
         statusMessage.set("Loading order...");
 
         try {
-            // Get the current order from the WorkerFlowContext
-            OrderBusiness order = WorkerFlowContext.getCurrentOrder();
+            // Load the order using the OrderManager
+            boolean orderLoaded = orderManager.loadCurrentOrder();
 
-            if (order == null) {
-                // If no order is in the context, try to get one from the session
-                SessionContext.getCurrentUser().ifPresentOrElse(
-                    user -> {
-                        try {
-                            // Get the assigned order for the current user using WorkerService
-                            Optional<OrderBusiness> assignedOrderOpt = workerService.getAssignedOrder(user);
-
-                            if (assignedOrderOpt.isEmpty()) {
-                                // If no assigned order is found, try to get all orders as a fallback
-                                List<OrderBusiness> orders = orderService.getAllOrders();
-
-                                if (orders.isEmpty()) {
-                                    errorMessage.set("No orders found in the system. Please contact your supervisor to create an order.");
-                                    loading.set(false);
-                                    return;
-                                }
-
-                                // Log that we're falling back to created orders
-                                System.out.println("[DEBUG_LOG] No assigned orders found for user: " + user.getUsername().value() + ", falling back to created orders");
-
-                                // Filter orders created by the current user as a fallback
-                                List<OrderBusiness> userOrders = orders.stream()
-                                    .filter(o -> o.getCreatedBy() != null && 
-                                           o.getCreatedBy().id().equals(user.getId()))
-                                    .toList();
-
-                                if (userOrders.isEmpty()) {
-                                    errorMessage.set("No active orders assigned to you. Please contact your supervisor to assign an order for documentation.");
-                                    loading.set(false);
-                                    return;
-                                }
-
-                                // Set the current order to the first order created by the user
-                                OrderBusiness userOrder = userOrders.get(0);
-                                currentOrder.set(userOrder);
-                                orderNumber.set(userOrder.getOrderNumber().toString());
-
-                                // Store the order in the WorkerFlowContext for future use
-                                WorkerFlowContext.setCurrentOrder(userOrder);
-
-                                // Load the photos for this order
-                                loadPhotosForOrder(userOrder.getId());
-                            } else {
-                                // Use the assigned order
-                                OrderBusiness assignedOrder = assignedOrderOpt.get();
-                                System.out.println("[DEBUG_LOG] Found assigned order for user: " + user.getUsername().value() + 
-                                    " - Order ID: " + assignedOrder.getId().id() + 
-                                    ", Order Number: " + (assignedOrder.getOrderNumber() != null ? assignedOrder.getOrderNumber().value() : "null"));
-
-                                currentOrder.set(assignedOrder);
-
-                                // Format the order number in a user-friendly way (e.g., "Order #123" instead of technical format)
-                                String friendlyOrderNumber = assignedOrder.getOrderNumber().toString().replace("ORD-", "Order #");
-                                orderNumber.set(friendlyOrderNumber);
-
-                                // Store the order in the WorkerFlowContext for future use
-                                WorkerFlowContext.setCurrentOrder(assignedOrder);
-
-                                // Load the photos for this order
-                                loadPhotosForOrder(assignedOrder.getId());
-                            }
-                        } catch (Exception e) {
-                            errorMessage.set("Error loading orders: " + e.getMessage() + ". Please try again or contact support.");
-                            loading.set(false);
-                        }
-                    },
-                    () -> {
-                        errorMessage.set("No user is logged in. Please log in to continue.");
-                        loading.set(false);
-                    }
-                );
-            } else {
-                // Use the order from the WorkerFlowContext
-                currentOrder.set(order);
-
-                // Format the order number in a user-friendly way
-                String friendlyOrderNumber = order.getOrderNumber().toString().replace("ORD-", "Order #");
-                orderNumber.set(friendlyOrderNumber);
-
-                // Load the photos for this order
-                loadPhotosForOrder(order.getId());
+            if (!orderLoaded) {
+                loading.set(false);
+                return;
             }
+
+            // Get the current order ID
+            OrderId orderId = orderManager.getCurrentOrderId();
+            if (orderId == null) {
+                errorMessage.set("Invalid order ID. Please try again or contact support.");
+                loading.set(false);
+                return;
+            }
+
+            // Load photos for the order
+            loadPhotosForOrder(orderId);
         } catch (Exception e) {
             errorMessage.set("Unexpected error loading order: " + e.getMessage() + ". Please try again or contact support.");
             loading.set(false);
@@ -207,132 +177,22 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
         try {
             // Get all photos for the order
             List<PhotoDocument> photos = photoService.getPhotosByOrderId(orderId);
-            takenPhotos.setAll(photos);
 
-            // Update the photos completed count
-            photosCompleted.set(photos.size());
+            // Load templates using the TemplateManager
+            boolean templatesLoaded = templateManager.loadTemplates(orderId);
 
-            // Get available templates from the WorkerService
-            System.out.println("[DEBUG_LOG] Getting available templates for order ID: " + orderId.id());
-            requiredTemplates = workerService.getAvailableTemplates(orderId);
-            System.out.println("[DEBUG_LOG] Found " + requiredTemplates.size() + " templates for order ID: " + orderId.id());
-
-            // Log template details for debugging
-            if (!requiredTemplates.isEmpty()) {
-                System.out.println("[DEBUG_LOG] Template details for order ID: " + orderId.id());
-                for (int i = 0; i < requiredTemplates.size(); i++) {
-                    PhotoTemplate template = requiredTemplates.get(i);
-                    System.out.println("[DEBUG_LOG]   Template " + (i+1) + ": " + 
-                        "Name=" + template.name() + 
-                        ", Description=" + template.description() + 
-                        ", RequiredFields=" + template.requiredFields());
-                }
-            }
-
-            // If no templates are available, show a clear non-technical message
-            if (requiredTemplates.isEmpty()) {
-                System.out.println("[DEBUG_LOG] No templates found for order ID: " + orderId.id() + " - showing error message");
-
-                // Try to get the order details for better error reporting
-                String orderDetails = "";
-                try {
-                    Optional<OrderBusiness> orderOpt = orderService.getOrderById(orderId);
-                    if (orderOpt.isPresent()) {
-                        OrderBusiness order = orderOpt.get();
-                        if (order.getOrderNumber() != null) {
-                            orderDetails = " for " + order.getOrderNumber().toString().replace("ORD-", "Order #");
-                        }
-                    }
-                } catch (Exception e) {
-                    System.err.println("[DEBUG_LOG] Error getting order details: " + e.getMessage());
-                }
-
-                errorMessage.set("No photo templates available" + orderDetails + ". Please contact your supervisor to set up templates.");
-                statusMessage.set("Waiting for templates to be assigned. Please refresh or contact your supervisor.");
+            if (!templatesLoaded) {
                 loading.set(false);
                 return;
             }
 
-            // Set the total required photos count
-            totalPhotosRequired.set(requiredTemplates.size());
-
-            // Initialize the template completion status map
-            Map<PhotoTemplate, Boolean> completionStatus = new HashMap<>();
-
-            // Create template status view models for each template
-            ObservableList<PhotoTemplateStatusViewModel> statusList = FXCollections.observableArrayList();
-
-            for (PhotoTemplate template : requiredTemplates) {
-                boolean isCompleted = photos.stream()
-                    .anyMatch(photo -> photo.getTemplate().equals(template));
-                completionStatus.put(template, isCompleted);
-
-                // Create a status view model for this template
-                PhotoTemplateStatusViewModel statusViewModel = new PhotoTemplateStatusViewModel(
-                    template, isCompleted, isCompleted, true);
-
-                // If there's a photo for this template, find it and set the preview image
-                if (isCompleted) {
-                    photos.stream()
-                        .filter(photo -> photo.getTemplate().equals(template))
-                        .findFirst()
-                        .ifPresent(photo -> {
-                            // If this is the most recently taken photo, set it as the current preview
-                            if (currentPhotoPreview.get() == null) {
-                                try {
-                                    // Try to load the photo as an image
-                                    Image image = loadPhotoAsImage(photo);
-                                    if (image != null) {
-                                        currentPhotoPreview.set(image);
-                                    }
-                                } catch (Exception e) {
-                                    // Log error but continue
-                                    System.err.println("Error loading photo preview: " + e.getMessage());
-                                }
-                            }
-                        });
-                }
-
-                statusList.add(statusViewModel);
-            }
-
-            // Update the observable lists
-            templateCompletionStatus.putAll(completionStatus);
-            templateStatusList.setAll(statusList);
-
-            // Update the filtered template list to ensure UI is refreshed immediately
-            updateFilteredTemplateList();
-
-            // Check if there's a selected template in the WorkerFlowContext
-            PhotoTemplate selectedTemplateFromContext = WorkerFlowContext.getSelectedTemplate();
-            if (selectedTemplateFromContext != null) {
-                selectedTemplate.set(selectedTemplateFromContext);
-
-                // Update the selected state in the status view models only if the list is not empty
-                if (!templateStatusList.isEmpty()) {
-                    for (PhotoTemplateStatusViewModel statusViewModel : templateStatusList) {
-                        statusViewModel.setSelected(
-                            statusViewModel.getTemplate().equals(selectedTemplateFromContext));
-                    }
-                }
-            } else if (!requiredTemplates.isEmpty()) {
-                // Auto-select the first template if none is selected
-                PhotoTemplate firstTemplate = requiredTemplates.get(0);
-                selectedTemplate.set(firstTemplate);
-                WorkerFlowContext.setSelectedTemplate(firstTemplate);
-
-                // Update the selected state in the status view models only if the list is not empty
-                if (!templateStatusList.isEmpty()) {
-                    for (PhotoTemplateStatusViewModel statusViewModel : templateStatusList) {
-                        statusViewModel.setSelected(
-                            statusViewModel.getTemplate().equals(firstTemplate));
-                    }
-                }
-            }
+            // Update template status based on the photos
+            templateManager.updateTemplateStatus(photos);
 
             loading.set(false);
-            statusMessage.set("Ready to take photos. " + photosCompleted.get() + " of " + 
-                            totalPhotosRequired.get() + " photos taken.");
+            state.set(PhotoCubeState.SELECTING_TEMPLATE);
+            statusMessage.set("Ready to take photos. " + templateManager.photosCompletedProperty().get() + " of " + 
+                            templateManager.totalPhotosRequiredProperty().get() + " photos taken.");
         } catch (Exception e) {
             // If we haven't exceeded the maximum number of retries, try again
             if (currentRetry < maxRetries) {
@@ -353,6 +213,7 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
                 errorMessage.set("Failed to load photos and templates after " + maxRetries + 
                                " attempts. Error: " + e.getMessage() + ". Please check your connection and try again.");
                 loading.set(false);
+                state.set(PhotoCubeState.ERROR);
                 statusMessage.set("Error loading data. Please try refreshing.");
             }
         }
@@ -364,29 +225,24 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
      * @param template the template to select
      */
     public void selectTemplate(PhotoTemplate template) {
+        // Check if we can transition to the camera preview state
+        if (!state.get().canTransitionTo(PhotoCubeState.CAMERA_PREVIEW)) {
+            errorMessage.set("Cannot select template in current state: " + state.get().getDescription());
+            return;
+        }
+
         loading.set(true);
-        statusMessage.set("Selecting template...");
 
         try {
-            selectedTemplate.set(template);
+            // Store the current order in the WorkerFlowContext
+            WorkerFlowContext.setCurrentOrder(orderManager.getCurrentOrder());
 
-            // Store the selected template in the worker flow context
-            WorkerFlowContext.setSelectedTemplate(template);
-            WorkerFlowContext.setCurrentOrder(currentOrder.get());
+            // Select the template using the TemplateManager
+            templateManager.selectTemplate(template);
 
-            // Update the selected state in the status view models only if the list is not empty
-            if (!templateStatusList.isEmpty()) {
-                for (PhotoTemplateStatusViewModel statusViewModel : templateStatusList) {
-                    statusViewModel.setSelected(
-                        statusViewModel.getTemplate().equals(template));
-                }
-            }
-
-            // Update the filtered template list to ensure UI is refreshed immediately
-            updateFilteredTemplateList();
-
+            // Update state to camera preview
+            state.set(PhotoCubeState.CAMERA_PREVIEW);
             loading.set(false);
-            statusMessage.set("Template selected: " + PhotoTemplateLabelProvider.getDisplayLabel(template) + ". Ready to capture.");
         } catch (Exception e) {
             errorMessage.set("Error selecting template: " + e.getMessage() + ". Please try again.");
             loading.set(false);
@@ -397,33 +253,39 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
      * Starts the camera preview for the selected template.
      */
     public void startCameraPreview() {
+        // Check if we can transition to the capturing photo state
+        if (!state.get().canTransitionTo(PhotoCubeState.CAPTURING_PHOTO)) {
+            errorMessage.set("Cannot start camera in current state: " + state.get().getDescription());
+            return;
+        }
+
         loading.set(true);
-        statusMessage.set("Starting camera preview...");
 
         try {
-            if (!cameraImageProvider.isCameraAvailable()) {
-                errorMessage.set("Camera is not available on this device. Please check camera permissions or try another device.");
-                loading.set(false);
-                return;
-            }
-
             // Check if a template is selected
-            if (selectedTemplate.get() == null) {
+            PhotoTemplate selectedTemplate = templateManager.getSelectedTemplate();
+            if (selectedTemplate == null) {
                 errorMessage.set("Please select a template before starting the camera.");
                 loading.set(false);
                 return;
             }
 
-            // Start the camera preview
-            cameraActive.set(true);
+            // Start the camera preview using the PhotoCaptureManager
+            boolean cameraStarted = photoCaptureManager.startCameraPreview(selectedTemplate);
 
-            // The actual camera preview will be handled by the controller
             loading.set(false);
-            statusMessage.set("Camera preview started. Position the camera and tap 'Capture' when ready.");
+
+            if (!cameraStarted) {
+                errorMessage.set("Failed to start camera. Please check camera permissions and try again.");
+                state.set(PhotoCubeState.ERROR);
+            } else {
+                // Camera started successfully, update state
+                state.set(PhotoCubeState.CAPTURING_PHOTO);
+            }
         } catch (Exception e) {
             errorMessage.set("Error starting camera preview: " + e.getMessage() + ". Please try again or use another device.");
             loading.set(false);
-            cameraActive.set(false);
+            state.set(PhotoCubeState.ERROR);
         }
     }
 
@@ -431,172 +293,40 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
      * Captures a photo for the selected template.
      */
     public void capturePhoto() {
-        if (!cameraActive.get()) {
-            errorMessage.set("Camera is not active. Please start the camera preview first.");
+        // Check if we can transition to the reviewing photo state
+        if (!state.get().canTransitionTo(PhotoCubeState.REVIEWING_PHOTO)) {
+            errorMessage.set("Cannot capture photo in current state: " + state.get().getDescription());
             return;
         }
-
-        if (selectedTemplate.get() == null) {
-            errorMessage.set("No template selected. Please select a template before capturing a photo.");
-            return;
-        }
-
-        if (captureInProgress.get()) {
-            errorMessage.set("Capture already in progress. Please wait.");
-            return;
-        }
-
-        captureInProgress.set(true);
-        statusMessage.set("Capturing photo...");
-
-        try {
-            // Capture the photo using the camera image provider
-            OrderBusiness order = currentOrder.get();
-            PhotoTemplate template = selectedTemplate.get();
-            String orderId = order != null ? order.getId().toString() : "";
-            Optional<File> capturedPhotoFile = cameraImageProvider.takePhoto(template, orderId);
-
-            if (capturedPhotoFile.isEmpty()) {
-                errorMessage.set("Unable to save photo. Please check camera permissions and try again.");
-                captureInProgress.set(false);
-                return;
-            }
-
-            // Convert the file to a Photo object
-            File photoFile = capturedPhotoFile.get();
-            Photo capturedPhoto = new Photo(photoFile.getName());
-
-            // Save the photo
-            savePhoto(capturedPhoto);
-        } catch (Exception e) {
-            errorMessage.set("Error capturing photo: " + e.getMessage() + ". Please try again.");
-            captureInProgress.set(false);
-        }
-    }
-
-    /**
-     * Saves a captured photo for the selected template.
-     * 
-     * @param photo the photo to save
-     */
-    private void savePhoto(Photo photo) {
-        statusMessage.set("Saving photo...");
 
         try {
             // Get the current order and selected template
-            OrderBusiness order = currentOrder.get();
-            PhotoTemplate template = selectedTemplate.get();
+            OrderBusiness order = orderManager.getCurrentOrder();
+            PhotoTemplate template = templateManager.getSelectedTemplate();
 
-            if (order == null || template == null) {
-                errorMessage.set("Missing order or template information. Please try again.");
-                captureInProgress.set(false);
+            if (template == null) {
+                errorMessage.set("No template selected. Please select a template before capturing a photo.");
+                state.set(PhotoCubeState.ERROR);
                 return;
             }
 
-            // Get the current user
-            SessionContext.getCurrentUser().ifPresentOrElse(
-                user -> {
-                    try {
-                        // Save the photo using the worker service
-                        PhotoDocument savedPhoto = workerService.capturePhoto(
-                            order.getId(), template, photo, user);
+            // Capture the photo using the PhotoCaptureManager
+            PhotoDocument savedPhoto = photoCaptureManager.capturePhoto(order, template);
 
-                        if (savedPhoto == null) {
-                            errorMessage.set("Failed to save photo. Please try again.");
-                            captureInProgress.set(false);
-                            return;
-                        }
+            if (savedPhoto != null) {
+                // Update the template status after photo capture
+                templateManager.updateAfterPhotoCapture(savedPhoto);
 
-                        // Update the UI
-                        updateAfterPhotoCapture(savedPhoto);
-                    } catch (Exception e) {
-                        errorMessage.set("Error saving photo: " + e.getMessage() + ". Please try again.");
-                        captureInProgress.set(false);
-                    }
-                },
-                () -> {
-                    errorMessage.set("No user is logged in. Please log in to continue.");
-                    captureInProgress.set(false);
-                }
-            );
+                // Update state to reviewing photo
+                state.set(PhotoCubeState.REVIEWING_PHOTO);
+                statusMessage.set("Photo captured successfully. Review the photo or select another template.");
+            } else {
+                errorMessage.set("Failed to capture photo. Please try again.");
+                state.set(PhotoCubeState.ERROR);
+            }
         } catch (Exception e) {
-            errorMessage.set("Error saving photo: " + e.getMessage() + ". Please try again.");
-            captureInProgress.set(false);
-        }
-    }
-
-    /**
-     * Updates the UI after a photo is captured and saved.
-     * 
-     * @param savedPhoto the saved photo document
-     */
-    private void updateAfterPhotoCapture(PhotoDocument savedPhoto) {
-        try {
-            // Add the photo to the taken photos list
-            takenPhotos.add(savedPhoto);
-
-            // Update the photos completed count
-            photosCompleted.set(photosCompleted.get() + 1);
-
-            // Update the template completion status
-            PhotoTemplate template = savedPhoto.getTemplate();
-            templateCompletionStatus.put(template, true);
-
-            // Update the template status view model only if the list is not empty
-            if (!templateStatusList.isEmpty()) {
-                for (PhotoTemplateStatusViewModel statusViewModel : templateStatusList) {
-                    if (statusViewModel.getTemplate().equals(template)) {
-                        statusViewModel.setCaptured(true);
-                        statusViewModel.setValidated(true);
-                        break;
-                    }
-                }
-            }
-
-            // Update the filtered template list to ensure UI is refreshed immediately
-            updateFilteredTemplateList();
-
-            // Load the photo as an image for preview
-            Image image = loadPhotoAsImage(savedPhoto);
-            if (image != null) {
-                currentPhotoPreview.set(image);
-            }
-
-            // Stop the camera preview
-            cameraActive.set(false);
-
-            // Reset the capture in progress flag
-            captureInProgress.set(false);
-
-            // Update the status message
-            statusMessage.set("Photo captured successfully. " + photosCompleted.get() + " of " + 
-                            totalPhotosRequired.get() + " photos taken.");
-
-            // Auto-select the next template if available
-            selectNextTemplate();
-        } catch (Exception e) {
-            errorMessage.set("Error updating UI after photo capture: " + e.getMessage() + ". Please try again.");
-            captureInProgress.set(false);
-        }
-    }
-
-    /**
-     * Selects the next template that doesn't have a photo yet.
-     */
-    private void selectNextTemplate() {
-        // Find the next template that doesn't have a photo
-        for (PhotoTemplate template : requiredTemplates) {
-            Boolean isCompleted = templateCompletionStatus.get(template);
-            if (isCompleted == null || !isCompleted) {
-                // Select this template
-                selectTemplate(template);
-                return;
-            }
-        }
-
-        // All templates have photos, check if we can go to summary
-        if (areAllPhotosTaken()) {
-            statusMessage.set("All required photos have been taken. You can now proceed to the summary.");
+            errorMessage.set("Error capturing photo: " + e.getMessage() + ". Please try again.");
+            state.set(PhotoCubeState.ERROR);
         }
     }
 
@@ -606,19 +336,12 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
      * @return true if all required photos have been taken, false otherwise
      */
     public boolean areAllPhotosTaken() {
-        OrderBusiness order = currentOrder.get();
-        if (order == null) {
+        OrderId orderId = orderManager.getCurrentOrderId();
+        if (orderId == null) {
             return false;
         }
 
-        try {
-            // Use the WorkerService to check if all required photos have been taken
-            return workerService.hasAllRequiredPhotos(order.getId());
-        } catch (Exception e) {
-            // If there's an error, fall back to checking the template completion status map
-            errorMessage.set("Error checking if all photos are taken: " + e.getMessage());
-            return templateCompletionStatus.values().stream().allMatch(Boolean::booleanValue);
-        }
+        return templateManager.areAllPhotosTaken(orderId);
     }
 
     /**
@@ -627,25 +350,24 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
      * @return a list of required templates that are missing photos
      */
     public List<PhotoTemplate> getMissingRequiredTemplates() {
-        OrderBusiness order = currentOrder.get();
-        if (order == null) {
-            return Collections.emptyList();
+        OrderId orderId = orderManager.getCurrentOrderId();
+        if (orderId == null) {
+            return java.util.Collections.emptyList();
         }
 
-        try {
-            // Use the WorkerService to get the missing required templates
-            return workerService.getMissingRequiredTemplates(order.getId());
-        } catch (Exception e) {
-            // If there's an error, log it and return an empty list
-            errorMessage.set("Error getting missing required templates: " + e.getMessage());
-            return Collections.emptyList();
-        }
+        return templateManager.getMissingRequiredTemplates(orderId);
     }
 
     /**
      * Navigates to the summary view if all required photos have been taken.
      */
     public void goToSummary() {
+        // Check if we can transition to the completed state
+        if (!state.get().canTransitionTo(PhotoCubeState.COMPLETED)) {
+            errorMessage.set("Cannot proceed to summary in current state: " + state.get().getDescription());
+            return;
+        }
+
         loading.set(true);
         statusMessage.set("Checking photo completion status...");
 
@@ -672,6 +394,8 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
                 return;
             }
 
+            // Update state to completed
+            state.set(PhotoCubeState.COMPLETED);
             statusMessage.set("Preparing summary view...");
 
             // Navigate to the summary view
@@ -681,6 +405,7 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
         } catch (Exception e) {
             errorMessage.set("Error preparing summary view: " + e.getMessage() + ". Please try again.");
             loading.set(false);
+            state.set(PhotoCubeState.ERROR);
         }
     }
 
@@ -688,10 +413,15 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
      * Navigates back to the assigned order view.
      */
     public void goBack() {
+        // Any state can transition back to the previous screen
         loading.set(true);
         statusMessage.set("Returning to previous screen...");
 
         try {
+            // Reset state before navigating back
+            // This ensures we don't leave the view in an inconsistent state
+            state.set(PhotoCubeState.LOADING);
+
             // Use ViewStackManager directly instead of Router to ensure proper back navigation
             com.belman.presentation.core.ViewStackManager.getInstance().navigateBack();
 
@@ -699,7 +429,29 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
         } catch (Exception e) {
             errorMessage.set("Error navigating back: " + e.getMessage() + ". Please try again.");
             loading.set(false);
+            state.set(PhotoCubeState.ERROR);
         }
+    }
+
+    /**
+     * Sets whether to show only remaining templates.
+     * When true, only templates that haven't been captured yet will be shown.
+     * When false, all templates will be shown.
+     * 
+     * @param showRemainingOnly whether to show only remaining templates
+     */
+    public void setShowRemainingOnly(boolean showRemainingOnly) {
+        templateManager.setShowRemainingOnly(showRemainingOnly);
+    }
+
+    /**
+     * Checks if the given template is the last remaining template in the filtered list.
+     * 
+     * @param template the template to check
+     * @return true if this is the last remaining template, false otherwise
+     */
+    public boolean isLastRemainingTemplate(PhotoTemplate template) {
+        return templateManager.isLastRemainingTemplate(template);
     }
 
     // Getters for properties
@@ -717,456 +469,73 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
     }
 
     public ObjectProperty<OrderBusiness> currentOrderProperty() {
-        return currentOrder;
+        return orderManager.currentOrderProperty();
     }
 
     public StringProperty orderNumberProperty() {
-        return orderNumber;
+        return orderManager.orderNumberProperty();
     }
 
     public ObjectProperty<PhotoTemplate> selectedTemplateProperty() {
-        return selectedTemplate;
+        return templateManager.selectedTemplateProperty();
     }
 
     public MapProperty<PhotoTemplate, Boolean> templateCompletionStatusProperty() {
-        return templateCompletionStatus;
+        return templateManager.templateCompletionStatusProperty();
     }
 
     public ListProperty<PhotoDocument> takenPhotosProperty() {
-        return takenPhotos;
+        return templateManager.takenPhotosProperty();
     }
 
     public IntegerProperty photosCompletedProperty() {
-        return photosCompleted;
+        return templateManager.photosCompletedProperty();
     }
 
     public IntegerProperty totalPhotosRequiredProperty() {
-        return totalPhotosRequired;
+        return templateManager.totalPhotosRequiredProperty();
     }
 
     public ObjectProperty<Image> currentPhotoPreviewProperty() {
-        return currentPhotoPreview;
+        return photoCaptureManager.currentPhotoPreviewProperty();
     }
 
     public BooleanProperty cameraActiveProperty() {
-        return cameraActive;
+        return photoCaptureManager.cameraActiveProperty();
     }
 
     public ListProperty<PhotoTemplateStatusViewModel> templateStatusListProperty() {
-        // Create a default empty list to return if needed
-        ObservableList<PhotoTemplateStatusViewModel> emptyList = FXCollections.observableArrayList();
-        SimpleListProperty<PhotoTemplateStatusViewModel> emptyProperty = new SimpleListProperty<>(emptyList);
-
-        try {
-            // First check if both lists are null or empty
-            if ((templateStatusList == null || templateStatusList.isEmpty()) && 
-                (filteredTemplateStatusList == null || filteredTemplateStatusList.isEmpty())) {
-                // If both lists are empty, return an empty list
-                System.out.println("Both template lists are empty, returning empty list");
-                return emptyProperty;
-            }
-
-            // Check if the appropriate list is empty
-            if (showRemainingOnly.get()) {
-                // If showing remaining only and filtered list is empty but main list is not,
-                // automatically switch to showing all templates
-                if ((filteredTemplateStatusList == null || filteredTemplateStatusList.isEmpty()) && 
-                    templateStatusList != null && !templateStatusList.isEmpty()) {
-                    // Only switch if we have captured all templates
-                    boolean allCaptured = true;
-                    try {
-                        allCaptured = templateStatusList.stream()
-                            .allMatch(PhotoTemplateStatusViewModel::isCaptured);
-                    } catch (Exception e) {
-                        System.err.println("Error checking if all templates are captured: " + e.getMessage());
-                    }
-
-                    if (allCaptured) {
-                        // Log this action
-                        System.out.println("All templates captured, automatically switching to show all templates");
-                        // Set a user-friendly message
-                        errorMessage.set("All templates have been captured. Showing all templates.");
-                        // Switch to showing all templates
-                        showRemainingOnly.set(false);
-                        // Return the main list if it's not null, otherwise return an empty list
-                        return templateStatusList != null ? templateStatusList : emptyProperty;
-                    }
-                }
-
-                // Return filtered list if it's not null and not empty, otherwise return an empty list
-                if (filteredTemplateStatusList != null && !filteredTemplateStatusList.isEmpty()) {
-                    return filteredTemplateStatusList;
-                } else {
-                    System.out.println("Filtered template list is null or empty, returning empty list");
-                    return emptyProperty;
-                }
-            } else {
-                // Return main list if it's not null and not empty, otherwise return an empty list
-                if (templateStatusList != null && !templateStatusList.isEmpty()) {
-                    return templateStatusList;
-                } else {
-                    System.out.println("Main template list is null or empty, returning empty list");
-                    return emptyProperty;
-                }
-            }
-        } catch (Exception e) {
-            // Log the error and return an empty list
-            System.err.println("Error in templateStatusListProperty: " + e.getMessage());
-            return emptyProperty;
-        }
+        return templateManager.templateStatusListProperty();
     }
 
     public BooleanProperty captureInProgressProperty() {
-        return captureInProgress;
+        return photoCaptureManager.captureInProgressProperty();
     }
 
     public BooleanProperty showRemainingOnlyProperty() {
-        return showRemainingOnly;
-    }
-
-    /**
-     * Sets whether to show only remaining templates.
-     * When true, only templates that haven't been captured yet will be shown.
-     * When false, all templates will be shown.
-     * 
-     * @param showRemainingOnly whether to show only remaining templates
-     */
-    public void setShowRemainingOnly(boolean showRemainingOnly) {
-        this.showRemainingOnly.set(showRemainingOnly);
-        updateFilteredTemplateList();
-    }
-
-    /**
-     * Updates the filtered template list based on the showRemainingOnly property.
-     * When showRemainingOnly is true, only templates that haven't been captured yet will be included.
-     * When showRemainingOnly is false, all templates will be included.
-     */
-    private void updateFilteredTemplateList() {
-        try {
-            // First check if the filtered template list is null to avoid NPE
-            if (filteredTemplateStatusList == null) {
-                System.err.println("Filtered template list is null, cannot update it");
-                return;
-            }
-
-            // Check if the template status list is null or empty to avoid NPE
-            if (templateStatusList == null || templateStatusList.isEmpty()) {
-                // If the template status list is empty, ensure the filtered list is also empty
-                System.out.println("Template status list is null or empty, clearing filtered list");
-                try {
-                    // Clear the list safely
-                    safelyClearList(filteredTemplateStatusList);
-                } catch (Exception e) {
-                    System.err.println("Error clearing filtered template list: " + e.getMessage());
-                }
-                return;
-            }
-
-            if (showRemainingOnly.get()) {
-                try {
-                    // Create a safe copy of the template status list to avoid concurrent modification
-                    List<PhotoTemplateStatusViewModel> safeList = new ArrayList<>();
-                    try {
-                        // Add all items from the template status list, with null check for each item
-                        for (PhotoTemplateStatusViewModel item : templateStatusList) {
-                            if (item != null) {
-                                safeList.add(item);
-                            }
-                        }
-                    } catch (Exception e) {
-                        System.err.println("Error creating safe copy of template status list: " + e.getMessage());
-                        // If we can't create a safe copy, use the original list
-                        safeList = new ArrayList<>(templateStatusList);
-                    }
-
-                    // Filter out completed templates with additional error handling
-                    List<PhotoTemplateStatusViewModel> remainingTemplates = new ArrayList<>();
-                    for (PhotoTemplateStatusViewModel template : safeList) {
-                        try {
-                            if (template != null && !template.isCaptured()) {
-                                remainingTemplates.add(template);
-                            }
-                        } catch (Exception e) {
-                            System.err.println("Error checking if template is captured: " + e.getMessage());
-                            // Include it in the remaining templates to be safe
-                            if (template != null) {
-                                remainingTemplates.add(template);
-                            }
-                        }
-                    }
-
-                    // Check if the filtered list would be empty
-                    if (remainingTemplates.isEmpty() && !safeList.isEmpty()) {
-                        // If all templates are captured and we're trying to show only remaining,
-                        // show a message and revert to showing all templates
-                        System.out.println("All templates captured, showing all templates instead of empty filtered list");
-                        errorMessage.set("All templates have been captured. Showing all templates.");
-                        showRemainingOnly.set(false);
-
-                        try {
-                            // Set all templates safely
-                            safelySetAllItems(filteredTemplateStatusList, safeList);
-                        } catch (Exception e) {
-                            System.err.println("Error setting all templates in filtered list: " + e.getMessage());
-                        }
-                    } else {
-                        // Set the filtered list to the remaining templates
-                        System.out.println("Setting filtered list to " + remainingTemplates.size() + " remaining templates");
-
-                        try {
-                            // Set remaining templates safely
-                            safelySetAllItems(filteredTemplateStatusList, remainingTemplates);
-                        } catch (Exception e) {
-                            System.err.println("Error setting remaining templates in filtered list: " + e.getMessage());
-                            // Fallback to showing all templates
-                            try {
-                                safelySetAllItems(filteredTemplateStatusList, safeList);
-                            } catch (Exception ex) {
-                                System.err.println("Error in fallback for filtered list: " + ex.getMessage());
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    System.err.println("Error filtering templates: " + e.getMessage());
-                    // Fallback to showing all templates
-                    try {
-                        safelySetAllItems(filteredTemplateStatusList, templateStatusList);
-                    } catch (Exception ex) {
-                        System.err.println("Error in fallback for filtered list: " + ex.getMessage());
-                    }
-                }
-            } else {
-                // Show all templates
-                System.out.println("Showing all " + templateStatusList.size() + " templates");
-
-                try {
-                    safelySetAllItems(filteredTemplateStatusList, templateStatusList);
-                } catch (Exception e) {
-                    System.err.println("Error setting all templates in filtered list: " + e.getMessage());
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error updating filtered template list: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Safely clears a list property.
-     * This method adds additional error handling to prevent exceptions when clearing a list.
-     * 
-     * @param listProperty the list property to clear
-     */
-    private <T> void safelyClearList(ListProperty<T> listProperty) {
-        if (listProperty == null) {
-            return;
-        }
-
-        try {
-            // Create a new empty observable list
-            ObservableList<T> emptyList = FXCollections.observableArrayList();
-
-            // Set the list property to the empty list
-            listProperty.setAll(emptyList);
-        } catch (Exception e) {
-            System.err.println("Error clearing list: " + e.getMessage());
-
-            try {
-                // Fallback to using clear() method
-                listProperty.clear();
-            } catch (Exception ex) {
-                System.err.println("Error using clear() method: " + ex.getMessage());
-            }
-        }
-    }
-
-    /**
-     * Safely sets all items in a list property.
-     * This method adds additional error handling to prevent exceptions when setting items in a list.
-     * 
-     * @param listProperty the list property to update
-     * @param items the items to set
-     */
-    private <T> void safelySetAllItems(ListProperty<T> listProperty, List<T> items) {
-        if (listProperty == null || items == null) {
-            return;
-        }
-
-        try {
-            // Create a new observable list with the items
-            ObservableList<T> observableList = FXCollections.observableArrayList();
-
-            // Add each item with null check
-            for (T item : items) {
-                if (item != null) {
-                    observableList.add(item);
-                }
-            }
-
-            // Set the list property to the new list
-            listProperty.setAll(observableList);
-        } catch (Exception e) {
-            System.err.println("Error setting items in list: " + e.getMessage());
-
-            try {
-                // Fallback to clearing and adding each item
-                listProperty.clear();
-                for (T item : items) {
-                    if (item != null) {
-                        listProperty.add(item);
-                    }
-                }
-            } catch (Exception ex) {
-                System.err.println("Error using clear() and add() methods: " + ex.getMessage());
-            }
-        }
+        return templateManager.showRemainingOnlyProperty();
     }
 
     public List<PhotoTemplate> getRequiredTemplates() {
-        return requiredTemplates;
+        return templateManager.getRequiredTemplates();
     }
 
     /**
-     * Checks if the given template is the last remaining template in the filtered list.
-     * This is used to prevent IndexOutOfBoundsException when clearing selection after
-     * selecting the last remaining template when showRemainingOnly is true.
+     * Gets the current state property of the photo cube workflow.
+     * This property can be observed to react to state changes in the UI.
      * 
-     * @param template the template to check
-     * @return true if this is the last remaining template, false otherwise
+     * @return the state property
      */
-    public boolean isLastRemainingTemplate(PhotoTemplate template) {
-        // If template is null, it can't be the last remaining template
-        if (template == null) {
-            return false;
-        }
-
-        // If not showing remaining only, this check is not relevant
-        if (!showRemainingOnly.get()) {
-            return false;
-        }
-
-        // If template status list is null or empty, return false
-        if (templateStatusList == null || templateStatusList.isEmpty()) {
-            return false;
-        }
-
-        try {
-            // Count how many templates are not captured yet
-            long remainingCount = templateStatusList.stream()
-                .filter(status -> !status.isCaptured())
-                .count();
-
-            // If there's only one remaining and it's this template, it's the last one
-            if (remainingCount == 1) {
-                return templateStatusList.stream()
-                    .filter(status -> !status.isCaptured())
-                    .anyMatch(status -> status.getTemplate() != null && status.getTemplate().equals(template));
-            }
-
-            return false;
-        } catch (Exception e) {
-            // Log the error but don't crash
-            System.err.println("Error in isLastRemainingTemplate: " + e.getMessage());
-            return false;
-        }
+    public ObjectProperty<PhotoCubeState> stateProperty() {
+        return state;
     }
 
     /**
-     * Loads a photo as a JavaFX Image.
+     * Gets the current state of the photo cube workflow.
      * 
-     * @param photoDocument the photo document to load
-     * @return the photo as a JavaFX Image, or null if the photo could not be loaded
+     * @return the current state
      */
-    private Image loadPhotoAsImage(PhotoDocument photoDocument) {
-        try {
-            if (photoDocument == null) {
-                System.err.println("Photo document is null");
-                return loadFallbackImage();
-            }
-
-            // Get the photo path from the photo document
-            String photoPath = photoDocument.getImagePath().value();
-            if (photoPath == null || photoPath.isBlank()) {
-                System.err.println("Photo path is null or empty");
-                return loadFallbackImage();
-            }
-
-            // Check if the photo path is a URL
-            if (photoPath.startsWith("http://") || photoPath.startsWith("https://")) {
-                // Load the image from the URL
-                return new Image(photoPath, true); // Use background loading
-            } else {
-                // Load the image from the file system
-                File photoFile = new File(photoPath);
-                if (photoFile.exists()) {
-                    // Load the image from the file
-                    return new Image(photoFile.toURI().toString(), true); // Use background loading
-                } 
-
-                // Try to load from photos directory
-                File mockCameraFile = new File("src/main/resources/photos/" + photoFile.getName());
-                if (mockCameraFile.exists()) {
-                    System.out.println("[DEBUG_LOG] Found image in photos directory: " + mockCameraFile.getName());
-                    return new Image(mockCameraFile.toURI().toString(), true); // Use background loading
-                }
-
-                // Try to load from photos dev-simulated directory
-                File mockDevFile = new File("src/main/resources/photos/dev-simulated/" + photoFile.getName());
-                if (mockDevFile.exists()) {
-                    return new Image(mockDevFile.toURI().toString(), true); // Use background loading
-                }
-
-                // Try to load from the class path
-                String classPathResource = "/com/belman/images/" + photoPath;
-                var inputStream = getClass().getResourceAsStream(classPathResource);
-                if (inputStream != null) {
-                    return new Image(inputStream);
-                }
-
-                // If all else fails, load a fallback image
-                System.err.println("Could not find image at path: " + photoPath);
-                return loadFallbackImage();
-            }
-        } catch (Exception e) {
-            // Log the error and return fallback image
-            System.err.println("Error loading photo as image: " + e.getMessage());
-            return loadFallbackImage();
-        }
-    }
-
-    /**
-     * Loads a fallback image when the requested image cannot be found.
-     * 
-     * @return a fallback image
-     */
-    private Image loadFallbackImage() {
-        try {
-            // First try to load a placeholder image from the classpath
-            var inputStream = getClass().getResourceAsStream("/com/belman/images/placeholder.png");
-            if (inputStream != null) {
-                return new Image(inputStream);
-            }
-
-            // Try to load any image from photos directory
-            File mockCameraDir = new File("src/main/resources/photos");
-            if (mockCameraDir.exists() && mockCameraDir.isDirectory()) {
-                File[] imageFiles = mockCameraDir.listFiles((dir, name) -> 
-                    name.toLowerCase().endsWith(".jpg") || 
-                    name.toLowerCase().endsWith(".png") || 
-                    name.toLowerCase().endsWith(".gif"));
-
-                if (imageFiles != null && imageFiles.length > 0) {
-                    return new Image(imageFiles[0].toURI().toString(), true);
-                }
-            }
-
-            // If all else fails, create a simple placeholder image
-            System.err.println("Creating empty placeholder image");
-            return new Image("https://via.placeholder.com/150x150.png?text=No+Image");
-        } catch (Exception e) {
-            System.err.println("Error loading fallback image: " + e.getMessage());
-            // Return null as last resort
-            return null;
-        }
+    public PhotoCubeState getState() {
+        return state.get();
     }
 }

@@ -192,6 +192,49 @@ public class SummaryViewModel extends BaseViewModel<SummaryViewModel> {
         com.belman.presentation.core.ViewStackManager.getInstance().navigateBack();
     }
 
+    /**
+     * Retakes a photo for the specified template.
+     * This method sets the selected template in the WorkerFlowContext and navigates back to the PhotoCubeView.
+     *
+     * @param photoDocument the photo document to retake
+     */
+    public void retakePhoto(PhotoDocument photoDocument) {
+        if (photoDocument == null) {
+            errorMessage.set("No photo selected to retake.");
+            return;
+        }
+
+        loading.set(true);
+        statusMessage.set("Preparing to retake photo...");
+
+        try {
+            // Get the template from the photo document
+            PhotoTemplate template = photoDocument.getTemplate();
+            if (template == null) {
+                errorMessage.set("Cannot retake photo: template information is missing.");
+                loading.set(false);
+                return;
+            }
+
+            // Set the selected template in the WorkerFlowContext
+            WorkerFlowContext.setSelectedTemplate(template);
+
+            // Ensure the current order is set in the WorkerFlowContext
+            if (currentOrder.get() != null) {
+                WorkerFlowContext.setCurrentOrder(currentOrder.get());
+            }
+
+            // Navigate back to the PhotoCubeView
+            com.belman.presentation.navigation.Router.navigateTo(
+                com.belman.presentation.usecases.worker.photocube.PhotoCubeView.class);
+
+            // Note: We don't set loading to false here because we're navigating away from this view
+        } catch (Exception e) {
+            errorMessage.set("Error preparing to retake photo: " + e.getMessage() + ". Please try again.");
+            loading.set(false);
+        }
+    }
+
     // Getters for properties
 
     public StringProperty errorMessageProperty() {

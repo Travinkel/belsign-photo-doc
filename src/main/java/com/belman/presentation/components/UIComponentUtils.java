@@ -15,9 +15,9 @@ import java.util.function.Consumer;
  */
 public class UIComponentUtils {
 
-    private static final String LOADING_OVERLAY_PATH = "/com/belman/presentation/components/LoadingOverlay.fxml";
-    private static final String CONFIRMATION_DIALOG_PATH = "/com/belman/presentation/components/ConfirmationDialog.fxml";
-    private static final String BELMAN_FOOTER_PATH = "/com/belman/presentation/components/BelmanFooter.fxml";
+    private static final String LOADING_OVERLAY_PATH = "/com/belman/presentation/usecases/components/LoadingOverlay.fxml";
+    private static final String CONFIRMATION_DIALOG_PATH = "/com/belman/presentation/usecases/components/ConfirmationDialog.fxml";
+    private static final String BELMAN_FOOTER_PATH = "/com/belman/presentation/usecases/components/BelmanFooter.fxml";
 
     /**
      * Adds a loading overlay to the specified parent pane.

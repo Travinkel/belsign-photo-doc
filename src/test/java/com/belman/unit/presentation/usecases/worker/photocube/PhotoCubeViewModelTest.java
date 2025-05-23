@@ -1,10 +1,12 @@
 package com.belman.unit.presentation.usecases.worker.photocube;
 
+import com.belman.application.usecase.order.OrderProgressService;
 import com.belman.application.usecase.order.OrderService;
 import com.belman.application.usecase.photo.CameraImageProvider;
 import com.belman.application.usecase.photo.CameraImageProviderFactory;
+import com.belman.application.usecase.photo.PhotoCaptureService;
 import com.belman.application.usecase.photo.PhotoService;
-import com.belman.application.usecase.worker.WorkerService;
+import com.belman.application.usecase.photo.PhotoTemplateService;
 import com.belman.domain.photo.PhotoTemplate;
 import com.belman.presentation.usecases.worker.photocube.PhotoCubeViewModel;
 import com.belman.presentation.usecases.worker.photocube.PhotoTemplateStatusViewModel;
@@ -39,7 +41,13 @@ public class PhotoCubeViewModelTest {
     private PhotoService photoService;
 
     @Mock
-    private WorkerService workerService;
+    private PhotoTemplateService photoTemplateService;
+
+    @Mock
+    private PhotoCaptureService photoCaptureService;
+
+    @Mock
+    private OrderProgressService orderProgressService;
 
     @Mock
     private CameraImageProvider cameraImageProvider;
@@ -72,7 +80,9 @@ public class PhotoCubeViewModelTest {
         // Inject the mocked dependencies using reflection
         injectDependency("orderService", orderService);
         injectDependency("photoService", photoService);
-        injectDependency("workerService", workerService);
+        injectDependency("photoTemplateService", photoTemplateService);
+        injectDependency("photoCaptureService", photoCaptureService);
+        injectDependency("orderProgressService", orderProgressService);
 
         // Get the existing templateStatusList from the viewModel
         Field templateStatusListField = PhotoCubeViewModel.class.getDeclaredField("templateStatusList");

@@ -206,8 +206,22 @@ public abstract class BaseView<T extends BaseViewModel<?>> extends View implemen
             fxmlUrl = getClass().getResource(fxmlPath);
         }
 
+        // Special case for authentication.login package in usecases
+        if (fxmlUrl == null && fxmlPath.contains("/presentation/usecases/authentication/login/")) {
+            String loginPath = fxmlPath.replace("/presentation/usecases/authentication/login/", "/presentation/usecases/login/");
+            System.out.println("FXML not found in authentication.login path, trying login path: " + loginPath);
+            fxmlUrl = getClass().getResource(loginPath);
+        }
+
+
         if (fxmlUrl == null) {
-            throw new IOException("FXML file not found for " + viewName);
+            String errorMessage = "FXML file not found for " + viewName + ". Tried paths: " + fxmlPath;
+
+            if (fxmlPath.contains("/presentation/usecases/authentication/login/")) {
+                errorMessage += ", " + fxmlPath.replace("/presentation/usecases/authentication/login/", "/presentation/usecases/login/");
+            }
+
+            throw new IOException(errorMessage);
         }
 
         return new FXMLLoader(fxmlUrl);

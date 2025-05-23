@@ -5,7 +5,7 @@ import com.belman.common.session.SessionContext;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.presentation.base.BaseViewModel;
 import com.belman.presentation.navigation.Router;
-import com.belman.presentation.usecases.authentication.login.LoginView;
+import com.belman.presentation.usecases.login.LoginView;
 import com.belman.presentation.usecases.worker.WorkerFlowContext;
 import com.belman.presentation.usecases.worker.assignedorder.AssignedOrderView;
 import javafx.beans.property.SimpleStringProperty;

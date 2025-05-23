@@ -1,7 +1,6 @@
 package com.belman.presentation.components;
 
 import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
@@ -12,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,7 +27,30 @@ public class PhotoGalleryComponentTest {
     @BeforeAll
     public static void initJavaFX() {
         // Initialize the JavaFX platform
-        new JFXPanel();
+        final CountDownLatch latch = new CountDownLatch(1);
+        final AtomicBoolean initialized = new AtomicBoolean(false);
+
+        try {
+            // Try to initialize the JavaFX platform
+            Platform.startup(() -> {
+                initialized.set(true);
+                latch.countDown();
+            });
+
+            // Wait for initialization to complete
+            if (!latch.await(5, TimeUnit.SECONDS)) {
+                System.err.println("JavaFX initialization timed out");
+            }
+        } catch (Exception e) {
+            // Platform already initialized or other error
+            System.out.println("[DEBUG_LOG] JavaFX platform initialization: " + e.getMessage());
+            initialized.set(true);
+            latch.countDown();
+        }
+
+        if (!initialized.get()) {
+            throw new RuntimeException("Could not initialize JavaFX platform");
+        }
     }
 
     /**

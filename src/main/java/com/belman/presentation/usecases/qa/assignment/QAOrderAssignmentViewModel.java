@@ -13,7 +13,7 @@ import com.belman.domain.user.UserRole;
 import com.belman.application.usecase.order.OrderService;
 import com.belman.presentation.base.BaseViewModel;
 import com.belman.presentation.navigation.Router;
-import com.belman.presentation.usecases.authentication.login.LoginView;
+import com.belman.presentation.usecases.login.LoginView;
 import com.belman.presentation.usecases.qa.dashboard.QADashboardView;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;

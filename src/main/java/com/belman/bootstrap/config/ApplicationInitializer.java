@@ -207,6 +207,11 @@ public class ApplicationInitializer {
             ServiceRegistry.registerService(navigationService);
             logger.success("RoleBasedNavigationService initialized successfully");
 
+            // Initialize PhotoCube managers
+            logger.debug("Initializing PhotoCube managers");
+            PhotoCubeManagersInitializer.initialize();
+            logger.success("PhotoCube managers initialized successfully");
+
             // AccessPolicyFactory and RoleBasedAccessControlFactory are no longer used
             // Commented out as per task list
             /*
