@@ -384,6 +384,9 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/quality-reports/jacoco</outputDirectory>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>jacoco-check</id>

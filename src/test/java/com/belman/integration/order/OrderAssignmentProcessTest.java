@@ -270,9 +270,9 @@ public class OrderAssignmentProcessTest {
      * Helper method to create an order with a specific status.
      */
     private OrderBusiness createOrder(String id, String orderNumber, OrderStatus status, UserBusiness createdBy) {
-        // Use a valid order number format: MM/YY-CUSTOMER-SEQUENCE
-        // where MM/YY is the month and year, CUSTOMER is a 6-digit customer ID, and SEQUENCE is an 8-digit sequence number
-        String validOrderNumber = "06/23-123456-12345678";
+        // Use a valid order number format: ORD-XX-YYMMDD-ZZZ-NNNN
+        // where XX is a project identifier, YYMMDD is the date, ZZZ is a project code, and NNNN is a sequence number
+        String validOrderNumber = "ORD-78-230625-PIP-0001";
 
         OrderBusiness order = new OrderBusiness(
             new OrderId(id),

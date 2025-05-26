@@ -159,7 +159,7 @@ public class StorageTypeCrossValidationTest {
 
         // Create test order
         OrderId orderId = new OrderId(UUID.randomUUID().toString());
-        OrderNumber orderNumber = new OrderNumber("06/23-123456-12345678");
+        OrderNumber orderNumber = new OrderNumber("ORD-78-230625-PIP-0001");
 
         // Test in memory mode
         System.setProperty(StorageTypeConfig.ENV_STORAGE_TYPE, "memory");

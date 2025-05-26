@@ -30,7 +30,7 @@ class DefaultQAServiceTest {
     @Mock
     private PhotoRepository photoRepository;
 
-    @Mock
+    // Using a real instance instead of a mock due to Java 23 + Mockito limitations with final classes
     private PhotoDocument testPhoto;
 
     private DefaultQAService qaService;
@@ -44,18 +44,37 @@ class DefaultQAServiceTest {
         // Create test data
         testPhotoId = new PhotoId(UUID.randomUUID().toString());
 
-        // Configure the test photo document mock
-        when(testPhoto.getId()).thenReturn(testPhotoId);
+        // Create a real PhotoDocument instance instead of a mock
+        // We need to create a minimal valid instance with required fields
+        com.belman.domain.user.UserBusiness testUser = new com.belman.domain.user.UserBusiness.Builder()
+            .id(new com.belman.domain.user.UserId("test-user"))
+            .username(new com.belman.domain.user.Username("testuser"))
+            .password(new com.belman.domain.security.HashedPassword("$2a$10$hKDVYxLefVHV/vtuPhWD3OigtRyOykRLDdUAp80Z1crSoS1lFqaFS"))
+            .email(new com.belman.domain.common.valueobjects.EmailAddress("test@example.com"))
+            .approvalState(com.belman.domain.user.ApprovalState.createApproved())
+            .build();
+
+        com.belman.domain.photo.PhotoTemplate template = new com.belman.domain.photo.PhotoTemplate("Test Template", "Test description", java.util.Collections.emptySet());
+        com.belman.domain.photo.Photo photo = new com.belman.domain.photo.Photo("test.jpg");
+
+        testPhoto = com.belman.domain.photo.PhotoDocument.builder()
+            .photoId(testPhotoId)
+            .template(template)
+            .imagePath(photo)
+            .uploadedBy(testUser)
+            .uploadedAt(new com.belman.domain.common.valueobjects.Timestamp(java.time.Instant.now()))
+            .build();
+
+        // Configure the repository mock to return our real photo instance
         when(photoRepository.findById(testPhotoId)).thenReturn(Optional.of(testPhoto));
     }
 
     @Test
     void getAnnotations_shouldReturnAnnotationsFromPhoto() {
         // Arrange
-        List<PhotoAnnotation> expectedAnnotations = Collections.singletonList(
-                new PhotoAnnotation("1", 0.5, 0.5, "Test annotation", PhotoAnnotation.AnnotationType.NOTE)
-        );
-        when(testPhoto.getAnnotations()).thenReturn(expectedAnnotations);
+        PhotoAnnotation annotation = new PhotoAnnotation("1", 0.5, 0.5, "Test annotation", PhotoAnnotation.AnnotationType.NOTE);
+        testPhoto.addAnnotation(annotation);
+        List<PhotoAnnotation> expectedAnnotations = Collections.singletonList(annotation);
 
         // Act
         List<PhotoAnnotation> actualAnnotations = qaService.getAnnotations(testPhotoId);
@@ -63,7 +82,6 @@ class DefaultQAServiceTest {
         // Assert
         assertEquals(expectedAnnotations, actualAnnotations);
         verify(photoRepository).findById(testPhotoId);
-        verify(testPhoto).getAnnotations();
     }
 
     @Test
@@ -88,8 +106,6 @@ class DefaultQAServiceTest {
         String text = "Test annotation";
         PhotoAnnotation.AnnotationType type = PhotoAnnotation.AnnotationType.NOTE;
 
-        when(testPhoto.addAnnotation(any(PhotoAnnotation.class))).thenReturn(true);
-
         // Act
         PhotoAnnotation annotation = qaService.createAnnotation(testPhotoId, x, y, text, type);
 
@@ -100,8 +116,10 @@ class DefaultQAServiceTest {
         assertEquals(text, annotation.getText());
         assertEquals(type, annotation.getType());
 
+        // Verify the annotation was added to the photo
+        assertTrue(testPhoto.getAnnotations().contains(annotation));
+
         verify(photoRepository).findById(testPhotoId);
-        verify(testPhoto).addAnnotation(any(PhotoAnnotation.class));
         verify(photoRepository).save(testPhoto);
     }
 
@@ -124,18 +142,31 @@ class DefaultQAServiceTest {
     @Test
     void updateAnnotation_shouldUpdateAndReturnTrue() {
         // Arrange
-        PhotoAnnotation annotation = new PhotoAnnotation(
-                "1", 0.5, 0.5, "Updated annotation", PhotoAnnotation.AnnotationType.NOTE);
+        String annotationId = "1";
+        PhotoAnnotation originalAnnotation = new PhotoAnnotation(
+                annotationId, 0.5, 0.5, "Original annotation", PhotoAnnotation.AnnotationType.NOTE);
+        testPhoto.addAnnotation(originalAnnotation);
 
-        when(testPhoto.updateAnnotation(annotation)).thenReturn(true);
+        PhotoAnnotation updatedAnnotation = new PhotoAnnotation(
+                annotationId, 0.7, 0.7, "Updated annotation", PhotoAnnotation.AnnotationType.ISSUE);
 
         // Act
-        boolean result = qaService.updateAnnotation(testPhotoId, annotation);
+        boolean result = qaService.updateAnnotation(testPhotoId, updatedAnnotation);
 
         // Assert
         assertTrue(result);
+
+        // Verify the annotation was updated
+        List<PhotoAnnotation> annotations = testPhoto.getAnnotations();
+        assertEquals(1, annotations.size());
+        PhotoAnnotation retrievedAnnotation = annotations.get(0);
+        assertEquals(annotationId, retrievedAnnotation.getId());
+        assertEquals(0.7, retrievedAnnotation.getX());
+        assertEquals(0.7, retrievedAnnotation.getY());
+        assertEquals("Updated annotation", retrievedAnnotation.getText());
+        assertEquals(PhotoAnnotation.AnnotationType.ISSUE, retrievedAnnotation.getType());
+
         verify(photoRepository).findById(testPhotoId);
-        verify(testPhoto).updateAnnotation(annotation);
         verify(photoRepository).save(testPhoto);
     }
 
@@ -161,15 +192,16 @@ class DefaultQAServiceTest {
     void deleteAnnotation_shouldDeleteAndReturnTrue() {
         // Arrange
         String annotationId = "1";
-        when(testPhoto.removeAnnotation(annotationId)).thenReturn(true);
+        PhotoAnnotation annotation = new PhotoAnnotation(annotationId, 0.5, 0.5, "Test annotation", PhotoAnnotation.AnnotationType.NOTE);
+        testPhoto.addAnnotation(annotation);
 
         // Act
         boolean result = qaService.deleteAnnotation(testPhotoId, annotationId);
 
         // Assert
         assertTrue(result);
+        assertFalse(testPhoto.getAnnotations().contains(annotation));
         verify(photoRepository).findById(testPhotoId);
-        verify(testPhoto).removeAnnotation(annotationId);
         verify(photoRepository).save(testPhoto);
     }
 
