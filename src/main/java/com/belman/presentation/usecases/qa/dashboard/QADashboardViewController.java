@@ -92,6 +92,14 @@ public class QADashboardViewController extends BaseController<QADashboardViewMod
     }
 
     /**
+     * Handles the assign order button click.
+     */
+    @FXML
+    private void handleAssignOrder() {
+        getViewModel().navigateToOrderAssignment();
+    }
+
+    /**
      * Handles the logout button click.
      */
     @FXML

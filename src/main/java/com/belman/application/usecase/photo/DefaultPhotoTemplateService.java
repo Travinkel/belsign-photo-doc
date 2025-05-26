@@ -125,6 +125,21 @@ public class DefaultPhotoTemplateService implements PhotoTemplateService {
                         PhotoTemplate.ANGLED_VIEW_OF_JOINT,
                         PhotoTemplate.OVERVIEW_OF_ASSEMBLY
                 );
+
+                // Even without a QA user, try to associate templates with the order
+                // This ensures templates are available even if user management is incomplete
+                for (PhotoTemplate template : templates) {
+                    logger.debug("Associating template {} with order {} (without QA user)", template.name(), orderId.id());
+                    System.out.println("[DEBUG_LOG] DefaultPhotoTemplateService: Associating template " + template.name() + " with order " + orderId.id() + " (without QA user)");
+                    boolean success = photoTemplateRepository.associateWithOrder(orderId, template.name(), true);
+                    if (success) {
+                        logger.debug("Successfully associated template {} with order {}", template.name(), orderId.id());
+                        System.out.println("[DEBUG_LOG] DefaultPhotoTemplateService: Successfully associated template " + template.name() + " with order " + orderId.id());
+                    } else {
+                        logger.warn("Failed to associate template {} with order {}", template.name(), orderId.id());
+                        System.out.println("[DEBUG_LOG] DefaultPhotoTemplateService: Failed to associate template " + template.name() + " with order " + orderId.id());
+                    }
+                }
             }
         }
 

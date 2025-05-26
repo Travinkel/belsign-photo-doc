@@ -253,9 +253,17 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
      * Starts the camera preview for the selected template.
      */
     public void startCameraPreview() {
-        // Check if we can transition to the capturing photo state
-        if (!state.get().canTransitionTo(PhotoCubeState.CAPTURING_PHOTO)) {
-            errorMessage.set("Cannot start camera in current state: " + state.get().getDescription());
+        // Get the current state
+        PhotoCubeState currentState = state.get();
+
+        // Check if we're in the correct state to start the camera
+        if (currentState != PhotoCubeState.CAMERA_PREVIEW) {
+            // If we're in SELECTING_TEMPLATE state, give a more helpful error message
+            if (currentState == PhotoCubeState.SELECTING_TEMPLATE) {
+                errorMessage.set("Please select a template before starting the camera.");
+            } else {
+                errorMessage.set("Cannot start camera in current state: " + currentState.getDescription());
+            }
             return;
         }
 

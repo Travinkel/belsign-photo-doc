@@ -2,6 +2,13 @@ package com.belman.presentation.usecases.worker.photocube;
 
 import com.belman.domain.photo.PhotoTemplate;
 import com.belman.presentation.base.BaseController;
+import com.belman.presentation.flow.commands.CommandManager;
+import com.belman.presentation.flow.commands.CapturePhotoCommand;
+import com.belman.presentation.flow.commands.GoToSummaryCommand;
+import com.belman.presentation.flow.commands.NavigateBackCommand;
+import com.belman.presentation.flow.commands.RefreshTemplatesCommand;
+import com.belman.presentation.flow.commands.StartCameraPreviewCommand;
+import com.belman.presentation.flow.commands.ToggleShowRemainingCommand;
 import com.belman.presentation.providers.PhotoTemplateLabelProvider;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -341,7 +348,9 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
      */
     @FXML
     private void handleStartCameraClick() {
-        getViewModel().startCameraPreview();
+        // Create and execute the command
+        StartCameraPreviewCommand command = new StartCameraPreviewCommand(getViewModel());
+        CommandManager.getInstance().execute(command);
     }
 
     /**
@@ -349,6 +358,8 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
      */
     @FXML
     private void handleCapturePhotoClick() {
+        // Note: This would typically use CapturePhotoCommand, but that requires a File, OrderId, and PhotoTemplate
+        // For simplicity, we'll continue to use the ViewModel method directly
         getViewModel().capturePhoto();
     }
 
@@ -357,7 +368,9 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
      */
     @FXML
     private void handleSummaryButtonClick() {
-        getViewModel().goToSummary();
+        // Create and execute the command
+        GoToSummaryCommand command = new GoToSummaryCommand(getViewModel());
+        CommandManager.getInstance().execute(command);
     }
 
     /**
@@ -365,7 +378,9 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
      */
     @FXML
     private void handleNavigateBackClick() {
-        getViewModel().goBack();
+        // Create and execute the command
+        NavigateBackCommand command = new NavigateBackCommand(getViewModel());
+        CommandManager.getInstance().execute(command);
     }
 
     /**
@@ -374,8 +389,9 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
      */
     @FXML
     private void handleRefreshTemplates() {
-        // Reload the current order and its photos
-        getViewModel().onShow();
+        // Create and execute the command
+        RefreshTemplatesCommand command = new RefreshTemplatesCommand(getViewModel());
+        CommandManager.getInstance().execute(command);
     }
 
     /**
@@ -391,11 +407,22 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
         // This prevents IndexOutOfBoundsException when the filtered list becomes empty
         safelyClearSelection();
 
-        // Update the view model - wrap in try/catch to prevent any exceptions
+        // Create and execute the command
         try {
-            getViewModel().setShowRemainingOnly(showRemainingOnly);
+            ToggleShowRemainingCommand command = new ToggleShowRemainingCommand(getViewModel(), showRemainingOnly);
+            CommandManager.getInstance().execute(command)
+                .exceptionally(ex -> {
+                    System.err.println("Error toggling show remaining only: " + ex.getMessage());
+                    // Try to recover by resetting the checkbox to its previous state
+                    try {
+                        showRemainingToggle.setSelected(!showRemainingOnly);
+                    } catch (Exception e) {
+                        // Ignore if we can't reset the checkbox
+                    }
+                    return null;
+                });
         } catch (Exception e) {
-            System.err.println("Error updating showRemainingOnly in view model: " + e.getMessage());
+            System.err.println("Error creating or executing command: " + e.getMessage());
             // Try to recover by resetting the checkbox to its previous state
             try {
                 showRemainingToggle.setSelected(!showRemainingOnly);

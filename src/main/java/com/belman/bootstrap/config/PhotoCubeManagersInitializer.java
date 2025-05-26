@@ -1,5 +1,6 @@
 package com.belman.bootstrap.config;
 
+import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.bootstrap.di.ServiceRegistry;
 import com.belman.common.logging.EmojiLogger;
 import com.belman.presentation.usecases.worker.photocube.managers.OrderManager;
@@ -27,19 +28,31 @@ public class PhotoCubeManagersInitializer {
             logger.debug("Creating OrderManager");
             OrderManager orderManager = new OrderManager();
             ServiceRegistry.registerService(orderManager);
-            logger.success("OrderManager registered successfully");
+
+            // Explicitly inject services into OrderManager
+            logger.debug("Injecting services into OrderManager");
+            ServiceLocator.injectServices(orderManager);
+            logger.success("OrderManager registered and injected successfully");
 
             // Create and register PhotoCaptureManager
             logger.debug("Creating PhotoCaptureManager");
             PhotoCaptureManager photoCaptureManager = new PhotoCaptureManager();
             ServiceRegistry.registerService(photoCaptureManager);
-            logger.success("PhotoCaptureManager registered successfully");
+
+            // Explicitly inject services into PhotoCaptureManager
+            logger.debug("Injecting services into PhotoCaptureManager");
+            ServiceLocator.injectServices(photoCaptureManager);
+            logger.success("PhotoCaptureManager registered and injected successfully");
 
             // Create and register TemplateManager
             logger.debug("Creating TemplateManager");
             TemplateManager templateManager = new TemplateManager();
             ServiceRegistry.registerService(templateManager);
-            logger.success("TemplateManager registered successfully");
+
+            // Explicitly inject services into TemplateManager
+            logger.debug("Injecting services into TemplateManager");
+            ServiceLocator.injectServices(templateManager);
+            logger.success("TemplateManager registered and injected successfully");
 
             logger.success("PhotoCube managers initialized successfully");
         } catch (Exception e) {

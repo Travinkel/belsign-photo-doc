@@ -140,24 +140,48 @@ public class OrderDiagnosticTool extends BaseService {
                     logInfo("Attempting to fix invalid order number: " + orderNumberStr + " for order ID: " + orderId.id());
 
                     try {
-                        // Try to create a valid order number from the invalid one
+                        // Try to convert the order number to the new format
                         if (orderNumberStr.startsWith("ORD-")) {
-                            // Extract parts and try to create a valid legacy format
+                            // Extract parts from the legacy format
                             String[] parts = orderNumberStr.split("-");
                             if (parts.length >= 5) {
-                                // Ensure each part has the correct format
-                                String prefix = "ORD";
-                                String number = parts[1].length() == 2 ? parts[1] : String.format("%02d", Integer.parseInt(parts[1]));
-                                String date = parts[2].length() == 6 ? parts[2] : "230101"; // Default date if invalid
-                                String code = parts[3].length() == 3 ? parts[3].toUpperCase() : "XXX"; // Default code if invalid
-                                String sequence = parts[4].length() == 4 ? parts[4] : "0001"; // Default sequence if invalid
+                                // Extract date part (YYMMDD) from the legacy format
+                                String date = parts[2];
+                                if (date.length() >= 6) {
+                                    String yy = date.substring(0, 2);
+                                    String mm = date.substring(2, 4);
 
-                                String fixedOrderNumber = prefix + "-" + number + "-" + date + "-" + code + "-" + sequence;
-                                logInfo("Fixed order number: " + orderNumberStr + " -> " + fixedOrderNumber);
+                                    // Use the code part as the customer ID, padded to 6 digits
+                                    String code = parts[3];
+                                    String customerId = String.format("%06d", Math.abs(code.hashCode() % 1000000));
 
-                                // Update the order with the fixed order number
-                                order.setOrderNumber(new OrderNumber(fixedOrderNumber));
+                                    // Use the sequence part, padded to 8 digits
+                                    String sequence = parts[4];
+                                    String paddedSequence = String.format("%08d", Integer.parseInt(sequence));
+
+                                    // Create a new order number in the format MM/YY-CUSTOMER-SEQUENCE
+                                    String newFormatOrderNumber = mm + "/" + yy + "-" + customerId + "-" + paddedSequence;
+
+                                    logInfo("Converted legacy order number to new format: " + orderNumberStr + " -> " + newFormatOrderNumber);
+
+                                    // Update the order with the new format order number
+                                    order.setOrderNumber(new OrderNumber(newFormatOrderNumber));
+                                    orderRepository.save(order);
+                                    fixReport.fixedOrderNumbers++;
+                                } else {
+                                    // If date part is invalid, generate a completely new order number
+                                    String generatedOrderNumber = OrderNumber.generate("123456").value();
+                                    order.setOrderNumber(new OrderNumber(generatedOrderNumber));
+                                    orderRepository.save(order);
+                                    logInfo("Generated new order number: " + orderNumberStr + " -> " + generatedOrderNumber);
+                                    fixReport.fixedOrderNumbers++;
+                                }
+                            } else {
+                                // If parts are invalid, generate a completely new order number
+                                String generatedOrderNumber = OrderNumber.generate("123456").value();
+                                order.setOrderNumber(new OrderNumber(generatedOrderNumber));
                                 orderRepository.save(order);
+                                logInfo("Generated new order number: " + orderNumberStr + " -> " + generatedOrderNumber);
                                 fixReport.fixedOrderNumbers++;
                             }
                         }

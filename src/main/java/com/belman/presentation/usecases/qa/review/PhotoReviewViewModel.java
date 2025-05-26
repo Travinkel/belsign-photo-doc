@@ -1,5 +1,6 @@
 package com.belman.presentation.usecases.qa.review;
 
+import com.belman.application.usecase.qa.QAService;
 import com.belman.common.di.Inject;
 import com.belman.common.session.SessionContext;
 import com.belman.domain.common.valueobjects.Timestamp;
@@ -9,6 +10,7 @@ import com.belman.domain.order.OrderRepository;
 import com.belman.domain.order.OrderStatus;
 import com.belman.domain.photo.PhotoAnnotation;
 import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoId;
 import com.belman.domain.photo.PhotoRepository;
 import com.belman.domain.user.UserReference;
 import com.belman.presentation.base.BaseViewModel;
@@ -61,6 +63,9 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
 
     @Inject
     private SessionContext sessionContext;
+
+    @Inject
+    private QAService qaService;
 
     private OrderBusiness currentOrder;
     private PhotoDocument selectedPhoto;
@@ -507,25 +512,19 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
                 return null;
             }
 
-            // Create a new annotation
-            String annotationId = UUID.randomUUID().toString();
-            PhotoAnnotation annotation = new PhotoAnnotation(
-                    annotationId,
+            // Create a new annotation using the QA service
+            PhotoAnnotation annotation = qaService.createAnnotation(
+                    selectedPhoto.getId(),
                     x,
                     y,
                     text,
                     selectedAnnotationType.get()
             );
 
-            // Add the annotation to the photo document
-            boolean added = selectedPhoto.addAnnotation(annotation);
-            if (!added) {
+            if (annotation == null) {
                 errorMessage.set("Failed to add annotation to photo");
                 return null;
             }
-
-            // Save the photo document
-            photoRepository.save(selectedPhoto);
 
             // Refresh the annotations list
             refreshAnnotations();
@@ -550,15 +549,12 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
                 return false;
             }
 
-            // Update the annotation in the photo document
-            boolean updated = selectedPhoto.updateAnnotation(annotation);
+            // Update the annotation using the QA service
+            boolean updated = qaService.updateAnnotation(selectedPhoto.getId(), annotation);
             if (!updated) {
                 errorMessage.set("Failed to update annotation");
                 return false;
             }
-
-            // Save the photo document
-            photoRepository.save(selectedPhoto);
 
             // Refresh the annotations list
             refreshAnnotations();
@@ -583,15 +579,12 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
                 return false;
             }
 
-            // Remove the annotation from the photo document
-            boolean removed = selectedPhoto.removeAnnotation(annotation.getId());
+            // Remove the annotation using the QA service
+            boolean removed = qaService.deleteAnnotation(selectedPhoto.getId(), annotation.getId());
             if (!removed) {
                 errorMessage.set("Failed to remove annotation");
                 return false;
             }
-
-            // Save the photo document
-            photoRepository.save(selectedPhoto);
 
             // Refresh the annotations list
             refreshAnnotations();
@@ -608,7 +601,7 @@ public class PhotoReviewViewModel extends BaseViewModel<PhotoReviewViewModel> {
      */
     private void refreshAnnotations() {
         if (selectedPhoto != null) {
-            annotations.setAll(selectedPhoto.getAnnotations());
+            annotations.setAll(qaService.getAnnotations(selectedPhoto.getId()));
         } else {
             annotations.clear();
         }

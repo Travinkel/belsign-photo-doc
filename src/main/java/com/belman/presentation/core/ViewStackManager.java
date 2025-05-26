@@ -396,6 +396,9 @@ public class ViewStackManager {
         // Register the QA Done view
         registerView("QADoneView", new com.belman.presentation.usecases.qa.done.QADoneViewFactory(viewDependencies));
 
+        // Register the QA Order Assignment view
+        registerView("QAOrderAssignmentView", new com.belman.presentation.usecases.qa.assignment.QAOrderAssignmentViewFactory(viewDependencies));
+
         // Legacy views - commented out as they are no longer used
         // registerView("PhotoUploadView", new PhotoUploadViewFactory(viewDependencies));
         // registerView("PhotoWorkflowView", new PhotoWorkflowViewFactory(viewDependencies));

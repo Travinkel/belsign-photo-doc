@@ -144,7 +144,8 @@ public class LoginViewController extends BaseController<LoginViewModel> {
     private void showUserSelectionDialog() {
         try {
             // Load the FXML
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/belman/presentation/usecases/login/UserSelectionDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/com/belman/presentation/usecases/login/UserSelectionDialog.fxml"));
             Parent root = loader.load();
 
             // Get the controller and set this controller as the login view controller
@@ -168,5 +169,17 @@ public class LoginViewController extends BaseController<LoginViewModel> {
     public void initializeBinding() {
         // Call setupBindings to avoid duplication
         setupBindings();
+    }
+
+    /**
+     * Handles the close button action.
+     * Closes the application when the close button is clicked.
+     */
+    @FXML
+    private void handleCloseButtonAction() {
+        // Get the stage from any UI component
+        Stage stage = (Stage) usernameField.getScene().getWindow();
+        // Close the stage
+        stage.close();
     }
 }

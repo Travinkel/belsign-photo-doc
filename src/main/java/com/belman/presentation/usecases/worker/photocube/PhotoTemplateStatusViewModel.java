@@ -1,6 +1,7 @@
 package com.belman.presentation.usecases.worker.photocube;
 
 import com.belman.domain.photo.PhotoTemplate;
+import com.belman.presentation.base.BaseViewModel;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -13,23 +14,23 @@ import javafx.beans.property.StringProperty;
  * This class represents a single template with its status (captured, validated, etc.)
  * and is used to populate the template list in the dashboard.
  */
-public class PhotoTemplateStatusViewModel {
+public class PhotoTemplateStatusViewModel extends BaseViewModel<PhotoTemplateStatusViewModel> {
 
     // The photo template this status represents
     private final ObjectProperty<PhotoTemplate> template = new SimpleObjectProperty<>();
-    
+
     // Whether a photo has been captured for this template
     private final BooleanProperty captured = new SimpleBooleanProperty(false);
-    
+
     // Whether the captured photo has passed validation
     private final BooleanProperty validated = new SimpleBooleanProperty(false);
-    
+
     // Optional validation message (e.g., why a photo failed validation)
     private final StringProperty validationMessage = new SimpleStringProperty("");
-    
+
     // Whether this template is currently selected
     private final BooleanProperty selected = new SimpleBooleanProperty(false);
-    
+
     // Whether this template is required (vs. optional)
     private final BooleanProperty required = new SimpleBooleanProperty(true);
 
@@ -39,6 +40,7 @@ public class PhotoTemplateStatusViewModel {
      * @param template the photo template
      */
     public PhotoTemplateStatusViewModel(PhotoTemplate template) {
+        super();
         this.template.set(template);
     }
 
@@ -51,10 +53,18 @@ public class PhotoTemplateStatusViewModel {
      * @param required whether this template is required
      */
     public PhotoTemplateStatusViewModel(PhotoTemplate template, boolean captured, boolean validated, boolean required) {
+        super();
         this.template.set(template);
         this.captured.set(captured);
         this.validated.set(validated);
         this.required.set(required);
+    }
+
+    /**
+     * Default constructor required by BaseViewModel.
+     */
+    public PhotoTemplateStatusViewModel() {
+        super();
     }
 
     // Getters and setters for properties

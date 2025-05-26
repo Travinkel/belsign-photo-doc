@@ -10,6 +10,7 @@ import com.belman.application.usecase.worker.WorkerService;
 import com.belman.presentation.base.BaseViewModel;
 import com.belman.presentation.navigation.Router;
 import com.belman.presentation.usecases.worker.WorkerFlowContext;
+import com.belman.presentation.usecases.worker.WorkerFlowState;
 import com.belman.presentation.usecases.worker.completed.CompletedView;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -62,8 +63,9 @@ public class SummaryViewModel extends BaseViewModel<SummaryViewModel> {
             }
 
             currentOrder.set(order);
-            // Format the order number in a user-friendly way (e.g., "Order #123" instead of technical format)
-            String friendlyOrderNumber = order.getOrderNumber().toString().replace("ORD-", "Order #");
+            // Format the order number in a user-friendly way (e.g., "Order #01/23-123456-12345678")
+            String orderNumberValue = order.getOrderNumber().value();
+            String friendlyOrderNumber = "Order #" + orderNumberValue;
             orderNumber.set(friendlyOrderNumber);
 
             // Get the taken photos from the worker flow context
@@ -141,6 +143,9 @@ public class SummaryViewModel extends BaseViewModel<SummaryViewModel> {
         loading.set(true);
         statusMessage.set("Submitting photos...");
 
+        // Update the flow state to indicate the order is being completed
+        WorkerFlowContext.setCurrentFlowState(WorkerFlowState.COMPLETING_ORDER);
+
         // Get the current user
         SessionContext.getCurrentUser().ifPresentOrElse(
             user -> {
@@ -154,10 +159,13 @@ public class SummaryViewModel extends BaseViewModel<SummaryViewModel> {
                         statusMessage.set("Photos submitted successfully!");
 
                         // Store information in the worker flow context for the completed view
-                        WorkerFlowContext.setAttribute("completedOrderNumber", order.getOrderNumber().toString());
+                        WorkerFlowContext.setAttribute("completedOrderNumber", order.getOrderNumber().value());
                         WorkerFlowContext.setAttribute("completedPhotoCount", photosCount.get());
                         WorkerFlowContext.setAttribute("completedByUsername", user.getUsername().value());
                         WorkerFlowContext.setAttribute("completedTimestamp", java.time.Instant.now().toString());
+
+                        // Update the flow state to indicate the order is completed
+                        WorkerFlowContext.setCurrentFlowState(WorkerFlowState.COMPLETED);
 
                         // Short delay before navigating to the completed view
                         new Thread(() -> {

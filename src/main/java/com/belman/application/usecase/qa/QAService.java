@@ -1,6 +1,7 @@
 package com.belman.application.usecase.qa;
 
 import com.belman.domain.order.OrderId;
+import com.belman.domain.photo.PhotoAnnotation;
 import com.belman.domain.photo.PhotoDocument;
 import com.belman.domain.photo.PhotoId;
 import com.belman.domain.user.UserBusiness;
@@ -9,7 +10,7 @@ import java.util.List;
 
 /**
  * Service for quality assurance.
- * Provides methods for reviewing and approving photos.
+ * Provides methods for reviewing and approving photos, as well as managing photo annotations.
  */
 public interface QAService {
     /**
@@ -104,4 +105,42 @@ public interface QAService {
      * @return true if the comment was added, false if the photo was not found
      */
     boolean addComment(PhotoId photoId, String comment, UserBusiness commentedBy);
+
+    /**
+     * Gets all annotations for a photo.
+     *
+     * @param photoId the ID of the photo
+     * @return a list of annotations for the photo, or an empty list if the photo was not found
+     */
+    List<PhotoAnnotation> getAnnotations(PhotoId photoId);
+
+    /**
+     * Creates a new annotation for a photo.
+     *
+     * @param photoId the ID of the photo to annotate
+     * @param x the x-coordinate (as percentage of image width, 0.0-1.0)
+     * @param y the y-coordinate (as percentage of image height, 0.0-1.0)
+     * @param text the text content of the annotation
+     * @param type the type of annotation
+     * @return the created annotation, or null if the photo was not found
+     */
+    PhotoAnnotation createAnnotation(PhotoId photoId, double x, double y, String text, PhotoAnnotation.AnnotationType type);
+
+    /**
+     * Updates an existing annotation.
+     *
+     * @param photoId the ID of the photo containing the annotation
+     * @param annotation the updated annotation
+     * @return true if the annotation was updated successfully, false if the photo or annotation was not found
+     */
+    boolean updateAnnotation(PhotoId photoId, PhotoAnnotation annotation);
+
+    /**
+     * Deletes an annotation from a photo.
+     *
+     * @param photoId the ID of the photo containing the annotation
+     * @param annotationId the ID of the annotation to delete
+     * @return true if the annotation was deleted successfully, false if the photo or annotation was not found
+     */
+    boolean deleteAnnotation(PhotoId photoId, String annotationId);
 }

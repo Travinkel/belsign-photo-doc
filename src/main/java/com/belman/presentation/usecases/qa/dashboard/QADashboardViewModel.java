@@ -1,5 +1,6 @@
 package com.belman.presentation.usecases.qa.dashboard;
 
+import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.common.di.Inject;
 import com.belman.common.session.SessionContext;
 import com.belman.domain.order.OrderBusiness;
@@ -8,11 +9,15 @@ import com.belman.domain.order.OrderRepository;
 import com.belman.domain.order.OrderStatus;
 import com.belman.domain.report.ReportFormat;
 import com.belman.domain.report.ReportType;
+import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.specification.OrderStatusSpecification;
 import com.belman.application.usecase.report.ReportService;
 import com.belman.presentation.base.BaseViewModel;
+import com.belman.presentation.base.LogoutCapable;
 import com.belman.presentation.flow.commands.GenerateReportPreviewCommand;
 import com.belman.presentation.navigation.Router;
+import com.belman.presentation.usecases.login.LoginView;
+import com.belman.presentation.usecases.qa.assignment.QAOrderAssignmentView;
 import com.belman.presentation.usecases.qa.review.PhotoReviewView;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -29,7 +34,8 @@ import java.util.stream.Collectors;
  * ViewModel for the QA dashboard view.
  * Provides data and operations for QA-specific functionality.
  */
-public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
+public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> implements LogoutCapable {
+    private final AuthenticationService authenticationService = ServiceLocator.getService(AuthenticationService.class);
     private final StringProperty welcomeMessage = new SimpleStringProperty("Welcome to QA Dashboard");
     private final StringProperty searchText = new SimpleStringProperty("");
     private final StringProperty errorMessage = new SimpleStringProperty("");
@@ -241,16 +247,46 @@ public class QADashboardViewModel extends BaseViewModel<QADashboardViewModel> {
     }
 
     /**
+     * Navigates to the order assignment view.
+     */
+    public void navigateToOrderAssignment() {
+        try {
+            // Navigate to the order assignment view
+            Router.navigateTo(QAOrderAssignmentView.class);
+        } catch (Exception e) {
+            errorMessage.set("Error navigating to order assignment: " + e.getMessage());
+        }
+    }
+
+    /**
      * Logs out the current user and navigates to the login view.
      */
+    @Override
     public void logout() {
         try {
             // Log out the user
-            if (sessionContext != null) {
-                sessionContext.navigateToLogin();
-            }
+            authenticationService.logout();
+
+            // Clear the session context
+            SessionContext.clear();
+
+            // Navigate to the login view
+            Router.navigateTo(LoginView.class);
         } catch (Exception e) {
-            errorMessage.set("Error logging out: " + e.getMessage());
+            // Log the full error for debugging
+            System.err.println("Error logging out: " + e.getMessage());
+            e.printStackTrace();
+
+            // Set a user-friendly error message
+            errorMessage.set("Unable to log out properly. Please close the application and restart it to ensure you are fully logged out.");
+
+            // Even if logout fails, try to navigate to login screen anyway
+            try {
+                // Navigate to the login view
+                Router.navigateTo(LoginView.class);
+            } catch (Exception navEx) {
+                System.err.println("Failed to navigate to login view after logout error: " + navEx.getMessage());
+            }
         }
     }
 }

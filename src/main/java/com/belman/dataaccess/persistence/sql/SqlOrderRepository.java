@@ -1,6 +1,5 @@
 package com.belman.dataaccess.persistence.sql;
 
-import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.domain.common.valueobjects.Timestamp;
 import com.belman.domain.customer.CustomerBusiness;
 import com.belman.domain.customer.CustomerId;
@@ -21,8 +20,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,56 +38,79 @@ public class SqlOrderRepository implements OrderRepository {
     private static final Logger LOGGER = Logger.getLogger(SqlOrderRepository.class.getName());
 
     private final DataSource dataSource;
+    private final UserRepository userRepository;
+    private final CustomerRepository customerRepository;
 
     /**
-     * Creates a new SqlOrderRepository with the specified DataSource.
+     * Creates a new SqlOrderRepository with the specified dependencies.
      *
      * @param dataSource the DataSource to use for database connections
+     * @param userRepository the repository for user data
+     * @param customerRepository the repository for customer data
      */
-    public SqlOrderRepository(DataSource dataSource) {
+    public SqlOrderRepository(DataSource dataSource, UserRepository userRepository, CustomerRepository customerRepository) {
         this.dataSource = dataSource;
+        this.userRepository = userRepository;
+        this.customerRepository = customerRepository;
     }
 
     @Override
     public Optional<OrderBusiness> findById(OrderId id) {
+        String orderId = id.id();
+
+        // Check cache first
+        synchronized (orderCache) {
+            OrderBusiness cachedOrder = orderCache.get(orderId);
+            if (cachedOrder != null) {
+                LOGGER.fine("Cache hit: Order found in cache with ID: " + orderId);
+                return Optional.of(cachedOrder);
+            }
+        }
+
+        LOGGER.fine("Cache miss: Order not found in cache with ID: " + orderId);
         String sql = "SELECT * FROM ORDERS WHERE order_id = ?";
-        System.out.println("[DEBUG_LOG] SqlOrderRepository: Finding order by ID: " + id.id());
+        LOGGER.fine("Finding order by ID: " + orderId);
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, id.id());
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: Executing SQL: " + sql + " with order_id = " + id.id());
+            stmt.setString(1, orderId);
+            LOGGER.fine("Executing SQL: " + sql + " with order_id = " + orderId);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    System.out.println("[DEBUG_LOG] SqlOrderRepository: Order found in database, mapping to OrderBusiness");
+                    LOGGER.fine("Order found in database, mapping to OrderBusiness");
                     OrderBusiness order = mapResultSetToOrder(rs);
 
                     // Load photo IDs for the order
-                    System.out.println("[DEBUG_LOG] SqlOrderRepository: Loading photos for order");
+                    LOGGER.fine("Loading photos for order");
                     loadPhotos(order);
 
-                    System.out.println("[DEBUG_LOG] SqlOrderRepository: Successfully retrieved order: " + 
-                                      "ID=" + order.getId().id() + 
-                                      ", Number=" + (order.getOrderNumber() != null ? order.getOrderNumber().value() : "null") + 
-                                      ", Status=" + order.getStatus() + 
-                                      ", AssignedTo=" + (order.getAssignedTo() != null ? order.getAssignedTo().id().id() : "null"));
+                    // Cache the order
+                    synchronized (orderCache) {
+                        orderCache.put(orderId, order);
+                    }
+
+                    LOGGER.fine("Successfully retrieved order: " + 
+                               "ID=" + order.getId().id() + 
+                               ", Number=" + (order.getOrderNumber() != null ? order.getOrderNumber().value() : "null") + 
+                               ", Status=" + order.getStatus() + 
+                               ", AssignedTo=" + (order.getAssignedTo() != null ? order.getAssignedTo().id().id() : "null"));
                     return Optional.of(order);
                 } else {
-                    System.out.println("[DEBUG_LOG] SqlOrderRepository: No order found with ID: " + id.id());
+                    LOGGER.fine("No order found with ID: " + orderId);
                 }
             }
         } catch (SQLException e) {
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: Error finding order by ID: " + e.getMessage());
-            e.printStackTrace();
-            LOGGER.log(Level.SEVERE, "Error finding order by id: " + id.id(), e);
+            LOGGER.log(Level.SEVERE, "Error finding order by id: " + orderId, e);
         }
         return Optional.empty();
     }
 
     @Override
     public OrderBusiness save(OrderBusiness orderBusiness) {
+        String orderId = orderBusiness.getId().id();
+
         // Check if orderBusiness already exists
         String checkSql = "SELECT COUNT(*) FROM ORDERS WHERE order_id = ?";
         boolean orderExists = false;
@@ -91,7 +118,7 @@ public class SqlOrderRepository implements OrderRepository {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(checkSql)) {
 
-            stmt.setString(1, orderBusiness.getId().id());
+            stmt.setString(1, orderId);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -99,7 +126,7 @@ public class SqlOrderRepository implements OrderRepository {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error checking if orderBusiness exists: " + orderBusiness.getId().id(), e);
+            LOGGER.log(Level.SEVERE, "Error checking if orderBusiness exists: " + orderId, e);
             throw new RuntimeException("Error checking if orderBusiness exists", e);
         }
 
@@ -107,6 +134,18 @@ public class SqlOrderRepository implements OrderRepository {
             updateOrder(orderBusiness);
         } else {
             insertOrder(orderBusiness);
+        }
+
+        // Update the cache
+        synchronized (orderCache) {
+            orderCache.put(orderId, orderBusiness);
+            LOGGER.fine("Updated order cache for ID: " + orderId);
+        }
+
+        // Update the photo ID cache
+        synchronized (photoIdCache) {
+            photoIdCache.put(orderId, new ArrayList<>(orderBusiness.getPhotoIds()));
+            LOGGER.fine("Updated photo ID cache for order ID: " + orderId);
         }
 
         return orderBusiness;
@@ -121,20 +160,30 @@ public class SqlOrderRepository implements OrderRepository {
 
     @Override
     public boolean deleteById(OrderId id) {
+        String orderId = id.id();
         String sql = "DELETE FROM ORDERS WHERE order_id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, id.id());
+            stmt.setString(1, orderId);
             int rowsAffected = stmt.executeUpdate();
 
             if (rowsAffected > 0) {
-                LOGGER.info("Order deleted successfully: " + id.id());
+                // Remove from caches
+                synchronized (orderCache) {
+                    orderCache.remove(orderId);
+                }
+
+                synchronized (photoIdCache) {
+                    photoIdCache.remove(orderId);
+                }
+
+                LOGGER.info("Order deleted successfully: " + orderId + " (removed from cache)");
                 return true;
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error deleting order: " + id.id(), e);
+            LOGGER.log(Level.SEVERE, "Error deleting order: " + orderId, e);
         }
 
         return false;
@@ -142,83 +191,83 @@ public class SqlOrderRepository implements OrderRepository {
 
     @Override
     public List<OrderBusiness> findAll() {
-        String sql = "SELECT * FROM ORDERS";
+        // Default to first page with default page size
+        return findAll(0, 50);
+    }
+
+    /**
+     * Finds all orders with pagination support.
+     *
+     * @param page the page number (0-based)
+     * @param pageSize the number of items per page
+     * @return a list of orders for the specified page
+     */
+    public List<OrderBusiness> findAll(int page, int pageSize) {
+        // Validate pagination parameters
+        if (page < 0) {
+            page = 0;
+        }
+        if (pageSize <= 0) {
+            pageSize = 100;
+        }
+
+        // Calculate offset
+        int offset = page * pageSize;
+
+        String sql = "SELECT * FROM ORDERS ORDER BY created_at DESC LIMIT ? OFFSET ?";
         List<OrderBusiness> orderBusinesses = new ArrayList<>();
 
-        System.out.println("[DEBUG_LOG] SqlOrderRepository: Executing findAll() to retrieve all orders");
-        LOGGER.info("Loading orders from database");
+        LOGGER.info("Loading orders from database (page=" + page + ", pageSize=" + pageSize + ")");
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: SQL query executed: " + sql);
-            LOGGER.fine("Executing SQL query: " + sql);
+            stmt.setInt(1, pageSize);
+            stmt.setInt(2, offset);
 
-            int count = 0;
-            int validOrderNumbers = 0;
-            int invalidOrderNumbers = 0;
+            LOGGER.fine("Executing SQL query: " + sql + " with params: pageSize=" + pageSize + ", offset=" + offset);
 
-            while (rs.next()) {
-                count++;
-                String orderId = rs.getString("order_id");
-                String orderNumberStr = rs.getString("order_number");
+            try (ResultSet rs = stmt.executeQuery()) {
+                int count = 0;
+                int validOrderNumbers = 0;
+                int invalidOrderNumbers = 0;
 
-                System.out.println("[DEBUG_LOG] SqlOrderRepository: Processing order #" + count + 
-                                  " from result set, ID=" + orderId + 
-                                  ", Number=" + (orderNumberStr != null ? orderNumberStr : "null"));
+                while (rs.next()) {
+                    count++;
+                    String orderId = rs.getString("order_id");
+                    String orderNumberStr = rs.getString("order_number");
 
-                try {
-                    OrderBusiness order = mapResultSetToOrder(rs);
+                    try {
+                        OrderBusiness order = mapResultSetToOrder(rs);
 
-                    // Validate order number
-                    if (order.getOrderNumber() != null) {
-                        validOrderNumbers++;
-                        System.out.println("[DEBUG_LOG] SqlOrderRepository: Valid order number: " + order.getOrderNumber().value());
-                    } else if (orderNumberStr != null) {
-                        invalidOrderNumbers++;
-                        System.out.println("[DEBUG_LOG] SqlOrderRepository: Invalid order number format: " + orderNumberStr);
-                        LOGGER.warning("Order " + orderId + " has invalid order number format: " + orderNumberStr);
-                    } else {
-                        System.out.println("[DEBUG_LOG] SqlOrderRepository: Order has no order number");
-                        LOGGER.warning("Order " + orderId + " has no order number");
+                        // Validate order number
+                        if (order.getOrderNumber() != null) {
+                            validOrderNumbers++;
+                        } else if (orderNumberStr != null) {
+                            invalidOrderNumbers++;
+                            LOGGER.warning("Order " + orderId + " has invalid order number format: " + orderNumberStr);
+                        } else {
+                            LOGGER.warning("Order " + orderId + " has no order number");
+                        }
+
+                        // Add the order to the list (without loading photos yet)
+                        orderBusinesses.add(order);
+                    } catch (Exception e) {
+                        LOGGER.log(Level.WARNING, "Error processing order " + orderId + ": " + e.getMessage(), e);
                     }
-
-                    System.out.println("[DEBUG_LOG] SqlOrderRepository: Mapped order: ID=" + order.getId().id() + 
-                                      ", Number=" + (order.getOrderNumber() != null ? order.getOrderNumber().value() : "null") + 
-                                      ", Status=" + order.getStatus() + 
-                                      ", AssignedTo=" + (order.getAssignedTo() != null ? order.getAssignedTo().id().id() : "null"));
-
-                    // Load photo IDs for the order
-                    System.out.println("[DEBUG_LOG] SqlOrderRepository: Loading photos for order: " + order.getId().id());
-                    loadPhotos(order);
-
-                    // Log detailed order information at trace level
-                    LOGGER.fine("Loaded order: ID=" + order.getId().id() +
-                               ", Number=" + (order.getOrderNumber() != null ? order.getOrderNumber().value() : "null") +
-                               ", Status=" + order.getStatus() +
-                               ", AssignedTo=" + (order.getAssignedTo() != null ? order.getAssignedTo().id().id() : "null"));
-
-                    orderBusinesses.add(order);
-                } catch (Exception e) {
-                    System.out.println("[DEBUG_LOG] SqlOrderRepository: Error processing order #" + count + ": " + e.getMessage());
-                    LOGGER.log(Level.WARNING, "Error processing order " + orderId + ": " + e.getMessage(), e);
                 }
+
+                // Batch load photos for all orders at once (more efficient than loading individually)
+                if (!orderBusinesses.isEmpty()) {
+                    loadPhotosForOrders(orderBusinesses);
+                }
+
+                LOGGER.info("Loaded " + orderBusinesses.size() + " orders from database (page " + page + ")");
+                LOGGER.fine("Order number statistics: " + validOrderNumbers + " valid, " + 
+                           invalidOrderNumbers + " invalid");
             }
-
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: Found " + orderBusinesses.size() + " total orders");
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: Valid order numbers: " + validOrderNumbers + 
-                              ", Invalid order numbers: " + invalidOrderNumbers);
-
-            LOGGER.info("Loaded " + orderBusinesses.size() + " orders from database");
-            LOGGER.info("Order number statistics: " + validOrderNumbers + " valid, " + 
-                       invalidOrderNumbers + " invalid");
-
         } catch (SQLException e) {
-            String errorMessage = "Error loading orders from database: " + e.getMessage();
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: " + errorMessage);
-            e.printStackTrace();
-            LOGGER.log(Level.SEVERE, errorMessage, e);
+            LOGGER.log(Level.SEVERE, "Error loading orders from database: " + e.getMessage(), e);
         }
 
         return orderBusinesses;
@@ -467,182 +516,338 @@ public class SqlOrderRepository implements OrderRepository {
 
     private OrderBusiness mapResultSetToOrder(ResultSet rs) throws SQLException {
         String orderId = rs.getString("order_id");
-        System.out.println("[DEBUG_LOG] SqlOrderRepository: Mapping ResultSet to OrderBusiness for order ID: " + orderId);
+        LOGGER.fine("Mapping ResultSet to OrderBusiness for order ID: " + orderId);
 
         OrderId id = new OrderId(orderId);
 
         // Get the created_by user ID and fetch the user
         String createdByIdStr = rs.getString("created_by");
-        System.out.println("[DEBUG_LOG] SqlOrderRepository: Order created by user ID: " + createdByIdStr);
-
         UserId createdById = new UserId(createdByIdStr);
-        UserReference createdBy = fetchUser(createdById);
-        System.out.println("[DEBUG_LOG] SqlOrderRepository: Fetched creator user: " + 
-                          (createdBy != null ? createdBy.username().value() : "null"));
+
+        // Use the cached version to avoid repeated database queries
+        UserReference createdBy = fetchUserCached(createdById);
 
         // Get the creation timestamp
         java.sql.Timestamp sqlTimestamp = rs.getTimestamp("created_at");
         Timestamp createdAt = new Timestamp(sqlTimestamp.toInstant());
-        System.out.println("[DEBUG_LOG] SqlOrderRepository: Order creation timestamp: " + createdAt.value());
 
         // Create the orderBusiness with the required fields
         OrderBusiness orderBusiness = new OrderBusiness(id, createdBy, createdAt);
-        System.out.println("[DEBUG_LOG] SqlOrderRepository: Created base OrderBusiness object");
 
         // Set optional fields
-        String orderNumberStr = rs.getString("order_number");
-        System.out.println("[DEBUG_LOG] SqlOrderRepository: Order number from DB: " + orderNumberStr);
-        if (orderNumberStr != null) {
-            try {
-                orderBusiness.setOrderNumber(new OrderNumber(orderNumberStr));
-                System.out.println("[DEBUG_LOG] SqlOrderRepository: Set order number: " + orderNumberStr);
-            } catch (IllegalArgumentException e) {
-                // Log a warning if the order number format is invalid
-                System.out.println("[DEBUG_LOG] SqlOrderRepository: WARNING - Invalid order number format: " + orderNumberStr + ", " + e.getMessage());
-                LOGGER.warning("Invalid order number format in database: " + orderNumberStr + ", " + e.getMessage());
+        setOrderNumber(orderBusiness, rs.getString("order_number"));
+        setCustomerId(orderBusiness, rs.getString("customer_id"));
+        setProductDescription(orderBusiness, rs.getString("product_description"));
+        setDeliveryAddress(orderBusiness, rs);
+        setOrderStatus(orderBusiness, rs.getString("status"));
+        setAssignedTo(orderBusiness, rs.getString("assigned_to"));
 
-                // Try to create a valid order number from the invalid one
-                try {
-                    // If it starts with "ORD-" but doesn't match the exact pattern, try to fix it
-                    if (orderNumberStr.startsWith("ORD-")) {
-                        // Extract parts and try to create a valid legacy format
-                        String[] parts = orderNumberStr.split("-");
-                        if (parts.length >= 5) {
-                            // Ensure each part has the correct format
-                            String prefix = "ORD";
-                            String number = parts[1].length() == 2 ? parts[1] : String.format("%02d", Integer.parseInt(parts[1]));
-                            String date = parts[2].length() == 6 ? parts[2] : "230101"; // Default date if invalid
-                            String code = parts[3].length() == 3 ? parts[3].toUpperCase() : "XXX"; // Default code if invalid
-                            String sequence = parts[4].length() == 4 ? parts[4] : "0001"; // Default sequence if invalid
-
-                            String fixedOrderNumber = prefix + "-" + number + "-" + date + "-" + code + "-" + sequence;
-                            System.out.println("[DEBUG_LOG] SqlOrderRepository: Attempting to fix order number: " + fixedOrderNumber);
-
-                            try {
-                                orderBusiness.setOrderNumber(new OrderNumber(fixedOrderNumber));
-                                System.out.println("[DEBUG_LOG] SqlOrderRepository: Successfully fixed order number to: " + fixedOrderNumber);
-                                LOGGER.info("Fixed invalid order number format: " + orderNumberStr + " -> " + fixedOrderNumber);
-                            } catch (IllegalArgumentException ex) {
-                                System.out.println("[DEBUG_LOG] SqlOrderRepository: Failed to fix order number: " + ex.getMessage());
-                                // Leave order number as null
-                            }
-                        }
-                    }
-                } catch (Exception ex) {
-                    System.out.println("[DEBUG_LOG] SqlOrderRepository: Error trying to fix order number: " + ex.getMessage());
-                    // Leave order number as null
-                }
-            }
-        }
-
-        String customerId = rs.getString("customer_id");
-        System.out.println("[DEBUG_LOG] SqlOrderRepository: Customer ID from DB: " + customerId);
-        if (customerId != null) {
-            try {
-                CustomerBusiness customer = fetchCustomer(new CustomerId(customerId));
-                if (customer != null) {
-                    orderBusiness.setCustomerId(customer.getId());
-                    System.out.println("[DEBUG_LOG] SqlOrderRepository: Set customer ID: " + customer.getId().id());
-                }
-            } catch (Exception e) {
-                System.out.println("[DEBUG_LOG] SqlOrderRepository: Error fetching customer with ID: " + customerId + ", " + e.getMessage());
-                // Set the customer ID directly from the database
-                orderBusiness.setCustomerId(new CustomerId(customerId));
-                System.out.println("[DEBUG_LOG] SqlOrderRepository: Set customer ID directly: " + customerId);
-            }
-        }
-
-        String productDescriptionStr = rs.getString("product_description");
-        System.out.println("[DEBUG_LOG] SqlOrderRepository: Product description from DB: " + productDescriptionStr);
-        if (productDescriptionStr != null) {
-            // This is simplified - in a real implementation, we would parse the product description properly
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: Product description parsing not implemented");
-        }
-
-        try {
-            String deliveryAddressStr = rs.getString("delivery_address");
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: Delivery address from DB: " + deliveryAddressStr);
-            if (deliveryAddressStr != null) {
-                // This is simplified - in a real implementation, we would parse the delivery information properly
-                System.out.println("[DEBUG_LOG] SqlOrderRepository: Delivery information parsing not implemented");
-            }
-        } catch (SQLException e) {
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: Delivery address column not found or error accessing it: " + e.getMessage());
-        }
-
-        String statusStr = rs.getString("status");
-        System.out.println("[DEBUG_LOG] SqlOrderRepository: Status from DB: " + statusStr);
-        if (statusStr != null) {
-            orderBusiness.setStatus(OrderStatus.valueOf(statusStr));
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: Set order status: " + statusStr);
-        }
-
-        // Set assigned_to if available
-        String assignedToId = rs.getString("assigned_to");
-        System.out.println("[DEBUG_LOG] SqlOrderRepository: Assigned to user ID from DB: " + assignedToId);
-
-        if (assignedToId != null) {
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: Fetching assigned user with ID: " + assignedToId);
-            UserReference assignedTo = fetchUser(new UserId(assignedToId));
-
-            if (assignedTo != null) {
-                System.out.println("[DEBUG_LOG] SqlOrderRepository: Setting order assignedTo: ID=" + 
-                                  assignedTo.id().id() + ", Username=" + assignedTo.username().value());
-                orderBusiness.setAssignedTo(assignedTo);
-            } else {
-                System.out.println("[DEBUG_LOG] SqlOrderRepository: Failed to fetch assigned user, assignedTo will be null");
-            }
-        } else {
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: Order is not assigned to any user");
-        }
-
-        System.out.println("[DEBUG_LOG] SqlOrderRepository: Completed mapping order: " + 
-                          "ID=" + orderBusiness.getId().id() + 
-                          ", Number=" + (orderBusiness.getOrderNumber() != null ? orderBusiness.getOrderNumber().value() : "null") + 
-                          ", Status=" + orderBusiness.getStatus() + 
-                          ", AssignedTo=" + (orderBusiness.getAssignedTo() != null ? 
-                                           orderBusiness.getAssignedTo().id().id() : "null"));
+        LOGGER.fine("Completed mapping order: ID=" + orderBusiness.getId().id() + 
+                   ", Number=" + (orderBusiness.getOrderNumber() != null ? orderBusiness.getOrderNumber().value() : "null") + 
+                   ", Status=" + orderBusiness.getStatus());
 
         return orderBusiness;
     }
 
-    private UserReference fetchUser(UserId userId) {
-        System.out.println("[DEBUG_LOG] SqlOrderRepository: Fetching user with ID: " + userId.id());
+    /**
+     * Sets the order number on the order business object.
+     * Attempts to fix invalid order numbers.
+     *
+     * @param orderBusiness the order business object
+     * @param orderNumberStr the order number string from the database
+     */
+    private void setOrderNumber(OrderBusiness orderBusiness, String orderNumberStr) {
+        if (orderNumberStr == null) {
+            return;
+        }
 
         try {
-            // Get the UserRepository from the ServiceLocator
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: Getting UserRepository from ServiceLocator");
-            UserRepository userRepository = ServiceLocator.getService(UserRepository.class);
+            orderBusiness.setOrderNumber(new OrderNumber(orderNumberStr));
+        } catch (IllegalArgumentException e) {
+            // Log a warning if the order number format is invalid
+            LOGGER.warning("Invalid order number format in database: " + orderNumberStr + ", " + e.getMessage());
+            attemptToFixOrderNumber(orderBusiness, orderNumberStr);
+        }
+    }
 
-            // Use the UserRepository to find the user by ID
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: Calling userRepository.findById() for user: " + userId.id());
+    /**
+     * Attempts to fix an invalid order number by converting it to the new format.
+     *
+     * @param orderBusiness the order business object
+     * @param orderNumberStr the invalid order number string
+     */
+    private void attemptToFixOrderNumber(OrderBusiness orderBusiness, String orderNumberStr) {
+        try {
+            // If it starts with "ORD-", convert it to the new format (MM/YY-CUSTOMER-SEQUENCE)
+            if (orderNumberStr.startsWith("ORD-")) {
+                // Extract parts from the legacy format
+                String[] parts = orderNumberStr.split("-");
+                if (parts.length >= 5) {
+                    // Extract date part (YYMMDD) from the legacy format
+                    String date = parts[2];
+                    if (date.length() >= 6) {
+                        String yy = date.substring(0, 2);
+                        String mm = date.substring(2, 4);
+
+                        // Use the code part as the customer ID, padded to 6 digits
+                        String code = parts[3];
+                        String customerId = String.format("%06d", Math.abs(code.hashCode() % 1000000));
+
+                        // Use the sequence part, padded to 8 digits
+                        String sequence = parts[4];
+                        String paddedSequence = String.format("%08d", Integer.parseInt(sequence));
+
+                        // Create a new order number in the format MM/YY-CUSTOMER-SEQUENCE
+                        String newFormatOrderNumber = mm + "/" + yy + "-" + customerId + "-" + paddedSequence;
+
+                        try {
+                            orderBusiness.setOrderNumber(new OrderNumber(newFormatOrderNumber));
+                            LOGGER.info("Converted legacy order number to new format: " + orderNumberStr + " -> " + newFormatOrderNumber);
+                        } catch (IllegalArgumentException ex) {
+                            // If conversion fails, generate a completely new order number
+                            String generatedOrderNumber = OrderNumber.generate("123456").value();
+                            orderBusiness.setOrderNumber(new OrderNumber(generatedOrderNumber));
+                            LOGGER.info("Generated new order number: " + orderNumberStr + " -> " + generatedOrderNumber);
+                        }
+                    } else {
+                        // If date part is invalid, generate a completely new order number
+                        String generatedOrderNumber = OrderNumber.generate("123456").value();
+                        orderBusiness.setOrderNumber(new OrderNumber(generatedOrderNumber));
+                        LOGGER.info("Generated new order number: " + orderNumberStr + " -> " + generatedOrderNumber);
+                    }
+                } else {
+                    // If parts are invalid, generate a completely new order number
+                    String generatedOrderNumber = OrderNumber.generate("123456").value();
+                    orderBusiness.setOrderNumber(new OrderNumber(generatedOrderNumber));
+                    LOGGER.info("Generated new order number: " + orderNumberStr + " -> " + generatedOrderNumber);
+                }
+            }
+        } catch (Exception ex) {
+            // If any exception occurs, generate a completely new order number
+            try {
+                String generatedOrderNumber = OrderNumber.generate("123456").value();
+                orderBusiness.setOrderNumber(new OrderNumber(generatedOrderNumber));
+                LOGGER.info("Generated new order number due to exception: " + ex.getMessage() + " -> " + generatedOrderNumber);
+            } catch (Exception e) {
+                // Leave order number as null
+                LOGGER.warning("Failed to generate new order number: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Sets the customer ID on the order business object.
+     *
+     * @param orderBusiness the order business object
+     * @param customerId the customer ID string from the database
+     */
+    private void setCustomerId(OrderBusiness orderBusiness, String customerId) {
+        if (customerId == null) {
+            return;
+        }
+
+        try {
+            CustomerBusiness customer = fetchCustomer(new CustomerId(customerId));
+            if (customer != null) {
+                orderBusiness.setCustomerId(customer.getId());
+            }
+        } catch (Exception e) {
+            // Set the customer ID directly from the database
+            orderBusiness.setCustomerId(new CustomerId(customerId));
+        }
+    }
+
+    /**
+     * Sets the product description on the order business object.
+     *
+     * @param orderBusiness the order business object
+     * @param productDescriptionStr the product description string from the database
+     */
+    private void setProductDescription(OrderBusiness orderBusiness, String productDescriptionStr) {
+        if (productDescriptionStr != null) {
+            // This is simplified - in a real implementation, we would parse the product description properly
+        }
+    }
+
+    /**
+     * Sets the delivery address on the order business object.
+     *
+     * @param orderBusiness the order business object
+     * @param rs the result set containing the delivery address
+     */
+    private void setDeliveryAddress(OrderBusiness orderBusiness, ResultSet rs) {
+        try {
+            String deliveryAddressStr = rs.getString("delivery_address");
+            if (deliveryAddressStr != null) {
+                // This is simplified - in a real implementation, we would parse the delivery information properly
+            }
+        } catch (SQLException e) {
+            LOGGER.warning("Delivery address column not found or error accessing it: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Sets the order status on the order business object.
+     *
+     * @param orderBusiness the order business object
+     * @param statusStr the status string from the database
+     */
+    private void setOrderStatus(OrderBusiness orderBusiness, String statusStr) {
+        if (statusStr != null) {
+            orderBusiness.setStatus(OrderStatus.valueOf(statusStr));
+        }
+    }
+
+    /**
+     * Sets the assigned to user on the order business object.
+     *
+     * @param orderBusiness the order business object
+     * @param assignedToId the assigned to user ID string from the database
+     */
+    private void setAssignedTo(OrderBusiness orderBusiness, String assignedToId) {
+        if (assignedToId != null) {
+            // Use the cached version to avoid repeated database queries
+            UserReference assignedTo = fetchUserCached(new UserId(assignedToId));
+            if (assignedTo != null) {
+                orderBusiness.setAssignedTo(assignedTo);
+            }
+        }
+    }
+
+    /**
+     * Fetches a user by ID.
+     * This method uses a cache to avoid repeated database queries for the same user.
+     * 
+     * @param userId the ID of the user to fetch
+     * @return a UserReference for the user, or null if not found
+     */
+    private UserReference fetchUser(UserId userId) {
+        LOGGER.fine("Fetching user with ID: " + userId.id());
+
+        try {
+            // Use the injected UserRepository to find the user by ID
             return userRepository.findById(userId)
-               .map(user -> {
-                   System.out.println("[DEBUG_LOG] SqlOrderRepository: User found: ID=" + user.getId().id() + 
-                                     ", Username=" + user.getUsername().value() + 
-                                     ", Roles=" + user.getRoles());
-                   return new UserReference(user.getId(), user.getUsername());
-               })
+               .map(user -> new UserReference(user.getId(), user.getUsername()))
                .orElseGet(() -> {
-                   System.out.println("[DEBUG_LOG] SqlOrderRepository: User not found with ID: " + userId.id());
+                   LOGGER.warning("User not found with ID: " + userId.id());
                    return null;
                });
         } catch (Exception e) {
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: Error fetching user: " + e.getMessage());
-            e.printStackTrace();
             LOGGER.log(Level.SEVERE, "Error fetching user: " + userId.id(), e);
 
             // Return a placeholder user reference in case of error
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: Creating placeholder user reference for ID: " + userId.id());
             return new UserReference(userId, new Username("unknown-user"));
         }
     }
 
+    /**
+     * Cache configuration
+     */
+    // Cache for user references to avoid repeated database queries
+    private static final Map<String, UserReference> userCache = new HashMap<>();
+
+    // Cache for orders to avoid repeated database queries
+    // Using a LinkedHashMap with access ordering to implement a simple LRU cache
+    private static final Map<String, OrderBusiness> orderCache = new LinkedHashMap<String, OrderBusiness>(100, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, OrderBusiness> eldest) {
+            return size() > 100; // Limit cache size to 100 entries
+        }
+    };
+
+    // Cache for photo IDs by order ID to avoid repeated database queries
+    private static final Map<String, List<PhotoId>> photoIdCache = new HashMap<>();
+
+    // Maximum age for cached items in milliseconds (5 minutes)
+    private static final long CACHE_EXPIRY_MS = 5 * 60 * 1000;
+
+    /**
+     * Fetches a user by ID using the cache.
+     * 
+     * @param userId the ID of the user to fetch
+     * @return a UserReference for the user, or null if not found
+     */
+    private UserReference fetchUserCached(UserId userId) {
+        String userIdStr = userId.id();
+
+        // Check if the user is already in the cache
+        if (userCache.containsKey(userIdStr)) {
+            return userCache.get(userIdStr);
+        }
+
+        // Fetch the user and add to cache
+        UserReference user = fetchUser(userId);
+        if (user != null) {
+            userCache.put(userIdStr, user);
+        }
+
+        return user;
+    }
+
+    /**
+     * Fetches multiple users by ID in a single batch operation.
+     * This reduces the number of database queries needed when loading many users.
+     * 
+     * @param userIds the list of user IDs to fetch
+     * @return a map of user IDs to UserReferences
+     */
+    private Map<String, UserReference> fetchUsers(List<UserId> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return new HashMap<>();
+        }
+
+        // Create a set of unique user IDs that aren't already in the cache
+        List<UserId> uniqueUserIds = userIds.stream()
+            .filter(id -> !userCache.containsKey(id.id()))
+            .distinct()
+            .toList();
+
+        if (uniqueUserIds.isEmpty()) {
+            // All users are already in the cache
+            Map<String, UserReference> result = new HashMap<>();
+            for (UserId userId : userIds) {
+                UserReference user = userCache.get(userId.id());
+                if (user != null) {
+                    result.put(userId.id(), user);
+                }
+            }
+            return result;
+        }
+
+        // Use the injected UserRepository
+        // Since UserRepository doesn't have a findAllById method, we'll use findAll and filter
+        List<com.belman.domain.user.UserBusiness> allUsers = userRepository.findAll();
+
+        // Filter to only the users we need
+        Set<String> uniqueUserIdStrings = uniqueUserIds.stream()
+            .map(UserId::id)
+            .collect(java.util.stream.Collectors.toSet());
+
+        List<com.belman.domain.user.UserBusiness> users = allUsers.stream()
+            .filter(user -> uniqueUserIdStrings.contains(user.getId().id()))
+            .toList();
+
+        // Add all fetched users to the cache
+        for (com.belman.domain.user.UserBusiness user : users) {
+            UserReference userRef = new UserReference(user.getId(), user.getUsername());
+            userCache.put(user.getId().id(), userRef);
+        }
+
+        // Create the result map
+        Map<String, UserReference> result = new HashMap<>();
+        for (UserId userId : userIds) {
+            UserReference user = userCache.get(userId.id());
+            if (user != null) {
+                result.put(userId.id(), user);
+            }
+        }
+
+        return result;
+    }
+
     private CustomerBusiness fetchCustomer(CustomerId customerId) {
         try {
-            // Get the CustomerRepository from the ServiceLocator
-            CustomerRepository customerRepository = ServiceLocator.getService(CustomerRepository.class);
-            // Use the CustomerRepository to find the customer by ID
+            // Use the injected CustomerRepository to find the customer by ID
             return customerRepository.findById(customerId);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error fetching customer: " + customerId.id(), e);
@@ -655,37 +860,162 @@ public class SqlOrderRepository implements OrderRepository {
         }
     }
 
+    /**
+     * Loads photos for a single order.
+     * Uses a cache to avoid repeated database queries.
+     * 
+     * @param orderBusiness the order to load photos for
+     */
     private void loadPhotos(OrderBusiness orderBusiness) {
+        String orderId = orderBusiness.getId().id();
+
+        // Check cache first
+        synchronized (photoIdCache) {
+            List<PhotoId> cachedPhotoIds = photoIdCache.get(orderId);
+            if (cachedPhotoIds != null) {
+                LOGGER.fine("Cache hit: Photo IDs found in cache for order ID: " + orderId);
+                for (PhotoId photoId : cachedPhotoIds) {
+                    orderBusiness.addPhotoId(photoId);
+                }
+                return;
+            }
+        }
+
+        LOGGER.fine("Cache miss: Photo IDs not found in cache for order ID: " + orderId);
         String sql = "SELECT photo_id FROM PHOTOS WHERE order_id = ?";
-        System.out.println("[DEBUG_LOG] SqlOrderRepository: Loading photos for order ID: " + orderBusiness.getId().id());
+        LOGGER.fine("Loading photos from database for order ID: " + orderId);
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, orderBusiness.getId().id());
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: Executing SQL: " + sql + " with order_id = " + orderBusiness.getId().id());
+            stmt.setString(1, orderId);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 int photoCount = 0;
+                List<PhotoId> photoIds = new ArrayList<>();
+
                 while (rs.next()) {
                     String photoIdStr = rs.getString("photo_id");
-                    System.out.println("[DEBUG_LOG] SqlOrderRepository: Found photo ID in database: " + photoIdStr);
 
                     if (photoIdStr != null && !photoIdStr.isEmpty()) {
                         PhotoId photoId = new PhotoId(photoIdStr);
                         orderBusiness.addPhotoId(photoId);
+                        photoIds.add(photoId);
                         photoCount++;
-                        System.out.println("[DEBUG_LOG] SqlOrderRepository: Added photo ID to order: " + photoIdStr);
-                    } else {
-                        System.out.println("[DEBUG_LOG] SqlOrderRepository: Skipping null or empty photo ID");
                     }
                 }
-                System.out.println("[DEBUG_LOG] SqlOrderRepository: Loaded " + photoCount + " photos for order ID: " + orderBusiness.getId().id());
+
+                // Cache the photo IDs
+                synchronized (photoIdCache) {
+                    photoIdCache.put(orderId, photoIds);
+                }
+
+                LOGGER.fine("Loaded " + photoCount + " photos for order ID: " + orderId);
             }
         } catch (SQLException e) {
-            System.out.println("[DEBUG_LOG] SqlOrderRepository: Error loading photo IDs: " + e.getMessage());
-            e.printStackTrace();
-            LOGGER.log(Level.SEVERE, "Error loading photo IDs for orderBusiness: " + orderBusiness.getId().id(), e);
+            LOGGER.log(Level.SEVERE, "Error loading photo IDs for order: " + orderId, e);
+        }
+    }
+
+    /**
+     * Loads photos for multiple orders in a single batch operation.
+     * This reduces the number of database queries needed when loading many orders.
+     * Uses cache where possible to avoid database queries.
+     * 
+     * @param orders the list of orders to load photos for
+     */
+    private void loadPhotosForOrders(List<OrderBusiness> orders) {
+        if (orders == null || orders.isEmpty()) {
+            return;
+        }
+
+        // Create a map of order IDs to orders for quick lookup
+        Map<String, OrderBusiness> orderMap = new HashMap<>();
+        List<String> orderIdsToLoad = new ArrayList<>();
+
+        // First check which orders already have photos in the cache
+        for (OrderBusiness order : orders) {
+            String orderId = order.getId().id();
+            orderMap.put(orderId, order);
+
+            // Check if photos for this order are in the cache
+            synchronized (photoIdCache) {
+                List<PhotoId> cachedPhotoIds = photoIdCache.get(orderId);
+                if (cachedPhotoIds != null) {
+                    // Use cached photo IDs
+                    LOGGER.fine("Cache hit: Using cached photo IDs for order " + orderId);
+                    for (PhotoId photoId : cachedPhotoIds) {
+                        order.addPhotoId(photoId);
+                    }
+                } else {
+                    // Need to load from database
+                    orderIdsToLoad.add(orderId);
+                }
+            }
+        }
+
+        // If all orders were in the cache, we're done
+        if (orderIdsToLoad.isEmpty()) {
+            LOGGER.fine("All photos for " + orders.size() + " orders were found in cache");
+            return;
+        }
+
+        // Build the SQL query for orders that need to be loaded from the database
+        StringBuilder orderIdList = new StringBuilder();
+        for (int i = 0; i < orderIdsToLoad.size(); i++) {
+            if (i > 0) {
+                orderIdList.append(",");
+            }
+            orderIdList.append("'").append(orderIdsToLoad.get(i)).append("'");
+        }
+
+        // Query to get all photos for the specified orders in one batch
+        String sql = "SELECT photo_id, order_id FROM PHOTOS WHERE order_id IN (" + orderIdList.toString() + ")";
+
+        LOGGER.fine("Batch loading photos for " + orderIdsToLoad.size() + " orders from database");
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            // Count photos loaded per order for logging
+            Map<String, Integer> photoCountByOrder = new HashMap<>();
+
+            // Map to collect photo IDs by order ID for caching
+            Map<String, List<PhotoId>> photoIdsByOrder = new HashMap<>();
+
+            while (rs.next()) {
+                String photoIdStr = rs.getString("photo_id");
+                String orderIdStr = rs.getString("order_id");
+
+                if (photoIdStr != null && !photoIdStr.isEmpty() && orderIdStr != null) {
+                    OrderBusiness order = orderMap.get(orderIdStr);
+                    if (order != null) {
+                        PhotoId photoId = new PhotoId(photoIdStr);
+                        order.addPhotoId(photoId);
+
+                        // Collect photo IDs for caching
+                        photoIdsByOrder.computeIfAbsent(orderIdStr, k -> new ArrayList<>()).add(photoId);
+
+                        // Update photo count for this order
+                        photoCountByOrder.put(orderIdStr, 
+                            photoCountByOrder.getOrDefault(orderIdStr, 0) + 1);
+                    }
+                }
+            }
+
+            // Update the cache with the loaded photo IDs
+            synchronized (photoIdCache) {
+                for (Map.Entry<String, List<PhotoId>> entry : photoIdsByOrder.entrySet()) {
+                    photoIdCache.put(entry.getKey(), entry.getValue());
+                }
+            }
+
+            // Log summary of photos loaded
+            LOGGER.fine("Batch loaded photos for " + orderIdsToLoad.size() + " orders from database. " +
+                       "Total photos: " + photoCountByOrder.values().stream().mapToInt(Integer::intValue).sum());
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error batch loading photos for orders: " + e.getMessage(), e);
         }
     }
 
@@ -694,11 +1024,93 @@ public class SqlOrderRepository implements OrderRepository {
 
     @Override
     public List<OrderBusiness> findBySpecification(Specification<OrderBusiness> spec) {
-        // For simplicity, we'll load all orders and filter in memory
-        // In a real implementation, this would translate the specification to SQL
-        return findAll().stream()
-                .filter(spec::isSatisfiedBy)
-                .toList();
+        // Check if the specification can be translated to SQL
+        if (spec instanceof com.belman.domain.specification.SqlSpecification) {
+            return findBySqlSpecification((com.belman.domain.specification.SqlSpecification<OrderBusiness>) spec);
+        }
+
+        // Fall back to in-memory filtering for non-SQL specifications
+        // But use pagination to avoid loading the entire database
+        List<OrderBusiness> allOrders = new ArrayList<>();
+        int page = 0;
+        int pageSize = 50; // Reduced page size for better memory efficiency
+        List<OrderBusiness> pageOfOrders;
+        int maxPages = 20; // Limit the number of pages to process to avoid excessive database queries
+        int processedPages = 0;
+
+        do {
+            pageOfOrders = findAll(page, pageSize);
+            List<OrderBusiness> matchingOrders = pageOfOrders.stream()
+                    .filter(spec::isSatisfiedBy)
+                    .toList();
+
+            allOrders.addAll(matchingOrders);
+
+            LOGGER.fine("Processed page " + page + ": found " + matchingOrders.size() + 
+                       " matching orders out of " + pageOfOrders.size());
+
+            page++;
+            processedPages++;
+
+            // Stop if we've processed the maximum number of pages or if we got fewer results than the page size
+            // (indicating we've reached the end of the data)
+        } while (!pageOfOrders.isEmpty() && pageOfOrders.size() == pageSize && processedPages < maxPages);
+
+        if (processedPages >= maxPages && !pageOfOrders.isEmpty()) {
+            LOGGER.warning("Reached maximum number of pages (" + maxPages + 
+                          ") when filtering by specification. Results may be incomplete.");
+        }
+
+        return allOrders;
+    }
+
+    /**
+     * Finds orders using a SQL specification.
+     * This method translates the specification to a SQL WHERE clause for efficient database filtering.
+     *
+     * @param sqlSpec the SQL specification
+     * @return a list of orders that satisfy the specification
+     */
+    private List<OrderBusiness> findBySqlSpecification(com.belman.domain.specification.SqlSpecification<OrderBusiness> sqlSpec) {
+        String whereClause = sqlSpec.toSqlClause();
+        List<Object> parameters = sqlSpec.getParameters();
+
+        String sql = "SELECT * FROM ORDERS";
+        if (whereClause != null && !whereClause.isEmpty()) {
+            sql += " WHERE " + whereClause;
+        }
+
+        List<OrderBusiness> orderBusinesses = new ArrayList<>();
+
+        LOGGER.info("Finding orders by SQL specification: " + whereClause);
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            // Set parameters
+            for (int i = 0; i < parameters.size(); i++) {
+                stmt.setObject(i + 1, parameters.get(i));
+            }
+
+            LOGGER.fine("Executing SQL query: " + sql);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    try {
+                        OrderBusiness order = mapResultSetToOrder(rs);
+                        loadPhotos(order);
+                        orderBusinesses.add(order);
+                    } catch (Exception e) {
+                        String orderId = rs.getString("order_id");
+                        LOGGER.log(Level.WARNING, "Error processing order " + orderId + ": " + e.getMessage(), e);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error finding orders by specification: " + e.getMessage(), e);
+        }
+
+        return orderBusinesses;
     }
 
     @Override

@@ -165,7 +165,7 @@ public class AssignedOrderViewModel extends BaseViewModel<AssignedOrderViewModel
 
                     // Update the UI properties
                     System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Updating UI properties with order data");
-                    orderNumber.set(order.getOrderNumber().toString());
+                    orderNumber.set(order.getOrderNumber().value());
                     System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Set orderNumber property: " + orderNumber.get());
 
                     // Use a placeholder for customer name since we don't have direct access to customer data
@@ -178,7 +178,7 @@ public class AssignedOrderViewModel extends BaseViewModel<AssignedOrderViewModel
                     System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Set productDescription property: " + productDescription.get());
 
                     // Set project name (placeholder)
-                    projectName.set("Project: " + order.getOrderNumber().toString());
+                    projectName.set("Project: " + order.getOrderNumber().value());
                     System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Set projectName property: " + projectName.get());
 
                     // Set location (placeholder)

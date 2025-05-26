@@ -4,12 +4,7 @@ import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRole;
 import com.belman.presentation.base.BaseController;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 /**
  * Controller for the User Management view.
@@ -24,13 +19,28 @@ public class UserManagementViewController extends BaseController<UserManagementV
     private Button searchButton;
 
     @FXML
-    private ListView<UserBusiness> usersListView;
+    private TableView<UserBusiness> userTable;
+
+    @FXML
+    private TableColumn<UserBusiness, String> usernameColumn;
+
+    @FXML
+    private TableColumn<UserBusiness, String> nameColumn;
+
+    @FXML
+    private TableColumn<UserBusiness, String> emailColumn;
+
+    @FXML
+    private TableColumn<UserBusiness, String> roleColumn;
+
+    @FXML
+    private TableColumn<UserBusiness, String> statusColumn;
+
+    @FXML
+    private TableColumn<UserBusiness, Void> actionsColumn;
 
     @FXML
     private ComboBox<UserRole> roleFilterComboBox;
-
-    @FXML
-    private Button addUserButton;
 
     @FXML
     private Button editUserButton;
@@ -39,7 +49,10 @@ public class UserManagementViewController extends BaseController<UserManagementV
     private Button deleteUserButton;
 
     @FXML
-    private ProgressIndicator progressIndicator;
+    private Button addUserButton;
+
+    @FXML
+    private Label totalUsersLabel;
 
     @FXML
     private Label errorLabel;
@@ -50,8 +63,42 @@ public class UserManagementViewController extends BaseController<UserManagementV
         searchField.textProperty().bindBidirectional(getViewModel().searchTextProperty());
         errorLabel.textProperty().bind(getViewModel().errorMessageProperty());
 
-        // Bind the users list to the view model
-        usersListView.setItems(getViewModel().getUsers());
+        // Update total users label
+        totalUsersLabel.setText("Total Users: " + getViewModel().getUsers().size());
+        getViewModel().getUsers().addListener((javafx.collections.ListChangeListener<UserBusiness>) c -> {
+            totalUsersLabel.setText("Total Users: " + getViewModel().getUsers().size());
+        });
+
+        // Bind the users table to the view model
+        userTable.setItems(getViewModel().getUsers());
+
+        // Set up cell value factories for the table columns
+        usernameColumn.setCellValueFactory(cellData -> 
+            new javafx.beans.property.SimpleStringProperty(cellData.getValue().getUsername().value()));
+
+        nameColumn.setCellValueFactory(cellData -> {
+            UserBusiness user = cellData.getValue();
+            String name = user.getName() != null ? 
+                user.getName().firstName() + " " + user.getName().lastName() : "";
+            return new javafx.beans.property.SimpleStringProperty(name);
+        });
+
+        emailColumn.setCellValueFactory(cellData -> 
+            new javafx.beans.property.SimpleStringProperty(
+                cellData.getValue().getEmail() != null ? cellData.getValue().getEmail().value() : ""));
+
+        roleColumn.setCellValueFactory(cellData -> {
+            UserBusiness user = cellData.getValue();
+            String roles = user.getRoles().stream()
+                    .map(Enum::name)
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("");
+            return new javafx.beans.property.SimpleStringProperty(roles);
+        });
+
+        statusColumn.setCellValueFactory(cellData -> 
+            new javafx.beans.property.SimpleStringProperty(
+                cellData.getValue().getApprovalState().isApproved() ? "Active" : "Inactive"));
 
         // Populate the role filter combo box
         roleFilterComboBox.setItems(getViewModel().getUserRoles());
@@ -60,21 +107,18 @@ public class UserManagementViewController extends BaseController<UserManagementV
 
         // Disable buttons when no user is selected
         editUserButton.disableProperty().bind(
-                usersListView.getSelectionModel().selectedItemProperty().isNull()
+                userTable.getSelectionModel().selectedItemProperty().isNull()
         );
         deleteUserButton.disableProperty().bind(
-                usersListView.getSelectionModel().selectedItemProperty().isNull()
+                userTable.getSelectionModel().selectedItemProperty().isNull()
         );
 
-        // Set up selection listener for the users list
-        usersListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+        // Set up selection listener for the users table
+        userTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 getViewModel().selectUser(newVal);
             }
         });
-
-        // Set up cell factory for the users list
-        usersListView.setCellFactory(listView -> new UserListCell());
     }
 
     /**
@@ -110,26 +154,11 @@ public class UserManagementViewController extends BaseController<UserManagementV
     }
 
     /**
-     * Custom list cell for displaying users.
+     * Handles the back button click.
      */
-    private static class UserListCell extends javafx.scene.control.ListCell<UserBusiness> {
-        @Override
-        protected void updateItem(UserBusiness item, boolean empty) {
-            super.updateItem(item, empty);
-
-            if (empty || item == null) {
-                setText(null);
-                setGraphic(null);
-            } else {
-                String username = item.getUsername().value();
-                String roles = item.getRoles().stream()
-                        .map(Enum::name)
-                        .reduce((a, b) -> a + ", " + b)
-                        .orElse("");
-                String status = item.getApprovalState().isApproved() ? "Active" : "Inactive";
-
-                setText(username + " (" + roles + ") - " + status);
-            }
-        }
+    @FXML
+    private void handleBack() {
+        com.belman.presentation.navigation.Router.navigateBack();
     }
+
 }

@@ -59,7 +59,8 @@ public class OrderManager {
                 currentOrder.set(order);
 
                 // Format the order number in a user-friendly way
-                String friendlyOrderNumber = order.getOrderNumber().toString().replace("ORD-", "Order #");
+                String orderNumberValue = order.getOrderNumber().value();
+                String friendlyOrderNumber = "Order #" + orderNumberValue;
                 orderNumber.set(friendlyOrderNumber);
 
                 return true;
@@ -96,7 +97,8 @@ public class OrderManager {
                         currentOrder.set(assignedOrder);
 
                         // Format the order number in a user-friendly way
-                        String friendlyOrderNumber = assignedOrder.getOrderNumber().toString().replace("ORD-", "Order #");
+                        String orderNumberValue = assignedOrder.getOrderNumber().value();
+                        String friendlyOrderNumber = "Order #" + orderNumberValue;
                         orderNumber.set(friendlyOrderNumber);
 
                         // Store the order in the WorkerFlowContext for future use
@@ -151,7 +153,7 @@ public class OrderManager {
             // Set the current order to the first order created by the user
             OrderBusiness userOrder = userOrders.get(0);
             currentOrder.set(userOrder);
-            orderNumber.set(userOrder.getOrderNumber().toString());
+            orderNumber.set(userOrder.getOrderNumber().value());
 
             // Store the order in the WorkerFlowContext for future use
             WorkerFlowContext.setCurrentOrder(userOrder);

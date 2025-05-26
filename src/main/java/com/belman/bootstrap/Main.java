@@ -28,7 +28,6 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import org.mindrot.jbcrypt.BCrypt;
 
 /**
  * Main application class for BelSign.
@@ -178,10 +177,16 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            // Create the scene with the root pane
-            Scene scene = new Scene(rootPane, 800, 600);
+            // Set stage style to TRANSPARENT for borderless window
+            primaryStage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
+
+            // Create the scene with the root pane - using larger dimensions for tablet-like appearance
+            Scene scene = new Scene(rootPane, 1024, 768);
             primaryStage.setScene(scene);
             primaryStage.setTitle("BelSign Photo Documentation");
+
+            // Make the scene background transparent to achieve borderless effect
+            scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
 
             // Initialize ViewStackManager with the root pane
             ViewStackManager.initWithRootPane(rootPane);
@@ -192,6 +197,12 @@ public class Main extends Application {
 
             // Load CSS (GUI)
             loadCss(scene);
+
+            // Center the stage on screen
+            primaryStage.centerOnScreen();
+
+            // Set stage to maximized for tablet-like fullscreen experience
+            primaryStage.setMaximized(true);
 
             // Show the stage
             primaryStage.show();
@@ -222,9 +233,9 @@ public class Main extends Application {
     private void applyPlatformStyling(Scene scene) {
         try {
             if (scene != null) {
-                // App is now mobile-only and Android-focused, so always apply smartphone styling
-                logger.debug("Applying smartphone styling (mobile-only mode)");
-                scene.getRoot().getStyleClass().add("smartphone");
+                // Apply tablet styling for desktop to make it tablet-like
+                logger.debug("Applying tablet styling for desktop");
+                scene.getRoot().getStyleClass().add("tablet");
             }
         } catch (Exception e) {
             logger.error("Platform styling failed: {}", e.getMessage(), e);
@@ -237,48 +248,67 @@ public class Main extends Application {
      * @param scene the JavaFX scene
      */
     private void loadCss(Scene scene) {
-        // Load main application CSS
-        var css = getClass().getResource("/com/belman/styles/app.css");
-        logger.debug("Loading app.css from: " + css);
+        // Load modular CSS files following industry standards for CSS organization
+        // This follows the recommended structure: base, components, layouts, views, utilities
 
-        if (css != null) {
-            scene.getStylesheets().add(css.toExternalForm());
-            logger.info("✅ Loaded app.css from: " + css);
+        // Load base.css (core styles and variables)
+        var baseCss = getClass().getResource("/com/belman/assets/styles/base.css");
+        logger.debug("Loading base.css from: " + baseCss);
+        if (baseCss != null) {
+            scene.getStylesheets().add(baseCss.toExternalForm());
+            logger.info("✅ Loaded base.css from: " + baseCss);
         } else {
-            logger.warn("⚠️ Could not find app.css at /com/belman/styles/app.css");
+            logger.error("❌ Could not find base.css at /com/belman/styles/base.css");
+            throw new RuntimeException("Required CSS file base.css not found");
         }
 
-        // Load Belman UI Style Guide CSS
-        var styleGuideCss = getClass().getResource("/com/belman/styles/belman-ui-styleguide.css");
-        logger.debug("Loading belman-ui-styleguide.css from: " + styleGuideCss);
-
-        if (styleGuideCss != null) {
-            scene.getStylesheets().add(styleGuideCss.toExternalForm());
-            logger.info("✅ Loaded belman-ui-styleguide.css from: " + styleGuideCss);
+        // Load components.css (reusable UI component styles)
+        var componentsCss = getClass().getResource("/com/belman/assets/styles/components.css");
+        logger.debug("Loading components.css from: " + componentsCss);
+        if (componentsCss != null) {
+            scene.getStylesheets().add(componentsCss.toExternalForm());
+            logger.info("✅ Loaded components.css from: " + componentsCss);
         } else {
-            logger.warn("⚠️ Could not find belman-ui-styleguide.css at /com/belman/styles/belman-ui-styleguide.css");
+            logger.error("❌ Could not find components.css at /com/belman/styles/components.css");
+            throw new RuntimeException("Required CSS file components.css not found");
         }
 
-        // Load Progressive Capture Dashboard CSS
-        var dashboardCss = getClass().getResource("/com/belman/styles/progressive-capture-dashboard.css");
-        logger.debug("Loading progressive-capture-dashboard.css from: " + dashboardCss);
-
-        if (dashboardCss != null) {
-            scene.getStylesheets().add(dashboardCss.toExternalForm());
-            logger.info("✅ Loaded progressive-capture-dashboard.css from: " + dashboardCss);
+        // Load layouts.css (layout patterns and containers)
+        var layoutsCss = getClass().getResource("/com/belman/assets/styles/layouts.css");
+        logger.debug("Loading layouts.css from: " + layoutsCss);
+        if (layoutsCss != null) {
+            scene.getStylesheets().add(layoutsCss.toExternalForm());
+            logger.info("✅ Loaded layouts.css from: " + layoutsCss);
         } else {
-            logger.warn("⚠️ Could not find progressive-capture-dashboard.css at /com/belman/styles/progressive-capture-dashboard.css");
+            logger.error("❌ Could not find layouts.css at /com/belman/styles/layouts.css");
+            throw new RuntimeException("Required CSS file layouts.css not found");
         }
 
-        // Load Photo Gallery CSS
-        var photoGalleryCss = getClass().getResource("/com/belman/styles/photo-gallery.css");
-        logger.debug("Loading photo-gallery.css from: " + photoGalleryCss);
-
-        if (photoGalleryCss != null) {
-            scene.getStylesheets().add(photoGalleryCss.toExternalForm());
-            logger.info("✅ Loaded photo-gallery.css from: " + photoGalleryCss);
+        // Load views.css (view-specific styles)
+        var viewsCss = getClass().getResource("/com/belman/assets/styles/views.css");
+        logger.debug("Loading views.css from: " + viewsCss);
+        if (viewsCss != null) {
+            scene.getStylesheets().add(viewsCss.toExternalForm());
+            logger.info("✅ Loaded views.css from: " + viewsCss);
         } else {
-            logger.warn("⚠️ Could not find photo-gallery.css at /com/belman/styles/photo-gallery.css");
+            logger.error("❌ Could not find views.css at /com/belman/styles/views.css");
+            throw new RuntimeException("Required CSS file views.css not found");
         }
+
+        // Load utilities.css (helper classes)
+        var utilitiesCss = getClass().getResource("/com/belman/assets/styles/utilities.css");
+        logger.debug("Loading utilities.css from: " + utilitiesCss);
+        if (utilitiesCss != null) {
+            scene.getStylesheets().add(utilitiesCss.toExternalForm());
+            logger.info("✅ Loaded utilities.css from: " + utilitiesCss);
+        } else {
+            logger.error("❌ Could not find utilities.css at /com/belman/styles/utilities.css");
+            throw new RuntimeException("Required CSS file utilities.css not found");
+        }
+
+        // PhotoCubeView styles have been integrated into views.css
+
+        // All required modular CSS files have been loaded successfully
+        logger.info("✅ All modular CSS files loaded successfully");
     }
 }

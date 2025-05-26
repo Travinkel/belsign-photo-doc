@@ -88,17 +88,23 @@ public class SplashViewController extends BaseController<SplashViewModel> {
                 return;
             }
 
-            // Make the logo smaller to signify loading
-            logoImage.setFitWidth(150);
-
-            // Create a flickering animation for the logo
-            Timeline flickerTimeline = new Timeline(
-                    new KeyFrame(Duration.ZERO, new KeyValue(logoImage.opacityProperty(), 1.0)),
-                    new KeyFrame(Duration.seconds(0.7), new KeyValue(logoImage.opacityProperty(), 0.5)),
-                    new KeyFrame(Duration.seconds(1.4), new KeyValue(logoImage.opacityProperty(), 1.0))
+            // Create a subtle pulsing animation for the logo
+            Timeline pulseTimeline = new Timeline(
+                    new KeyFrame(Duration.ZERO, 
+                        new KeyValue(logoImage.opacityProperty(), 1.0),
+                        new KeyValue(logoImage.scaleXProperty(), 1.0),
+                        new KeyValue(logoImage.scaleYProperty(), 1.0)),
+                    new KeyFrame(Duration.seconds(1.5), 
+                        new KeyValue(logoImage.opacityProperty(), 0.85),
+                        new KeyValue(logoImage.scaleXProperty(), 0.95),
+                        new KeyValue(logoImage.scaleYProperty(), 0.95)),
+                    new KeyFrame(Duration.seconds(3.0), 
+                        new KeyValue(logoImage.opacityProperty(), 1.0),
+                        new KeyValue(logoImage.scaleXProperty(), 1.0),
+                        new KeyValue(logoImage.scaleYProperty(), 1.0))
             );
-            flickerTimeline.setCycleCount(Timeline.INDEFINITE);
-            flickerTimeline.play();
+            pulseTimeline.setCycleCount(Timeline.INDEFINITE);
+            pulseTimeline.play();
 
             // Simulate loading with a timeline animation
             loadingTimeline = new Timeline(
@@ -108,8 +114,8 @@ public class SplashViewController extends BaseController<SplashViewModel> {
 
             loadingTimeline.setOnFinished(event -> {
                 try {
-                    // Stop the flickering animation
-                    flickerTimeline.stop();
+                    // Stop the pulsing animation
+                    pulseTimeline.stop();
 
                     // Navigate to the next view after splash screen finishes
                     Platform.runLater(() -> getViewModel().onLoadingComplete());
