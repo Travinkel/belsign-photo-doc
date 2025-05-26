@@ -1,13 +1,18 @@
 # PowerShell script to watch for changes in source files and automatically re-run quality assessment
 # This script monitors src/main/java and src/test/java directories for changes
 
+# Get the project root directory (parent of .junie/scripts)
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$projectRoot = Split-Path -Parent (Split-Path -Parent $scriptDir)
+
 Write-Host "Starting file watcher for quality assessment..."
+Write-Host "Project root: $projectRoot"
 Write-Host "Monitoring src/main/java and src/test/java for changes..."
 Write-Host "Press Ctrl+C to stop monitoring."
 
 # Create a FileSystemWatcher to monitor the src directory
 $watcher = New-Object System.IO.FileSystemWatcher
-$watcher.Path = "src"
+$watcher.Path = Join-Path -Path $projectRoot -ChildPath "src"
 $watcher.IncludeSubdirectories = $true
 $watcher.EnableRaisingEvents = $true
 
@@ -25,21 +30,22 @@ $action = {
     $path = $Event.SourceEventArgs.FullPath
     $changeType = $Event.SourceEventArgs.ChangeType
     $timeStamp = Get-Date
-    
+
     # Check if the file is in src/main/java or src/test/java
     if ($path -match "src[/\\](main|test)[/\\]java") {
         # Check if enough time has passed since the last run
         $timeSinceLastRun = ($timeStamp - $script:lastRunTime).TotalSeconds
         if ($timeSinceLastRun -ge $script:debouncePeriod) {
             $script:lastRunTime = $timeStamp
-            
+
             Write-Host ""
             Write-Host "File $path was $changeType at $timeStamp"
             Write-Host "Running quality assessment..."
-            
+
             # Run the quality assessment script
-            & .\run-quality-assessment.ps1
-            
+            $qualityScriptPath = Join-Path -Path $scriptDir -ChildPath "run-quality-assessment.ps1"
+            & $qualityScriptPath
+
             Write-Host "Quality assessment completed. Continuing to monitor for changes..."
             Write-Host "Press Ctrl+C to stop monitoring."
         }
@@ -55,7 +61,8 @@ $handlers += Register-ObjectEvent -InputObject $watcher -EventName Renamed -Acti
 
 # Run the initial quality assessment
 Write-Host "Running initial quality assessment..."
-& .\run-quality-assessment.ps1
+$qualityScriptPath = Join-Path -Path $scriptDir -ChildPath "run-quality-assessment.ps1"
+& $qualityScriptPath
 
 Write-Host "Initial quality assessment completed. Now monitoring for changes..."
 Write-Host "Press Ctrl+C to stop monitoring."
