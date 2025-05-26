@@ -81,6 +81,13 @@
                     <!-- Login button -->
                     <Button fx:id="loginButton" text="Log In" 
                            styleClass="btn, btn-primary"/>
+
+                    <!-- Camera icon -->
+                    <HBox alignment="CENTER_RIGHT" styleClass="camera-icon-container">
+                        <ImageView fitHeight="32" preserveRatio="true">
+                            <Image url="@/com/belman/assets/icons/camera.svg"/>
+                        </ImageView>
+                    </HBox>
                 </VBox>
 
                 <!-- Separator -->

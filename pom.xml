@@ -14,6 +14,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>21.0.2</javafx.version>
         <gluon.version>6.2.3</gluon.version>
+        <!-- Disable ANSI colors to prevent Surefire parsing errors -->
+        <jansi.passthrough>true</jansi.passthrough>
+        <style.color>never</style.color>
     </properties>
 
     <repositories>
@@ -108,6 +111,26 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- JUnit Platform dependencies for custom test reporting -->
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>1.10.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-engine</artifactId>
+            <version>1.10.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-commons</artifactId>
+            <version>1.10.0</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>com.gluonhq.attach</groupId>
             <artifactId>position</artifactId>
@@ -144,7 +167,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
-            <version>5.2.0</version>
+            <version>5.11.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -360,6 +383,51 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>jacoco-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>INSTRUCTION</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.70</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.60</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.70</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>METHOD</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.75</minimum>
+                                        </limit>
+                                        <limit>
+                                            <counter>CLASS</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.80</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                            <excludes>
+                                <exclude>**/bootstrap/**/*</exclude>
+                                <exclude>**/generated/**/*</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -398,6 +466,8 @@
                     <targetJdk>${maven.compiler.target}</targetJdk>
                     <excludes>
                         <exclude>**/generated/**/*.java</exclude>
+                        <!-- Exclude UI tests that require JavaFX -->
+                        <exclude>**/presentation/**/*Test.java</exclude>
                     </excludes>
                     <excludeRoots>
                         <excludeRoot>target/generated-sources</excludeRoot>
@@ -418,6 +488,114 @@
                         <goals>
                             <goal>check</goal>
                             <goal>cpd-check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- SonarQube plugin for code quality analysis -->
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.9.1.2184</version>
+                <configuration>
+                    <sonar.projectKey>belman-photo-doc</sonar.projectKey>
+                    <sonar.projectName>Belsign Photo Documentation</sonar.projectName>
+                    <sonar.host.url>http://localhost:9000</sonar.host.url>
+                    <sonar.login>${sonar.login}</sonar.login>
+                    <sonar.sources>src/main/java</sonar.sources>
+                    <sonar.tests>src/test/java</sonar.tests>
+                    <sonar.java.binaries>target/classes</sonar.java.binaries>
+                    <sonar.java.test.binaries>target/test-classes</sonar.java.test.binaries>
+                    <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+                    <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+                    <sonar.exclusions>**/bootstrap/**/*</sonar.exclusions>
+                </configuration>
+            </plugin>
+
+            <!-- Maven Surefire plugin for unit test execution and XML report generation -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <reportFormat>xml</reportFormat>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/Abstract*.java</exclude>
+                        <!-- Exclude UI tests that require JavaFX -->
+                        <exclude>**/presentation/**/*Test.java</exclude>
+                        <!-- Exclude integration tests (handled by Failsafe) -->
+                        <exclude>**/*IT.java</exclude>
+                    </excludes>
+                    <!-- Configure headless mode for JavaFX -->
+                    <argLine>
+                        -Djava.awt.headless=true
+                        -Dtestfx.robot=glass
+                        -Dtestfx.headless=true
+                        -Dprism.order=sw
+                        -Dprism.text=t2k
+                        -Dheadless.geometry=1280x720-32
+                        -Djansi.passthrough=true
+                        -Dstyle.color=never
+                        -Dorg.slf4j.simpleLogger.defaultLogLevel=info
+                        -Dorg.slf4j.simpleLogger.showDateTime=false
+                        -Dcom.zaxxer.hikari.pool.HikariPool=info
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                        --add-opens java.base/java.util=ALL-UNNAMED
+                        --add-opens java.base/java.lang.reflect=ALL-UNNAMED
+                        --add-opens java.base/java.text=ALL-UNNAMED
+                        --add-opens java.desktop/java.awt.font=ALL-UNNAMED
+                    </argLine>
+                    <useJUnitPlatform>true</useJUnitPlatform>
+                    <!-- Control forking behavior -->
+                    <forkCount>1</forkCount>
+                    <reuseForks>false</reuseForks>
+                    <!-- Disable ANSI colors in output -->
+                    <disableXmlReport>false</disableXmlReport>
+                    <useFile>true</useFile>
+                    <trimStackTrace>false</trimStackTrace>
+                </configuration>
+            </plugin>
+            <!-- Maven Failsafe plugin for integration test execution -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <includes>
+                        <include>**/*IT.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/Abstract*.java</exclude>
+                        <!-- Exclude UI tests that require JavaFX -->
+                        <exclude>**/presentation/**/*IT.java</exclude>
+                    </excludes>
+                    <!-- Configure headless mode for JavaFX -->
+                    <argLine>
+                        -Djava.awt.headless=true
+                        -Dtestfx.robot=glass
+                        -Dtestfx.headless=true
+                        -Dprism.order=sw
+                        -Dprism.text=t2k
+                        -Dheadless.geometry=1280x720-32
+                        -Djansi.passthrough=true
+                        -Dstyle.color=never
+                        -Dorg.slf4j.simpleLogger.defaultLogLevel=info
+                        -Dorg.slf4j.simpleLogger.showDateTime=false
+                        -Dcom.zaxxer.hikari.pool.HikariPool=info
+                    </argLine>
+                    <!-- Control forking behavior -->
+                    <forkCount>1</forkCount>
+                    <reuseForks>false</reuseForks>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
                         </goals>
                     </execution>
                 </executions>
