@@ -57,11 +57,7 @@
                     <CheckBox fx:id="enableAutoBackupCheckbox" text="Enable Automatic Backup"/>
                     <HBox spacing="10.0" alignment="CENTER_LEFT">
                         <Label text="Backup Interval:"/>
-                        <ComboBox fx:id="backupIntervalComboBox" promptText="Select interval">
-                            <String fx:value="Daily"/>
-                            <String fx:value="Weekly"/>
-                            <String fx:value="Monthly"/>
-                        </ComboBox>
+                        <ComboBox fx:id="backupIntervalComboBox" promptText="Select interval"/>
                     </HBox>
                     <HBox spacing="10.0" alignment="CENTER_LEFT">
                         <Label text="Backup Location:"/>

@@ -47,18 +47,90 @@
  *       6.2.4. Smartphone - Order View
  */
 
+/* 7. Admin View Styles */
+
+/* 7.1. Admin Dashboard */
+.admin-dashboard-view, .admin-view {
+    -fx-background-color: linear-gradient(to bottom, white, -belman-light-blue-20);
+    -fx-padding: 24px;
+    -fx-alignment: center-left;
+}
+
+.admin-dashboard-view .section, .admin-view .section {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-padding: 16px;
+    -fx-spacing: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 75, 136, 0.15), 8, 0, 0, 4);
+    -fx-alignment: center-left;
+}
+
+.admin-dashboard-view .section-title, .admin-view .section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+}
+
+.admin-dashboard-view .header, .admin-view .header {
+    -fx-padding: 10px 0;
+    -fx-border-color: transparent transparent -belman-light-blue-40 transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.admin-dashboard-view .title-label, .admin-view .title-label {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+}
+
+.admin-dashboard-view .action-button, .admin-view .action-button {
+    -fx-min-width: 200px;
+    -fx-alignment: center-left;
+}
+
+/* 7.2. System Settings View */
+.system-settings-view {
+    -fx-background-color: linear-gradient(to bottom, white, -belman-light-blue-20);
+    -fx-padding: 24px;
+    -fx-alignment: center-left;
+}
+
+.system-settings-view .section {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-padding: 16px;
+    -fx-spacing: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 75, 136, 0.15), 8, 0, 0, 4);
+    -fx-alignment: center-left;
+}
+
+/* 7.3. Tablet-friendly adjustments for admin views */
+@media (min-width: 768px) {
+    .admin-dashboard-view, .admin-view, .system-settings-view {
+        -fx-padding: 32px;
+    }
+
+    .admin-dashboard-view .section, .admin-view .section, .system-settings-view .section {
+        -fx-padding: 24px;
+    }
+
+    .admin-dashboard-view .title-label, .admin-view .title-label {
+        -fx-font-size: 28px;
+    }
+}
+
 /* 1. Splash View Styles */
 
 /* 1.1. Container and Layout */
 .splash-view {
     -fx-background-color: linear-gradient(to bottom, white, -belman-light-blue-20);
-    -fx-padding: -spacing-large;
+    -fx-padding: 24px;
     -fx-effect: innershadow(gaussian, rgba(0, 75, 136, 0.15), 12, 0, 0, 0);
 }
 
 .splash-container {
     -fx-background-color: white;
-    -fx-padding: -spacing-large;
+    -fx-padding: 24px;
     -fx-background-radius: 12px;
     -fx-border-color: rgba(127, 168, 197, 0.2);
     -fx-border-width: 1px;
@@ -74,7 +146,9 @@
 }
 
 .splash-background {
-    -fx-background-color: white;
+    -fx-background-color: linear-gradient(to bottom, white, -belman-light-blue-20);
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
 }
 
 /* 1.2. Logo and Branding - Tablet-friendly by default */
@@ -115,21 +189,21 @@
     -fx-font-size: -font-size-small;
     -fx-text-fill: -belman-grey-50;
     -fx-font-style: italic;
-    -fx-padding: 0 0 -spacing-small 0;
+    -fx-padding: 0 0 10px 0;
 }
 
 .message-label {
     -fx-font-size: -font-size-body;
     -fx-text-fill: -belman-blue;
     -fx-font-weight: normal;
-    -fx-padding: -spacing-small 0;
+    -fx-padding: 10px 0;
 }
 
 .footer-label {
     -fx-font-size: -font-size-small;
     -fx-text-fill: -belman-grey-50;
     -fx-font-style: italic;
-    -fx-padding: -spacing-small 0;
+    -fx-padding: 10px 0;
 }
 
 /* 2. Login View Styles */
@@ -238,7 +312,15 @@
     -fx-max-width: 300px;
 }
 
-/* 2.9. Separator */
+/* 2.9. Icon Containers */
+.camera-icon-container, .mobile-icon-container {
+    -fx-padding: 16px 0 0 0;
+    -fx-alignment: center-right;
+    -fx-min-height: 32px;
+    -fx-pref-height: 32px;
+}
+
+/* 2.10. Separator */
 .separator-container {
     -fx-padding: 0 16px;
     -fx-alignment: center;

@@ -1,6 +1,7 @@
 package com.belman.bootstrap;
 
 import com.belman.bootstrap.config.ApplicationBootstrapper;
+import com.belman.bootstrap.config.DevTestDataSeeder;
 import com.belman.bootstrap.config.StorageTypeConfig;
 import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.bootstrap.di.ServiceRegistry;
@@ -64,6 +65,22 @@ public class Main extends Application {
             logger.debug("Java version: " + System.getProperty("java.version"));
             logger.debug("JavaFX version: " + System.getProperty("javafx.version"));
             logger.debug("OS: " + System.getProperty("os.name") + " " + System.getProperty("os.version"));
+
+            // Check for memory mode command line argument
+            boolean forceMemory = false;
+            for (String arg : args) {
+                if (arg.equals("--memory") || arg.equals("-m")) {
+                    forceMemory = true;
+                    logger.info("Memory mode flag detected in command line arguments");
+                    break;
+                }
+            }
+
+            // Force memory mode if requested
+            if (forceMemory) {
+                logger.info("Forcing memory mode as requested by command line argument");
+                StorageTypeConfig.forceMemoryMode();
+            }
 
             // Initialize storage type configuration
             logger.debug("Initializing storage type configuration...");
@@ -206,6 +223,10 @@ public class Main extends Application {
 
             // Show the stage
             primaryStage.show();
+
+            // Seed test data for in-memory repositories
+            logger.info("Seeding test data for in-memory repositories");
+            DevTestDataSeeder.seedData();
 
             // Show the splash view (GUI)
             logger.info("Showing splash view");

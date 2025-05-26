@@ -36,6 +36,7 @@ public class DefaultOrderService implements OrderService {
         this.orderRepository = orderRepository;
         this.logger = loggerFactory.getLogger(DefaultOrderService.class);
         logger.info("DefaultOrderService initialized");
+        System.out.println("OrderRepo in SERVICE: " + orderRepository.hashCode());
     }
 
     @Override

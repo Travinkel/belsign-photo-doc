@@ -19,6 +19,15 @@ public class AdminDashboardViewController extends BaseController<AdminDashboardV
     private Button manageUsersButton;
 
     @FXML
+    private Button backupButton;
+
+    @FXML
+    private Button exportButton;
+
+    @FXML
+    private Button settingsButton;
+
+    @FXML
     private ProgressIndicator progressIndicator;
 
     @FXML
@@ -45,5 +54,29 @@ public class AdminDashboardViewController extends BaseController<AdminDashboardV
     @FXML
     private void handleLogout() {
         getViewModel().logout();
+    }
+
+    /**
+     * Handles the backup database button click.
+     */
+    @FXML
+    private void handleBackupDatabase() {
+        getViewModel().backupDatabase();
+    }
+
+    /**
+     * Handles the export reports button click.
+     */
+    @FXML
+    private void handleExportReports() {
+        getViewModel().exportReports();
+    }
+
+    /**
+     * Handles the system settings button click.
+     */
+    @FXML
+    private void handleSystemSettings() {
+        getViewModel().openSystemSettings();
     }
 }

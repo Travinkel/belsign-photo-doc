@@ -4,6 +4,7 @@ import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.common.di.Inject;
 import com.belman.common.session.SessionContext;
 import com.belman.domain.order.OrderBusiness;
+import com.belman.domain.order.OrderStatus;
 import com.belman.domain.photo.PhotoTemplate;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.user.UserReference;
@@ -116,11 +117,20 @@ public class AssignedOrderViewModel extends BaseViewModel<AssignedOrderViewModel
 
                         userOrders = orders.stream()
                             .filter(o -> {
-                                boolean isAssigned = o.getAssignedTo() != null && 
-                                                    o.getAssignedTo().id().id().equals(user.getId().id());
+                                if (o.getAssignedTo() == null) {
+                                    return false;
+                                }
+
+                                String orderAssignedToId = o.getAssignedTo().id().id();
+                                String userId = user.getId().id();
+
+                                // Compare case-insensitive to handle UUID case differences
+                                boolean isAssigned = orderAssignedToId.equalsIgnoreCase(userId);
+
                                 System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Order " + o.getId().id() + 
-                                    " assigned to " + (o.getAssignedTo() != null ? o.getAssignedTo().id().id() : "null") + 
+                                    " assigned to " + orderAssignedToId + 
                                     " - matches current user: " + isAssigned);
+
                                 return isAssigned;
                             })
                             .toList();
@@ -129,8 +139,15 @@ public class AssignedOrderViewModel extends BaseViewModel<AssignedOrderViewModel
                         if (!userOrders.isEmpty()) {
                             statusMessage.set("Production user: Showing assigned orders (" + userOrders.size() + " total)");
                         }
+                    } else if (user.getRoles().contains(UserRole.QA)) {
+                        // For QA users, show orders with status COMPLETED that need approval
+                        System.out.println("[DEBUG_LOG] AssignedOrderViewModel: QA user - showing orders that need approval");
+                        userOrders = orders.stream()
+                            .filter(o -> o.getStatus() == OrderStatus.COMPLETED)
+                            .toList();
+                        System.out.println("[DEBUG_LOG] AssignedOrderViewModel: After filtering, found " + userOrders.size() + " COMPLETED orders for QA user");
                     } else {
-                        // For other users (QA, Admin), filter orders for the current user
+                        // For other users (Admin), filter orders for the current user
                         System.out.println("[DEBUG_LOG] AssignedOrderViewModel: Regular user, filtering orders for current user: " + user.getId().id());
                         userOrders = orders.stream()
                             .filter(o -> {

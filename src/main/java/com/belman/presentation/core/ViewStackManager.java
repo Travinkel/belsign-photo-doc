@@ -378,6 +378,9 @@ public class ViewStackManager {
         // Register the new User Management view
         registerView("UserManagementView", new com.belman.presentation.usecases.admin.usermanagement.UserManagementViewFactory(viewDependencies));
 
+        // Register the System Settings view
+        registerView("SystemSettingsView", new com.belman.presentation.usecases.admin.settings.SystemSettingsViewFactory(viewDependencies));
+
         // Register the QA dashboard view (archived version)
         // registerView("QADashboardView", new QADashboardViewFactory(viewDependencies));
 

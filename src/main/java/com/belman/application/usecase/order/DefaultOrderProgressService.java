@@ -52,12 +52,21 @@ public class DefaultOrderProgressService implements OrderProgressService {
         logger.debug("Filtering for orders assigned to worker");
         List<OrderBusiness> assignedOrders = allOrders.stream()
                 .filter(order -> {
-                    boolean isAssigned = order.getAssignedTo() != null && 
-                                        order.getAssignedTo().id().id().equals(worker.getId().id());
+                    if (order.getAssignedTo() == null) {
+                        return false;
+                    }
+
+                    String orderAssignedToId = order.getAssignedTo().id().id();
+                    String workerId = worker.getId().id();
+
+                    // Compare case-insensitive to handle UUID case differences
+                    boolean isAssigned = orderAssignedToId.equalsIgnoreCase(workerId);
+
                     logger.trace("Order {} assigned to: {}, matches worker: {}", 
                                 order.getId().id(), 
-                                (order.getAssignedTo() != null ? order.getAssignedTo().id().id() : "null"), 
+                                orderAssignedToId, 
                                 isAssigned);
+
                     return isAssigned;
                 })
                 .collect(Collectors.toList());
@@ -66,16 +75,12 @@ public class DefaultOrderProgressService implements OrderProgressService {
 
         if (assignedOrders.isEmpty()) {
             logger.debug("No assigned orders found for worker");
-            System.out.println("[DEBUG_LOG] No assigned orders found for worker: " + worker.getUsername().value() + " (ID: " + worker.getId().id() + ")");
             return Optional.empty();
         } else {
             OrderBusiness assignedOrder = assignedOrders.get(0);
             String orderNumber = assignedOrder.getOrderNumber() != null ? assignedOrder.getOrderNumber().value() : "null";
             logger.debug("Returning first assigned order: {}, Number: {}", 
                         assignedOrder.getId().id(), orderNumber);
-            System.out.println("[DEBUG_LOG] Retrieved assigned order for worker: " + worker.getUsername().value() 
-                + " - Order ID: " + assignedOrder.getId().id() 
-                + ", Order Number: " + orderNumber);
             return Optional.of(assignedOrder);
         }
     }

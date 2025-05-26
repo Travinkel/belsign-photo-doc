@@ -80,7 +80,7 @@ public class OrderAssignmentProcessTest {
         nonProductionUser.addRole(UserRole.QA); // Only QA role, not PRODUCTION
 
         // Create a test order
-        order = createOrder("order-1", "ORD-001", OrderStatus.PENDING, adminUser);
+        order = createOrder("order-1", "06/23-123456-12345678", OrderStatus.PENDING, adminUser);
 
         // Set up the repository mock to return the test order
         when(orderRepository.findById(any(OrderId.class))).thenReturn(Optional.of(order));

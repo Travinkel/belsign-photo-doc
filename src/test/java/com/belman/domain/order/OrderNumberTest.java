@@ -10,9 +10,9 @@ public class OrderNumberTest {
 
     @Test
     public void testConstructorWithValidFormat() {
-        // Test with the format (MM/YY-CUSTOMER-SEQUENCE)
-        OrderNumber orderNumber = new OrderNumber("01/23-123456-12345678");
-        assertEquals("01/23-123456-12345678", orderNumber.value());
+        // Test with the format (ORD-XX-YYMMDD-ZZZ-NNNN)
+        OrderNumber orderNumber = new OrderNumber("ORD-78-230625-PIP-0003");
+        assertEquals("ORD-78-230625-PIP-0003", orderNumber.value());
     }
 
     @Test
@@ -22,27 +22,33 @@ public class OrderNumberTest {
             new OrderNumber("INVALID-FORMAT");
         });
 
-        // Test with the legacy format (should now be invalid)
+        // Test with the old format (should now be invalid)
         assertThrows(IllegalArgumentException.class, () -> {
-            new OrderNumber("ORD-01-230701-WLD-0001");
+            new OrderNumber("01/23-123456-12345678");
         });
     }
 
     @Test
-    public void testGetMonthYear() {
-        OrderNumber orderNumber = new OrderNumber("01/23-123456-12345678");
-        assertEquals("01/23", orderNumber.getMonthYear());
+    public void testGetProjectIdentifier() {
+        OrderNumber orderNumber = new OrderNumber("ORD-78-230625-PIP-0003");
+        assertEquals("78", orderNumber.getProjectIdentifier());
     }
 
     @Test
-    public void testGetCustomerIdentifier() {
-        OrderNumber orderNumber = new OrderNumber("01/23-123456-12345678");
-        assertEquals("123456", orderNumber.getCustomerIdentifier());
+    public void testGetDateCode() {
+        OrderNumber orderNumber = new OrderNumber("ORD-78-230625-PIP-0003");
+        assertEquals("230625", orderNumber.getDateCode());
+    }
+
+    @Test
+    public void testGetProjectCode() {
+        OrderNumber orderNumber = new OrderNumber("ORD-78-230625-PIP-0003");
+        assertEquals("PIP", orderNumber.getProjectCode());
     }
 
     @Test
     public void testGetSequenceNumber() {
-        OrderNumber orderNumber = new OrderNumber("01/23-123456-12345678");
-        assertEquals("12345678", orderNumber.getSequenceNumber());
+        OrderNumber orderNumber = new OrderNumber("ORD-78-230625-PIP-0003");
+        assertEquals("0003", orderNumber.getSequenceNumber());
     }
 }

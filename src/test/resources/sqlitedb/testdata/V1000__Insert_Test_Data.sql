@@ -25,9 +25,9 @@ VALUES
 -- Insert test orders
 INSERT INTO ORDERS (order_id, order_number, customer_id, created_by, created_at, modified_at, status, product_description, delivery_address, delivery_date)
 VALUES
-    ('77777777-7777-7777-7777-777777777777', 'ORD-001-TEST-WLD-0001', '44444444-4444-4444-4444-444444444444', '11111111-1111-1111-1111-111111111111', datetime('now'), NULL, 'PENDING', 'Welding work on expansion joint', '123 Main St, Anytown, USA', date('now', '+30 days')),
-    ('88888888-8888-8888-8888-888888888888', 'ORD-002-TEST-EXP-0002', '55555555-5555-5555-5555-555555555555', '11111111-1111-1111-1111-111111111111', datetime('now'), NULL, 'IN_PROGRESS', 'Expansion joint assembly', '456 Tech Blvd, Innovation City, USA', date('now', '+45 days')),
-    ('99999999-9999-9999-9999-999999999999', 'ORD-003-TEST-PIP-0003', '66666666-6666-6666-6666-666666666666', '11111111-1111-1111-1111-111111111111', datetime('now'), NULL, 'COMPLETED', 'Pipe end-cap inspection', '789 Residential Ave, Hometown, USA', date('now', '+15 days'));
+    ('77777777-7777-7777-7777-777777777777', '07/23-444444-12345001', '44444444-4444-4444-4444-444444444444', '11111111-1111-1111-1111-111111111111', datetime('now'), NULL, 'PENDING', 'Welding work on expansion joint', '123 Main St, Anytown, USA', date('now', '+30 days')),
+    ('88888888-8888-8888-8888-888888888888', '07/23-555555-12345002', '55555555-5555-5555-5555-555555555555', '11111111-1111-1111-1111-111111111111', datetime('now'), NULL, 'IN_PROGRESS', 'Expansion joint assembly', '456 Tech Blvd, Innovation City, USA', date('now', '+45 days')),
+    ('99999999-9999-9999-9999-999999999999', '07/23-666666-12345003', '66666666-6666-6666-6666-666666666666', '11111111-1111-1111-1111-111111111111', datetime('now'), NULL, 'COMPLETED', 'Pipe end-cap inspection', '789 Residential Ave, Hometown, USA', date('now', '+15 days'));
 
 -- Update orders to assign them to production workers
 UPDATE ORDERS SET assigned_to = '22222222-2222-2222-2222-222222222222' WHERE order_id = '77777777-7777-7777-7777-777777777777';

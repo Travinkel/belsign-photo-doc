@@ -108,7 +108,7 @@ public class PhotoCubeFeatureTest {
 
         // Create an order using the factory method
         testOrder = OrderBusiness.createNew(
-                new OrderNumber("ORD-12345"),
+                new OrderNumber("07/23-123456-12345678"),
                 testUser
         );
 

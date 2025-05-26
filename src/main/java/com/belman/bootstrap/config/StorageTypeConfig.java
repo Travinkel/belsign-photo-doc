@@ -15,7 +15,7 @@ public class StorageTypeConfig {
     public static final String ENV_STORAGE_TYPE = "BELSIGN_STORAGE_TYPE";
     // Changed default from "memory" to "sqlite" to ensure database migrations run and tables are created
     // This fixes the "no such table: USERS" error when trying to authenticate
-    private static final String DEFAULT_STORAGE_TYPE = "sqlite";
+    private static final String DEFAULT_STORAGE_TYPE = "memory"; // Changed default to "memory" to ensure in-memory repositories are used by default
 
     public enum StorageType {
         MEMORY,
@@ -25,6 +25,7 @@ public class StorageTypeConfig {
 
     private static StorageType storageType;
     private static boolean initialized = false;
+    private static boolean forceMemoryMode = false; // Flag to force memory mode regardless of environment variable
 
     /**
      * Resets the storage type configuration.
@@ -47,6 +48,15 @@ public class StorageTypeConfig {
         }
 
         logger.debug("Initializing storage type configuration...");
+
+        // If force memory mode is enabled, use MEMORY storage type
+        if (forceMemoryMode) {
+            logger.info("Force memory mode is enabled, using MEMORY storage type");
+            storageType = StorageType.MEMORY;
+            initialized = true;
+            logger.startup("🗄️ Storage type: " + storageType + " (FORCED)");
+            return;
+        }
 
         // Check environment variable first
         String storageTypeStr = System.getenv(ENV_STORAGE_TYPE);
@@ -140,5 +150,16 @@ public class StorageTypeConfig {
      */
     public static boolean isSqlServerMode() {
         return getStorageType() == StorageType.SQLSERVER;
+    }
+
+    /**
+     * Forces the application to use memory mode regardless of the environment variable.
+     * This method should be called before the StorageTypeConfig is initialized.
+     */
+    public static void forceMemoryMode() {
+        forceMemoryMode = true;
+        // Reset initialization state to force re-initialization
+        reset();
+        logger.info("Memory mode forced. Application will use in-memory repositories.");
     }
 }

@@ -74,6 +74,7 @@ public class SplashViewController extends BaseController<SplashViewModel> {
 
     /**
      * Initializes the loading animation with a timeline.
+     * Uses modern JavaFX animation techniques with interpolators for smoother animations.
      */
     private void initializeLoadingAnimation() {
         try {
@@ -88,28 +89,44 @@ public class SplashViewController extends BaseController<SplashViewModel> {
                 return;
             }
 
-            // Create a subtle pulsing animation for the logo
+            // Create a more sophisticated pulsing animation for the logo
+            // Using Interpolator.EASE_BOTH for smoother animation
             Timeline pulseTimeline = new Timeline(
                     new KeyFrame(Duration.ZERO, 
-                        new KeyValue(logoImage.opacityProperty(), 1.0),
-                        new KeyValue(logoImage.scaleXProperty(), 1.0),
-                        new KeyValue(logoImage.scaleYProperty(), 1.0)),
-                    new KeyFrame(Duration.seconds(1.5), 
-                        new KeyValue(logoImage.opacityProperty(), 0.85),
-                        new KeyValue(logoImage.scaleXProperty(), 0.95),
-                        new KeyValue(logoImage.scaleYProperty(), 0.95)),
-                    new KeyFrame(Duration.seconds(3.0), 
-                        new KeyValue(logoImage.opacityProperty(), 1.0),
-                        new KeyValue(logoImage.scaleXProperty(), 1.0),
-                        new KeyValue(logoImage.scaleYProperty(), 1.0))
+                        new KeyValue(logoImage.opacityProperty(), 1.0, javafx.animation.Interpolator.EASE_BOTH),
+                        new KeyValue(logoImage.scaleXProperty(), 1.0, javafx.animation.Interpolator.EASE_BOTH),
+                        new KeyValue(logoImage.scaleYProperty(), 1.0, javafx.animation.Interpolator.EASE_BOTH)),
+                    new KeyFrame(Duration.seconds(1.8), 
+                        new KeyValue(logoImage.opacityProperty(), 0.9, javafx.animation.Interpolator.EASE_BOTH),
+                        new KeyValue(logoImage.scaleXProperty(), 0.97, javafx.animation.Interpolator.EASE_BOTH),
+                        new KeyValue(logoImage.scaleYProperty(), 0.97, javafx.animation.Interpolator.EASE_BOTH)),
+                    new KeyFrame(Duration.seconds(3.6), 
+                        new KeyValue(logoImage.opacityProperty(), 1.0, javafx.animation.Interpolator.EASE_BOTH),
+                        new KeyValue(logoImage.scaleXProperty(), 1.0, javafx.animation.Interpolator.EASE_BOTH),
+                        new KeyValue(logoImage.scaleYProperty(), 1.0, javafx.animation.Interpolator.EASE_BOTH))
             );
             pulseTimeline.setCycleCount(Timeline.INDEFINITE);
             pulseTimeline.play();
 
+            // Update message during loading phases
+            Timeline messageTimeline = new Timeline(
+                    new KeyFrame(Duration.ZERO, e -> getViewModel().setMessage("Initializing...")),
+                    new KeyFrame(Duration.seconds(0.8), e -> getViewModel().setMessage("Loading resources...")),
+                    new KeyFrame(Duration.seconds(1.6), e -> getViewModel().setMessage("Preparing application..."))
+            );
+            messageTimeline.play();
+
             // Simulate loading with a timeline animation
+            // Using Interpolator.EASE_OUT for a more natural loading progress
             loadingTimeline = new Timeline(
-                    new KeyFrame(Duration.ZERO, new KeyValue(loadingProgress.progressProperty(), 0)),
-                    new KeyFrame(Duration.seconds(2.5), new KeyValue(loadingProgress.progressProperty(), 1))
+                    new KeyFrame(Duration.ZERO, 
+                        new KeyValue(loadingProgress.progressProperty(), 0, javafx.animation.Interpolator.EASE_OUT)),
+                    new KeyFrame(Duration.seconds(0.8), 
+                        new KeyValue(loadingProgress.progressProperty(), 0.3, javafx.animation.Interpolator.EASE_BOTH)),
+                    new KeyFrame(Duration.seconds(1.6), 
+                        new KeyValue(loadingProgress.progressProperty(), 0.7, javafx.animation.Interpolator.EASE_BOTH)),
+                    new KeyFrame(Duration.seconds(2.8), 
+                        new KeyValue(loadingProgress.progressProperty(), 1.0, javafx.animation.Interpolator.EASE_IN))
             );
 
             loadingTimeline.setOnFinished(event -> {
@@ -117,8 +134,14 @@ public class SplashViewController extends BaseController<SplashViewModel> {
                     // Stop the pulsing animation
                     pulseTimeline.stop();
 
+                    // Final message
+                    getViewModel().setMessage("Ready!");
+
                     // Navigate to the next view after splash screen finishes
-                    Platform.runLater(() -> getViewModel().onLoadingComplete());
+                    // Small delay for better user experience
+                    Timeline delayTimeline = new Timeline(new KeyFrame(Duration.seconds(0.5)));
+                    delayTimeline.setOnFinished(e -> Platform.runLater(() -> getViewModel().onLoadingComplete()));
+                    delayTimeline.play();
                 } catch (Exception e) {
                     handleNavigationError(e);
                 }

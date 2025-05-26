@@ -26,7 +26,7 @@
         <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="header">
             <Label text="Admin Dashboard" styleClass="title-label"/>
             <HBox HBox.hgrow="ALWAYS" />
-            <Button fx:id="logoutButton" text="Logout" styleClass="logout-button" onAction="#handleLogout"/>
+            <Button fx:id="logoutButton" text="Logout" styleClass="logout-button, secondary-button" onAction="#handleLogout"/>
         </HBox>
 
         <!-- Dashboard Content -->
@@ -39,7 +39,7 @@
                 <!-- User Management Section -->
                 <VBox spacing="10.0" styleClass="section">
                     <Label text="User Management" styleClass="section-title"/>
-                    <Button fx:id="manageUsersButton" text="Manage Users" styleClass="action-button" onAction="#handleManageUsers"/>
+                    <Button fx:id="manageUsersButton" text="Manage Users" styleClass="action-button, primary-button" onAction="#handleManageUsers"/>
                 </VBox>
 
                 <!-- System Statistics Section -->
@@ -63,9 +63,9 @@
                 <!-- System Actions Section -->
                 <VBox spacing="10.0" styleClass="section">
                     <Label text="System Actions" styleClass="section-title"/>
-                    <Button fx:id="backupButton" text="Backup Database" styleClass="action-button"/>
-                    <Button fx:id="exportButton" text="Export Reports" styleClass="action-button"/>
-                    <Button fx:id="settingsButton" text="System Settings" styleClass="action-button"/>
+                    <Button fx:id="backupButton" text="Backup Database" styleClass="action-button, secondary-button" onAction="#handleBackupDatabase"/>
+                    <Button fx:id="exportButton" text="Export Reports" styleClass="action-button, secondary-button" onAction="#handleExportReports"/>
+                    <Button fx:id="settingsButton" text="System Settings" styleClass="action-button, secondary-button" onAction="#handleSystemSettings"/>
                 </VBox>
             </VBox>
         </ScrollPane>

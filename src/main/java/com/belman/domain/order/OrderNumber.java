@@ -8,11 +8,12 @@ import java.util.Random;
 
 /**
  * Value object representing an order number in the BelSign system.
- * OrderBusiness numbers follow a specific format: "MM/YY-CUSTOMER-SEQUENCE"
+ * OrderBusiness numbers follow a specific format: "ORD-XX-YYMMDD-ZZZ-NNNN"
  * where:
- * - MM/YY is the month and year when the order was created
- * - CUSTOMER is a customer-specific identifier (often numeric)
- * - SEQUENCE is a unique sequence number for that month
+ * - XX is a project identifier
+ * - YYMMDD is the date in year-month-day format
+ * - ZZZ is a project code
+ * - NNNN is a sequence number
  * <p>
  * This is specific to the order bounded context.
  */
@@ -29,59 +30,74 @@ public record OrderNumber(String value) implements ValueObject {
             throw new IllegalArgumentException("OrderBusiness number must not be null or blank");
         }
 
-        // Only accept the new format (MM/YY-CUSTOMER-SEQUENCE)
-        if (!value.matches("\\d{2}/\\d{2}-\\d{6}-\\d{8}")) {
+        // Only accept the new format (ORD-XX-YYMMDD-ZZZ-NNNN)
+        if (!value.matches("ORD-\\d{2}-\\d{6}-[A-Z]{3}-\\d{4}")) {
             throw new IllegalArgumentException("Invalid order number format: " + value +
-                                               ". Expected format: MM/YY-CUSTOMER-SEQUENCE");
+                                               ". Expected format: ORD-XX-YYMMDD-ZZZ-NNNN");
         }
     }
 
     /**
-     * Generates a new order number based on the current date and a customer identifier.
+     * Generates a new order number based on the current date and a project code.
      *
-     * @param customerId the customer identifier (typically a 6-digit number)
+     * @param projectCode the project code (typically a 3-letter code)
      * @return a new OrderNumber
      */
-    public static OrderNumber generate(String customerId) {
-        // Format: MM/YY-CUSTOMER-SEQUENCE
+    public static OrderNumber generate(String projectCode) {
+        // Format: ORD-XX-YYMMDD-ZZZ-NNNN
         LocalDate now = LocalDate.now();
-        String monthYear = now.format(DateTimeFormatter.ofPattern("MM/yy"));
+        String dateStr = now.format(DateTimeFormatter.ofPattern("yyMMdd"));
 
-        // Ensure customerId is padded to 6 digits
-        String paddedCustomerId = String.format("%06d", Integer.parseInt(customerId));
+        // Default project identifier to 78 as per the example
+        String projectId = "78";
 
-        // Generate a random 8-digit sequence number
+        // Ensure project code is uppercase and exactly 3 letters
+        String formattedProjectCode = projectCode.toUpperCase();
+        if (formattedProjectCode.length() != 3) {
+            formattedProjectCode = String.format("%-3s", formattedProjectCode).replace(' ', 'X').substring(0, 3);
+        }
+
+        // Generate a random 4-digit sequence number
         // In a real system, this would be managed by a sequence generator
         Random random = new Random();
-        String sequence = String.format("%08d", random.nextInt(100000000));
+        String sequence = String.format("%04d", random.nextInt(10000));
 
-        return new OrderNumber(monthYear + "-" + paddedCustomerId + "-" + sequence);
+        return new OrderNumber("ORD-" + projectId + "-" + dateStr + "-" + formattedProjectCode + "-" + sequence);
     }
 
     /**
-     * Extracts the month and year portion of the order number.
+     * Extracts the project identifier portion of the order number.
      *
-     * @return the month and year portion (e.g., "01/23")
+     * @return the project identifier portion (e.g., "78")
      */
-    public String getMonthYear() {
-        return value.substring(0, 5);
+    public String getProjectIdentifier() {
+        return value.substring(4, 6);
     }
 
     /**
-     * Extracts the customer identifier portion of the order number.
+     * Extracts the date portion of the order number.
      *
-     * @return the customer identifier portion (e.g., "123456")
+     * @return the date portion (e.g., "230625")
      */
-    public String getCustomerIdentifier() {
-        return value.substring(6, 12);
+    public String getDateCode() {
+        return value.substring(7, 13);
+    }
+
+    /**
+     * Extracts the project code portion of the order number.
+     *
+     * @return the project code portion (e.g., "PIP")
+     */
+    public String getProjectCode() {
+        return value.substring(14, 17);
     }
 
     /**
      * Extracts the sequence number portion of the order number.
      *
-     * @return the sequence number portion (e.g., "12345678")
+     * @return the sequence number portion (e.g., "0003")
      */
     public String getSequenceNumber() {
-        return value.substring(13);
+        return value.substring(18);
     }
 }

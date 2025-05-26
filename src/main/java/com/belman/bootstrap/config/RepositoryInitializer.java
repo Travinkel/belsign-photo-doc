@@ -365,7 +365,7 @@ public class RepositoryInitializer {
                     // Create and save test orders
                     try {
                         // Order 1 - Check if it already exists
-                        String orderNumber1 = "ORD-12-230615-WLD-0001";
+                        String orderNumber1 = "ORD-78-230625-PIP-0001";
                         if (!orderExists(orderRepository, orderNumber1)) {
                             // Create order 1
                             var order1 = createTestOrder(
@@ -394,7 +394,7 @@ public class RepositoryInitializer {
                         }
 
                         // Order 2 - Check if it already exists
-                        String orderNumber2 = "ORD-45-230620-EXP-0002";
+                        String orderNumber2 = "ORD-78-230625-PIP-0002";
                         if (!orderExists(orderRepository, orderNumber2)) {
                             // Create order 2
                             var order2 = createTestOrder(

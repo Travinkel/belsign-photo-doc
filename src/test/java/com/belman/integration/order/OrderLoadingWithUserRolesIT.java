@@ -85,10 +85,10 @@ public class OrderLoadingWithUserRolesIT {
         productionUser = createUserWithRole("production-user-it", UserRole.PRODUCTION);
 
         // Create test orders with different statuses
-        pendingOrder = createOrder("order-it-1", "ORD-01-230701-ABC-0001", OrderStatus.PENDING, adminUser);
-        inProgressOrder = createOrder("order-it-2", "ORD-02-230701-ABC-0002", OrderStatus.IN_PROGRESS, adminUser);
-        completedOrder = createOrder("order-it-3", "ORD-03-230701-ABC-0003", OrderStatus.COMPLETED, adminUser);
-        approvedOrder = createOrder("order-it-4", "ORD-04-230701-ABC-0004", OrderStatus.APPROVED, adminUser);
+        pendingOrder = createOrder("order-it-1", "07/23-123001-12345001", OrderStatus.PENDING, adminUser);
+        inProgressOrder = createOrder("order-it-2", "07/23-123002-12345002", OrderStatus.IN_PROGRESS, adminUser);
+        completedOrder = createOrder("order-it-3", "07/23-123003-12345003", OrderStatus.COMPLETED, adminUser);
+        approvedOrder = createOrder("order-it-4", "07/23-123004-12345004", OrderStatus.APPROVED, adminUser);
 
         // Assign the in-progress order to the production user
         inProgressOrder.assignTo(productionUser, new UserReference(adminUser.getId(), adminUser.getUsername()), "Assigned for testing");

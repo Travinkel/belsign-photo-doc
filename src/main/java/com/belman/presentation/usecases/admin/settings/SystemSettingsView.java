@@ -11,11 +11,6 @@ public class SystemSettingsView extends BaseView<SystemSettingsViewModel> {
      * Creates a new SystemSettingsView.
      */
     public SystemSettingsView() {
-        super(SystemSettingsViewModel.class);
-    }
-
-    @Override
-    protected String getFxmlPath() {
-        return "/com/belman/presentation/usecases/admin/settings/SystemSettingsView.fxml";
+        // The BaseView constructor will load the FXML and initialize the controller and viewModel
     }
 }

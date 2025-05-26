@@ -16,41 +16,44 @@ public class SystemSettingsViewController extends BaseController<SystemSettingsV
 
     @FXML
     private Label welcomeLabel;
-    
+
     @FXML
     private Label errorLabel;
-    
+
     @FXML
     private TextField databaseUrlField;
-    
+
     @FXML
     private TextField databaseUserField;
-    
+
     @FXML
     private TextField databasePasswordField;
-    
+
     @FXML
     private CheckBox enableAutoBackupCheckbox;
-    
+
     @FXML
     private ComboBox<String> backupIntervalComboBox;
-    
+
     @FXML
     private TextField backupLocationField;
-    
+
     @FXML
     private Button saveButton;
-    
+
     @FXML
     private Button backButton;
-    
+
     @Override
     protected void setupBindings() {
         // Bind view model properties to UI elements
         welcomeLabel.textProperty().bind(getViewModel().welcomeMessageProperty());
         errorLabel.textProperty().bind(getViewModel().errorMessageProperty());
+
+        // Initialize ComboBox items
+        backupIntervalComboBox.getItems().addAll("Daily", "Weekly", "Monthly");
     }
-    
+
     /**
      * Handles the save button click.
      */
@@ -58,7 +61,7 @@ public class SystemSettingsViewController extends BaseController<SystemSettingsV
     private void handleSave() {
         getViewModel().saveSettings();
     }
-    
+
     /**
      * Handles the back button click.
      */
