@@ -55,13 +55,17 @@ public class DefaultWorkerService implements WorkerService {
     @Override
     public List<PhotoTemplate> getAvailableTemplates(OrderId orderId) {
         logger.debug("Delegating getAvailableTemplates to PhotoTemplateService");
-        return photoTemplateService.getAvailableTemplates(orderId);
+        return photoTemplateService.getAvailableTemplates(orderId).stream()
+                .filter(template -> template != null)
+                .toList();
     }
 
     @Override
     public List<PhotoDocument> getCapturedPhotos(OrderId orderId) {
         logger.debug("Delegating getCapturedPhotos to PhotoCaptureService");
-        return photoCaptureService.getCapturedPhotos(orderId);
+        return photoCaptureService.getCapturedPhotos(orderId).stream()
+                .filter(photo -> photo != null)
+                .toList();
     }
 
     @Override
@@ -85,12 +89,18 @@ public class DefaultWorkerService implements WorkerService {
     @Override
     public boolean hasAllRequiredPhotos(OrderId orderId) {
         logger.debug("Delegating hasAllRequiredPhotos to PhotoTemplateService");
-        return photoTemplateService.hasAllRequiredPhotos(orderId);
+        return Optional.of(orderId)
+                .map(id -> photoTemplateService.hasAllRequiredPhotos(id))
+                .orElse(false);
     }
 
     @Override
     public List<PhotoTemplate> getMissingRequiredTemplates(OrderId orderId) {
-        logger.debug("Getting templates for order using getAvailableTemplates");
-        return photoTemplateService.getAvailableTemplates(orderId);
+        logger.debug("Getting missing required templates for order");
+        return Optional.ofNullable(orderId)
+                .map(id -> photoTemplateService.getMissingRequiredTemplates(id).stream()
+                        .filter(template -> template != null)
+                        .toList())
+                .orElse(java.util.Collections.emptyList());
     }
 }

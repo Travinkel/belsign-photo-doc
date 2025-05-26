@@ -37,26 +37,38 @@ public class MockCameraService implements CameraService {
 
     @Override
     public Optional<File> takePhoto() {
-        logInfo("Taking photo with mock camera service");
-        return getRandomImageFile();
+        return Optional.of("Taking photo with mock camera service")
+                .map(message -> {
+                    logInfo(message);
+                    return getRandomImageFile();
+                })
+                .orElseGet(Optional::empty);
     }
 
     @Override
     public Optional<File> selectPhoto() {
-        logInfo("Selecting photo with mock camera service");
-        return getRandomImageFile();
+        return Optional.of("Selecting photo with mock camera service")
+                .map(message -> {
+                    logInfo(message);
+                    return getRandomImageFile();
+                })
+                .orElseGet(Optional::empty);
     }
 
     @Override
     public boolean isCameraAvailable() {
         // Always return true for the mock implementation
-        return true;
+        return java.util.stream.Stream.of(true)
+                .findFirst()
+                .orElse(false);
     }
 
     @Override
     public boolean isGalleryAvailable() {
         // Always return true for the mock implementation
-        return true;
+        return java.util.stream.Stream.of(true)
+                .findFirst()
+                .orElse(false);
     }
 
     /**
@@ -67,53 +79,58 @@ public class MockCameraService implements CameraService {
     private Optional<File> getRandomImageFile() {
         try {
             // First try to get images from order directories
-            List<Path> orderDirs = Files.list(Paths.get(MOCK_CAMERA_PATH))
+            return Files.list(Paths.get(MOCK_CAMERA_PATH))
                     .filter(Files::isDirectory)
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList())
+                    .stream()
+                    .findAny()
+                    .map(orderDir -> {
+                        try {
+                            // Get all image files in the order directory
+                            List<Path> imageFiles = Files.list(orderDir)
+                                .filter(path -> {
+                                    String fileName = path.getFileName().toString().toLowerCase();
+                                    return java.util.stream.Stream.of(".jpg", ".jpeg", ".png", ".gif")
+                                            .anyMatch(fileName::endsWith);
+                                })
+                                .collect(Collectors.toList());
 
-            if (!orderDirs.isEmpty()) {
-                // Select a random order directory
-                Path orderDir = orderDirs.get(random.nextInt(orderDirs.size()));
-
-                // Get all image files in the order directory
-                List<Path> imageFiles = Files.list(orderDir)
-                    .filter(path -> {
-                        String fileName = path.getFileName().toString().toLowerCase();
-                        return fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || 
-                               fileName.endsWith(".png") || fileName.endsWith(".gif");
+                            return Optional.of(imageFiles)
+                                    .filter(files -> !files.isEmpty())
+                                    .map(files -> files.get(random.nextInt(files.size())))
+                                    .map(Path::toFile)
+                                    .orElseGet(() -> {
+                                        logInfo("No image files found in order directory: " + orderDir + ", falling back to root directory");
+                                        return null;
+                                    });
+                        } catch (IOException e) {
+                            logError("Error accessing order directory: " + orderDir, e);
+                            return null;
+                        }
                     })
-                    .collect(Collectors.toList());
-
-                if (!imageFiles.isEmpty()) {
-                    // Select a random image file
-                    Path imageFile = imageFiles.get(random.nextInt(imageFiles.size()));
-                    return Optional.of(imageFile.toFile());
-                } else {
-                    logInfo("No image files found in order directory: " + orderDir + ", falling back to root directory");
-                }
-            } else {
-                logInfo("No order directories found in mock camera path, checking for images directly in the directory");
-            }
-
-            // If no images found in order directories, check for images directly in the mock camera directory
-            List<Path> rootImageFiles = Files.list(Paths.get(MOCK_CAMERA_PATH))
-                .filter(path -> {
-                    String fileName = path.getFileName().toString().toLowerCase();
-                    return fileName.endsWith(".jpg") || fileName.endsWith(".jpeg") || 
-                           fileName.endsWith(".png") || fileName.endsWith(".gif");
-                })
-                .collect(Collectors.toList());
-
-            if (rootImageFiles.isEmpty()) {
-                logError("No image files found in mock camera directory", null);
-                return Optional.empty();
-            }
-
-            // Select a random image file
-            Path imageFile = rootImageFiles.get(random.nextInt(rootImageFiles.size()));
-            logInfo("Using image file from photos directory: " + imageFile.getFileName());
-            System.out.println("[DEBUG_LOG] Found image in photos directory: " + imageFile.getFileName() + " (path: " + MOCK_CAMERA_PATH + ")");
-            return Optional.of(imageFile.toFile());
+                    .or(() -> {
+                        logInfo("No order directories found or no images in order directories, checking root directory");
+                        try {
+                            // If no images found in order directories, check for images directly in the mock camera directory
+                            return Files.list(Paths.get(MOCK_CAMERA_PATH))
+                                .filter(path -> {
+                                    String fileName = path.getFileName().toString().toLowerCase();
+                                    return java.util.stream.Stream.of(".jpg", ".jpeg", ".png", ".gif")
+                                            .anyMatch(fileName::endsWith);
+                                })
+                                .collect(Collectors.toList())
+                                .stream()
+                                .findAny()
+                                .map(path -> {
+                                    logInfo("Using image file from photos directory: " + path.getFileName());
+                                    System.out.println("[DEBUG_LOG] Found image in photos directory: " + path.getFileName() + " (path: " + MOCK_CAMERA_PATH + ")");
+                                    return path.toFile();
+                                });
+                        } catch (IOException e) {
+                            logError("Error accessing mock camera directory", e);
+                            return Optional.empty();
+                        }
+                    });
         } catch (IOException e) {
             logError("Error accessing mock camera directory", e);
             return Optional.empty();
@@ -128,15 +145,14 @@ public class MockCameraService implements CameraService {
      * @return an Optional containing the metadata file if found, or empty if not found
      */
     public Optional<File> getMetadataFile(File imageFile) {
-        if (imageFile == null) {
-            return Optional.empty();
-        }
-
-        String imagePath = imageFile.getAbsolutePath();
-        String metadataPath = imagePath.substring(0, imagePath.lastIndexOf('.')) + ".txt";
-        File metadataFile = new File(metadataPath);
-
-        return metadataFile.exists() ? Optional.of(metadataFile) : Optional.empty();
+        return Optional.ofNullable(imageFile)
+                .map(File::getAbsolutePath)
+                .map(path -> {
+                    int lastDotIndex = path.lastIndexOf('.');
+                    return lastDotIndex > 0 ? path.substring(0, lastDotIndex) + ".txt" : path + ".txt";
+                })
+                .map(File::new)
+                .filter(File::exists);
     }
 
     /**
@@ -145,11 +161,11 @@ public class MockCameraService implements CameraService {
      * @param message the info message
      */
     private void logInfo(String message) {
-        if (loggerFactory != null) {
-            loggerFactory.getLogger(this.getClass()).info(message);
-        } else {
-            System.out.println(message);
-        }
+        Optional.ofNullable(loggerFactory)
+                .ifPresentOrElse(
+                        factory -> factory.getLogger(this.getClass()).info(message),
+                        () -> System.out.println(message)
+                );
     }
 
     /**
@@ -159,17 +175,17 @@ public class MockCameraService implements CameraService {
      * @param e       the exception, or null if there is no exception
      */
     private void logError(String message, Exception e) {
-        if (loggerFactory != null) {
-            if (e != null) {
-                loggerFactory.getLogger(this.getClass()).error(message, e);
-            } else {
-                loggerFactory.getLogger(this.getClass()).error(message);
-            }
-        } else {
-            System.err.println(message);
-            if (e != null) {
-                e.printStackTrace();
-            }
-        }
+        Optional.ofNullable(loggerFactory)
+                .ifPresentOrElse(
+                        factory -> Optional.ofNullable(e)
+                                .ifPresentOrElse(
+                                        ex -> factory.getLogger(this.getClass()).error(message, ex),
+                                        () -> factory.getLogger(this.getClass()).error(message)
+                                ),
+                        () -> {
+                            System.err.println(message);
+                            Optional.ofNullable(e).ifPresent(Exception::printStackTrace);
+                        }
+                );
     }
 }

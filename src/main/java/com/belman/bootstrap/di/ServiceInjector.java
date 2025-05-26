@@ -49,32 +49,33 @@ public final class ServiceInjector {
             System.out.println("Mock AuthenticationService: authenticate called with username: " + username);
 
             // For testing, accept any username/password where they match
-            if (username != null && !username.trim().isEmpty() && username.equals(password)) {
-                // Create a test user
-                Username userUsername = new Username(username);
-                HashedPassword hashedPassword = new HashedPassword(password); // In real system, this would be hashed
-                EmailAddress email = new EmailAddress(username + "@example.com");
-                UserRole role = UserRole.PRODUCTION; // Default role
+            return Optional.ofNullable(username)
+                    .filter(u -> !u.trim().isEmpty())
+                    .filter(u -> u.equals(password))
+                    .map(u -> {
+                        // Create a test user
+                        Username userUsername = new Username(u);
+                        HashedPassword hashedPassword = new HashedPassword(password); // In real system, this would be hashed
+                        EmailAddress email = new EmailAddress(u + "@example.com");
 
-                // Assign specific roles based on username for testing
-                if (username.toLowerCase().contains("admin")) {
-                    role = UserRole.ADMIN;
-                } else if (username.toLowerCase().contains("qa")) {
-                    role = UserRole.QA;
-                }
+                        // Determine role based on username
+                        UserRole role = java.util.stream.Stream.of(
+                                new java.util.AbstractMap.SimpleEntry<>(u.toLowerCase().contains("admin"), UserRole.ADMIN),
+                                new java.util.AbstractMap.SimpleEntry<>(u.toLowerCase().contains("qa"), UserRole.QA))
+                                .filter(java.util.Map.Entry::getKey)
+                                .map(java.util.Map.Entry::getValue)
+                                .findFirst()
+                                .orElse(UserRole.PRODUCTION);
 
-                UserBusiness user = UserBusiness.createNewUser(userUsername, hashedPassword, email);
-                // Add the assigned role
-                user.addRole(role);
+                        UserBusiness user = UserBusiness.createNewUser(userUsername, hashedPassword, email);
+                        // Add the assigned role
+                        user.addRole(role);
 
-                currentUser = user;
+                        currentUser = user;
 
-                System.out.println("Mock auth successful. User created with role: " + role);
-                return Optional.of(user);
-            }
-
-            System.out.println("Mock auth failed for username: " + username);
-            return Optional.empty();
+                        System.out.println("Mock auth successful. User created with role: " + role);
+                        return user;
+                    });
         }
 
         @Override
@@ -84,13 +85,18 @@ public final class ServiceInjector {
 
         @Override
         public void logout() {
-            currentUser = null;
-            System.out.println("Mock AuthenticationService: User logged out");
+            Optional.ofNullable(currentUser)
+                    .ifPresent(user -> {
+                        currentUser = null;
+                        System.out.println("Mock AuthenticationService: User logged out");
+                    });
         }
 
         @Override
         public boolean isLoggedIn() {
-            return currentUser != null;
+            return Optional.ofNullable(currentUser)
+                    .map(user -> true)
+                    .orElse(false);
         }
     }
 }

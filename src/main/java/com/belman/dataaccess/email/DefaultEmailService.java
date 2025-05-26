@@ -45,110 +45,152 @@ public class DefaultEmailService extends BaseService implements EmailService {
 
     @Override
     protected LoggerFactory getLoggerFactory() {
-        return loggerFactory;
+        return java.util.Optional.ofNullable(loggerFactory)
+                .orElseThrow(() -> new IllegalStateException("LoggerFactory not initialized"));
     }
 
     @Override
     public boolean sendEmail(EmailAddress to, String subject, String body) {
-        try {
-            // In a real implementation, this would use JavaMail API to send the email
-            LOGGER.info("Sending email to " + to.value());
-            LOGGER.info("Subject: " + subject);
-            LOGGER.info("Body: " + body);
+        return java.util.Optional.ofNullable(to)
+                .map(recipient -> {
+                    try {
+                        // In a real implementation, this would use JavaMail API to send the email
+                        LOGGER.info("Sending email to " + recipient.value());
+                        LOGGER.info("Subject: " + subject);
+                        LOGGER.info("Body: " + body);
 
-            // Simulate sending the email
-            return true;
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to send email", e);
-            return false;
-        }
+                        // Simulate sending the email
+                        return true;
+                    } catch (Exception e) {
+                        LOGGER.log(Level.SEVERE, "Failed to send email", e);
+                        return false;
+                    }
+                })
+                .orElse(false);
     }
 
     @Override
     public boolean sendEmail(List<EmailAddress> to, String subject, String body) {
-        try {
-            // In a real implementation, this would use JavaMail API to send the email
-            LOGGER.info("Sending email to " + to.size() + " recipients");
-            LOGGER.info("Subject: " + subject);
-            LOGGER.info("Body: " + body);
+        return java.util.Optional.ofNullable(to)
+                .filter(recipients -> !recipients.isEmpty())
+                .map(recipients -> {
+                    try {
+                        // In a real implementation, this would use JavaMail API to send the email
+                        LOGGER.info("Sending email to " + recipients.size() + " recipients");
+                        LOGGER.info("Subject: " + subject);
+                        LOGGER.info("Body: " + body);
 
-            // Simulate sending the email
-            return true;
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to send email", e);
-            return false;
-        }
+                        // Simulate sending the email
+                        return true;
+                    } catch (Exception e) {
+                        LOGGER.log(Level.SEVERE, "Failed to send email", e);
+                        return false;
+                    }
+                })
+                .orElse(false);
     }
 
     @Override
     public boolean sendEmailWithAttachment(EmailAddress to, String subject, String body, String attachmentName, byte[] attachmentData, String attachmentMimeType) {
-        try {
-            // In a real implementation, this would use JavaMail API to send the email with attachment
-            LOGGER.info("Sending email with attachment to " + to.value());
-            LOGGER.info("Subject: " + subject);
-            LOGGER.info("Body: " + body);
-            LOGGER.info("Attachment: " + attachmentName + " (" + attachmentMimeType + ")");
+        return java.util.Optional.ofNullable(to)
+                .filter(recipient -> attachmentName != null && !attachmentName.isEmpty())
+                .filter(recipient -> attachmentData != null && attachmentData.length > 0)
+                .filter(recipient -> attachmentMimeType != null && !attachmentMimeType.isEmpty())
+                .map(recipient -> {
+                    try {
+                        // In a real implementation, this would use JavaMail API to send the email with attachment
+                        LOGGER.info("Sending email with attachment to " + recipient.value());
+                        LOGGER.info("Subject: " + subject);
+                        LOGGER.info("Body: " + body);
+                        LOGGER.info("Attachment: " + attachmentName + " (" + attachmentMimeType + ")");
 
-            // Simulate sending the email
-            return true;
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to send email with attachment", e);
-            return false;
-        }
+                        // Simulate sending the email
+                        return true;
+                    } catch (Exception e) {
+                        LOGGER.log(Level.SEVERE, "Failed to send email with attachment", e);
+                        return false;
+                    }
+                })
+                .orElse(false);
     }
 
     @Override
     public boolean sendEmailWithAttachment(List<EmailAddress> to, String subject, String body, String attachmentName, byte[] attachmentData, String attachmentMimeType) {
-        try {
-            // In a real implementation, this would use JavaMail API to send the email with attachment
-            LOGGER.info("Sending email with attachment to " + to.size() + " recipients");
-            LOGGER.info("Subject: " + subject);
-            LOGGER.info("Body: " + body);
-            LOGGER.info("Attachment: " + attachmentName + " (" + attachmentMimeType + ")");
+        return java.util.Optional.ofNullable(to)
+                .filter(recipients -> !recipients.isEmpty())
+                .filter(recipients -> attachmentName != null && !attachmentName.isEmpty())
+                .filter(recipients -> attachmentData != null && attachmentData.length > 0)
+                .filter(recipients -> attachmentMimeType != null && !attachmentMimeType.isEmpty())
+                .map(recipients -> {
+                    try {
+                        // In a real implementation, this would use JavaMail API to send the email with attachment
+                        LOGGER.info("Sending email with attachment to " + recipients.size() + " recipients");
+                        LOGGER.info("Subject: " + subject);
+                        LOGGER.info("Body: " + body);
+                        LOGGER.info("Attachment: " + attachmentName + " (" + attachmentMimeType + ")");
 
-            // Simulate sending the email
-            return true;
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to send email with attachment", e);
-            return false;
-        }
+                        // Simulate sending the email
+                        return true;
+                    } catch (Exception e) {
+                        LOGGER.log(Level.SEVERE, "Failed to send email with attachment", e);
+                        return false;
+                    }
+                })
+                .orElse(false);
     }
 
     @Override
     public boolean sendEmailWithAttachments(EmailAddress to, String subject, String body, List<String> attachmentNames, List<byte[]> attachmentData, List<String> attachmentMimeTypes) {
-        try {
-            // In a real implementation, this would use JavaMail API to send the email with attachments
-            LOGGER.info("Sending email with " + attachmentNames.size() + " attachments to " + to.value());
-            LOGGER.info("Subject: " + subject);
-            LOGGER.info("Body: " + body);
-            for (int i = 0; i < attachmentNames.size(); i++) {
-                LOGGER.info("Attachment " + (i + 1) + ": " + attachmentNames.get(i) + " (" + attachmentMimeTypes.get(i) + ")");
-            }
+        return java.util.Optional.ofNullable(to)
+                .filter(recipient -> attachmentNames != null && !attachmentNames.isEmpty())
+                .filter(recipient -> attachmentNames.size() == attachmentData.size() && attachmentNames.size() == attachmentMimeTypes.size())
+                .map(recipient -> {
+                    try {
+                        // In a real implementation, this would use JavaMail API to send the email with attachments
+                        LOGGER.info("Sending email with " + attachmentNames.size() + " attachments to " + recipient.value());
+                        LOGGER.info("Subject: " + subject);
+                        LOGGER.info("Body: " + body);
 
-            // Simulate sending the email
-            return true;
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to send email with attachments", e);
-            return false;
-        }
+                        // Log attachment details using Stream API
+                        java.util.stream.IntStream.range(0, attachmentNames.size())
+                                .forEach(i -> LOGGER.info("Attachment " + (i + 1) + ": " + 
+                                        attachmentNames.get(i) + " (" + attachmentMimeTypes.get(i) + ")"));
+
+                        // Simulate sending the email
+                        return true;
+                    } catch (Exception e) {
+                        LOGGER.log(Level.SEVERE, "Failed to send email with attachments", e);
+                        return false;
+                    }
+                })
+                .orElse(false);
     }
 
     @Override
     public boolean sendEmailWithAttachments(List<EmailAddress> to, String subject, String body, List<String> attachmentNames, List<byte[]> attachmentData, List<String> attachmentMimeTypes) {
-        try {
-            // In a real implementation, this would use JavaMail API to send the email with attachments
-            LOGGER.info("Sending email with " + attachmentNames.size() + " attachments to " + to.size() + " recipients");
-            LOGGER.info("Subject: " + subject);
-            LOGGER.info("Body: " + body);
-            for (int i = 0; i < attachmentNames.size(); i++) {
-                LOGGER.info("Attachment " + (i + 1) + ": " + attachmentNames.get(i) + " (" + attachmentMimeTypes.get(i) + ")");
-            }
+        return java.util.Optional.ofNullable(to)
+                .filter(recipients -> !recipients.isEmpty())
+                .filter(recipients -> attachmentNames != null && !attachmentNames.isEmpty())
+                .filter(recipients -> attachmentNames.size() == attachmentData.size() && attachmentNames.size() == attachmentMimeTypes.size())
+                .map(recipients -> {
+                    try {
+                        // In a real implementation, this would use JavaMail API to send the email with attachments
+                        LOGGER.info("Sending email with " + attachmentNames.size() + " attachments to " + recipients.size() + " recipients");
+                        LOGGER.info("Subject: " + subject);
+                        LOGGER.info("Body: " + body);
 
-            // Simulate sending the email
-            return true;
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to send email with attachments", e);
-            return false;
-        }
+                        // Log attachment details using Stream API
+                        java.util.stream.IntStream.range(0, attachmentNames.size())
+                                .forEach(i -> LOGGER.info("Attachment " + (i + 1) + ": " + 
+                                        attachmentNames.get(i) + " (" + attachmentMimeTypes.get(i) + ")"));
+
+                        // Simulate sending the email
+                        return true;
+                    } catch (Exception e) {
+                        LOGGER.log(Level.SEVERE, "Failed to send email with attachments", e);
+                        return false;
+                    }
+                })
+                .orElse(false);
     }
 }

@@ -526,7 +526,7 @@ public class TemplateManager {
      * 
      * @param listProperty the list property to clear
      */
-    private <T> void safelyClearList(ListProperty<T> listProperty) {
+    private <T extends Object> void safelyClearList(ListProperty<T> listProperty) {
         if (listProperty == null) {
             return;
         }
@@ -556,7 +556,7 @@ public class TemplateManager {
      * @param listProperty the list property to update
      * @param items the items to set
      */
-    private <T> void safelySetAllItems(ListProperty<T> listProperty, List<T> items) {
+    private <T extends Object> void safelySetAllItems(ListProperty<T> listProperty, List<T> items) {
         if (listProperty == null || items == null) {
             return;
         }

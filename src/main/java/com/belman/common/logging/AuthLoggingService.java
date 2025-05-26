@@ -28,32 +28,37 @@ public class AuthLoggingService {
      * This method should be called once during application startup.
      */
     public static synchronized void initialize() {
-        if (initialized) {
-            return;
-        }
+        java.util.Optional.of(initialized)
+                .filter(init -> init)
+                .ifPresent(init -> {
+                    return; // Early return if already initialized
+                });
 
         try {
             // Create log file in the user's home directory
             String userHome = System.getProperty("user.home");
             File logDir = new File(userHome, "belsign-logs");
-            if (!logDir.exists()) {
-                logDir.mkdirs();
-            }
+
+            java.util.Optional.of(logDir)
+                    .filter(dir -> !dir.exists())
+                    .ifPresent(File::mkdirs);
 
             logFile = new File(logDir, LOG_FILE_NAME);
-            
+
             // Clear the log file on startup
             try (PrintWriter writer = new PrintWriter(new FileWriter(logFile, false))) {
-                writer.println("=== Authentication and Navigation Log ===");
-                writer.println("Started at: " + LocalDateTime.now().format(DATE_TIME_FORMATTER));
-                writer.println("=======================================");
+                java.util.stream.Stream.of(
+                        "=== Authentication and Navigation Log ===",
+                        "Started at: " + LocalDateTime.now().format(DATE_TIME_FORMATTER),
+                        "======================================="
+                ).forEach(writer::println);
             }
 
             // Schedule periodic flushing of the log queue
             scheduler.scheduleAtFixedRate(AuthLoggingService::flushLogQueue, 1, 1, TimeUnit.SECONDS);
 
             initialized = true;
-            
+
             // Log initialization success
             logInfo("AuthLoggingService", "Logging service initialized. Log file: " + logFile.getAbsolutePath());
         } catch (Exception e) {
@@ -71,10 +76,9 @@ public class AuthLoggingService {
         }
 
         try (PrintWriter writer = new PrintWriter(new FileWriter(logFile, true))) {
-            String log;
-            while ((log = logQueue.poll()) != null) {
-                writer.println(log);
-            }
+            java.util.stream.Stream.generate(logQueue::poll)
+                    .takeWhile(log -> log != null)
+                    .forEach(writer::println);
         } catch (IOException e) {
             System.err.println("Failed to write to log file: " + e.getMessage());
         }
@@ -87,7 +91,9 @@ public class AuthLoggingService {
      * @param message the message to log
      */
     public static void logAuth(String source, String message) {
-        log("AUTH", source, message);
+        java.util.Optional.ofNullable(source)
+                .ifPresent(src -> java.util.Optional.ofNullable(message)
+                        .ifPresent(msg -> log("AUTH", src, msg)));
     }
 
     /**
@@ -158,16 +164,16 @@ public class AuthLoggingService {
      * @param message the message to log
      */
     private static void log(String type, String source, String message) {
-        if (!initialized) {
-            initialize();
-        }
+        java.util.Optional.of(initialized)
+                .filter(init -> !init)
+                .ifPresent(init -> initialize());
 
         String timestamp = LocalDateTime.now().format(DATE_TIME_FORMATTER);
         String logEntry = String.format("[%s] [%s] [%s] %s", timestamp, type, source, message);
-        
+
         // Add to queue for async writing
         logQueue.add(logEntry);
-        
+
         // Also print to console for immediate feedback
         System.out.println("[DEBUG_LOG] " + logEntry);
     }
@@ -179,10 +185,16 @@ public class AuthLoggingService {
     public static void shutdown() {
         flushLogQueue();
         scheduler.shutdown();
-        try {
-            scheduler.awaitTermination(5, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+
+        java.util.Optional.of(scheduler)
+                .map(s -> {
+                    try {
+                        return s.awaitTermination(5, TimeUnit.SECONDS);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return false;
+                    }
+                })
+                .orElse(false);
     }
 }
