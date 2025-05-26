@@ -7,9 +7,13 @@ import com.belman.application.usecase.photo.CameraImageProviderFactory;
 import com.belman.application.usecase.photo.PhotoCaptureService;
 import com.belman.application.usecase.photo.PhotoService;
 import com.belman.application.usecase.photo.PhotoTemplateService;
+import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.domain.photo.PhotoTemplate;
 import com.belman.presentation.usecases.worker.photocube.PhotoCubeViewModel;
 import com.belman.presentation.usecases.worker.photocube.PhotoTemplateStatusViewModel;
+import com.belman.presentation.usecases.worker.photocube.managers.OrderManager;
+import com.belman.presentation.usecases.worker.photocube.managers.PhotoCaptureManager;
+import com.belman.presentation.usecases.worker.photocube.managers.TemplateManager;
 import javafx.beans.property.ListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -52,6 +56,15 @@ public class PhotoCubeViewModelTest {
     @Mock
     private CameraImageProvider cameraImageProvider;
 
+    @Mock
+    private OrderManager orderManager;
+
+    @Mock
+    private PhotoCaptureManager photoCaptureManager;
+
+    @Mock
+    private TemplateManager templateManager;
+
     private PhotoCubeViewModel viewModel;
 
     // Use real PhotoTemplate instances instead of mocks
@@ -71,8 +84,16 @@ public class PhotoCubeViewModelTest {
 
     @BeforeEach
     public void setUp() throws Exception {
+        // Clear any existing services in the ServiceLocator
+        ServiceLocator.clear();
+
         // Configure the mocked factory to return our mock CameraImageProvider
         mockedFactory.when(CameraImageProviderFactory::getInstance).thenReturn(cameraImageProvider);
+
+        // Register the mock manager services with the ServiceLocator
+        ServiceLocator.registerService(OrderManager.class, orderManager);
+        ServiceLocator.registerService(PhotoCaptureManager.class, photoCaptureManager);
+        ServiceLocator.registerService(TemplateManager.class, templateManager);
 
         // Create the view model manually
         viewModel = new PhotoCubeViewModel();

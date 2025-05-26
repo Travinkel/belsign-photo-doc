@@ -64,32 +64,29 @@ public class ViewLoaderMigrationTest {
     }
 
     @Test
-    @DisplayName("Should handle login view from both authentication.login and login packages")
+    @DisplayName("Should load login view from login package")
     public void shouldHandleLoginViewFromBothLocations() {
         try {
-            System.out.println("[DEBUG_LOG] Testing loading LoginView from both locations");
-            
-            // Try to load from authentication.login package
-            var components = ViewLoader.load(com.belman.presentation.usecases.authentication.login.LoginView.class);
+            System.out.println("[DEBUG_LOG] Testing loading LoginView from login package");
+
+            // Load from login package
+            var components = ViewLoader.load(com.belman.presentation.usecases.login.LoginView.class);
             assertNotNull(components, "Loaded components should not be null");
             assertNotNull(components.parent(), "Parent should not be null");
             assertNotNull(components.controller(), "Controller should not be null");
             assertNotNull(components.viewModel(), "ViewModel should not be null");
-            System.out.println("[DEBUG_LOG] Successfully loaded LoginView from authentication.login package");
-            
-            // If we have a login package, try to load from there too
+            System.out.println("[DEBUG_LOG] Successfully loaded LoginView from login package");
+
+            // Check if old authentication.login package exists (should not exist anymore)
             try {
-                Class<?> loginViewClass = Class.forName("com.belman.presentation.usecases.login.LoginView");
-                var loginComponents = ViewLoader.load(loginViewClass);
-                assertNotNull(loginComponents, "Loaded components should not be null");
-                assertNotNull(loginComponents.parent(), "Parent should not be null");
-                assertNotNull(loginComponents.controller(), "Controller should not be null");
-                assertNotNull(loginComponents.viewModel(), "ViewModel should not be null");
-                System.out.println("[DEBUG_LOG] Successfully loaded LoginView from login package");
+                Class<?> oldLoginViewClass = Class.forName("com.belman.presentation.usecases.authentication.login.LoginView");
+                var oldLoginComponents = ViewLoader.load(oldLoginViewClass);
+                assertNotNull(oldLoginComponents, "Loaded components should not be null");
+                System.out.println("[DEBUG_LOG] Successfully loaded LoginView from authentication.login package (unexpected)");
             } catch (ClassNotFoundException e) {
-                System.out.println("[DEBUG_LOG] LoginView class not found in login package, which is expected if migration is complete");
+                System.out.println("[DEBUG_LOG] LoginView class not found in authentication.login package, which is expected after migration");
             }
-            
+
         } catch (Exception e) {
             fail("Failed to load LoginView: " + e.getMessage());
         }
@@ -100,21 +97,21 @@ public class ViewLoaderMigrationTest {
     public void shouldCreateFallbackViewWhenFxmlNotFound() {
         try {
             System.out.println("[DEBUG_LOG] Testing fallback view creation");
-            
+
             // Create a test class that doesn't have a corresponding FXML file
             class TestView extends com.belman.presentation.base.BaseView<com.belman.presentation.base.BaseViewModel<?>> {
             }
-            
+
             var components = ViewLoader.load(TestView.class);
             assertNotNull(components, "Loaded components should not be null");
             assertNotNull(components.parent(), "Parent should not be null");
             assertNotNull(components.controller(), "Controller should not be null");
             assertNotNull(components.viewModel(), "ViewModel should not be null");
-            
+
             // The parent should be a VBox with an error message
             assertTrue(components.parent() instanceof javafx.scene.layout.VBox, 
                     "Parent should be a VBox for fallback view");
-            
+
             System.out.println("[DEBUG_LOG] Successfully created fallback view");
         } catch (Exception e) {
             fail("Failed to create fallback view: " + e.getMessage());

@@ -6,9 +6,6 @@ import com.belman.domain.photo.PhotoAnnotation;
 import com.belman.domain.photo.PhotoDocument;
 import com.belman.domain.photo.PhotoId;
 import com.belman.domain.photo.PhotoRepository;
-import com.belman.domain.user.UserBusiness;
-import com.belman.domain.user.UserId;
-import com.belman.domain.user.Username;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -33,10 +30,11 @@ class DefaultQAServiceTest {
     @Mock
     private PhotoRepository photoRepository;
 
-    private DefaultQAService qaService;
+    @Mock
     private PhotoDocument testPhoto;
+
+    private DefaultQAService qaService;
     private PhotoId testPhotoId;
-    private UserBusiness testUser;
 
     @BeforeEach
     void setUp() {
@@ -45,13 +43,8 @@ class DefaultQAServiceTest {
 
         // Create test data
         testPhotoId = new PhotoId(UUID.randomUUID().toString());
-        testUser = new UserBusiness(
-                new UserId(UUID.randomUUID().toString()),
-                new Username("testuser")
-        );
 
-        // Create a test photo document
-        testPhoto = mock(PhotoDocument.class);
+        // Configure the test photo document mock
         when(testPhoto.getId()).thenReturn(testPhotoId);
         when(photoRepository.findById(testPhotoId)).thenReturn(Optional.of(testPhoto));
     }
@@ -94,7 +87,7 @@ class DefaultQAServiceTest {
         double y = 0.5;
         String text = "Test annotation";
         PhotoAnnotation.AnnotationType type = PhotoAnnotation.AnnotationType.NOTE;
-        
+
         when(testPhoto.addAnnotation(any(PhotoAnnotation.class))).thenReturn(true);
 
         // Act
@@ -106,7 +99,7 @@ class DefaultQAServiceTest {
         assertEquals(y, annotation.getY());
         assertEquals(text, annotation.getText());
         assertEquals(type, annotation.getType());
-        
+
         verify(photoRepository).findById(testPhotoId);
         verify(testPhoto).addAnnotation(any(PhotoAnnotation.class));
         verify(photoRepository).save(testPhoto);
@@ -133,7 +126,7 @@ class DefaultQAServiceTest {
         // Arrange
         PhotoAnnotation annotation = new PhotoAnnotation(
                 "1", 0.5, 0.5, "Updated annotation", PhotoAnnotation.AnnotationType.NOTE);
-        
+
         when(testPhoto.updateAnnotation(annotation)).thenReturn(true);
 
         // Act
@@ -152,7 +145,7 @@ class DefaultQAServiceTest {
         PhotoId nonExistentPhotoId = new PhotoId(UUID.randomUUID().toString());
         PhotoAnnotation annotation = new PhotoAnnotation(
                 "1", 0.5, 0.5, "Test", PhotoAnnotation.AnnotationType.NOTE);
-        
+
         when(photoRepository.findById(nonExistentPhotoId)).thenReturn(Optional.empty());
 
         // Act
@@ -185,7 +178,7 @@ class DefaultQAServiceTest {
         // Arrange
         PhotoId nonExistentPhotoId = new PhotoId(UUID.randomUUID().toString());
         String annotationId = "1";
-        
+
         when(photoRepository.findById(nonExistentPhotoId)).thenReturn(Optional.empty());
 
         // Act

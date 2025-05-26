@@ -9,17 +9,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class OrderNumberTest {
 
     @Test
-    public void testConstructorWithNewFormat() {
-        // Test with the new format (MM/YY-CUSTOMER-SEQUENCE)
+    public void testConstructorWithValidFormat() {
+        // Test with the format (MM/YY-CUSTOMER-SEQUENCE)
         OrderNumber orderNumber = new OrderNumber("01/23-123456-12345678");
         assertEquals("01/23-123456-12345678", orderNumber.value());
-    }
-
-    @Test
-    public void testConstructorWithLegacyFormat() {
-        // Test with the legacy format (ORD-XX-YYMMDD-ABC-NNNN)
-        OrderNumber orderNumber = new OrderNumber("ORD-01-230701-WLD-0001");
-        assertEquals("ORD-01-230701-WLD-0001", orderNumber.value());
     }
 
     @Test
@@ -28,41 +21,28 @@ public class OrderNumberTest {
         assertThrows(IllegalArgumentException.class, () -> {
             new OrderNumber("INVALID-FORMAT");
         });
+
+        // Test with the legacy format (should now be invalid)
+        assertThrows(IllegalArgumentException.class, () -> {
+            new OrderNumber("ORD-01-230701-WLD-0001");
+        });
     }
 
     @Test
-    public void testGetMonthYearWithNewFormat() {
+    public void testGetMonthYear() {
         OrderNumber orderNumber = new OrderNumber("01/23-123456-12345678");
         assertEquals("01/23", orderNumber.getMonthYear());
     }
 
     @Test
-    public void testGetMonthYearWithLegacyFormat() {
-        OrderNumber orderNumber = new OrderNumber("ORD-01-230701-WLD-0001");
-        assertEquals("07/23", orderNumber.getMonthYear());
-    }
-
-    @Test
-    public void testGetCustomerIdentifierWithNewFormat() {
+    public void testGetCustomerIdentifier() {
         OrderNumber orderNumber = new OrderNumber("01/23-123456-12345678");
         assertEquals("123456", orderNumber.getCustomerIdentifier());
     }
 
     @Test
-    public void testGetCustomerIdentifierWithLegacyFormat() {
-        OrderNumber orderNumber = new OrderNumber("ORD-01-230701-WLD-0001");
-        assertEquals("WLD", orderNumber.getCustomerIdentifier());
-    }
-
-    @Test
-    public void testGetSequenceNumberWithNewFormat() {
+    public void testGetSequenceNumber() {
         OrderNumber orderNumber = new OrderNumber("01/23-123456-12345678");
         assertEquals("12345678", orderNumber.getSequenceNumber());
-    }
-
-    @Test
-    public void testGetSequenceNumberWithLegacyFormat() {
-        OrderNumber orderNumber = new OrderNumber("ORD-01-230701-WLD-0001");
-        assertEquals("0001", orderNumber.getSequenceNumber());
     }
 }

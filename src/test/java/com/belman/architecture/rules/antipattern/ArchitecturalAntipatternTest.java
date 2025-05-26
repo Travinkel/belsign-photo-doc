@@ -1,16 +1,14 @@
 package com.belman.architecture.rules.antipattern;
 
+import com.belman.architecture.rules.BaseArchUnitTest;
 import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaClass;
-import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaField;
 import com.tngtech.archunit.core.domain.JavaMethod;
-import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -25,14 +23,7 @@ import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.sli
  * These tests combine scope rules with antipattern detection to ensure
  * the architecture remains clean and maintainable.
  */
-public class ArchitecturalAntipatternTest {
-
-    private static JavaClasses importedClasses;
-
-    @BeforeAll
-    public static void setup() {
-        importedClasses = new ClassFileImporter().importPackages("com.belman");
-    }
+public class ArchitecturalAntipatternTest extends BaseArchUnitTest {
 
     /**
      * Detects service classes that directly use repository implementations instead of interfaces.
@@ -41,8 +32,8 @@ public class ArchitecturalAntipatternTest {
     @Test
     public void servicesShouldNotDependOnRepositoryImplementations() {
         ArchRule rule = noClasses()
-                .that().resideInAPackage("com.belman.service..")
-                .should().dependOnClassesThat().resideInAPackage("com.belman.repository.persistence..")
+                .that().resideInAPackage("com.belman.application..")
+                .should().dependOnClassesThat().resideInAPackage("com.belman.dataaccess.repository..")
                 .because("Services should depend on repository interfaces, not implementations");
 
         rule.check(importedClasses);
@@ -55,8 +46,8 @@ public class ArchitecturalAntipatternTest {
     @Test
     public void uiShouldNotDependOnRepositories() {
         ArchRule rule = noClasses()
-                .that().resideInAPackage("com.belman.ui..")
-                .should().dependOnClassesThat().resideInAPackage("com.belman.repository..")
+                .that().resideInAPackage("com.belman.presentation..")
+                .should().dependOnClassesThat().resideInAPackage("com.belman.dataaccess..")
                 .because(
                         "UI classes should not directly access repositories, they should go through the service layer");
 
@@ -91,9 +82,9 @@ public class ArchitecturalAntipatternTest {
                 int methodCount = javaClass.getMethods().size();
                 int fieldCount = javaClass.getFields().size();
 
-                // Define thresholds for god classes
-                int methodThreshold = 20;
-                int fieldThreshold = 15;
+                // Define stricter thresholds for god classes
+                int methodThreshold = 15;
+                int fieldThreshold = 10;
 
                 boolean isGodClass = methodCount > methodThreshold || fieldCount > fieldThreshold;
 
@@ -134,8 +125,8 @@ public class ArchitecturalAntipatternTest {
                             .filter(call -> !call.getTargetOwner().equals(javaClass))
                             .count();
 
-                    // Define threshold for feature envy
-                    int threshold = 5;
+                    // Define stricter threshold for feature envy
+                    int threshold = 3;
 
                     if (callsToOtherClasses > threshold) {
                         String message = String.format(
@@ -236,8 +227,8 @@ public class ArchitecturalAntipatternTest {
                                 .filter(call -> call.getTargetOwner().equals(field.getRawType()))
                                 .count();
 
-                        // Define threshold for inappropriate intimacy
-                        int threshold = 5;
+                        // Define stricter threshold for inappropriate intimacy
+                        int threshold = 3;
 
                         if (accessesToFieldMethods > threshold) {
                             String message = String.format(
@@ -273,7 +264,8 @@ public class ArchitecturalAntipatternTest {
             public boolean test(JavaClass javaClass) {
                 return javaClass.getSimpleName().endsWith("Service") &&
                        !javaClass.isInterface() &&
-                       javaClass.getPackageName().contains("service");
+                       (javaClass.getPackageName().contains("application") || 
+                        javaClass.getPackageName().contains("service"));
             }
         };
 
@@ -333,7 +325,7 @@ public class ArchitecturalAntipatternTest {
                             .count();
 
                     // If there are too many method chains, it might violate Law of Demeter
-                    if (methodChainCount > 3) {
+                    if (methodChainCount > 2) {
                         String message = String.format(
                                 "Method %s in class %s might violate Law of Demeter with %d getter/finder calls",
                                 method.getName(), javaClass.getName(), methodChainCount);
