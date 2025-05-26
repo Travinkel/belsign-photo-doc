@@ -1,0 +1,355 @@
+/* Utilities CSS for BelSign Photo Documentation
+ * Contains helper classes:
+ * - Spacing helpers
+ * - Text alignment
+ * - Visibility controls
+ * - Animation utilities
+ */
+
+/* Text Alignment */
+.text-left {
+    -fx-text-alignment: left;
+}
+
+.text-center {
+    -fx-text-alignment: center;
+}
+
+.text-right {
+    -fx-text-alignment: right;
+}
+
+.text-justify {
+    -fx-text-alignment: justify;
+}
+
+/* Text Styles */
+.text-bold {
+    -fx-font-weight: bold;
+}
+
+.text-italic {
+    -fx-font-style: italic;
+}
+
+.text-underline {
+    -fx-underline: true;
+}
+
+.text-small {
+    -fx-font-size: -font-size-small;
+}
+
+.text-large {
+    -fx-font-size: -font-size-large;
+}
+
+/* Text Colors */
+.text-primary {
+    -fx-text-fill: -belman-blue;
+}
+
+.text-secondary {
+    -fx-text-fill: -belman-light-blue;
+}
+
+.text-success {
+    -fx-text-fill: -belman-green;
+}
+
+.text-danger {
+    -fx-text-fill: #d32f2f;
+}
+
+.text-muted {
+    -fx-text-fill: -belman-grey-50;
+}
+
+/* Background Colors */
+.bg-primary {
+    -fx-background-color: -belman-blue;
+}
+
+.bg-secondary {
+    -fx-background-color: -belman-light-blue;
+}
+
+.bg-success {
+    -fx-background-color: -belman-green;
+}
+
+.bg-danger {
+    -fx-background-color: #d32f2f;
+}
+
+.bg-light {
+    -fx-background-color: -belman-grey-07;
+}
+
+.bg-dark {
+    -fx-background-color: -belman-dark-grey;
+}
+
+.bg-white {
+    -fx-background-color: white;
+}
+
+.bg-transparent {
+    -fx-background-color: transparent;
+}
+
+/* Visibility Controls */
+.hidden {
+    -fx-opacity: 0;
+    -fx-visibility: hidden;
+}
+
+.visible {
+    -fx-opacity: 1;
+    -fx-visibility: visible;
+}
+
+.collapsed {
+    -fx-managed: false;
+    -fx-visible: false;
+}
+
+/* Opacity Levels */
+.opacity-25 {
+    -fx-opacity: 0.25;
+}
+
+.opacity-50 {
+    -fx-opacity: 0.5;
+}
+
+.opacity-75 {
+    -fx-opacity: 0.75;
+}
+
+.opacity-100 {
+    -fx-opacity: 1.0;
+}
+
+/* Cursor Styles */
+.cursor-pointer {
+    -fx-cursor: hand;
+}
+
+.cursor-default {
+    -fx-cursor: default;
+}
+
+.cursor-text {
+    -fx-cursor: text;
+}
+
+.cursor-wait {
+    -fx-cursor: wait;
+}
+
+/* Overflow Controls */
+.overflow-hidden {
+    -fx-pref-width: 100%;
+    -fx-pref-height: 100%;
+    -fx-max-width: 100%;
+    -fx-max-height: 100%;
+}
+
+.overflow-auto {
+    -fx-pref-width: 100%;
+    -fx-pref-height: 100%;
+    -fx-max-width: 100%;
+    -fx-max-height: 100%;
+}
+
+/* Width and Height */
+.w-100 {
+    -fx-pref-width: 100%;
+    -fx-min-width: 100%;
+}
+
+.h-100 {
+    -fx-pref-height: 100%;
+    -fx-min-height: 100%;
+}
+
+.w-auto {
+    -fx-pref-width: USE_COMPUTED_SIZE;
+    -fx-min-width: USE_COMPUTED_SIZE;
+}
+
+.h-auto {
+    -fx-pref-height: USE_COMPUTED_SIZE;
+    -fx-min-height: USE_COMPUTED_SIZE;
+}
+
+/* Flex Grow */
+.flex-grow {
+    -fx-hgrow: ALWAYS;
+    -fx-vgrow: ALWAYS;
+}
+
+.flex-grow-h {
+    -fx-hgrow: ALWAYS;
+}
+
+.flex-grow-v {
+    -fx-vgrow: ALWAYS;
+}
+
+/* Animation Utilities */
+.fade-in {
+    -fx-opacity: 0;
+    -fx-animation: fade-in 0.3s ease-in forwards;
+}
+
+.fade-out {
+    -fx-opacity: 1;
+    -fx-animation: fade-out 0.3s ease-out forwards;
+}
+
+.slide-in-right {
+    -fx-translate-x: 100%;
+    -fx-animation: slide-in-right 0.3s ease-out forwards;
+}
+
+.slide-out-right {
+    -fx-translate-x: 0;
+    -fx-animation: slide-out-right 0.3s ease-in forwards;
+}
+
+.slide-in-left {
+    -fx-translate-x: -100%;
+    -fx-animation: slide-in-left 0.3s ease-out forwards;
+}
+
+.slide-out-left {
+    -fx-translate-x: 0;
+    -fx-animation: slide-out-left 0.3s ease-in forwards;
+}
+
+.slide-in-top {
+    -fx-translate-y: -100%;
+    -fx-animation: slide-in-top 0.3s ease-out forwards;
+}
+
+.slide-out-top {
+    -fx-translate-y: 0;
+    -fx-animation: slide-out-top 0.3s ease-in forwards;
+}
+
+.slide-in-bottom {
+    -fx-translate-y: 100%;
+    -fx-animation: slide-in-bottom 0.3s ease-out forwards;
+}
+
+.slide-out-bottom {
+    -fx-translate-y: 0;
+    -fx-animation: slide-out-bottom 0.3s ease-in forwards;
+}
+
+.scale-in {
+    -fx-scale-x: 0;
+    -fx-scale-y: 0;
+    -fx-animation: scale-in 0.3s ease-out forwards;
+}
+
+.scale-out {
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+    -fx-animation: scale-out 0.3s ease-in forwards;
+}
+
+/* Keyframes */
+@keyframes fade-in {
+    from { -fx-opacity: 0; }
+    to { -fx-opacity: 1; }
+}
+
+@keyframes fade-out {
+    from { -fx-opacity: 1; }
+    to { -fx-opacity: 0; }
+}
+
+@keyframes slide-in-right {
+    from { -fx-translate-x: 100%; }
+    to { -fx-translate-x: 0; }
+}
+
+@keyframes slide-out-right {
+    from { -fx-translate-x: 0; }
+    to { -fx-translate-x: 100%; }
+}
+
+@keyframes slide-in-left {
+    from { -fx-translate-x: -100%; }
+    to { -fx-translate-x: 0; }
+}
+
+@keyframes slide-out-left {
+    from { -fx-translate-x: 0; }
+    to { -fx-translate-x: -100%; }
+}
+
+@keyframes slide-in-top {
+    from { -fx-translate-y: -100%; }
+    to { -fx-translate-y: 0; }
+}
+
+@keyframes slide-out-top {
+    from { -fx-translate-y: 0; }
+    to { -fx-translate-y: -100%; }
+}
+
+@keyframes slide-in-bottom {
+    from { -fx-translate-y: 100%; }
+    to { -fx-translate-y: 0; }
+}
+
+@keyframes slide-out-bottom {
+    from { -fx-translate-y: 0; }
+    to { -fx-translate-y: 100%; }
+}
+
+@keyframes scale-in {
+    from { -fx-scale-x: 0; -fx-scale-y: 0; }
+    to { -fx-scale-x: 1; -fx-scale-y: 1; }
+}
+
+@keyframes scale-out {
+    from { -fx-scale-x: 1; -fx-scale-y: 1; }
+    to { -fx-scale-x: 0; -fx-scale-y: 0; }
+}
+
+/* Responsive Utilities - Simplified for tablet-first approach */
+.hide {
+    visibility: hidden;
+    -fx-managed: false;
+}
+
+.show {
+    visibility: visible;
+    -fx-managed: true;
+}
+
+/* Print Utilities */
+@media print {
+    .no-print {
+        visibility: hidden;
+        -fx-managed: false;
+    }
+
+    .print-only {
+        visibility: visible;
+    }
+}
+
+.no-print {
+    visibility: visible;
+}
+
+.print-only {
+    visibility: hidden;
+    -fx-managed: false;
+}

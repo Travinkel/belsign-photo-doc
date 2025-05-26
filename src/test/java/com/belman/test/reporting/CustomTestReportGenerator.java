@@ -1,0 +1,266 @@
+package com.belman.test.reporting;
+
+import org.junit.platform.engine.TestExecutionResult;
+import org.junit.platform.launcher.TestExecutionListener;
+import org.junit.platform.launcher.TestIdentifier;
+import org.junit.platform.launcher.TestPlan;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * Custom test report generator that creates HTML and text reports for test executions.
+ * This class implements the JUnit TestExecutionListener interface to receive test execution events.
+ * 
+ * Usage:
+ * 1. Register this listener with the JUnit LauncherDiscoveryRequestBuilder
+ * 2. Run tests
+ * 3. Reports will be generated in the 'test-reports' directory
+ * 
+ * Example:
+ * <pre>
+ * LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
+ *     .selectors(selectPackage("com.belman.test"))
+ *     .build();
+ * 
+ * TestPlan testPlan = LauncherFactory.create().discover(request);
+ * Launcher launcher = LauncherFactory.create();
+ * 
+ * // Register the custom report generator
+ * CustomTestReportGenerator reportGenerator = new CustomTestReportGenerator();
+ * launcher.registerTestExecutionListeners(reportGenerator);
+ * 
+ * // Execute tests
+ * launcher.execute(request);
+ * </pre>
+ */
+public class CustomTestReportGenerator implements TestExecutionListener {
+
+    private static final String REPORT_DIR = "test-reports";
+    private final Map<String, TestExecutionResult> testResults = new HashMap<>();
+    private final AtomicInteger totalTests = new AtomicInteger(0);
+    private final AtomicInteger passedTests = new AtomicInteger(0);
+    private final AtomicInteger failedTests = new AtomicInteger(0);
+    private final AtomicInteger skippedTests = new AtomicInteger(0);
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+
+    @Override
+    public void testPlanExecutionStarted(TestPlan testPlan) {
+        startTime = LocalDateTime.now();
+        System.out.println("[DEBUG_LOG] Test execution started at: " + formatDateTime(startTime));
+        
+        // Create report directory if it doesn't exist
+        createReportDirectory();
+    }
+
+    @Override
+    public void testPlanExecutionFinished(TestPlan testPlan) {
+        endTime = LocalDateTime.now();
+        System.out.println("[DEBUG_LOG] Test execution finished at: " + formatDateTime(endTime));
+        
+        // Generate reports
+        generateTextReport();
+        generateHtmlReport();
+    }
+
+    @Override
+    public void executionStarted(TestIdentifier testIdentifier) {
+        if (testIdentifier.isTest()) {
+            totalTests.incrementAndGet();
+        }
+    }
+
+    @Override
+    public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
+        if (testIdentifier.isTest()) {
+            testResults.put(testIdentifier.getDisplayName(), testExecutionResult);
+            
+            switch (testExecutionResult.getStatus()) {
+                case SUCCESSFUL:
+                    passedTests.incrementAndGet();
+                    break;
+                case FAILED:
+                    failedTests.incrementAndGet();
+                    break;
+                case ABORTED:
+                    skippedTests.incrementAndGet();
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Creates the report directory if it doesn't exist.
+     */
+    private void createReportDirectory() {
+        Path reportDir = Paths.get(REPORT_DIR);
+        if (!Files.exists(reportDir)) {
+            try {
+                Files.createDirectories(reportDir);
+                System.out.println("[DEBUG_LOG] Created report directory: " + reportDir.toAbsolutePath());
+            } catch (IOException e) {
+                System.err.println("Error creating report directory: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Generates a text report with test results.
+     */
+    private void generateTextReport() {
+        String timestamp = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").format(endTime);
+        String reportFileName = REPORT_DIR + File.separator + "test_report_" + timestamp + ".txt";
+        
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(reportFileName))) {
+            writer.write("=== Belsign Photo Documentation Test Report ===\n");
+            writer.write("Generated: " + formatDateTime(endTime) + "\n\n");
+            
+            writer.write("Test Execution Summary:\n");
+            writer.write("- Start Time: " + formatDateTime(startTime) + "\n");
+            writer.write("- End Time: " + formatDateTime(endTime) + "\n");
+            writer.write("- Duration: " + calculateDuration() + " seconds\n\n");
+            
+            writer.write("Test Results:\n");
+            writer.write("- Total Tests: " + totalTests.get() + "\n");
+            writer.write("- Passed: " + passedTests.get() + "\n");
+            writer.write("- Failed: " + failedTests.get() + "\n");
+            writer.write("- Skipped: " + skippedTests.get() + "\n\n");
+            
+            writer.write("Detailed Test Results:\n");
+            testResults.forEach((testName, result) -> {
+                try {
+                    writer.write("- " + testName + ": " + result.getStatus() + "\n");
+                    if (result.getStatus() == TestExecutionResult.Status.FAILED && result.getThrowable().isPresent()) {
+                        writer.write("  Error: " + result.getThrowable().get().getMessage() + "\n");
+                    }
+                } catch (IOException e) {
+                    System.err.println("Error writing test result: " + e.getMessage());
+                }
+            });
+            
+            System.out.println("[DEBUG_LOG] Text report generated: " + reportFileName);
+        } catch (IOException e) {
+            System.err.println("Error generating text report: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Generates an HTML report with test results.
+     */
+    private void generateHtmlReport() {
+        String timestamp = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss").format(endTime);
+        String reportFileName = REPORT_DIR + File.separator + "test_report_" + timestamp + ".html";
+        
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(reportFileName))) {
+            writer.write("<!DOCTYPE html>\n");
+            writer.write("<html lang=\"en\">\n");
+            writer.write("<head>\n");
+            writer.write("    <meta charset=\"UTF-8\">\n");
+            writer.write("    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n");
+            writer.write("    <title>Belsign Photo Documentation Test Report</title>\n");
+            writer.write("    <style>\n");
+            writer.write("        body { font-family: Arial, sans-serif; margin: 20px; }\n");
+            writer.write("        h1 { color: #333; }\n");
+            writer.write("        .summary { background-color: #f5f5f5; padding: 15px; border-radius: 5px; }\n");
+            writer.write("        .passed { color: green; }\n");
+            writer.write("        .failed { color: red; }\n");
+            writer.write("        .skipped { color: orange; }\n");
+            writer.write("        table { border-collapse: collapse; width: 100%; margin-top: 20px; }\n");
+            writer.write("        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }\n");
+            writer.write("        th { background-color: #f2f2f2; }\n");
+            writer.write("        tr:nth-child(even) { background-color: #f9f9f9; }\n");
+            writer.write("    </style>\n");
+            writer.write("</head>\n");
+            writer.write("<body>\n");
+            
+            writer.write("    <h1>Belsign Photo Documentation Test Report</h1>\n");
+            writer.write("    <p>Generated: " + formatDateTime(endTime) + "</p>\n");
+            
+            writer.write("    <div class=\"summary\">\n");
+            writer.write("        <h2>Test Execution Summary</h2>\n");
+            writer.write("        <p>Start Time: " + formatDateTime(startTime) + "</p>\n");
+            writer.write("        <p>End Time: " + formatDateTime(endTime) + "</p>\n");
+            writer.write("        <p>Duration: " + calculateDuration() + " seconds</p>\n");
+            writer.write("        <p>Total Tests: " + totalTests.get() + "</p>\n");
+            writer.write("        <p class=\"passed\">Passed: " + passedTests.get() + "</p>\n");
+            writer.write("        <p class=\"failed\">Failed: " + failedTests.get() + "</p>\n");
+            writer.write("        <p class=\"skipped\">Skipped: " + skippedTests.get() + "</p>\n");
+            writer.write("    </div>\n");
+            
+            writer.write("    <h2>Detailed Test Results</h2>\n");
+            writer.write("    <table>\n");
+            writer.write("        <tr>\n");
+            writer.write("            <th>Test Name</th>\n");
+            writer.write("            <th>Status</th>\n");
+            writer.write("            <th>Error Message</th>\n");
+            writer.write("        </tr>\n");
+            
+            testResults.forEach((testName, result) -> {
+                try {
+                    String statusClass = "";
+                    switch (result.getStatus()) {
+                        case SUCCESSFUL:
+                            statusClass = "passed";
+                            break;
+                        case FAILED:
+                            statusClass = "failed";
+                            break;
+                        case ABORTED:
+                            statusClass = "skipped";
+                            break;
+                    }
+                    
+                    writer.write("        <tr>\n");
+                    writer.write("            <td>" + testName + "</td>\n");
+                    writer.write("            <td class=\"" + statusClass + "\">" + result.getStatus() + "</td>\n");
+                    writer.write("            <td>");
+                    if (result.getStatus() == TestExecutionResult.Status.FAILED && result.getThrowable().isPresent()) {
+                        writer.write(result.getThrowable().get().getMessage());
+                    }
+                    writer.write("</td>\n");
+                    writer.write("        </tr>\n");
+                } catch (IOException e) {
+                    System.err.println("Error writing test result: " + e.getMessage());
+                }
+            });
+            
+            writer.write("    </table>\n");
+            writer.write("</body>\n");
+            writer.write("</html>");
+            
+            System.out.println("[DEBUG_LOG] HTML report generated: " + reportFileName);
+        } catch (IOException e) {
+            System.err.println("Error generating HTML report: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Formats a LocalDateTime object as a string.
+     * 
+     * @param dateTime the LocalDateTime to format
+     * @return the formatted date and time string
+     */
+    private String formatDateTime(LocalDateTime dateTime) {
+        return dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
+
+    /**
+     * Calculates the duration of the test execution in seconds.
+     * 
+     * @return the duration in seconds
+     */
+    private long calculateDuration() {
+        return java.time.Duration.between(startTime, endTime).getSeconds();
+    }
+}

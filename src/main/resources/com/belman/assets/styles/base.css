@@ -1,0 +1,102 @@
+/* Base CSS for BelSign Photo Documentation
+ * Contains core styles and variables:
+ * - Color palette definitions
+ * - Typography settings
+ * - Global element styles
+ * - CSS variables for consistent theming
+ */
+
+/* Color Definitions - Based on Belsign UI Style Guide */
+* {
+    /* Primary Colors */
+    -belman-light-blue: #7fa8c5;  /* Icons, Call-to-actions, Links, Highlighted messages */
+    -belman-blue: #004b88;        /* Main brand symbol, Icons, Important actions/messages */
+    -belman-green: #338d71;       /* Flexibles branding, Secondary CTAs */
+    -belman-dark-grey: #333535;   /* Document back pages, Footers */
+
+    /* Utility Colors */
+    -belman-error-red: #c62828;   /* Error messages, Warnings */
+    -belman-warning-red: #d32f2f; /* Warning indicators, Alert buttons */
+
+    /* Gradient Colors - Derived from primary colors */
+    -belman-light-blue-10: #f0f8ff; /* Very light blue for gradients (top) */
+    -belman-light-blue-20: #d0e4f5; /* Light blue for gradients (bottom) */
+    -belman-grey-05: #f8f8f8;      /* Very light grey for gradients */
+
+    /* Secondary Colors (Greys) */
+    -belman-grey-80: #575757;     /* Table headers, Legal footers */
+    -belman-grey-50: #9d9d9d;     /* Info boxes, SoMe icons, Hover states */
+    -belman-grey-30: #c6c6c6;     /* Info boxes, Tables */
+    -belman-grey-20: #dadada;     /* Info highlight boxes, Table body, Some CTA buttons */
+    -belman-grey-15: #e3e3e3;     /* Image backgrounds, Text box backgrounds */
+    -belman-grey-07: #f2f2f2;     /* Website background, Light box backgrounds */
+
+    /* Responsive Sizing Variables - Based on UI Style Guide */
+    -touch-target-size: 48px;     /* Minimum size for touch targets */
+    -spacing-small: 10px;         /* Minimum spacing between elements */
+    -spacing-medium: 16px;        /* Standard spacing */
+    -spacing-large: 24px;         /* Large spacing for sections */
+
+    /* Font Sizes - Based on UI Style Guide */
+    -font-size-small: 14px;       /* Small text, captions */
+    -font-size-body: 16px;        /* Body text (minimum size) */
+    -font-size-large: 18px;       /* Large text, buttons */
+    -font-size-heading-small: 20px; /* Small headings */
+    -font-size-heading: 24px;     /* Standard headings */
+    -font-size-heading-large: 28px; /* Large headings */
+}
+
+/* Global Styles */
+.root {
+    -fx-font-family: "Segoe UI", "Roboto", "Arial", sans-serif;
+    -fx-font-size: -font-size-body;
+    -fx-background-color: -belman-grey-07;
+}
+
+/* Typography - Tablet-friendly by default */
+.root {
+    -fx-font-size: 14px;
+}
+
+.title {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
+}
+
+.subtitle {
+    -fx-font-size: 18px;
+    -fx-text-fill: -belman-dark-grey;
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
+}
+
+.body-text {
+    -fx-font-size: 14px;
+    -fx-text-fill: -belman-grey-80;
+    -fx-wrap-text: true;
+}
+
+.title-label {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+}
+
+.section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+    -fx-padding: 0 0 5px 0;
+}
+
+/* Tablet-like styling for desktop applications */
+.tablet-style {
+    /* Remove window borders */
+    -fx-background-color: transparent;
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 15, 0, 0, 5);
+}

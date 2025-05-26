@@ -1,0 +1,426 @@
+/* Components CSS for BelSign Photo Documentation
+ * Contains reusable UI component styles:
+ * - Buttons, inputs, cards
+ * - Form elements
+ * - Lists and tables
+ * - Dialog/modal styles
+ */
+
+/* Button Styles - Enhanced for touch, tablet-friendly by default */
+.button {
+    -fx-min-height: -touch-target-size;
+    -fx-min-width: 100px;
+    -fx-padding: 10px 16px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 2, 0, 0, 1);
+    -fx-transition: all 0.2s ease-in-out;
+    -fx-font-size: 16px;
+}
+
+.button:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 4, 0, 0, 2);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.button:pressed {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 1, 0, 0, 0);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-translate-y: 1px;
+}
+
+/* Primary Button */
+.button-primary {
+    -fx-background-color: -belman-blue;
+    -fx-text-fill: white;
+    -fx-font-size: -font-size-large;
+    -fx-padding: 12px 24px;
+    -fx-background-radius: 6px;
+    -fx-min-height: -touch-target-size;
+    -fx-cursor: hand;
+}
+
+.button-primary:hover {
+    -fx-background-color: derive(-belman-blue, 10%);
+}
+
+.button-primary:pressed {
+    -fx-background-color: derive(-belman-blue, -10%);
+}
+
+/* Secondary Button */
+.button-secondary {
+    -fx-background-color: white;
+    -fx-border-color: -belman-light-blue;
+    -fx-border-width: 2px;
+    -fx-text-fill: -belman-blue;
+    -fx-font-size: -font-size-large;
+    -fx-padding: 12px 24px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-min-height: -touch-target-size;
+    -fx-cursor: hand;
+}
+
+.button-secondary:hover {
+    -fx-background-color: derive(white, -5%);
+    -fx-border-color: derive(-belman-light-blue, 10%);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 4, 0, 0, 1);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.button-secondary:pressed {
+    -fx-background-color: derive(white, -10%);
+    -fx-border-color: derive(-belman-light-blue, -10%);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 0);
+}
+
+/* Success Button */
+.button-success {
+    -fx-background-color: -belman-green;
+    -fx-text-fill: white;
+    -fx-font-size: -font-size-large;
+    -fx-padding: 12px 24px;
+    -fx-background-radius: 6px;
+    -fx-min-height: -touch-target-size;
+    -fx-cursor: hand;
+}
+
+.button-success:hover {
+    -fx-background-color: derive(-belman-green, 10%);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 6, 0, 0, 2);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.button-success:pressed {
+    -fx-background-color: derive(-belman-green, -10%);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+}
+
+/* Danger Button */
+.button-danger {
+    -fx-background-color: #d32f2f;
+    -fx-text-fill: white;
+    -fx-font-size: -font-size-large;
+    -fx-padding: 12px 24px;
+    -fx-background-radius: 6px;
+    -fx-min-height: -touch-target-size;
+    -fx-cursor: hand;
+}
+
+.button-danger:hover {
+    -fx-background-color: derive(#d32f2f, 10%);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 6, 0, 0, 2);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.button-danger:pressed {
+    -fx-background-color: derive(#d32f2f, -10%);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+}
+
+/* Back Button */
+.back-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: -font-size-body;
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+    -fx-border-color: white;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-min-width: 80px;
+}
+
+.back-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+}
+
+.back-button:pressed {
+    -fx-background-color: rgba(255, 255, 255, 0.3);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+/* Close button */
+.close-button {
+    -fx-background-color: rgba(211, 47, 47, 0.8);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 50%;
+    -fx-min-width: 30px;
+    -fx-min-height: 30px;
+    -fx-max-width: 30px;
+    -fx-max-height: 30px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 3, 0, 0, 1);
+    -fx-alignment: center;
+}
+
+.close-button:hover {
+    -fx-background-color: rgba(211, 47, 47, 1.0);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0, 0, 2);
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+.close-button:pressed {
+    -fx-background-color: rgba(180, 0, 0, 1.0);
+    -fx-scale-x: 0.9;
+    -fx-scale-y: 0.9;
+}
+
+/* Form Controls - Enhanced for touch, tablet-friendly by default */
+.text-field, .text-area, .combo-box, .choice-box {
+    -fx-min-height: -touch-target-size;
+    -fx-background-radius: 4px;
+    -fx-padding: 6px;
+    -fx-font-size: 14px;
+    -fx-border-color: -belman-grey-30;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-transition: border-color 0.2s ease-in-out;
+}
+
+/* Enhanced focus styles for better accessibility */
+.text-field:focused, .text-area:focused, .combo-box:focused, .choice-box:focused {
+    -fx-border-color: -belman-blue;
+    -fx-border-width: 3px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 75, 136, 0.5), 6, 0, 0, 0);
+    -fx-background-color: derive(white, 2%);
+    /* Animation for better visibility */
+    -fx-transition: border-color 0.2s ease-in-out, effect 0.2s ease-in-out;
+    /* Outline for better keyboard navigation */
+    -fx-background-insets: -1.5;
+}
+
+/* Focus styles for buttons */
+.button:focused {
+    -fx-effect: dropshadow(gaussian, rgba(0, 75, 136, 0.7), 10, 0, 0, 0);
+    -fx-border-color: -belman-blue;
+    -fx-border-width: 3px;
+    -fx-border-radius: 10px;
+    -fx-background-insets: -2;
+    /* Animation for better visibility */
+    -fx-transition: border-color 0.2s ease-in-out, effect 0.2s ease-in-out;
+    /* Subtle scale effect to indicate focus */
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+/* Focus styles for login-specific buttons */
+.login-button:focused, .nfc-button:focused {
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.9), 12, 0, 0, 0);
+    -fx-border-color: white;
+    -fx-border-width: 3px;
+    -fx-border-radius: 10px;
+    /* Animation for better visibility */
+    -fx-transition: border-color 0.2s ease-in-out, effect 0.2s ease-in-out;
+    /* Subtle scale effect to indicate focus */
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+.text-field:hover, .text-area:hover, .combo-box:hover, .choice-box:hover {
+    -fx-border-color: -belman-grey-50;
+}
+
+.check-box, .radio-button {
+    -fx-min-height: -touch-target-size;
+    -fx-padding: 8px;
+    -fx-font-size: -font-size-body;
+    -fx-transition: scale 0.1s ease-in-out;
+}
+
+.check-box:hover, .radio-button:hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.check-box .box, .radio-button .radio {
+    -fx-min-height: 24px;
+    -fx-min-width: 24px;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-border-color: -belman-grey-50;
+    -fx-border-width: 1px;
+}
+
+.check-box:selected .box, .radio-button:selected .radio {
+    -fx-background-color: -belman-blue;
+    -fx-border-color: -belman-blue;
+}
+
+/* Card Styles */
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-border-color: -belman-grey-30;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-padding: -spacing-medium;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);
+}
+
+/* List and Table Views */
+.list-view, .table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 4px;
+    -fx-border-color: -belman-grey-30;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+}
+
+.list-view .list-cell, .table-view .table-row-cell {
+    -fx-min-height: -touch-target-size;
+    -fx-padding: 10px;
+    -fx-border-color: transparent transparent -belman-grey-15 transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.list-view .list-cell:hover, .table-view .table-row-cell:hover {
+    -fx-background-color: derive(-belman-grey-07, -2%);
+}
+
+.list-view .list-cell:selected, .table-view .table-row-cell:selected {
+    -fx-background-color: derive(-belman-light-blue, 80%);
+    -fx-text-fill: -belman-dark-grey;
+}
+
+.table-view .column-header {
+    -fx-background-color: -belman-grey-15;
+    -fx-font-weight: bold;
+    -fx-padding: 10px;
+    -fx-min-height: -touch-target-size;
+}
+
+/* Progress Bar */
+.progress-bar {
+    -fx-accent: -belman-light-blue;
+    -fx-min-height: 10px;
+}
+
+.progress-bar .track {
+    -fx-background-color: -belman-grey-15;
+}
+
+/* Error Styles */
+/* Error styles with enhanced accessibility, tablet-friendly by default */
+.error-container {
+    -fx-background-color: rgba(211, 47, 47, 0.2);
+    -fx-background-radius: 10px;
+    -fx-padding: 8px;
+    -fx-border-color: rgba(211, 47, 47, 0.7);
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(211, 47, 47, 0.3), 5, 0, 0, 2);
+    /* Animation for better visibility */
+    -fx-transition: all 0.3s ease-in-out;
+}
+
+.error-container:hover {
+    -fx-background-color: rgba(211, 47, 47, 0.25);
+    -fx-effect: dropshadow(gaussian, rgba(211, 47, 47, 0.4), 6, 0, 0, 3);
+}
+
+.error-icon-label {
+    -fx-font-size: 18px;
+    -fx-text-fill: #b71c1c; /* Even darker red for better contrast */
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.8), 1, 0, 0, 0);
+}
+
+.error-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #b71c1c; /* Even darker red for better contrast */
+    -fx-font-weight: bold; /* Bold for better readability */
+    -fx-wrap-text: true;
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.8), 1, 0, 0, 0);
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+}
+
+.loading-container {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-padding: 20px;
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+    -fx-max-width: 300px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 5);
+}
+
+.loading-text {
+    -fx-font-size: -font-size-heading-small;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+}
+
+.loading-progress {
+    -fx-accent: -belman-blue;
+    -fx-pref-width: 250px;
+}
+
+/* Confirmation Dialog */
+.confirmation-dialog-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+}
+
+.confirmation-dialog {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-padding: 20px;
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+    -fx-max-width: 400px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 5);
+}
+
+.confirmation-title {
+    -fx-font-size: -font-size-heading-small;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+}
+
+.confirmation-message {
+    -fx-font-size: -font-size-body;
+    -fx-text-fill: -belman-grey-80;
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
+}
+
+.confirmation-buttons {
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+}
+
+/* Scroll bars - Wider for touch */
+.scroll-bar {
+    -fx-min-width: 16px;
+    -fx-pref-width: 16px;
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: -belman-grey-50;
+    -fx-background-radius: 8px;
+}
+
+/* All styles are now tablet-friendly by default */

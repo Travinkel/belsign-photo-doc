@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.belman.presentation.usecases.login.LoginViewController"
+           prefHeight="600.0" prefWidth="800.0"
+           styleClass="login-view">
+
+    <!-- Background is handled via CSS on the StackPane -->
+
+    <!-- Close button -->
+    <Button fx:id="closeButton" text="X" styleClass="close-button" 
+            onAction="#handleCloseButtonAction"
+            StackPane.alignment="TOP_RIGHT">
+        <StackPane.margin>
+            <Insets top="16.0" right="16.0"/>
+        </StackPane.margin>
+    </Button>
+
+    <!-- Main content container -->
+    <VBox styleClass="container" alignment="CENTER" maxWidth="900" maxHeight="600">
+
+        <!-- Login card with shadow and rounded corners -->
+        <VBox styleClass="card, login-card" spacing="24">
+
+            <!-- Header with logo and app name -->
+            <HBox styleClass="login-header" alignment="CENTER" spacing="16">
+                <ImageView fitWidth="180" preserveRatio="true">
+                    <Image url="@/com/belman/images/BELMAN_Logo_264pxl.png"/>
+                </ImageView>
+                <VBox alignment="CENTER_LEFT">
+                    <Label text="BelSign" styleClass="title"/>
+                    <Label text="Photo Documentation" styleClass="subtitle"/>
+                </VBox>
+            </HBox>
+
+            <!-- Login options container -->
+            <HBox styleClass="login-options" spacing="32" alignment="CENTER">
+
+                <!-- Credentials login section -->
+                <VBox styleClass="login-section" HBox.hgrow="ALWAYS" alignment="TOP_CENTER">
+                    <Label text="Sign in with credentials" styleClass="section-title"/>
+
+                    <!-- Username field -->
+                    <VBox styleClass="form-group">
+                        <Label text="Username" styleClass="form-label"/>
+                        <TextField fx:id="usernameField" 
+                                  promptText="Enter your username"
+                                  styleClass="form-control"/>
+                    </VBox>
+
+                    <!-- Password field -->
+                    <VBox styleClass="form-group">
+                        <Label text="Password" styleClass="form-label"/>
+                        <PasswordField fx:id="passwordField" 
+                                      promptText="Enter your password"
+                                      styleClass="form-control"/>
+                    </VBox>
+
+                    <!-- Error message container -->
+                    <HBox fx:id="errorContainer" styleClass="alert, alert-danger" visible="false">
+                        <ImageView fitHeight="20" preserveRatio="true">
+                            <Image url="@/com/belman/assets/icons/warning.svg"/>
+                        </ImageView>
+                        <Label fx:id="errorLabel" styleClass="alert-text" wrapText="true"/>
+                    </HBox>
+
+                    <!-- Login button -->
+                    <Button fx:id="loginButton" text="Log In" 
+                           styleClass="btn, btn-primary"/>
+                </VBox>
+
+                <!-- Separator -->
+                <VBox styleClass="separator-container" alignment="CENTER">
+                    <Line startX="0" startY="0" endX="0" endY="60" 
+                         styleClass="separator-line"/>
+                    <Label text="OR" styleClass="separator-text"/>
+                    <Line startX="0" startY="0" endX="0" endY="60" 
+                         styleClass="separator-line"/>
+                </VBox>
+
+                <!-- NFC login section -->
+                <VBox styleClass="login-section" HBox.hgrow="ALWAYS" alignment="TOP_CENTER">
+                    <Label text="Sign in with NFC badge" styleClass="section-title"/>
+
+                    <!-- NFC icon -->
+                    <ImageView styleClass="nfc-icon" fitHeight="72" preserveRatio="true">
+                        <Image url="@/com/belman/assets/icons/nfc.svg"/>
+                    </ImageView>
+
+                    <!-- NFC instructions -->
+                    <Label text="Hold your badge near the NFC reader to sign in" 
+                          styleClass="nfc-instruction"
+                          wrapText="true" textAlignment="CENTER"/>
+
+                    <!-- NFC button -->
+                    <Button fx:id="nfcButton" text="Scan NFC Badge" 
+                           styleClass="btn, btn-success"/>
+
+                    <!-- Mobile icon -->
+                    <HBox alignment="CENTER_RIGHT" styleClass="mobile-icon-container">
+                        <ImageView fitHeight="32" preserveRatio="true">
+                            <Image url="@/com/belman/assets/icons/mobile.svg"/>
+                        </ImageView>
+                    </HBox>
+                </VBox>
+            </HBox>
+
+            <!-- Development helper button -->
+            <Button fx:id="devHelperButton" text="Dev: Show Available Users" 
+                   styleClass="btn, btn-secondary, btn-sm"/>
+        </VBox>
+
+        <!-- Loading overlay (hidden by default) -->
+        <StackPane fx:id="loadingOverlay" styleClass="loading-overlay" visible="false" 
+                  managed="false" StackPane.alignment="CENTER">
+            <VBox alignment="CENTER" spacing="16" styleClass="loading-container">
+                <ProgressIndicator styleClass="loading-indicator"/>
+                <Label text="Logging in..." styleClass="loading-text"/>
+            </VBox>
+        </StackPane>
+    </VBox>
+</StackPane>

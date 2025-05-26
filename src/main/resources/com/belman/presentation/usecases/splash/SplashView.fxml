@@ -2,37 +2,55 @@
 
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.Label?>
 <?import com.gluonhq.charm.glisten.control.ProgressBar?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.paint.Color?>
 
 <StackPane xmlns="http://javafx.com/javafx"
            xmlns:fx="http://javafx.com/fxml"
            fx:controller="com.belman.presentation.usecases.splash.SplashViewController"
-           prefHeight="600.0" prefWidth="400.0"
-           styleClass="splash-view">
-    <VBox alignment="CENTER" spacing="20.0">
+           prefHeight="800.0" prefWidth="1024.0"
+           styleClass="splash-view, tablet-style">
+    <VBox alignment="CENTER" spacing="30.0" styleClass="splash-container">
         <padding>
-            <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
+            <Insets top="40.0" right="40.0" bottom="40.0" left="40.0"/>
         </padding>
 
-        <!-- Logo -->
-        <ImageView fx:id="logoImage" fitWidth="200.0" preserveRatio="true">
-            <Image url="@/com/belman/images/logo.png"/>
+        <!-- Logo with enhanced size and styling -->
+        <ImageView fx:id="logoImage" fitWidth="300.0" preserveRatio="true" styleClass="splash-logo">
+            <Image url="@/com/belman/images/BELMAN_Logo_264pxl.png"/>
+            <effect>
+                <DropShadow>
+                    <color>
+                        <Color opacity="0.25" />
+                    </color>
+                </DropShadow>
+            </effect>
         </ImageView>
 
-        <!-- App Name -->
+        <!-- App Name with enhanced styling -->
         <Label fx:id="titleLabel" text="BelSign Photo Documentation" styleClass="title-label"/>
 
         <!-- Version -->
         <Label fx:id="subtitleLabel" text="Version 1.0" styleClass="version-label"/>
 
-        <!-- Loading Message -->
+        <!-- Loading Message with enhanced styling -->
         <Label fx:id="messageLabel" text="Loading..." styleClass="message-label"/>
 
-        <!-- Loading Progress -->
-        <ProgressBar fx:id="loadingProgress" progress="0.0" prefWidth="250.0" styleClass="loading-progress"/>
+        <!-- Loading Progress with enhanced styling -->
+        <ProgressBar fx:id="loadingProgress" progress="0.0" styleClass="loading-progress"/>
+
+        <!-- Footer with company info -->
+        <HBox alignment="CENTER" spacing="10.0">
+            <padding>
+                <Insets top="20.0" />
+            </padding>
+            <Label text="© 2023 Belman A/S" styleClass="footer-label" />
+        </HBox>
     </VBox>
 </StackPane>

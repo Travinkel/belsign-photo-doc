@@ -33,8 +33,12 @@
                     <Insets top="15.0" right="15.0" bottom="10.0" left="15.0"/>
                 </padding>
 
-                <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="header">
+                <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="header">
                     <Button fx:id="navigateBackButton" text="Back" styleClass="back-button" onAction="#handleNavigateBackClick"/>
+                    <!-- Belman Logo -->
+                    <ImageView fitHeight="40.0" preserveRatio="true" styleClass="header-logo">
+                        <Image url="@/com/belman/images/BELMAN_Logo_264pxl.png"/>
+                    </ImageView>
                     <Label text="Photo Documentation" styleClass="title-label"/>
                     <HBox HBox.hgrow="ALWAYS" />
                     <Label text="Order:" styleClass="order-label"/>
@@ -65,7 +69,9 @@
                     <padding>
                         <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
                     </padding>
-                    <Label text="⚠️" styleClass="error-icon"/>
+                    <ImageView styleClass="error-icon" fitHeight="24.0" preserveRatio="true">
+                        <Image url="@/com/belman/assets/icons/warning.svg"/>
+                    </ImageView>
                     <Label fx:id="errorLabel" text="" styleClass="error-message" wrapText="true"/>
                 </HBox>
             </VBox>
@@ -90,7 +96,9 @@
 
                         <!-- Placeholder when no photo is available -->
                         <VBox fx:id="noPhotoPlaceholder" alignment="CENTER" spacing="15.0" styleClass="no-photo-placeholder">
-                            <Label text="📷" style="-fx-font-size: 48px;"/>
+                            <ImageView styleClass="camera-icon" fitHeight="48.0" preserveRatio="true">
+                                <Image url="@/com/belman/assets/icons/camera.svg"/>
+                            </ImageView>
                             <Label text="No photo taken yet" styleClass="placeholder-text"/>
                             <Label text="Select a template from the list and click 'Start Camera'" 
                                    wrapText="true" textAlignment="CENTER" styleClass="placeholder-instruction"/>
@@ -152,7 +160,9 @@
                                 <padding>
                                     <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
                                 </padding>
-                                <Label text="📷" style="-fx-font-size: 48px;" styleClass="empty-state-icon"/>
+                                <ImageView styleClass="empty-state-icon camera-icon" fitHeight="48.0" preserveRatio="true">
+                                    <Image url="@/com/belman/assets/icons/camera.svg"/>
+                                </ImageView>
                                 <Label text="No Photo Templates Available" styleClass="empty-state-title"/>
                                 <Label text="This order doesn't have any photo templates defined yet. Please contact your supervisor or QA team to set up templates for documentation." 
                                        wrapText="true" styleClass="empty-state-message"/>

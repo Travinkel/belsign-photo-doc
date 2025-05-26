@@ -16,50 +16,50 @@
            fx:controller="com.belman.presentation.usecases.admin.dashboard.AdminDashboardViewController"
            prefHeight="600.0" prefWidth="400.0"
            styleClass="admin-dashboard-view">
-    
+
     <VBox spacing="10.0">
         <padding>
             <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
         </padding>
-        
+
         <!-- Header -->
         <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="header">
             <Label text="Admin Dashboard" styleClass="title-label"/>
             <HBox HBox.hgrow="ALWAYS" />
-            <Button fx:id="logoutButton" text="Logout" styleClass="logout-button"/>
+            <Button fx:id="logoutButton" text="Logout" styleClass="logout-button" onAction="#handleLogout"/>
         </HBox>
-        
+
         <!-- Dashboard Content -->
         <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
             <VBox spacing="20.0">
                 <padding>
                     <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
                 </padding>
-                
+
                 <!-- User Management Section -->
                 <VBox spacing="10.0" styleClass="section">
                     <Label text="User Management" styleClass="section-title"/>
-                    <Button fx:id="userManagementButton" text="Manage Users" styleClass="action-button"/>
+                    <Button fx:id="manageUsersButton" text="Manage Users" styleClass="action-button" onAction="#handleManageUsers"/>
                 </VBox>
-                
+
                 <!-- System Statistics Section -->
                 <VBox spacing="10.0" styleClass="section">
                     <Label text="System Statistics" styleClass="section-title"/>
                     <GridPane hgap="10.0" vgap="10.0">
                         <Label text="Total Users:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
                         <Label fx:id="totalUsersLabel" text="0" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-                        
+
                         <Label text="Active Orders:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                         <Label fx:id="activeOrdersLabel" text="0" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                        
+
                         <Label text="Completed Orders:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
                         <Label fx:id="completedOrdersLabel" text="0" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                        
+
                         <Label text="Pending Reviews:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
                         <Label fx:id="pendingReviewsLabel" text="0" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
                     </GridPane>
                 </VBox>
-                
+
                 <!-- System Actions Section -->
                 <VBox spacing="10.0" styleClass="section">
                     <Label text="System Actions" styleClass="section-title"/>

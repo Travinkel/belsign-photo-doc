@@ -29,7 +29,7 @@
                 <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="header">
                     <Label text="QA Dashboard" styleClass="title-label"/>
                     <HBox HBox.hgrow="ALWAYS" />
-                    <Button fx:id="logoutButton" text="Logout" styleClass="logout-button"/>
+                    <Button fx:id="logoutButton" text="Logout" styleClass="logout-button" onAction="#handleLogout"/>
                 </HBox>
 
                 <!-- Search and Filter -->
@@ -58,6 +58,7 @@
                 <!-- Action Buttons -->
                 <HBox spacing="10.0" alignment="CENTER">
                     <Button fx:id="reviewPhotosButton" text="Review Photos" onAction="#handleReviewPhotos"/>
+                    <Button fx:id="assignOrderButton" text="Assign Order" onAction="#handleAssignOrder"/>
                     <Button fx:id="generateReportButton" text="Generate Report" onAction="#handleGenerateReport"/>
                 </HBox>
 

@@ -1,0 +1,1781 @@
+/* Views CSS for BelSign Photo Documentation
+ * Contains view-specific styles:
+ * - Styles unique to specific screens
+ * - Organized by sections (login, splash, photo capture, etc.)
+ * - Minimal overrides of component styles
+ *
+ * TABLE OF CONTENTS:
+ * 1. Splash View Styles
+ *    1.1. Container and Layout
+ *    1.2. Logo and Branding
+ *    1.3. Progress Indicators
+ *    1.4. Text Elements
+ * 
+ * 2. Login View Styles
+ *    2.1. Background and Container
+ *    2.2. Card Layout
+ *    2.3. Branding Elements
+ *    2.4. Form Elements
+ *    2.5. Buttons and Controls
+ * 
+ * 3. Photo Gallery Styles
+ *    3.1. Gallery Layout
+ *    3.2. Photo Items
+ *    3.3. Gallery Controls
+ * 
+ * 4. Progressive Capture Dashboard (PhotoCubeView) Styles
+ *    4.1. Layout and Panels
+ *    4.2. Template List Styles
+ *    4.3. Camera Controls
+ *    4.4. Photo Preview Area
+ * 
+ * 5. AssignedOrderView Styles
+ *    5.1. Order Cards
+ *    5.2. Order Details
+ *    5.3. Status Indicators
+ * 
+ * 6. Responsive Styles
+ *    6.1. Tablet Styles
+ *       6.1.1. Tablet - Splash View
+ *       6.1.2. Tablet - Login View
+ *       6.1.3. Tablet - Photo Capture
+ *       6.1.4. Tablet - Order View
+ *    6.2. Smartphone Styles
+ *       6.2.1. Smartphone - Splash View
+ *       6.2.2. Smartphone - Login View
+ *       6.2.3. Smartphone - Photo Capture
+ *       6.2.4. Smartphone - Order View
+ */
+
+/* 1. Splash View Styles */
+
+/* 1.1. Container and Layout */
+.splash-view {
+    -fx-background-color: linear-gradient(to bottom, white, -belman-light-blue-20);
+    -fx-padding: -spacing-large;
+    -fx-effect: innershadow(gaussian, rgba(0, 75, 136, 0.15), 12, 0, 0, 0);
+}
+
+.splash-container {
+    -fx-background-color: white;
+    -fx-padding: -spacing-large;
+    -fx-background-radius: 12px;
+    -fx-border-color: rgba(127, 168, 197, 0.2);
+    -fx-border-width: 1px;
+    -fx-border-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 75, 136, 0.25), 12, 0, 0, 6);
+}
+
+.splash-content {
+    -fx-alignment: center;
+    -fx-spacing: -spacing-medium;
+    -fx-max-width: 800px;
+    -fx-max-height: 600px;
+}
+
+.splash-background {
+    -fx-background-color: white;
+}
+
+/* 1.2. Logo and Branding - Tablet-friendly by default */
+.splash-logo {
+    -fx-fit-width: 240px;
+    -fx-preserve-ratio: true;
+    -fx-effect: dropshadow(gaussian, rgba(0, 75, 136, 0.2), 6, 0, 0, 3);
+    -fx-transition: opacity 0.5s ease-in-out, scale 0.5s ease-in-out;
+}
+
+/* 1.3. Progress Indicators - Tablet-friendly by default */
+.loading-progress {
+    -fx-pref-width: 300px;
+    -fx-pref-height: 10px;
+    -fx-accent: -belman-blue;
+    -fx-effect: dropshadow(gaussian, rgba(0, 75, 136, 0.25), 4, 0, 0, 2);
+    -fx-transition: width 0.3s ease-in-out;
+}
+
+.loading-progress .bar {
+    -fx-background-color: -belman-blue;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 0;
+    -fx-transition: width 0.3s ease-in-out;
+}
+
+.loading-progress .track {
+    -fx-background-color: -belman-grey-15;
+    -fx-background-radius: 6px;
+    -fx-background-insets: 0;
+    -fx-border-color: -belman-grey-30;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+}
+
+/* 1.4. Text Elements */
+.version-text, .version-label {
+    -fx-font-size: -font-size-small;
+    -fx-text-fill: -belman-grey-50;
+    -fx-font-style: italic;
+    -fx-padding: 0 0 -spacing-small 0;
+}
+
+.message-label {
+    -fx-font-size: -font-size-body;
+    -fx-text-fill: -belman-blue;
+    -fx-font-weight: normal;
+    -fx-padding: -spacing-small 0;
+}
+
+.footer-label {
+    -fx-font-size: -font-size-small;
+    -fx-text-fill: -belman-grey-50;
+    -fx-font-style: italic;
+    -fx-padding: -spacing-small 0;
+}
+
+/* 2. Login View Styles */
+
+/* 2.1. Background and Container */
+.login-view {
+    -fx-background-image: url('/com/belman/images/loginBackground.png');
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+    -fx-background-repeat: no-repeat;
+}
+
+/* 2.2. Login Card */
+.login-card {
+    -fx-background-color: white;
+    -fx-background-radius: 16px;
+    -fx-padding: 24px;
+    -fx-spacing: 24px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 15, 0, 0, 5);
+    -fx-max-width: 800px;
+    -fx-min-width: 700px;
+    -fx-alignment: center;
+}
+
+/* 2.3. Login Header */
+.login-header {
+    -fx-padding: 0 0 16px 0;
+    -fx-border-color: transparent transparent -belman-grey-20 transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-border-insets: 0 -8px 16px -8px;
+}
+
+/* 2.4. Login Options Container */
+.login-options {
+    -fx-padding: 16px 0;
+    -fx-alignment: center;
+}
+
+/* 2.5. Login Section */
+.login-section {
+    -fx-spacing: 16px;
+    -fx-alignment: top-center;
+    -fx-min-width: 300px;
+    -fx-max-width: 350px;
+}
+
+/* 2.6. Form Elements */
+.form-group {
+    -fx-spacing: 8px;
+    -fx-padding: 0 0 8px 0;
+    -fx-min-width: 100%;
+}
+
+.form-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+}
+
+.form-control {
+    -fx-min-height: 48px;
+    -fx-pref-height: 48px;
+    -fx-font-size: 16px;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: -belman-grey-30;
+    -fx-border-width: 1px;
+    -fx-background-color: white;
+    -fx-min-width: 100%;
+}
+
+.form-control:focused {
+    -fx-border-color: -belman-blue;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 75, 136, 0.2), 4, 0, 0, 0);
+}
+
+.form-control:hover {
+    -fx-border-color: -belman-grey-50;
+}
+
+/* 2.7. Section Title */
+.section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+    -fx-padding: 0 0 16px 0;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+    -fx-wrap-text: true;
+}
+
+/* 2.8. NFC Elements */
+.nfc-icon {
+    -fx-opacity: 0.9;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 4, 0, 0, 2);
+}
+
+.nfc-instruction {
+    -fx-font-size: 16px;
+    -fx-text-fill: -belman-grey-80;
+    -fx-text-alignment: center;
+    -fx-padding: 8px 0 16px 0;
+    -fx-wrap-text: true;
+    -fx-max-width: 300px;
+}
+
+/* 2.9. Separator */
+.separator-container {
+    -fx-padding: 0 16px;
+    -fx-alignment: center;
+}
+
+.separator-line {
+    -fx-stroke: -belman-grey-30;
+    -fx-stroke-width: 1px;
+    -fx-opacity: 0.8;
+}
+
+.separator-text {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-grey-50;
+    -fx-padding: 8px 0;
+}
+
+/* 2.10. Alert Styles */
+.alert {
+    -fx-padding: 12px;
+    -fx-spacing: 8px;
+    -fx-background-radius: 8px;
+    -fx-alignment: center-left;
+    -fx-min-width: 100%;
+    -fx-max-width: 100%;
+}
+
+.alert-danger {
+    -fx-background-color: rgba(211, 47, 47, 0.1);
+    -fx-border-color: rgba(211, 47, 47, 0.3);
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+}
+
+.alert-text {
+    -fx-font-size: 14px;
+    -fx-text-fill: #d32f2f;
+    -fx-wrap-text: true;
+}
+
+/* 2.11. Button Styles */
+.btn {
+    -fx-min-height: 48px;
+    -fx-pref-height: 48px;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 24px;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-min-width: 200px;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 3, 0, 0, 1);
+    -fx-transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.btn:pressed {
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 0);
+}
+
+.btn-primary {
+    -fx-background-color: -belman-blue;
+    -fx-text-fill: white;
+}
+
+.btn-primary:hover {
+    -fx-background-color: derive(-belman-blue, 10%);
+}
+
+.btn-primary:pressed {
+    -fx-background-color: derive(-belman-blue, -10%);
+}
+
+.btn-success {
+    -fx-background-color: -belman-green;
+    -fx-text-fill: white;
+}
+
+.btn-success:hover {
+    -fx-background-color: derive(-belman-green, 10%);
+}
+
+.btn-success:pressed {
+    -fx-background-color: derive(-belman-green, -10%);
+}
+
+.btn-secondary {
+    -fx-background-color: white;
+    -fx-text-fill: -belman-blue;
+    -fx-border-color: -belman-light-blue;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: derive(white, -5%);
+    -fx-border-color: derive(-belman-light-blue, 10%);
+}
+
+.btn-secondary:pressed {
+    -fx-background-color: derive(white, -10%);
+    -fx-border-color: derive(-belman-light-blue, -10%);
+}
+
+.btn-sm {
+    -fx-min-height: 36px;
+    -fx-pref-height: 36px;
+    -fx-font-size: 14px;
+    -fx-padding: 6px 12px;
+    -fx-min-width: 120px;
+}
+
+/* 2.12. Loading Overlay */
+.loading-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+    -fx-alignment: center;
+}
+
+.loading-container {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-padding: 24px;
+    -fx-spacing: 16px;
+    -fx-alignment: center;
+    -fx-max-width: 250px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 0, 5);
+}
+
+.loading-indicator {
+    -fx-progress-color: -belman-blue;
+    -fx-max-width: 48px;
+    -fx-max-height: 48px;
+}
+
+.loading-text {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+}
+
+/* 3. Photo Gallery Styles */
+
+/* 3.1. Gallery Layout */
+.photo-gallery {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-border-color: -belman-grey-30;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);
+}
+
+.photo-gallery-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+
+.photo-gallery-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.photo-gallery-scroll > .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-padding: 0 0 0 1px;
+}
+
+.photo-gallery-scroll > .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-padding: 1px 0 0 0;
+}
+
+/* 3.2. Photo Items */
+.photo-gallery-thumbnail {
+    -fx-background-color: -belman-grey-15;
+    -fx-background-radius: 4px;
+    -fx-border-color: -belman-grey-30;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
+    -fx-cursor: hand;
+    -fx-transition: all 0.2s ease-in-out;
+}
+
+.photo-gallery-thumbnail:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 4, 0, 0, 2);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.photo-gallery-thumbnail.selected {
+    -fx-border-color: -belman-blue;
+    -fx-border-width: 3px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 75, 136, 0.3), 5, 0, 0, 2);
+}
+
+.photo-gallery-status-label {
+    -fx-background-color: rgba(0, 0, 0, 0.6);
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 2px 6px;
+    -fx-background-radius: 4px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 2, 0, 0, 1);
+}
+
+.photo-gallery-status-label.status-pending {
+    -fx-background-color: orange;
+    -fx-opacity: 0.8; /* Warning color (orange) with opacity */
+}
+
+.photo-gallery-status-label.status-approved {
+    -fx-background-color: -belman-green;
+    -fx-opacity: 0.8; /* Belman green with opacity */
+}
+
+.photo-gallery-status-label.status-rejected {
+    -fx-background-color: -belman-error-red;
+    -fx-opacity: 0.8; /* Error color (red) with opacity */
+}
+
+.photo-gallery-caption-label {
+    -fx-background-color: rgba(0, 0, 0, 0.6);
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 2px 6px;
+    -fx-background-radius: 4px;
+    -fx-max-width: 100%;
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 2, 0, 0, 1);
+}
+
+/* 3.3. Gallery Controls */
+.photo-gallery-empty-label {
+    -fx-font-size: -font-size-body;
+    -fx-text-fill: -belman-grey-50;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
+.photo-gallery-loading-overlay {
+    -fx-background-color: rgba(255, 255, 255, 0.8);
+    -fx-alignment: center;
+}
+
+.photo-gallery-loading-label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+}
+
+.photo-gallery-zoom-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.8);
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
+.photo-gallery-zoomed-image {
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.3), 10, 0, 0, 0);
+    -fx-max-width: 90%;
+    -fx-max-height: 90%;
+}
+
+/* 4. Progressive Capture Dashboard (PhotoCubeView) Styles */
+.progressive-capture-dashboard {
+    -fx-background-color: -belman-grey-07;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Common panel title styling */
+.progressive-capture-dashboard .panel-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+    -fx-padding: 0 0 10px 0;
+    -fx-border-color: transparent transparent -belman-grey-20 transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+/* Header styles */
+.progressive-capture-dashboard .header {
+    -fx-background-color: -belman-grey-07;
+    -fx-border-color: -belman-grey-20;
+    -fx-border-width: 0 0 1px 0;
+    -fx-padding: -spacing-small;
+    -fx-spacing: -spacing-small;
+}
+
+.progressive-capture-dashboard .title-label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+}
+
+.progressive-capture-dashboard .order-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: -belman-grey-60;
+}
+
+.progressive-capture-dashboard .order-number {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue-80;
+}
+
+/* Status and progress bar */
+.progressive-capture-dashboard .status-progress-bar {
+    -fx-background-color: -belman-grey-07;
+    -fx-padding: -spacing-small;
+    -fx-spacing: -spacing-small;
+}
+
+.progressive-capture-dashboard .status-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: -belman-grey-60;
+}
+
+.progressive-capture-dashboard .status-value {
+    -fx-font-size: 14px;
+    -fx-text-fill: -belman-grey-80;
+}
+
+/* Progress steps */
+.progressive-capture-dashboard .progress-step-container {
+    -fx-spacing: 5px;
+    -fx-padding: 5px;
+}
+
+.progressive-capture-dashboard .progress-step {
+    -fx-background-color: -belman-grey-20;
+    -fx-background-radius: 50%;
+    -fx-min-width: 12px;
+    -fx-min-height: 12px;
+    -fx-max-width: 12px;
+    -fx-max-height: 12px;
+}
+
+.progressive-capture-dashboard .progress-step.completed {
+    -fx-background-color: -belman-green;
+}
+
+.progressive-capture-dashboard .progress-step.current {
+    -fx-background-color: -belman-blue;
+}
+
+.progressive-capture-dashboard .progress-percent {
+    -fx-font-size: 12px;
+    -fx-text-fill: -belman-grey-80;
+}
+
+/* Error container */
+.progressive-capture-dashboard .error-container {
+    -fx-background-color: derive(-belman-red, 90%);
+    -fx-border-color: -belman-red-60;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: -spacing-small;
+}
+
+.progressive-capture-dashboard .error-message {
+    -fx-font-size: 14px;
+    -fx-text-fill: -belman-red-80;
+}
+
+/* Main content layout */
+.progressive-capture-dashboard .center-container {
+    -fx-spacing: -spacing-medium;
+    -fx-padding: -spacing-medium;
+}
+
+/* 4.1. Layout and Panels
+ * -------------------------------------------- */
+.progressive-capture-dashboard .photo-preview-panel {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-border-color: -belman-grey-30;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-padding: -spacing-medium;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);
+}
+
+.progressive-capture-dashboard .progress-panel {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-border-color: -belman-grey-30;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-padding: -spacing-medium;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);
+    -fx-alignment: center;
+}
+
+.progressive-capture-dashboard .template-list-panel {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-border-color: -belman-grey-30;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-padding: -spacing-medium;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);
+}
+
+.progressive-capture-dashboard .template-info {
+    -fx-background-color: -belman-grey-07;
+    -fx-padding: -spacing-small;
+    -fx-background-radius: 4px;
+    -fx-border-color: -belman-grey-20;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+}
+
+.progressive-capture-dashboard .template-name {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+}
+
+.progressive-capture-dashboard .template-description {
+    -fx-font-size: 14px;
+    -fx-text-fill: -belman-grey-80;
+    -fx-wrap-text: true;
+}
+
+/* 4.2. Template List Styles
+ * -------------------------------------------- */
+.progressive-capture-dashboard .template-list {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-border-color: -belman-grey-20;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-padding: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 4, 0, 0, 1);
+}
+
+/* Base list cell styling */
+.progressive-capture-dashboard .template-list .list-cell {
+    -fx-background-color: white;
+    -fx-padding: 16px;
+    -fx-border-color: transparent transparent -belman-grey-15 transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-font-size: -font-size-body;
+    -fx-text-fill: -belman-grey-80;
+    -fx-background-radius: 6px;
+    -fx-min-height: -touch-target-size;
+    -fx-transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+/* Hover state */
+.progressive-capture-dashboard .template-list .list-cell:hover {
+    -fx-background-color: -belman-grey-07;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
+}
+
+/* Selected state */
+.progressive-capture-dashboard .template-list .list-cell:selected {
+    -fx-background-color: derive(-belman-blue, 95%);
+    -fx-text-fill: -belman-blue;
+    -fx-font-weight: bold;
+    -fx-border-color: -belman-blue;
+    -fx-border-width: 0 0 0 4px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 75, 136, 0.1), 3, 0, 0, 1);
+}
+
+/* Completed state */
+.progressive-capture-dashboard .template-list .list-cell.completed {
+    -fx-background-color: derive(-belman-green, 95%);
+    -fx-text-fill: -belman-green;
+    -fx-font-weight: normal;
+    -fx-border-color: -belman-green;
+    -fx-border-width: 0 0 0 4px;
+    -fx-effect: dropshadow(gaussian, rgba(51, 141, 113, 0.1), 3, 0, 0, 1);
+}
+
+.progressive-capture-dashboard .template-list .list-cell.completed:hover {
+    -fx-background-color: derive(-belman-green, 90%);
+}
+
+/* Remaining state */
+.progressive-capture-dashboard .template-list .list-cell.remaining {
+    -fx-background-color: white;
+    -fx-text-fill: -belman-grey-80;
+    -fx-font-weight: normal;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 0 4px;
+    -fx-border-color: transparent transparent -belman-grey-15 transparent;
+}
+
+.progressive-capture-dashboard .template-list .list-cell.remaining:hover {
+    -fx-background-color: -belman-grey-07;
+    -fx-border-color: -belman-grey-30 transparent -belman-grey-15 transparent;
+    -fx-border-width: 0 0 1px 4px;
+}
+
+/* 4.3. Camera Controls */
+.camera-button {
+    -fx-background-color: -belman-blue;
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-padding: 14px 24px;
+    -fx-background-radius: 12px;
+    -fx-min-width: 180px;
+    -fx-min-height: 56px; /* Larger than minimum touch target size */
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 5, 0, 0, 2);
+    -fx-transition: all 0.2s ease-in-out;
+    -fx-alignment: center;
+    -fx-content-display: left;
+    -fx-graphic-text-gap: 10px;
+}
+
+.camera-button:hover {
+    -fx-background-color: derive(-belman-blue, 10%);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 8, 0, 0, 3);
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+.camera-button:pressed {
+    -fx-background-color: derive(-belman-blue, -10%);
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 3, 0, 0, 1);
+    -fx-translate-y: 1px;
+}
+
+.camera-button:focused {
+    -fx-effect: dropshadow(gaussian, rgba(0, 75, 136, 0.5), 10, 0, 0, 0);
+    -fx-border-color: white;
+    -fx-border-width: 2px;
+    -fx-border-radius: 12px;
+    -fx-background-insets: -2;
+}
+
+.camera-button:disabled {
+    -fx-background-color: -belman-grey-30;
+    -fx-text-fill: -belman-grey-50;
+    -fx-opacity: 0.7;
+    -fx-effect: none;
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+}
+
+/* 4.4. Photo Preview Area */
+.progressive-capture-dashboard .preview-container {
+    -fx-background-color: -belman-grey-07;
+    -fx-border-color: -belman-grey-20;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-min-height: 300px;
+}
+
+.progressive-capture-dashboard .photo-preview {
+    -fx-background-color: transparent;
+}
+
+.no-photo-placeholder {
+    -fx-background-color: linear-gradient(to bottom, rgba(0, 0, 0, 0.03), rgba(0, 0, 0, 0.08));
+    -fx-padding: 24px;
+    -fx-spacing: 16px;
+    -fx-alignment: center;
+    -fx-background-radius: 8px;
+    -fx-border-color: rgba(0, 75, 136, 0.1);
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.05), 10, 0, 0, 0);
+    -fx-min-width: 280px;
+    -fx-max-width: 90%;
+    -fx-min-height: 200px;
+}
+
+.progressive-capture-dashboard .no-photo-placeholder {
+    -fx-padding: -spacing-medium;
+    -fx-spacing: -spacing-small;
+}
+
+.progressive-capture-dashboard .placeholder-text {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-grey-60;
+}
+
+.progressive-capture-dashboard .placeholder-instruction {
+    -fx-font-size: 14px;
+    -fx-text-fill: -belman-grey-60;
+    -fx-text-alignment: center;
+}
+
+/* Camera active indicator */
+.progressive-capture-dashboard .camera-active-indicator {
+    -fx-background-color: rgba(0, 0, 0, 0.7);
+    -fx-padding: -spacing-medium;
+    -fx-spacing: -spacing-small;
+    -fx-background-radius: 4px;
+}
+
+.progressive-capture-dashboard .camera-active-text {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.progressive-capture-dashboard .camera-instruction {
+    -fx-font-size: 14px;
+    -fx-text-fill: white;
+    -fx-text-alignment: center;
+}
+
+/* Photo overlay */
+.progressive-capture-dashboard .photo-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+    -fx-padding: -spacing-medium;
+    -fx-spacing: -spacing-small;
+    -fx-opacity: 0;
+    -fx-transition: opacity 0.3s ease-in-out;
+}
+
+.progressive-capture-dashboard .photo-overlay.visible {
+    -fx-opacity: 1;
+}
+
+.progressive-capture-dashboard .overlay-checkmark {
+    -fx-font-size: 48px;
+    -fx-text-fill: -belman-green;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0, 0, 2);
+}
+
+.progressive-capture-dashboard .overlay-template-name {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 3, 0, 0, 1);
+}
+
+.no-photo-placeholder .camera-icon {
+    -fx-font-size: 56px;
+    -fx-text-fill: -belman-blue;
+    -fx-effect: dropshadow(gaussian, rgba(0, 75, 136, 0.2), 6, 0, 0, 2);
+    -fx-opacity: 0.9;
+    -fx-background-color: rgba(127, 168, 197, 0.1);
+    -fx-background-radius: 50%;
+    -fx-padding: 16px;
+    -fx-border-color: rgba(127, 168, 197, 0.3);
+    -fx-border-width: 1px;
+    -fx-border-radius: 50%;
+}
+
+.no-photo-placeholder .placeholder-text {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.8), 1, 0, 0, 1);
+}
+
+.no-photo-placeholder .placeholder-instruction {
+    -fx-font-size: 16px;
+    -fx-text-fill: -belman-grey-80;
+    -fx-text-alignment: center;
+    -fx-wrap-text: true;
+    -fx-max-width: 300px;
+    -fx-padding: 0 8px;
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.8), 1, 0, 0, 1);
+}
+
+.camera-active-indicator {
+    -fx-background-color: -belman-blue;
+    -fx-opacity: 0.7;
+    -fx-padding: 20px;
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+}
+
+.camera-active-indicator .camera-active-text {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 3, 0, 0, 1);
+}
+
+.camera-active-indicator .camera-instruction {
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-opacity: 0.9;
+    -fx-text-alignment: center;
+}
+
+.photo-overlay {
+    -fx-background-color: -belman-green;
+    -fx-opacity: 0.7;
+    -fx-padding: 20px;
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+    -fx-transition: opacity 0.3s ease-in-out;
+}
+
+.photo-overlay.visible {
+    -fx-opacity: 1;
+}
+
+.overlay-checkmark {
+    -fx-font-size: 48px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 3, 0, 0, 1);
+}
+
+.overlay-template-name {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 2, 0, 0, 1);
+    -fx-text-alignment: center;
+    -fx-wrap-text: true;
+}
+
+.capture-button {
+    -fx-background-color: -belman-green;
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-padding: 14px 24px;
+    -fx-background-radius: 12px;
+    -fx-min-width: 180px;
+    -fx-min-height: 56px; /* Larger than minimum touch target size */
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 5, 0, 0, 2);
+    -fx-transition: all 0.2s ease-in-out;
+    -fx-alignment: center;
+    -fx-content-display: left;
+    -fx-graphic-text-gap: 10px;
+}
+
+.capture-button:hover {
+    -fx-background-color: derive(-belman-green, 10%);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 8, 0, 0, 3);
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+.capture-button:pressed {
+    -fx-background-color: derive(-belman-green, -10%);
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 3, 0, 0, 1);
+    -fx-translate-y: 1px;
+}
+
+.capture-button:focused {
+    -fx-effect: dropshadow(gaussian, rgba(51, 141, 113, 0.5), 10, 0, 0, 0);
+    -fx-border-color: white;
+    -fx-border-width: 2px;
+    -fx-border-radius: 12px;
+    -fx-background-insets: -2;
+}
+
+.capture-button:disabled {
+    -fx-background-color: -belman-grey-30;
+    -fx-text-fill: -belman-grey-50;
+    -fx-opacity: 0.7;
+    -fx-effect: none;
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+}
+
+/* All styles are now tablet-friendly by default */
+
+/* All login styles are now tablet-friendly by default */
+
+/* 4.5. Additional UI Elements
+ * -------------------------------------------- */
+/* Help container */
+.progressive-capture-dashboard .help-container {
+    -fx-background-color: -belman-grey-07;
+    -fx-border-color: -belman-grey-20;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: -spacing-small;
+    -fx-spacing: 5px;
+}
+
+.progressive-capture-dashboard .help-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-grey-80;
+}
+
+.progressive-capture-dashboard .help-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: -belman-grey-60;
+}
+
+/* Loading overlay */
+.progressive-capture-dashboard .loading-overlay {
+    -fx-background-color: rgba(255, 255, 255, 0.8);
+}
+
+.progressive-capture-dashboard .loading-progress {
+    -fx-pref-width: 200px;
+}
+
+.progressive-capture-dashboard .loading-text {
+    -fx-font-size: 16px;
+    -fx-text-fill: -belman-grey-80;
+}
+
+/* Summary button */
+.progressive-capture-dashboard .summary-button {
+    -fx-background-color: -belman-green;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 4px;
+}
+
+.progressive-capture-dashboard .summary-button:hover {
+    -fx-background-color: derive(-belman-green, -10%);
+}
+
+.progressive-capture-dashboard .summary-button:disabled {
+    -fx-background-color: -belman-grey-20;
+    -fx-text-fill: -belman-grey-60;
+}
+
+/* Back button */
+.progressive-capture-dashboard .back-button {
+    -fx-background-color: -belman-grey-60;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 4px;
+}
+
+.progressive-capture-dashboard .back-button:hover {
+    -fx-background-color: derive(-belman-grey-60, -10%);
+}
+
+/* Responsive styles for tablet */
+@media (max-width: 800px) {
+    .progressive-capture-dashboard .center-container {
+        -fx-orientation: vertical;
+    }
+
+    .progressive-capture-dashboard .photo-preview-panel,
+    .progressive-capture-dashboard .template-list-panel {
+        -fx-max-width: 100%;
+    }
+}
+
+/* 5. AssignedOrderView Styles */
+.assigned-order-view {
+    -fx-background-color: -belman-grey-07;
+}
+
+.header {
+    -fx-background-color: white;
+    -fx-padding: -spacing-small -spacing-medium;
+    -fx-border-color: transparent transparent -belman-grey-20 transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 3, 0, 0, 2);
+}
+
+.header-logo {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 3, 0, 0, 1);
+    -fx-opacity: 1.0;
+    -fx-transition: opacity 0.3s ease-in-out;
+}
+
+.header-logo:hover {
+    -fx-opacity: 0.9;
+}
+
+.worker-label {
+    -fx-font-size: -font-size-body;
+    -fx-text-fill: -belman-grey-80;
+}
+
+.worker-name {
+    -fx-font-size: -font-size-body;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+}
+
+.order-number {
+    -fx-font-size: -font-size-body;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+}
+
+/* 5.1. Order Cards */
+/* Standardized card styles with consistent elevation and shadow effects */
+.order-details-card {
+    -fx-background-color: linear-gradient(to bottom, white, -belman-grey-05);
+    -fx-background-radius: 16px;
+    -fx-border-color: -belman-grey-30;
+    -fx-border-width: 1px;
+    -fx-border-radius: 16px;
+    -fx-padding: -spacing-large;
+    /* Enhanced shadow for better elevation */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0, 0, 3),
+                dropshadow(gaussian, rgba(0, 0, 0, 0.1), 20, 0, 0, 6);
+    /* Transition for hover effect */
+    -fx-transition: effect 0.3s ease-in-out;
+}
+
+.order-details-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 12, 0, 0, 4),
+                dropshadow(gaussian, rgba(0, 0, 0, 0.15), 24, 0, 0, 8);
+}
+
+.photo-documentation-card {
+    -fx-background-color: linear-gradient(to bottom, -belman-light-blue-10, -belman-light-blue-20);
+    -fx-background-radius: 16px;
+    -fx-border-color: -belman-light-blue;
+    -fx-border-width: 1px;
+    -fx-border-radius: 16px;
+    -fx-padding: -spacing-large;
+    /* Enhanced shadow for better elevation */
+    -fx-effect: dropshadow(gaussian, rgba(0, 75, 136, 0.15), 10, 0, 0, 3),
+                dropshadow(gaussian, rgba(0, 0, 0, 0.1), 20, 0, 0, 6);
+    /* Transition for hover effect */
+    -fx-transition: effect 0.3s ease-in-out;
+}
+
+.photo-documentation-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 75, 136, 0.2), 12, 0, 0, 4),
+                dropshadow(gaussian, rgba(0, 0, 0, 0.15), 24, 0, 0, 8);
+}
+
+/* 5.2. Order Details */
+.detail-label {
+    -fx-font-size: -font-size-body;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-grey-80;
+}
+
+.detail-value {
+    -fx-font-size: -font-size-body;
+    -fx-text-fill: -belman-grey-80;
+}
+
+.order-description {
+    -fx-background-color: -belman-grey-07;
+    -fx-background-radius: 8px;
+    -fx-padding: 12px;
+    -fx-border-color: -belman-grey-20;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+}
+
+.photo-count {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -belman-blue;
+}
+
+.photo-session-description {
+    -fx-font-size: -font-size-body;
+    -fx-text-fill: -belman-grey-80;
+    -fx-wrap-text: true;
+}
+
+/* 5.3. Status Indicators */
+.status-label {
+    -fx-font-size: -font-size-body;
+    -fx-font-style: italic;
+    -fx-text-fill: -belman-grey-50;
+}
+
+.camera-icon {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 2);
+    -fx-text-fill: -belman-blue;
+    -fx-background-color: rgba(127, 168, 197, 0.15);
+    -fx-background-radius: 50%;
+    -fx-padding: -spacing-medium -spacing-large;
+    -fx-border-color: -belman-light-blue;
+    -fx-border-width: 2px;
+    -fx-border-radius: 50%;
+    -fx-alignment: center;
+    -fx-min-width: 80px;
+    -fx-min-height: 80px;
+}
+
+.start-button {
+    -fx-min-width: 200px;
+}
+
+/* Error and status message styles */
+.error-icon {
+    -fx-font-size: 20px;
+    -fx-text-fill: -belman-error-red; /* Error message icon color */
+    -fx-font-weight: bold;
+    -fx-background-color: rgba(211, 47, 47, 0.15);
+    -fx-background-radius: 50%;
+    -fx-padding: 5px 8px;
+    -fx-border-color: rgba(211, 47, 47, 0.5);
+    -fx-border-width: 1px;
+    -fx-border-radius: 50%;
+    -fx-effect: dropshadow(gaussian, rgba(211, 47, 47, 0.2), 3, 0, 0, 1);
+    -fx-min-width: 30px;
+    -fx-min-height: 30px;
+    -fx-alignment: center;
+}
+
+.error-message {
+    -fx-font-size: -font-size-body;
+    -fx-text-fill: -belman-error-red; /* Error message text color */
+    -fx-font-weight: 600; /* Semi-bold for better readability */
+    -fx-wrap-text: true;
+}
+
+/* Status message styles */
+.status-container {
+    -fx-background-color: derive(-belman-blue, 90%);
+    -fx-background-radius: 12px;
+    -fx-padding: 12px;
+    -fx-border-color: derive(-belman-blue, 70%);
+    -fx-border-width: 1px;
+    -fx-border-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 75, 136, 0.1), 3, 0, 0, 1);
+}
+
+/* Card container styles for proper spacing */
+.card-container {
+    -fx-spacing: -spacing-large;
+    -fx-padding: -spacing-large;
+}
+
+/* Orientation-specific styles for AssignedOrderView */
+.tablet-portrait .assigned-order-view .card-container {
+    -fx-spacing: -spacing-medium;
+    -fx-padding: -spacing-medium -spacing-small;
+}
+
+.tablet-landscape .assigned-order-view .card-container {
+    -fx-spacing: -spacing-large;
+    -fx-padding: -spacing-medium -spacing-large;
+}
+
+.tablet-portrait .assigned-order-view .order-details-card,
+.tablet-portrait .assigned-order-view .photo-documentation-card {
+    -fx-padding: -spacing-small;
+}
+
+.tablet-landscape .assigned-order-view .order-details-card,
+.tablet-landscape .assigned-order-view .photo-documentation-card {
+    -fx-padding: -spacing-medium;
+}
+
+/* Element scaling for different screen sizes in AssignedOrderView */
+.tablet-portrait .assigned-order-view .title-label {
+    -fx-font-size: 20px;
+}
+
+.tablet-portrait .assigned-order-view .section-title {
+    -fx-font-size: 18px;
+}
+
+.tablet-portrait .assigned-order-view .detail-label,
+.tablet-portrait .assigned-order-view .detail-value,
+.tablet-portrait .assigned-order-view .worker-label,
+.tablet-portrait .assigned-order-view .worker-name,
+.tablet-portrait .assigned-order-view .order-number {
+    -fx-font-size: 14px;
+}
+
+.tablet-portrait .assigned-order-view .photo-count {
+    -fx-font-size: 16px;
+}
+
+.tablet-portrait .assigned-order-view .photo-session-description,
+.tablet-portrait .assigned-order-view .status-label {
+    -fx-font-size: 13px;
+}
+
+.tablet-portrait .assigned-order-view .camera-icon {
+    -fx-min-width: 60px;
+    -fx-min-height: 60px;
+}
+
+.tablet-portrait .assigned-order-view .start-button {
+    -fx-min-width: 160px;
+    -fx-font-size: 15px;
+}
+
+.tablet-landscape .assigned-order-view .title-label {
+    -fx-font-size: 22px;
+}
+
+.tablet-landscape .assigned-order-view .section-title {
+    -fx-font-size: 20px;
+}
+
+.tablet-landscape .assigned-order-view .detail-label,
+.tablet-landscape .assigned-order-view .detail-value,
+.tablet-landscape .assigned-order-view .worker-label,
+.tablet-landscape .assigned-order-view .worker-name,
+.tablet-landscape .assigned-order-view .order-number {
+    -fx-font-size: 15px;
+}
+
+.tablet-landscape .assigned-order-view .photo-count {
+    -fx-font-size: 18px;
+}
+
+.tablet-landscape .assigned-order-view .photo-session-description,
+.tablet-landscape .assigned-order-view .status-label {
+    -fx-font-size: 14px;
+}
+
+.tablet-landscape .assigned-order-view .camera-icon {
+    -fx-min-width: 75px;
+    -fx-min-height: 75px;
+}
+
+.tablet-landscape .assigned-order-view .start-button {
+    -fx-min-width: 180px;
+    -fx-font-size: 16px;
+}
+
+/* Tablet optimizations for worker views */
+.tablet .header {
+    -fx-padding: 8px 12px;
+}
+
+.tablet .card-container {
+    -fx-spacing: -spacing-medium;
+    -fx-padding: -spacing-medium;
+}
+
+.tablet .header-logo {
+    -fx-fit-height: 36px;
+}
+
+.tablet .worker-label, 
+.tablet .worker-name,
+.tablet .order-number {
+    -fx-font-size: 14px;
+}
+
+/* Tablet-optimized card styles with consistent elevation */
+.tablet .order-details-card,
+.tablet .photo-documentation-card {
+    -fx-padding: -spacing-medium;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    /* Simplified shadow for better performance on tablets */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0, 0, 3);
+}
+
+.tablet .order-details-card:hover,
+.tablet .photo-documentation-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0, 0, 4);
+}
+
+.tablet .detail-label,
+.tablet .detail-value {
+    -fx-font-size: 14px;
+}
+
+.tablet .order-description {
+    -fx-padding: -spacing-small;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+}
+
+.tablet .photo-count {
+    -fx-font-size: 16px;
+}
+
+.tablet .photo-session-description,
+.tablet .status-label {
+    -fx-font-size: 14px;
+}
+
+.tablet .camera-icon {
+    -fx-font-size: 40px !important;
+    -fx-min-width: 70px;
+    -fx-min-height: 70px;
+    -fx-padding: 12px 16px;
+}
+
+.tablet .start-button {
+    -fx-min-width: 180px;
+    -fx-font-size: 16px;
+    -fx-padding: -spacing-small -spacing-medium;
+}
+
+.tablet .error-icon {
+    -fx-font-size: 18px;
+    -fx-min-width: 26px;
+    -fx-min-height: 26px;
+    -fx-padding: 4px 6px;
+}
+
+.tablet .error-message {
+    -fx-font-size: 14px;
+}
+
+.tablet .status-container {
+    -fx-background-radius: 10px;
+    -fx-padding: -spacing-small;
+    -fx-border-radius: 10px;
+}
+
+/* Tablet optimizations for PhotoCubeView layout */
+.tablet .progressive-capture-dashboard .center-container {
+    -fx-spacing: 12px;
+    -fx-padding: 12px;
+}
+
+/* Optimize panel widths for better space usage */
+.tablet .progressive-capture-dashboard .photo-preview-panel,
+.tablet .progressive-capture-dashboard .template-list-panel {
+    -fx-max-width: 100%;
+    -fx-pref-width: 100%;
+}
+
+/* Portrait mode - stack panels vertically */
+.tablet-portrait .progressive-capture-dashboard .center-container {
+    -fx-orientation: vertical;
+    -fx-spacing: 10px;
+}
+
+/* Landscape mode - arrange panels horizontally with adjusted widths */
+.tablet-landscape .progressive-capture-dashboard .center-container {
+    -fx-orientation: horizontal;
+    -fx-spacing: 15px;
+}
+
+.tablet-landscape .progressive-capture-dashboard .photo-preview-panel {
+    -fx-max-width: 55%;
+    -fx-pref-width: 55%;
+}
+
+.tablet-landscape .progressive-capture-dashboard .template-list-panel {
+    -fx-max-width: 45%;
+    -fx-pref-width: 45%;
+}
+
+/* Tablet optimizations for camera controls */
+.tablet .camera-button, .tablet .capture-button {
+    -fx-font-size: 16px;
+    -fx-padding: 12px 20px;
+    -fx-min-width: 160px;
+    -fx-min-height: 52px;
+    -fx-background-radius: 10px;
+}
+
+.tablet .camera-button:hover, .tablet .capture-button:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 6, 0, 0, 2);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.tablet .camera-button:pressed, .tablet .capture-button:pressed {
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+.tablet .camera-button:focused, .tablet .capture-button:focused {
+    -fx-border-width: 1.5px;
+}
+
+/* Portrait mode - make buttons full width for easier touch */
+.tablet-portrait .progressive-capture-dashboard .camera-button,
+.tablet-portrait .progressive-capture-dashboard .capture-button {
+    -fx-min-width: 100%;
+    -fx-max-width: 100%;
+}
+
+/* Tablet optimizations for photo preview area */
+.tablet .no-photo-placeholder {
+    -fx-padding: -spacing-medium;
+}
+
+.tablet .no-photo-placeholder .camera-icon {
+    -fx-font-size: 40px;
+}
+
+.tablet .no-photo-placeholder .placeholder-text {
+    -fx-font-size: 16px;
+}
+
+.tablet .no-photo-placeholder .placeholder-instruction {
+    -fx-font-size: 13px;
+}
+
+.tablet .camera-active-indicator {
+    -fx-padding: -spacing-medium;
+}
+
+.tablet .camera-active-indicator .camera-active-text {
+    -fx-font-size: 20px;
+}
+
+.tablet .camera-active-indicator .camera-instruction {
+    -fx-font-size: 14px;
+}
+
+.tablet .photo-overlay {
+    -fx-padding: -spacing-medium;
+}
+
+.tablet .overlay-checkmark {
+    -fx-font-size: 40px;
+}
+
+.tablet .overlay-template-name {
+    -fx-font-size: 16px;
+}
+
+/* Smartphone optimizations for worker views */
+.smartphone .header {
+    -fx-padding: 6px 10px;
+}
+
+.smartphone .header-logo {
+    -fx-fit-height: 30px;
+}
+
+.smartphone .worker-label, 
+.smartphone .worker-name,
+.smartphone .order-number {
+    -fx-font-size: 12px;
+}
+
+/* Responsive styles for smartphones */
+.smartphone .splash-logo {
+    -fx-fit-width: 160px;
+}
+
+/* Smartphone-optimized container spacing */
+.smartphone .card-container {
+    -fx-spacing: -spacing-small;
+    -fx-padding: -spacing-small;
+}
+
+/* Smartphone-optimized card styles with consistent elevation */
+.smartphone .order-details-card,
+.smartphone .photo-documentation-card {
+    -fx-padding: -spacing-small;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    /* Simplified shadow for better performance on smartphones */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 6, 0, 0, 2);
+}
+
+.smartphone .order-details-card:hover,
+.smartphone .photo-documentation-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0, 0, 3);
+}
+
+/* Responsive styles for smartphones */
+.smartphone .login-card {
+    -fx-max-width: 600px;
+    -fx-min-width: 550px;
+    -fx-max-height: 500px;
+    -fx-padding: -spacing-medium -spacing-medium;
+    -fx-background-radius: 14px;
+    -fx-spacing: -spacing-medium;
+}
+
+.smartphone .branding-container {
+    -fx-padding: 0 0 -spacing-small 0;
+    -fx-border-insets: 0 -10px -spacing-small -10px;
+    -fx-spacing: -spacing-small;
+    -fx-background-radius: 4px 4px 0 0;
+}
+
+.smartphone .login-logo {
+    -fx-fit-width: 120px;
+}
+
+.smartphone .login-title {
+    -fx-font-size: -font-size-heading-small;
+    -fx-letter-spacing: 0.2px;
+}
+
+.smartphone .login-subtitle {
+    -fx-font-size: -font-size-large;
+}
+
+/* Ensure login option title is properly sized and wrapped in smartphone mode */
+.smartphone .login-option-title {
+    -fx-font-size: 18px;
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
+    -fx-padding: 0 0 10px 0;
+}
+
+/* Ensure NFC instruction is properly sized and wrapped in smartphone mode */
+.smartphone .nfc-instruction {
+    -fx-font-size: 14px;
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
+    -fx-padding: 5px 0 10px 0;
+    -fx-max-width: 100%;
+}
+
+/* Ensure login form has appropriate width and spacing in smartphone mode */
+.smartphone .login-form {
+    -fx-max-width: 100%;
+    -fx-min-width: 250px;
+    -fx-pref-width: 100%;
+    -fx-spacing: 16px;
+    -fx-padding: 10px 0;
+}
+
+/* Ensure NFC login form has appropriate width and spacing in smartphone mode */
+.smartphone .nfc-login-form {
+    -fx-max-width: 100%;
+    -fx-min-width: 250px;
+    -fx-pref-width: 100%;
+    -fx-spacing: 16px;
+    -fx-padding: 10px 0;
+    -fx-alignment: center;
+}
+
+/* Ensure field container has appropriate width and spacing in smartphone mode */
+.smartphone .login-form .field-container {
+    -fx-max-width: 100%;
+    -fx-min-width: 100%;
+    -fx-pref-width: 100%;
+    -fx-spacing: 8px;
+    -fx-padding: 0 0 8px 0;
+}
+
+/* Ensure input container has appropriate width and spacing in smartphone mode */
+.smartphone .login-form .input-container {
+    -fx-max-width: 100%;
+    -fx-min-width: 100%;
+    -fx-pref-width: 100%;
+    -fx-spacing: 8px;
+    -fx-alignment: center-left;
+}
+
+/* Ensure field label has appropriate font size and text wrapping in smartphone mode */
+.smartphone .login-form .field-label {
+    -fx-font-size: 16px;
+    -fx-wrap-text: true;
+    -fx-padding: 5px 0;
+}
+
+/* Ensure error container has appropriate width and spacing in smartphone mode */
+.smartphone .error-container {
+    -fx-max-width: 100%;
+    -fx-min-width: 100%;
+    -fx-pref-width: 100%;
+    -fx-spacing: 8px;
+    -fx-padding: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+}
+
+/* Ensure error label has appropriate font size and text wrapping in smartphone mode */
+.smartphone .error-label {
+    -fx-font-size: 14px;
+    -fx-wrap-text: true;
+    -fx-text-alignment: left;
+}
+
+/* Apply smartphone styles to form elements using hierarchical selectors */
+.smartphone .login-form TextField, 
+.smartphone .login-form PasswordField {
+    -fx-padding: 12px 16px;
+    -fx-font-size: 16px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-min-height: 48px;
+    -fx-pref-height: 48px;
+    -fx-max-width: 100%;
+}
+
+/* Apply smartphone styles to buttons using hierarchical selectors */
+.smartphone .button-primary.login-button,
+.smartphone .button-success.nfc-button {
+    -fx-font-size: 16px;
+    -fx-padding: 12px 16px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-min-width: 180px;
+    -fx-min-height: 48px;
+    -fx-pref-height: 48px;
+}
+
+.smartphone .close-button {
+    -fx-min-width: -touch-target-size;
+    -fx-min-height: -touch-target-size;
+    -fx-font-size: 12px;
+    -fx-background-radius: 15px;
+}
+
+.smartphone .photo-gallery-thumbnail {
+    -fx-effect: none;
+    -fx-border-width: 1px;
+}
+
+.smartphone .photo-gallery-thumbnail.selected {
+    -fx-border-width: 2px;
+}
+
+.smartphone .photo-gallery-status-label,
+.smartphone .photo-gallery-caption-label {
+    -fx-font-size: 10px;
+    -fx-padding: 1px 3px;
+}
+
+.smartphone .photo-gallery-empty-label {
+    -fx-font-size: 12px;
+}
+
+.smartphone .progressive-capture-dashboard .panel-title {
+    -fx-font-size: 14px;
+}
+
+.smartphone .progressive-capture-dashboard .template-name {
+    -fx-font-size: 12px;
+}
+
+.smartphone .progressive-capture-dashboard .template-description {
+    -fx-font-size: 11px;
+}
