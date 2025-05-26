@@ -209,36 +209,48 @@ public class SummaryViewModel extends BaseViewModel<SummaryViewModel> {
     public void retakePhoto(PhotoDocument photoDocument) {
         if (photoDocument == null) {
             errorMessage.set("No photo selected to retake.");
+            System.out.println("No photo selected to retake.");
             return;
         }
 
         loading.set(true);
         statusMessage.set("Preparing to retake photo...");
+        System.out.println("Preparing to retake photo for document: " + photoDocument.getId());
 
         try {
             // Get the template from the photo document
             PhotoTemplate template = photoDocument.getTemplate();
             if (template == null) {
                 errorMessage.set("Cannot retake photo: template information is missing.");
+                System.out.println("Cannot retake photo: template information is missing.");
                 loading.set(false);
                 return;
             }
 
+            System.out.println("Template found: " + template.name());
+
             // Set the selected template in the WorkerFlowContext
             WorkerFlowContext.setSelectedTemplate(template);
+            System.out.println("Selected template set in WorkerFlowContext: " + template.name());
 
             // Ensure the current order is set in the WorkerFlowContext
             if (currentOrder.get() != null) {
                 WorkerFlowContext.setCurrentOrder(currentOrder.get());
+                System.out.println("Current order set in WorkerFlowContext: " + currentOrder.get().getId());
+            } else {
+                System.out.println("Warning: Current order is null");
             }
 
             // Navigate back to the PhotoCubeView
+            System.out.println("Navigating to PhotoCubeView...");
             com.belman.presentation.navigation.Router.navigateTo(
                 com.belman.presentation.usecases.worker.photocube.PhotoCubeView.class);
 
             // Note: We don't set loading to false here because we're navigating away from this view
         } catch (Exception e) {
             errorMessage.set("Error preparing to retake photo: " + e.getMessage() + ". Please try again.");
+            System.out.println("Error preparing to retake photo: " + e.getMessage());
+            e.printStackTrace();
             loading.set(false);
         }
     }

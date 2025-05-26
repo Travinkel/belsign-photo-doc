@@ -65,17 +65,6 @@ public class SummaryViewController extends BaseController<SummaryViewModel> {
     @FXML
     private VBox emptyStatePane;
 
-    @FXML
-    private TextField dateField;
-
-    @FXML
-    private TextField locationField;
-
-    @FXML
-    private TextField workTypeField;
-
-    @FXML
-    private TextArea notesTextArea;
 
     // The photo gallery component
     private PhotoGalleryComponent photoGallery;
@@ -89,14 +78,6 @@ public class SummaryViewController extends BaseController<SummaryViewModel> {
         loadingPane.visibleProperty().bind(getViewModel().loadingProperty());
         photosCountLabel.textProperty().bind(getViewModel().photosCountProperty().asString("%d photos taken"));
 
-        // Set the date field to today's date in a user-friendly format
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM d, yyyy");
-        dateField.setText(today.format(formatter));
-
-        // Set default values for location and work type fields
-        locationField.setPromptText("Example: Assembly Hall, Station 3");
-        workTypeField.setPromptText("Example: Welding, Assembly, Inspection");
 
         // Create and configure the photo gallery
         setupPhotoGallery();
@@ -123,6 +104,9 @@ public class SummaryViewController extends BaseController<SummaryViewModel> {
         photoGallery.setEmptyText("No photos captured");
         photoGallery.setSelectionMode(true);
 
+        // Clear the container before adding the photo gallery
+        photoGalleryContainer.getChildren().clear();
+
         // Add the photo gallery to the container
         photoGalleryContainer.getChildren().add(photoGallery);
 
@@ -137,6 +121,11 @@ public class SummaryViewController extends BaseController<SummaryViewModel> {
 
         // Initial update
         updatePhotoGallery();
+
+        // Enable the retake button if a photo is selected
+        if (photoGallery.getSelectedPhoto() != null) {
+            retakePhotoButton.setDisable(false);
+        }
     }
 
     /**
@@ -149,36 +138,57 @@ public class SummaryViewController extends BaseController<SummaryViewModel> {
             try {
                 // Create a file object for the image
                 File file = new File(doc.getImagePath().path());
+                String fileUrl;
 
                 if (file.exists()) {
-                    // Create a photo item with the image URL
-                    String fileUrl = file.toURI().toString();
-                    PhotoItem item = new PhotoItem(fileUrl);
+                    // Use the existing file
+                    fileUrl = file.toURI().toString();
+                } else {
+                    // Try to find the file in the resources directory
+                    String fileName = new File(doc.getImagePath().path()).getName();
+                    File resourceFile = new File("src/main/resources/photos/" + fileName);
 
-                    // Set the caption to the template name
-                    item.setCaption(PhotoTemplateLabelProvider.getDisplayLabel(doc.getTemplate()));
-
-                    // Set the status based on the approval status
-                    if (doc.isApproved()) {
-                        item.setStatus("Approved");
-                    } else if (doc.isPending()) {
-                        item.setStatus("Pending");
+                    if (resourceFile.exists()) {
+                        fileUrl = resourceFile.toURI().toString();
                     } else {
-                        item.setStatus("Rejected");
+                        // Use a placeholder image
+                        fileUrl = getClass().getResource("/com/belman/assets/icons/camera.svg").toString();
+                        System.out.println("Using placeholder image for " + doc.getImagePath().path());
                     }
-
-                    // Store the photo document as user data for reference
-                    item.setUserData(doc);
-
-                    photoItems.add(item);
                 }
+
+                // Create a photo item with the image URL
+                PhotoItem item = new PhotoItem(fileUrl);
+
+                // Set the caption to the template name
+                item.setCaption(PhotoTemplateLabelProvider.getDisplayLabel(doc.getTemplate()));
+
+                // Set the status based on the approval status
+                if (doc.isApproved()) {
+                    item.setStatus("Approved");
+                } else if (doc.isPending()) {
+                    item.setStatus("Pending");
+                } else {
+                    item.setStatus("Rejected");
+                }
+
+                // Store the photo document as user data for reference
+                item.setUserData(doc);
+
+                photoItems.add(item);
             } catch (Exception e) {
                 System.err.println("Error loading photo: " + e.getMessage());
+                e.printStackTrace();
             }
         }
 
         // Update the photo gallery
         photoGallery.setPhotoItems(photoItems);
+
+        // Enable the retake button if a photo is selected
+        if (photoGallery.getSelectedPhoto() != null) {
+            retakePhotoButton.setDisable(false);
+        }
     }
 
     /**
@@ -257,11 +267,13 @@ public class SummaryViewController extends BaseController<SummaryViewModel> {
 
         if (selectedItem == null || !(selectedItem.getUserData() instanceof PhotoDocument)) {
             // No photo selected or invalid user data
+            System.out.println("No photo selected or invalid user data");
             return;
         }
 
         // Get the photo document from the selected item
         PhotoDocument photoDocument = (PhotoDocument) selectedItem.getUserData();
+        System.out.println("Retaking photo for template: " + photoDocument.getTemplate().name());
 
         // Call the view model to handle retaking the photo
         getViewModel().retakePhoto(photoDocument);

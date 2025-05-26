@@ -303,6 +303,12 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 4, 0, 0, 2);
 }
 
+.smartphone-icon {
+    -fx-opacity: 0.9;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 4, 0, 0, 2);
+    -fx-fill: -belman-green;
+}
+
 .nfc-instruction {
     -fx-font-size: 16px;
     -fx-text-fill: -belman-grey-80;
@@ -703,6 +709,17 @@
     -fx-spacing: -spacing-medium;
     -fx-padding: -spacing-medium;
     -fx-fill-width: true;
+    -fx-pref-width: 1024px;
+    -fx-max-width: infinity;
+}
+
+/* Direct targeting of VBox children for more specific control */
+.progressive-capture-dashboard .center-container > VBox:first-child {
+    -fx-pref-width: 700px;
+}
+
+.progressive-capture-dashboard .center-container > VBox:last-child {
+    -fx-pref-width: 300px;
 }
 
 /* 4.1. Layout and Panels
@@ -715,8 +732,8 @@
     -fx-border-radius: 8px;
     -fx-padding: -spacing-medium;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);
-    -fx-max-width: 60%;
-    -fx-pref-width: 60%;
+    -fx-pref-width: 700px;
+    -fx-max-width: infinity;
 }
 
 .progressive-capture-dashboard .progress-panel {
@@ -738,8 +755,8 @@
     -fx-border-radius: 8px;
     -fx-padding: -spacing-medium;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);
-    -fx-max-width: 40%;
-    -fx-pref-width: 40%;
+    -fx-pref-width: 300px;
+    -fx-max-width: infinity;
 }
 
 .progressive-capture-dashboard .template-info {
@@ -1554,10 +1571,14 @@
 }
 
 /* Optimize panel widths for better space usage */
-.tablet .progressive-capture-dashboard .photo-preview-panel,
+.tablet .progressive-capture-dashboard .photo-preview-panel {
+    -fx-pref-width: 700px;
+    -fx-max-width: infinity;
+}
+
 .tablet .progressive-capture-dashboard .template-list-panel {
-    -fx-max-width: 100%;
-    -fx-pref-width: 100%;
+    -fx-pref-width: 300px;
+    -fx-max-width: infinity;
 }
 
 /* Portrait mode - stack panels vertically */
@@ -1573,13 +1594,13 @@
 }
 
 .tablet-landscape .progressive-capture-dashboard .photo-preview-panel {
-    -fx-max-width: 60%;
-    -fx-pref-width: 60%;
+    -fx-pref-width: 700px;
+    -fx-max-width: infinity;
 }
 
 .tablet-landscape .progressive-capture-dashboard .template-list-panel {
-    -fx-max-width: 40%;
-    -fx-pref-width: 40%;
+    -fx-pref-width: 300px;
+    -fx-max-width: infinity;
 }
 
 /* Tablet optimizations for camera controls */

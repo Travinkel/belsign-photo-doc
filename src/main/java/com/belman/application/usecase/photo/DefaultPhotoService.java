@@ -1,6 +1,7 @@
 package com.belman.application.usecase.photo;
 
 import com.belman.common.platform.PlatformUtils;
+import com.belman.common.session.SessionPhotoStore;
 import com.belman.domain.common.valueobjects.Timestamp;
 import com.belman.domain.order.OrderId;
 import com.belman.domain.photo.Photo;
@@ -49,6 +50,7 @@ public class DefaultPhotoService implements PhotoService {
     private final PhotoRepository photoRepository;
     private final String photoStorageDirectory;
     private final ErrorHandler errorHandler = ErrorHandler.getInstance();
+    private final SessionPhotoStore sessionPhotoStore = SessionPhotoStore.getInstance();
 
     /**
      * Creates a new DefaultPhotoService.
@@ -69,12 +71,40 @@ public class DefaultPhotoService implements PhotoService {
 
     @Override
     public Optional<PhotoDocument> getPhotoById(PhotoId photoId) {
-        return photoRepository.findById(photoId);
+        // First check the session store
+        Optional<PhotoDocument> sessionPhoto = sessionPhotoStore.getPhoto(photoId);
+        if (sessionPhoto.isPresent()) {
+            return sessionPhoto;
+        }
+
+        // Fall back to the repository
+        Optional<PhotoDocument> repoPhoto = photoRepository.findById(photoId);
+
+        // If found in repository but not in session store, add it to session store
+        if (repoPhoto.isPresent()) {
+            sessionPhotoStore.addPhoto(repoPhoto.get());
+        }
+
+        return repoPhoto;
     }
 
     @Override
     public List<PhotoDocument> getPhotosByOrderId(OrderId orderId) {
-        return photoRepository.findByOrderId(orderId);
+        // First check the session store
+        List<PhotoDocument> sessionPhotos = sessionPhotoStore.getPhotosByOrderId(orderId);
+        if (!sessionPhotos.isEmpty()) {
+            return sessionPhotos;
+        }
+
+        // Fall back to the repository
+        List<PhotoDocument> repoPhotos = photoRepository.findByOrderId(orderId);
+
+        // Add all photos from repository to session store
+        for (PhotoDocument photo : repoPhotos) {
+            sessionPhotoStore.addPhoto(photo);
+        }
+
+        return repoPhotos;
     }
 
     @Override
@@ -86,8 +116,13 @@ public class DefaultPhotoService implements PhotoService {
                 uploadedBy,
                 orderId);
 
-        // Save the photo document
-        return photoRepository.save(photoDocument);
+        // Save the photo document to the repository
+        PhotoDocument savedPhoto = photoRepository.save(photoDocument);
+
+        // Also save to the session store
+        sessionPhotoStore.addPhoto(savedPhoto);
+
+        return savedPhoto;
     }
 
     @Override
@@ -104,11 +139,42 @@ public class DefaultPhotoService implements PhotoService {
 
     @Override
     public boolean deletePhoto(PhotoId photoId, UserBusiness deletedBy) {
-        return photoRepository.deleteById(photoId);
+        // Delete from repository
+        boolean deleted = photoRepository.deleteById(photoId);
+
+        // If deleted from repository, also remove from session store
+        if (deleted) {
+            sessionPhotoStore.removePhoto(photoId);
+        }
+
+        return deleted;
     }
 
     @Override
     public boolean approvePhoto(PhotoId photoId, UserBusiness approvedBy) {
+        // First check the session store
+        Optional<PhotoDocument> sessionPhotoOpt = sessionPhotoStore.getPhoto(photoId);
+        if (sessionPhotoOpt.isPresent()) {
+            try {
+                PhotoDocument photo = sessionPhotoOpt.get();
+                UserReference userRef = new UserReference(approvedBy.getId(), approvedBy.getUsername());
+                Timestamp timestamp = new Timestamp(java.time.Instant.now());
+                photo.approve(userRef, timestamp);
+
+                // Update in repository
+                photoRepository.save(photo);
+
+                // Update in session store
+                sessionPhotoStore.updatePhoto(photo);
+
+                return true;
+            } catch (IllegalStateException e) {
+                // Photo is already approved or rejected
+                return false;
+            }
+        }
+
+        // If not in session store, check repository
         Optional<PhotoDocument> photoOpt = photoRepository.findById(photoId);
         if (photoOpt.isPresent()) {
             PhotoDocument photo = photoOpt.get();
@@ -116,7 +182,13 @@ public class DefaultPhotoService implements PhotoService {
                 UserReference userRef = new UserReference(approvedBy.getId(), approvedBy.getUsername());
                 Timestamp timestamp = new Timestamp(java.time.Instant.now());
                 photo.approve(userRef, timestamp);
+
+                // Update in repository
                 photoRepository.save(photo);
+
+                // Add to session store
+                sessionPhotoStore.addPhoto(photo);
+
                 return true;
             } catch (IllegalStateException e) {
                 // Photo is already approved or rejected
@@ -128,6 +200,29 @@ public class DefaultPhotoService implements PhotoService {
 
     @Override
     public boolean rejectPhoto(PhotoId photoId, UserBusiness rejectedBy, String reason) {
+        // First check the session store
+        Optional<PhotoDocument> sessionPhotoOpt = sessionPhotoStore.getPhoto(photoId);
+        if (sessionPhotoOpt.isPresent()) {
+            try {
+                PhotoDocument photo = sessionPhotoOpt.get();
+                UserReference userRef = new UserReference(rejectedBy.getId(), rejectedBy.getUsername());
+                Timestamp timestamp = new Timestamp(java.time.Instant.now());
+                photo.reject(userRef, timestamp, reason);
+
+                // Update in repository
+                photoRepository.save(photo);
+
+                // Update in session store
+                sessionPhotoStore.updatePhoto(photo);
+
+                return true;
+            } catch (IllegalStateException e) {
+                // Photo is already approved or rejected
+                return false;
+            }
+        }
+
+        // If not in session store, check repository
         Optional<PhotoDocument> photoOpt = photoRepository.findById(photoId);
         if (photoOpt.isPresent()) {
             PhotoDocument photo = photoOpt.get();
@@ -135,7 +230,13 @@ public class DefaultPhotoService implements PhotoService {
                 UserReference userRef = new UserReference(rejectedBy.getId(), rejectedBy.getUsername());
                 Timestamp timestamp = new Timestamp(java.time.Instant.now());
                 photo.reject(userRef, timestamp, reason);
+
+                // Update in repository
                 photoRepository.save(photo);
+
+                // Add to session store
+                sessionPhotoStore.addPhoto(photo);
+
                 return true;
             } catch (IllegalStateException e) {
                 // Photo is already approved or rejected
@@ -196,8 +297,13 @@ public class DefaultPhotoService implements PhotoService {
                     .orderId(orderId)
                     .build();
 
-            // Save the photo document
-            return photoRepository.save(photo);
+            // Save the photo document to the repository
+            PhotoDocument savedPhoto = photoRepository.save(photo);
+
+            // Also save to the session store
+            sessionPhotoStore.addPhoto(savedPhoto);
+
+            return savedPhoto;
         } catch (IOException e) {
             String errorMessage = UPLOAD_ERROR_MESSAGE + e.getMessage();
             errorHandler.handleException(e, errorMessage);

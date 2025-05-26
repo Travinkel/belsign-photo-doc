@@ -103,6 +103,11 @@
                 <VBox styleClass="login-section" HBox.hgrow="ALWAYS" alignment="TOP_CENTER">
                     <Label text="Sign in with NFC badge" styleClass="section-title"/>
 
+                    <!-- Smartphone icon -->
+                    <ImageView styleClass="smartphone-icon" fitHeight="48" preserveRatio="true">
+                        <Image url="@/com/belman/assets/icons/mobile.svg"/>
+                    </ImageView>
+
                     <!-- NFC icon -->
                     <ImageView styleClass="nfc-icon" fitHeight="72" preserveRatio="true">
                         <Image url="@/com/belman/assets/icons/nfc.svg"/>

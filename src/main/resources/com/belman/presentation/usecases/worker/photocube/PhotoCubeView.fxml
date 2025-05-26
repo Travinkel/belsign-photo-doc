@@ -1,24 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.Priority?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.ProgressBar?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
-<?import javafx.geometry.Insets?>
-<?import javafx.geometry.Pos?>
-
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 <StackPane xmlns="http://javafx.com/javafx"
            xmlns:fx="http://javafx.com/fxml"
            fx:controller="com.belman.presentation.usecases.worker.photocube.PhotoCubeViewController"
@@ -34,13 +19,14 @@
                 </padding>
 
                 <HBox alignment="CENTER_LEFT" spacing="15.0" styleClass="header">
-                    <Button fx:id="navigateBackButton" text="Back" styleClass="back-button" onAction="#handleNavigateBackClick"/>
+                    <Button fx:id="navigateBackButton" text="Back" styleClass="back-button"
+                            onAction="#handleNavigateBackClick"/>
                     <!-- Belman Logo -->
                     <ImageView fitHeight="40.0" preserveRatio="true" styleClass="header-logo">
                         <Image url="@/com/belman/images/BELMAN_Logo_264pxl.png"/>
                     </ImageView>
                     <Label text="Photo Documentation" styleClass="title-label"/>
-                    <HBox HBox.hgrow="ALWAYS" />
+                    <HBox HBox.hgrow="ALWAYS"/>
                     <Label text="Order:" styleClass="order-label"/>
                     <Label fx:id="orderNumberLabel" text="ORD-123-230615-WLD-0001" styleClass="order-number"/>
                     <HBox alignment="CENTER" spacing="5.0" styleClass="progress-indicator">
@@ -56,11 +42,12 @@
                     </HBox>
 
                     <!-- Stepped Progress Bar -->
-                    <HBox fx:id="steppedProgressContainer" styleClass="progress-step-container" alignment="CENTER" spacing="5.0">
+                    <HBox fx:id="steppedProgressContainer" styleClass="progress-step-container" alignment="CENTER"
+                          spacing="5.0">
                         <!-- Steps will be added here programmatically -->
                     </HBox>
 
-                    <Button fx:id="summaryButton" text="Go to Summary" styleClass="summary-button" 
+                    <Button fx:id="summaryButton" text="Go to Summary" styleClass="summary-button"
                             onAction="#handleSummaryButtonClick"/>
                 </HBox>
 
@@ -82,7 +69,8 @@
             <HBox fx:id="centerContainer" spacing="15.0"
                   styleClass="center-container"
                   prefWidth="1400.0"
-                  maxWidth="Infinity">                <padding>
+                  maxWidth="Infinity">
+                <padding>
                     <Insets top="15.0" right="15.0" bottom="15.0" left="15.0"/>
                 </padding>
 
@@ -95,24 +83,25 @@
                     <!-- Preview Container -->
                     <StackPane styleClass="preview-container" VBox.vgrow="ALWAYS">
                         <!-- Camera Preview or Last Taken Photo -->
-                        <ImageView fx:id="photoPreviewImageView" fitWidth="380.0" preserveRatio="true" 
-                                  styleClass="photo-preview"/>
+                        <ImageView fx:id="photoPreviewImageView" fitWidth="380.0" preserveRatio="true"
+                                   styleClass="photo-preview"/>
 
                         <!-- Placeholder when no photo is available -->
-                        <VBox fx:id="noPhotoPlaceholder" alignment="CENTER" spacing="15.0" styleClass="no-photo-placeholder">
+                        <VBox fx:id="noPhotoPlaceholder" alignment="CENTER" spacing="15.0"
+                              styleClass="no-photo-placeholder">
                             <ImageView styleClass="camera-icon" fitHeight="48.0" preserveRatio="true">
                                 <Image url="@/com/belman/assets/icons/camera.svg"/>
                             </ImageView>
                             <Label text="No photo taken yet" styleClass="placeholder-text"/>
-                            <Label text="Select a template from the list and click 'Start Camera'" 
+                            <Label text="Select a template from the list and click 'Start Camera'"
                                    wrapText="true" textAlignment="CENTER" styleClass="placeholder-instruction"/>
                         </VBox>
 
                         <!-- Camera Active Indicator -->
-                        <VBox fx:id="cameraActiveIndicator" alignment="CENTER" visible="false" 
+                        <VBox fx:id="cameraActiveIndicator" alignment="CENTER" visible="false"
                               styleClass="camera-active-indicator">
                             <Label text="Camera Active" styleClass="camera-active-text"/>
-                            <Label text="Position the subject and tap 'Capture'" 
+                            <Label text="Position the subject and tap 'Capture'"
                                    wrapText="true" textAlignment="CENTER" styleClass="camera-instruction"/>
                         </VBox>
 
@@ -125,9 +114,9 @@
 
                     <!-- Camera Controls -->
                     <HBox spacing="10.0" alignment="CENTER">
-                        <Button fx:id="startCameraButton" text="Start Camera" styleClass="camera-button" 
+                        <Button fx:id="startCameraButton" text="Start Camera" styleClass="camera-button"
                                 onAction="#handleStartCameraClick"/>
-                        <Button fx:id="captureButton" text="Capture Photo" styleClass="capture-button" 
+                        <Button fx:id="captureButton" text="Capture Photo" styleClass="capture-button"
                                 onAction="#handleCapturePhotoClick" disable="true"/>
                     </HBox>
 
@@ -135,7 +124,7 @@
                     <VBox spacing="5.0" styleClass="template-info">
                         <Label text="Selected Template:" styleClass="info-label"/>
                         <Label fx:id="selectedTemplateLabel" text="None selected" styleClass="template-name"/>
-                        <Label fx:id="templateDescriptionLabel" text="" wrapText="true" 
+                        <Label fx:id="templateDescriptionLabel" text="" wrapText="true"
                                styleClass="template-description"/>
                     </VBox>
                 </VBox>
@@ -149,8 +138,8 @@
                         <!-- Show Remaining Only Toggle -->
                         <HBox styleClass="toggle-container" alignment="CENTER">
                             <Label text="Show remaining only" styleClass="toggle-label"/>
-                            <CheckBox fx:id="showRemainingToggle" styleClass="toggle-switch" 
-                                     onAction="#handleShowRemainingToggle"/>
+                            <CheckBox fx:id="showRemainingToggle" styleClass="toggle-switch"
+                                      onAction="#handleShowRemainingToggle"/>
                         </HBox>
                         <padding>
                             <Insets bottom="5.0"/>
@@ -164,11 +153,12 @@
                                 <padding>
                                     <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
                                 </padding>
-                                <ImageView styleClass="empty-state-icon camera-icon" fitHeight="48.0" preserveRatio="true">
+                                <ImageView styleClass="empty-state-icon camera-icon" fitHeight="48.0"
+                                           preserveRatio="true">
                                     <Image url="@/com/belman/assets/icons/camera.svg"/>
                                 </ImageView>
                                 <Label text="No Photo Templates Available" styleClass="empty-state-title"/>
-                                <Label text="This order doesn't have any photo templates defined yet. Please contact your supervisor or QA team to set up templates for documentation." 
+                                <Label text="This order doesn't have any photo templates defined yet. Please contact your supervisor or QA team to set up templates for documentation."
                                        wrapText="true" styleClass="empty-state-message"/>
                                 <Button text="Refresh" onAction="#handleRefreshTemplates" styleClass="refresh-button"/>
                             </VBox>

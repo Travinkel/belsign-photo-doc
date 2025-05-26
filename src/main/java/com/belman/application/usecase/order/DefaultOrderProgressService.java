@@ -108,6 +108,25 @@ public class DefaultOrderProgressService implements OrderProgressService {
 
             // Complete the order
             try {
+                // Ensure the order is in IN_PROGRESS status before completing it
+                if (order.getStatus() != com.belman.domain.order.OrderStatus.IN_PROGRESS) {
+                    logger.debug("Order is not in IN_PROGRESS status, attempting to start processing");
+                    try {
+                        // Try to start processing if the order is in PENDING status
+                        if (order.getStatus() == com.belman.domain.order.OrderStatus.PENDING) {
+                            order.startProcessing();
+                            logger.debug("Successfully changed order status to IN_PROGRESS");
+                        } else {
+                            // If the order is not in PENDING status, set it to IN_PROGRESS directly
+                            logger.debug("Setting order status to IN_PROGRESS directly");
+                            order.setStatus(com.belman.domain.order.OrderStatus.IN_PROGRESS);
+                        }
+                    } catch (Exception e) {
+                        logger.warn("Could not set order to IN_PROGRESS status: {}", e.getMessage());
+                        // Continue anyway, as we'll try to complete the order regardless
+                    }
+                }
+
                 logger.debug("Changing order status to COMPLETED");
                 order.completeProcessing();
 

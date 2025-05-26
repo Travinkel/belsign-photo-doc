@@ -5,6 +5,7 @@ import com.belman.bootstrap.di.ServiceRegistry;
 import com.belman.bootstrap.config.StorageTypeManager;
 import com.belman.common.logging.EmojiLogger;
 import com.belman.common.session.SessionContext;
+import com.belman.common.session.SessionPhotoStore;
 import com.belman.common.session.SimpleSessionContext;
 import com.belman.domain.services.LoggerFactory;
 import com.belman.domain.order.OrderRepository;
@@ -199,6 +200,13 @@ public class ApplicationInitializer {
             // Register the SessionContext with the ServiceRegistry
             ServiceRegistry.registerService(sessionContext);
             logger.success("Simple SessionContext initialized successfully");
+
+            // Initialize SessionPhotoStore for in-memory photo persistence across user sessions
+            logger.debug("Initializing SessionPhotoStore");
+            SessionPhotoStore sessionPhotoStore = SessionPhotoStore.getInstance();
+            // Register the SessionPhotoStore with the ServiceRegistry
+            ServiceRegistry.registerService(sessionPhotoStore);
+            logger.success("SessionPhotoStore initialized successfully");
 
             // Initialize RoleBasedNavigationService
             logger.debug("Initializing RoleBasedNavigationService");

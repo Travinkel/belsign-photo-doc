@@ -32,7 +32,7 @@
                 </padding>
 
                 <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="header">
-                    <Button fx:id="backButton" text="Back" styleClass="back-button"/>
+                    <Button fx:id="backButton" text="Back" styleClass="back-button" onAction="#handleBackClick"/>
                     <Label text="Photo Summary" styleClass="title-label"/>
                 </HBox>
 
@@ -75,38 +75,6 @@
                         </VBox>
                     </VBox>
 
-                    <!-- Simplified Metadata -->
-                    <VBox spacing="10.0" styleClass="metadata">
-                        <Label text="Basic Information (Optional)" styleClass="section-title"/>
-                        <Label text="These fields are optional. Fill in only what you know." styleClass="help-text"/>
-
-                        <GridPane hgap="10.0" vgap="10.0">
-                            <columnConstraints>
-                                <ColumnConstraints hgrow="NEVER" minWidth="100.0" />
-                                <ColumnConstraints hgrow="ALWAYS" />
-                            </columnConstraints>
-
-                            <Label text="Where:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="metadata-label"/>
-                            <TextField fx:id="locationField" promptText="Example: Assembly Hall, Station 3" 
-                                      GridPane.rowIndex="0" GridPane.columnIndex="1" styleClass="metadata-field"/>
-
-                            <Label text="What:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="metadata-label"/>
-                            <TextField fx:id="workTypeField" promptText="Example: Welding, Assembly, Inspection" 
-                                      GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="metadata-field"/>
-
-                            <!-- Date field will be set in the controller -->
-                            <Label text="Date:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="metadata-label"/>
-                            <TextField fx:id="dateField" promptText="Today's date will be filled automatically" 
-                                      GridPane.rowIndex="2" GridPane.columnIndex="1" styleClass="metadata-field"/>
-                        </GridPane>
-                    </VBox>
-
-                    <!-- Notes -->
-                    <VBox spacing="10.0" styleClass="notes">
-                        <Label text="Additional Notes" styleClass="section-title"/>
-                        <TextArea fx:id="notesTextArea" promptText="Enter any additional notes or comments about the photos..." 
-                                 prefHeight="100.0" wrapText="true" styleClass="notes-field"/>
-                    </VBox>
                 </VBox>
             </ScrollPane>
         </center>
@@ -118,7 +86,7 @@
                     <Insets top="15.0" right="15.0" bottom="20.0" left="15.0"/>
                 </padding>
 
-                <Button fx:id="submitButton" text="Submit Photos" styleClass="submit-button"/>
+                <Button fx:id="submitButton" text="Submit Photos" styleClass="submit-button" onAction="#handleSubmitClick"/>
             </HBox>
         </bottom>
     </BorderPane>

@@ -339,20 +339,32 @@ public class TemplateManager {
     }
 
     /**
-     * Gets the templates for the specified order.
+     * Gets the missing required templates for the specified order.
+     * These are templates that don't have photos yet.
      * 
      * @param orderId the ID of the order
-     * @return a list of templates for the order
+     * @return a list of templates that don't have photos yet
      */
     public List<PhotoTemplate> getMissingRequiredTemplates(OrderId orderId) {
         try {
-            // Use the PhotoTemplateService to get the available templates
-            return photoTemplateService.getAvailableTemplates(orderId);
+            // Get all available templates for the order
+            List<PhotoTemplate> allTemplates = photoTemplateService.getAvailableTemplates(orderId);
+
+            // Filter out templates that already have photos
+            List<PhotoTemplate> missingTemplates = new ArrayList<>();
+            for (PhotoTemplate template : allTemplates) {
+                Boolean isCompleted = templateCompletionStatus.get(template);
+                if (isCompleted == null || !isCompleted) {
+                    missingTemplates.add(template);
+                }
+            }
+
+            return missingTemplates;
         } catch (Exception e) {
             // If there's an error, log it and return an empty list
             final String errorMsg = e.getMessage(); // Create a final copy for the lambda
             javafx.application.Platform.runLater(() -> {
-                errorMessage.set("Error getting templates for order: " + errorMsg);
+                errorMessage.set("Error getting missing templates for order: " + errorMsg);
             });
             return Collections.emptyList();
         }
