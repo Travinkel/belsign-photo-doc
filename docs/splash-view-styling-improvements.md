@@ -1,10 +1,10 @@
 # SplashView Styling Improvements
 
-This document outlines the styling improvements made to the SplashView screen to enhance the Belman branding and follow best practices.
+This document outlines the styling improvements made to the SplashView screen to enhance the Belman branding and follow modern JavaFX practices.
 
 ## Overview of Changes
 
-The SplashView has been enhanced with improved styling that better aligns with Belman branding guidelines and provides a more polished user experience. The changes focus on consistent use of Belman colors, proper spacing, enhanced animations, and responsive design for different devices.
+The SplashView has been enhanced with improved styling that better aligns with Belman branding guidelines and provides a more polished user experience. The changes focus on consistent use of Belman colors, proper spacing, enhanced animations with modern interpolators, and responsive design for different devices.
 
 ## Specific Improvements
 
