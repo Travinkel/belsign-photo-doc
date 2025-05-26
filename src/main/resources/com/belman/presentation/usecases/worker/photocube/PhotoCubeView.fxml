@@ -79,13 +79,17 @@
 
         <!-- Main Content - Three-Panel Layout -->
         <center>
-            <HBox fx:id="centerContainer" spacing="15.0" styleClass="center-container">
-                <padding>
+            <HBox fx:id="centerContainer" spacing="15.0"
+                  styleClass="center-container"
+                  prefWidth="1400.0"
+                  maxWidth="Infinity">                <padding>
                     <Insets top="15.0" right="15.0" bottom="15.0" left="15.0"/>
                 </padding>
 
                 <!-- Left Panel: Photo Preview -->
-                <VBox spacing="10.0" styleClass="photo-preview-panel" HBox.hgrow="ALWAYS" maxWidth="400.0">
+                <VBox spacing="10.0" styleClass="template-list-panel"
+                      HBox.hgrow="SOMETIMES"
+                      prefWidth="300.0" maxWidth="Infinity">
                     <Label text="Photo Preview" styleClass="panel-title"/>
 
                     <!-- Preview Container -->
@@ -138,7 +142,7 @@
 
 
                 <!-- Right Panel: Template List -->
-                <VBox spacing="10.0" styleClass="template-list-panel" HBox.hgrow="ALWAYS" maxWidth="400.0">
+                <VBox spacing="10.0" styleClass="template-list-panel" HBox.hgrow="ALWAYS" maxWidth="Infinity">
                     <HBox alignment="CENTER" spacing="10.0">
                         <Label text="Required Photos" styleClass="panel-title" HBox.hgrow="ALWAYS"/>
 

@@ -33,11 +33,30 @@ public class AdminDashboardViewController extends BaseController<AdminDashboardV
     @FXML
     private Label errorLabel;
 
+    // Statistics labels
+    @FXML
+    private Label totalUsersLabel;
+
+    @FXML
+    private Label activeOrdersLabel;
+
+    @FXML
+    private Label completedOrdersLabel;
+
+    @FXML
+    private Label pendingReviewsLabel;
+
     @Override
     protected void setupBindings() {
         // Bind view model properties to UI elements
         welcomeLabel.textProperty().bind(getViewModel().welcomeMessageProperty());
         errorLabel.textProperty().bind(getViewModel().errorMessageProperty());
+
+        // Bind statistics properties to labels
+        totalUsersLabel.textProperty().bind(getViewModel().totalUsersProperty().asString());
+        activeOrdersLabel.textProperty().bind(getViewModel().activeOrdersProperty().asString());
+        completedOrdersLabel.textProperty().bind(getViewModel().completedOrdersProperty().asString());
+        pendingReviewsLabel.textProperty().bind(getViewModel().pendingReviewsProperty().asString());
     }
 
     /**

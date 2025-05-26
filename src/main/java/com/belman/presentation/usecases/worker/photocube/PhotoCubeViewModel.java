@@ -78,38 +78,50 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
         // Bind error messages from managers to this view model
         orderManager.errorMessageProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !newVal.isEmpty()) {
-                errorMessage.set(newVal);
+                javafx.application.Platform.runLater(() -> {
+                    errorMessage.set(newVal);
+                });
             }
         });
 
         photoCaptureManager.errorMessageProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !newVal.isEmpty()) {
-                errorMessage.set(newVal);
+                javafx.application.Platform.runLater(() -> {
+                    errorMessage.set(newVal);
+                });
             }
         });
 
         templateManager.errorMessageProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !newVal.isEmpty()) {
-                errorMessage.set(newVal);
+                javafx.application.Platform.runLater(() -> {
+                    errorMessage.set(newVal);
+                });
             }
         });
 
         // Bind status messages from managers to this view model
         orderManager.statusMessageProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !newVal.isEmpty()) {
-                statusMessage.set(newVal);
+                javafx.application.Platform.runLater(() -> {
+                    statusMessage.set(newVal);
+                });
             }
         });
 
         photoCaptureManager.statusMessageProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !newVal.isEmpty()) {
-                statusMessage.set(newVal);
+                javafx.application.Platform.runLater(() -> {
+                    statusMessage.set(newVal);
+                });
             }
         });
 
         templateManager.statusMessageProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !newVal.isEmpty()) {
-                statusMessage.set(newVal);
+                javafx.application.Platform.runLater(() -> {
+                    statusMessage.set(newVal);
+                });
             }
         });
     }
@@ -124,31 +136,40 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
      * Loads the current order and its photos.
      */
     private void loadCurrentOrder() {
-        loading.set(true);
-        statusMessage.set("Loading order...");
+        // Ensure UI updates happen on the JavaFX application thread
+        javafx.application.Platform.runLater(() -> {
+            loading.set(true);
+            statusMessage.set("Loading order...");
+        });
 
         try {
             // Load the order using the OrderManager
             boolean orderLoaded = orderManager.loadCurrentOrder();
 
             if (!orderLoaded) {
-                loading.set(false);
+                javafx.application.Platform.runLater(() -> {
+                    loading.set(false);
+                });
                 return;
             }
 
             // Get the current order ID
             OrderId orderId = orderManager.getCurrentOrderId();
             if (orderId == null) {
-                errorMessage.set("Invalid order ID. Please try again or contact support.");
-                loading.set(false);
+                javafx.application.Platform.runLater(() -> {
+                    errorMessage.set("Invalid order ID. Please try again or contact support.");
+                    loading.set(false);
+                });
                 return;
             }
 
             // Load photos for the order
             loadPhotosForOrder(orderId);
         } catch (Exception e) {
-            errorMessage.set("Unexpected error loading order: " + e.getMessage() + ". Please try again or contact support.");
-            loading.set(false);
+            javafx.application.Platform.runLater(() -> {
+                errorMessage.set("Unexpected error loading order: " + e.getMessage() + ". Please try again or contact support.");
+                loading.set(false);
+            });
         }
     }
 
@@ -158,8 +179,11 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
      * @param orderId the ID of the order
      */
     private void loadPhotosForOrder(OrderId orderId) {
-        statusMessage.set("Loading photos and templates...");
-        loading.set(true);
+        // Ensure UI updates happen on the JavaFX application thread
+        javafx.application.Platform.runLater(() -> {
+            statusMessage.set("Loading photos and templates...");
+            loading.set(true);
+        });
 
         // Maximum number of retry attempts
         final int MAX_RETRIES = 3;
@@ -182,22 +206,31 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
             boolean templatesLoaded = templateManager.loadTemplates(orderId);
 
             if (!templatesLoaded) {
-                loading.set(false);
+                javafx.application.Platform.runLater(() -> {
+                    loading.set(false);
+                });
                 return;
             }
 
             // Update template status based on the photos
             templateManager.updateTemplateStatus(photos);
 
-            loading.set(false);
-            state.set(PhotoCubeState.SELECTING_TEMPLATE);
-            statusMessage.set("Ready to take photos. " + templateManager.photosCompletedProperty().get() + " of " + 
-                            templateManager.totalPhotosRequiredProperty().get() + " photos taken.");
+            // Ensure UI updates happen on the JavaFX application thread
+            javafx.application.Platform.runLater(() -> {
+                loading.set(false);
+                state.set(PhotoCubeState.SELECTING_TEMPLATE);
+                statusMessage.set("Ready to take photos. " + templateManager.photosCompletedProperty().get() + " of " + 
+                                templateManager.totalPhotosRequiredProperty().get() + " photos taken.");
+            });
         } catch (Exception e) {
             // If we haven't exceeded the maximum number of retries, try again
             if (currentRetry < maxRetries) {
                 int nextRetry = currentRetry + 1;
-                statusMessage.set("Connection issue detected. Retrying... (Attempt " + nextRetry + "/" + maxRetries + ")");
+                final int retryAttempt = nextRetry; // Create a final copy for the lambda
+
+                javafx.application.Platform.runLater(() -> {
+                    statusMessage.set("Connection issue detected. Retrying... (Attempt " + retryAttempt + "/" + maxRetries + ")");
+                });
 
                 // Wait a bit before retrying (exponential backoff)
                 try {
@@ -210,11 +243,13 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
                 loadPhotosWithRetry(orderId, nextRetry, maxRetries);
             } else {
                 // We've exhausted all retries, show error message
-                errorMessage.set("Failed to load photos and templates after " + maxRetries + 
-                               " attempts. Error: " + e.getMessage() + ". Please check your connection and try again.");
-                loading.set(false);
-                state.set(PhotoCubeState.ERROR);
-                statusMessage.set("Error loading data. Please try refreshing.");
+                javafx.application.Platform.runLater(() -> {
+                    errorMessage.set("Failed to load photos and templates after " + maxRetries + 
+                                   " attempts. Error: " + e.getMessage() + ". Please check your connection and try again.");
+                    loading.set(false);
+                    state.set(PhotoCubeState.ERROR);
+                    statusMessage.set("Error loading data. Please try refreshing.");
+                });
             }
         }
     }
@@ -440,6 +475,11 @@ public class PhotoCubeViewModel extends BaseViewModel<PhotoCubeViewModel> {
             state.set(PhotoCubeState.ERROR);
         }
     }
+
+    public ListProperty<PhotoTemplateStatusViewModel> filteredTemplateStatusListProperty() {
+        return templateManager.filteredTemplateStatusListProperty();
+    }
+
 
     /**
      * Sets whether to show only remaining templates.

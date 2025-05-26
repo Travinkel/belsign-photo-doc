@@ -62,7 +62,10 @@ public class TemplateManager {
      * @return true if templates were loaded successfully, false otherwise
      */
     public boolean loadTemplates(OrderId orderId) {
-        statusMessage.set("Loading templates...");
+        // Ensure UI updates happen on the JavaFX application thread
+        javafx.application.Platform.runLater(() -> {
+            statusMessage.set("Loading templates...");
+        });
 
         try {
             // Get available templates from the PhotoTemplateService
@@ -85,17 +88,36 @@ public class TemplateManager {
             // If no templates are available, show a clear non-technical message
             if (requiredTemplates.isEmpty()) {
                 System.out.println("[DEBUG_LOG] No templates found for order ID: " + orderId.id() + " - showing error message");
-                errorMessage.set("No photo templates available. Please contact your supervisor to set up templates.");
-                statusMessage.set("Waiting for templates to be assigned. Please refresh or contact your supervisor.");
+                javafx.application.Platform.runLater(() -> {
+                    errorMessage.set("No photo templates available. Please contact your supervisor to set up templates.");
+                    statusMessage.set("Waiting for templates to be assigned. Please refresh or contact your supervisor.");
+                });
                 return false;
             }
 
             // Set the total required photos count
-            totalPhotosRequired.set(requiredTemplates.size());
+            javafx.application.Platform.runLater(() -> {
+                totalPhotosRequired.set(requiredTemplates.size());
+            });
+
+            updateTemplateStatus(Collections.emptyList());
+
+            if (!requiredTemplates.isEmpty()) {
+                javafx.application.Platform.runLater(() ->
+                        javafx.application.Platform.runLater(() ->
+                                selectTemplate(requiredTemplates.get(0))
+                        )
+                );
+            }
+
+
 
             return true;
         } catch (Exception e) {
-            errorMessage.set("Error loading templates: " + e.getMessage() + ". Please try again or contact support.");
+            final String errorMsg = e.getMessage(); // Create a final copy for the lambda
+            javafx.application.Platform.runLater(() -> {
+                errorMessage.set("Error loading templates: " + errorMsg + ". Please try again or contact support.");
+            });
             return false;
         }
     }
@@ -107,15 +129,14 @@ public class TemplateManager {
      */
     public void updateTemplateStatus(List<PhotoDocument> photos) {
         try {
-            // Update the photos completed count
-            photosCompleted.set(photos.size());
-            takenPhotos.setAll(photos);
+            // Prepare data outside of Platform.runLater to minimize work on UI thread
+            final int photosCount = photos.size();
 
             // Initialize the template completion status map
-            Map<PhotoTemplate, Boolean> completionStatus = new HashMap<>();
+            final Map<PhotoTemplate, Boolean> completionStatus = new HashMap<>();
 
             // Create template status view models for each template
-            ObservableList<PhotoTemplateStatusViewModel> statusList = FXCollections.observableArrayList();
+            final ObservableList<PhotoTemplateStatusViewModel> statusList = FXCollections.observableArrayList();
 
             for (PhotoTemplate template : requiredTemplates) {
                 boolean isCompleted = photos.stream()
@@ -129,44 +150,56 @@ public class TemplateManager {
                 statusList.add(statusViewModel);
             }
 
-            // Update the observable lists
-            templateCompletionStatus.putAll(completionStatus);
-            templateStatusList.setAll(statusList);
+            // Get selected template from context
+            final PhotoTemplate selectedTemplateFromContext = WorkerFlowContext.getSelectedTemplate();
+            final PhotoTemplate firstTemplate = !requiredTemplates.isEmpty() ? requiredTemplates.get(0) : null;
 
-            // Update the filtered template list to ensure UI is refreshed immediately
-            updateFilteredTemplateList();
+            // Update UI on JavaFX application thread
+            javafx.application.Platform.runLater(() -> {
+                // Update the photos completed count
+                photosCompleted.set(photosCount);
+                takenPhotos.setAll(photos);
 
-            // Check if there's a selected template in the WorkerFlowContext
-            PhotoTemplate selectedTemplateFromContext = WorkerFlowContext.getSelectedTemplate();
-            if (selectedTemplateFromContext != null) {
-                selectedTemplate.set(selectedTemplateFromContext);
+                // Update the observable lists
+                templateCompletionStatus.putAll(completionStatus);
+                templateStatusList.setAll(statusList);
 
-                // Update the selected state in the status view models only if the list is not empty
-                if (!templateStatusList.isEmpty()) {
-                    for (PhotoTemplateStatusViewModel statusViewModel : templateStatusList) {
-                        statusViewModel.setSelected(
-                            statusViewModel.getTemplate().equals(selectedTemplateFromContext));
+                // Update the filtered template list to ensure UI is refreshed immediately
+                updateFilteredTemplateList();
+
+                // Check if there's a selected template in the WorkerFlowContext
+                if (selectedTemplateFromContext != null) {
+                    selectedTemplate.set(selectedTemplateFromContext);
+
+                    // Update the selected state in the status view models only if the list is not empty
+                    if (!templateStatusList.isEmpty()) {
+                        for (PhotoTemplateStatusViewModel statusViewModel : templateStatusList) {
+                            statusViewModel.setSelected(
+                                statusViewModel.getTemplate().equals(selectedTemplateFromContext));
+                        }
+                    }
+                } else if (firstTemplate != null) {
+                    // Auto-select the first template if none is selected
+                    selectedTemplate.set(firstTemplate);
+                    WorkerFlowContext.setSelectedTemplate(firstTemplate);
+
+                    // Update the selected state in the status view models only if the list is not empty
+                    if (!templateStatusList.isEmpty()) {
+                        for (PhotoTemplateStatusViewModel statusViewModel : templateStatusList) {
+                            statusViewModel.setSelected(
+                                statusViewModel.getTemplate().equals(firstTemplate));
+                        }
                     }
                 }
-            } else if (!requiredTemplates.isEmpty()) {
-                // Auto-select the first template if none is selected
-                PhotoTemplate firstTemplate = requiredTemplates.get(0);
-                selectedTemplate.set(firstTemplate);
-                WorkerFlowContext.setSelectedTemplate(firstTemplate);
 
-                // Update the selected state in the status view models only if the list is not empty
-                if (!templateStatusList.isEmpty()) {
-                    for (PhotoTemplateStatusViewModel statusViewModel : templateStatusList) {
-                        statusViewModel.setSelected(
-                            statusViewModel.getTemplate().equals(firstTemplate));
-                    }
-                }
-            }
-
-            statusMessage.set("Ready to take photos. " + photosCompleted.get() + " of " + 
-                            totalPhotosRequired.get() + " photos taken.");
+                statusMessage.set("Ready to take photos. " + photosCompleted.get() + " of " + 
+                                totalPhotosRequired.get() + " photos taken.");
+            });
         } catch (Exception e) {
-            errorMessage.set("Error updating template status: " + e.getMessage() + ". Please try again or contact support.");
+            final String errorMsg = e.getMessage(); // Create a final copy for the lambda
+            javafx.application.Platform.runLater(() -> {
+                errorMessage.set("Error updating template status: " + errorMsg + ". Please try again or contact support.");
+            });
         }
     }
 
@@ -176,28 +209,40 @@ public class TemplateManager {
      * @param template the template to select
      */
     public void selectTemplate(PhotoTemplate template) {
-        statusMessage.set("Selecting template...");
+        // Ensure UI updates happen on the JavaFX application thread
+        javafx.application.Platform.runLater(() -> {
+            statusMessage.set("Selecting template...");
+        });
 
         try {
-            selectedTemplate.set(template);
-
-            // Store the selected template in the worker flow context
+            // Store the selected template in the worker flow context (this is not a UI operation)
             WorkerFlowContext.setSelectedTemplate(template);
 
-            // Update the selected state in the status view models only if the list is not empty
-            if (!templateStatusList.isEmpty()) {
-                for (PhotoTemplateStatusViewModel statusViewModel : templateStatusList) {
-                    statusViewModel.setSelected(
-                        statusViewModel.getTemplate().equals(template));
+            // Get the display label outside of Platform.runLater to minimize work on UI thread
+            final String displayLabel = PhotoTemplateLabelProvider.getDisplayLabel(template);
+
+            // Update UI on JavaFX application thread
+            javafx.application.Platform.runLater(() -> {
+                selectedTemplate.set(template);
+
+                // Update the selected state in the status view models only if the list is not empty
+                if (!templateStatusList.isEmpty()) {
+                    for (PhotoTemplateStatusViewModel statusViewModel : templateStatusList) {
+                        statusViewModel.setSelected(
+                            statusViewModel.getTemplate().equals(template));
+                    }
                 }
-            }
 
-            // Update the filtered template list to ensure UI is refreshed immediately
-            updateFilteredTemplateList();
+                // Update the filtered template list to ensure UI is refreshed immediately
+                updateFilteredTemplateList();
 
-            statusMessage.set("Template selected: " + PhotoTemplateLabelProvider.getDisplayLabel(template) + ". Ready to capture.");
+                statusMessage.set("Template selected: " + displayLabel + ". Ready to capture.");
+            });
         } catch (Exception e) {
-            errorMessage.set("Error selecting template: " + e.getMessage() + ". Please try again.");
+            final String errorMsg = e.getMessage(); // Create a final copy for the lambda
+            javafx.application.Platform.runLater(() -> {
+                errorMessage.set("Error selecting template: " + errorMsg + ". Please try again.");
+            });
         }
     }
 
@@ -208,38 +253,46 @@ public class TemplateManager {
      */
     public void updateAfterPhotoCapture(PhotoDocument savedPhoto) {
         try {
-            // Add the photo to the taken photos list
-            takenPhotos.add(savedPhoto);
+            // Get template outside of Platform.runLater to minimize work on UI thread
+            final PhotoTemplate template = savedPhoto.getTemplate();
 
-            // Update the photos completed count
-            photosCompleted.set(photosCompleted.get() + 1);
+            // Update UI on JavaFX application thread
+            javafx.application.Platform.runLater(() -> {
+                // Add the photo to the taken photos list
+                takenPhotos.add(savedPhoto);
 
-            // Update the template completion status
-            PhotoTemplate template = savedPhoto.getTemplate();
-            templateCompletionStatus.put(template, true);
+                // Update the photos completed count
+                photosCompleted.set(photosCompleted.get() + 1);
 
-            // Update the template status view model only if the list is not empty
-            if (!templateStatusList.isEmpty()) {
-                for (PhotoTemplateStatusViewModel statusViewModel : templateStatusList) {
-                    if (statusViewModel.getTemplate().equals(template)) {
-                        statusViewModel.setCaptured(true);
-                        statusViewModel.setValidated(true);
-                        break;
+                // Update the template completion status
+                templateCompletionStatus.put(template, true);
+
+                // Update the template status view model only if the list is not empty
+                if (!templateStatusList.isEmpty()) {
+                    for (PhotoTemplateStatusViewModel statusViewModel : templateStatusList) {
+                        if (statusViewModel.getTemplate().equals(template)) {
+                            statusViewModel.setCaptured(true);
+                            statusViewModel.setValidated(true);
+                            break;
+                        }
                     }
                 }
-            }
 
-            // Update the filtered template list to ensure UI is refreshed immediately
-            updateFilteredTemplateList();
+                // Update the filtered template list to ensure UI is refreshed immediately
+                updateFilteredTemplateList();
 
-            // Update the status message
-            statusMessage.set("Photo captured successfully. " + photosCompleted.get() + " of " + 
-                            totalPhotosRequired.get() + " photos taken.");
+                // Update the status message
+                statusMessage.set("Photo captured successfully. " + photosCompleted.get() + " of " + 
+                                totalPhotosRequired.get() + " photos taken.");
+            });
 
             // Auto-select the next template if available
             selectNextTemplate();
         } catch (Exception e) {
-            errorMessage.set("Error updating template status after photo capture: " + e.getMessage() + ". Please try again.");
+            final String errorMsg = e.getMessage(); // Create a final copy for the lambda
+            javafx.application.Platform.runLater(() -> {
+                errorMessage.set("Error updating template status after photo capture: " + errorMsg + ". Please try again.");
+            });
         }
     }
 
@@ -259,7 +312,9 @@ public class TemplateManager {
 
         // All templates have photos, check if we can go to summary
         if (areAllPhotosTaken()) {
-            statusMessage.set("All required photos have been taken. You can now proceed to the summary.");
+            javafx.application.Platform.runLater(() -> {
+                statusMessage.set("All required photos have been taken. You can now proceed to the summary.");
+            });
         }
     }
 
@@ -275,24 +330,30 @@ public class TemplateManager {
             return photoTemplateService.hasAllRequiredPhotos(orderId);
         } catch (Exception e) {
             // If there's an error, fall back to checking the template completion status map
-            errorMessage.set("Error checking if all photos are taken: " + e.getMessage());
+            final String errorMsg = e.getMessage(); // Create a final copy for the lambda
+            javafx.application.Platform.runLater(() -> {
+                errorMessage.set("Error checking if all photos are taken: " + errorMsg);
+            });
             return templateCompletionStatus.values().stream().allMatch(Boolean::booleanValue);
         }
     }
 
     /**
-     * Gets the missing required templates for the specified order.
+     * Gets the templates for the specified order.
      * 
      * @param orderId the ID of the order
-     * @return a list of required templates that are missing photos
+     * @return a list of templates for the order
      */
     public List<PhotoTemplate> getMissingRequiredTemplates(OrderId orderId) {
         try {
-            // Use the PhotoTemplateService to get the missing required templates
-            return photoTemplateService.getMissingRequiredTemplates(orderId);
+            // Use the PhotoTemplateService to get the available templates
+            return photoTemplateService.getAvailableTemplates(orderId);
         } catch (Exception e) {
             // If there's an error, log it and return an empty list
-            errorMessage.set("Error getting missing required templates: " + e.getMessage());
+            final String errorMsg = e.getMessage(); // Create a final copy for the lambda
+            javafx.application.Platform.runLater(() -> {
+                errorMessage.set("Error getting templates for order: " + errorMsg);
+            });
             return Collections.emptyList();
         }
     }
@@ -327,10 +388,16 @@ public class TemplateManager {
                 // If the template status list is empty, ensure the filtered list is also empty
                 System.out.println("Template status list is null or empty, clearing filtered list");
                 try {
-                    // Clear the list safely
-                    safelyClearList(filteredTemplateStatusList);
+                    // Clear the list safely on the JavaFX application thread
+                    javafx.application.Platform.runLater(() -> {
+                        try {
+                            safelyClearList(filteredTemplateStatusList);
+                        } catch (Exception e) {
+                            System.err.println("Error clearing filtered template list: " + e.getMessage());
+                        }
+                    });
                 } catch (Exception e) {
-                    System.err.println("Error clearing filtered template list: " + e.getMessage());
+                    System.err.println("Error scheduling clear operation: " + e.getMessage());
                 }
                 return;
             }
@@ -338,7 +405,7 @@ public class TemplateManager {
             if (showRemainingOnly.get()) {
                 try {
                     // Create a safe copy of the template status list to avoid concurrent modification
-                    List<PhotoTemplateStatusViewModel> safeList = new ArrayList<>();
+                    final List<PhotoTemplateStatusViewModel> safeList = new ArrayList<>();
                     try {
                         // Add all items from the template status list, with null check for each item
                         for (PhotoTemplateStatusViewModel item : templateStatusList) {
@@ -349,11 +416,11 @@ public class TemplateManager {
                     } catch (Exception e) {
                         System.err.println("Error creating safe copy of template status list: " + e.getMessage());
                         // If we can't create a safe copy, use the original list
-                        safeList = new ArrayList<>(templateStatusList);
+                        safeList.addAll(templateStatusList);
                     }
 
                     // Filter out completed templates with additional error handling
-                    List<PhotoTemplateStatusViewModel> remainingTemplates = new ArrayList<>();
+                    final List<PhotoTemplateStatusViewModel> remainingTemplates = new ArrayList<>();
                     for (PhotoTemplateStatusViewModel template : safeList) {
                         try {
                             if (template != null && !template.isCaptured()) {
@@ -373,50 +440,67 @@ public class TemplateManager {
                         // If all templates are captured and we're trying to show only remaining,
                         // show a message and revert to showing all templates
                         System.out.println("All templates captured, showing all templates instead of empty filtered list");
-                        errorMessage.set("All templates have been captured. Showing all templates.");
-                        showRemainingOnly.set(false);
 
-                        try {
-                            // Set all templates safely
-                            safelySetAllItems(filteredTemplateStatusList, safeList);
-                        } catch (Exception e) {
-                            System.err.println("Error setting all templates in filtered list: " + e.getMessage());
-                        }
+                        // Update UI on JavaFX application thread
+                        javafx.application.Platform.runLater(() -> {
+                            errorMessage.set("All templates have been captured. Showing all templates.");
+                            showRemainingOnly.set(false);
+
+                            try {
+                                // Set all templates safely
+                                safelySetAllItems(filteredTemplateStatusList, safeList);
+                            } catch (Exception e) {
+                                System.err.println("Error setting all templates in filtered list: " + e.getMessage());
+                            }
+                        });
                     } else {
                         // Set the filtered list to the remaining templates
                         System.out.println("Setting filtered list to " + remainingTemplates.size() + " remaining templates");
 
-                        try {
-                            // Set remaining templates safely
-                            safelySetAllItems(filteredTemplateStatusList, remainingTemplates);
-                        } catch (Exception e) {
-                            System.err.println("Error setting remaining templates in filtered list: " + e.getMessage());
-                            // Fallback to showing all templates
+                        // Update UI on JavaFX application thread
+                        javafx.application.Platform.runLater(() -> {
                             try {
-                                safelySetAllItems(filteredTemplateStatusList, safeList);
-                            } catch (Exception ex) {
-                                System.err.println("Error in fallback for filtered list: " + ex.getMessage());
+                                // Set remaining templates safely
+                                safelySetAllItems(filteredTemplateStatusList, remainingTemplates);
+                            } catch (Exception e) {
+                                System.err.println("Error setting remaining templates in filtered list: " + e.getMessage());
+                                // Fallback to showing all templates
+                                try {
+                                    safelySetAllItems(filteredTemplateStatusList, safeList);
+                                } catch (Exception ex) {
+                                    System.err.println("Error in fallback for filtered list: " + ex.getMessage());
+                                }
                             }
-                        }
+                        });
                     }
                 } catch (Exception e) {
                     System.err.println("Error filtering templates: " + e.getMessage());
                     // Fallback to showing all templates
-                    try {
-                        safelySetAllItems(filteredTemplateStatusList, templateStatusList);
-                    } catch (Exception ex) {
-                        System.err.println("Error in fallback for filtered list: " + ex.getMessage());
-                    }
+                    final List<PhotoTemplateStatusViewModel> finalTemplateStatusList = new ArrayList<>(templateStatusList);
+
+                    // Update UI on JavaFX application thread
+                    javafx.application.Platform.runLater(() -> {
+                        try {
+                            safelySetAllItems(filteredTemplateStatusList, finalTemplateStatusList);
+                        } catch (Exception ex) {
+                            System.err.println("Error in fallback for filtered list: " + ex.getMessage());
+                        }
+                    });
                 }
             } else {
                 // Show all templates
                 System.out.println("Showing all " + templateStatusList.size() + " templates");
+                final List<PhotoTemplateStatusViewModel> finalTemplateStatusList = new ArrayList<>(templateStatusList);
 
-                try {
-                    safelySetAllItems(filteredTemplateStatusList, templateStatusList);
-                } catch (Exception e) {
-                    System.err.println("Error setting all templates in filtered list: " + e.getMessage());
-                }
+                // Update UI on JavaFX application thread
+                javafx.application.Platform.runLater(() -> {
+                    try {
+                        // Set all templates safely
+                        safelySetAllItems(filteredTemplateStatusList, finalTemplateStatusList);
+                    } catch (Exception e) {
+                        System.err.println("Error setting all templates in filtered list: " + e.getMessage());
+                    }
+                });
             }
         } catch (Exception e) {
             System.err.println("Error updating filtered template list: " + e.getMessage());
@@ -650,6 +734,10 @@ public class TemplateManager {
 
     public List<PhotoTemplate> getRequiredTemplates() {
         return requiredTemplates;
+    }
+
+    public ListProperty<PhotoTemplateStatusViewModel> filteredTemplateStatusListProperty() {
+        return filteredTemplateStatusList;
     }
 
     public PhotoTemplate getSelectedTemplate() {

@@ -606,12 +606,39 @@ public class OrderBusiness extends BusinessObject<OrderId> {
                 .collect(Collectors.toList());
 
         // Define the required templates
+        // Note: In a real implementation, this should be retrieved from the PhotoTemplateRepository
+        // based on the templates associated with this order. For now, we include all standard templates
+        // to ensure we don't miss any required photos.
         List<PhotoTemplate> requiredTemplates = Arrays.asList(
                 PhotoTemplate.TOP_VIEW_OF_JOINT,
                 PhotoTemplate.SIDE_VIEW_OF_WELD,
                 PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY,
-                PhotoTemplate.BACK_VIEW_OF_ASSEMBLY
+                PhotoTemplate.BACK_VIEW_OF_ASSEMBLY,
+                PhotoTemplate.LEFT_VIEW_OF_ASSEMBLY,
+                PhotoTemplate.RIGHT_VIEW_OF_ASSEMBLY,
+                PhotoTemplate.BOTTOM_VIEW_OF_ASSEMBLY,
+                PhotoTemplate.CLOSE_UP_OF_WELD,
+                PhotoTemplate.ANGLED_VIEW_OF_JOINT,
+                PhotoTemplate.OVERVIEW_OF_ASSEMBLY
         );
+
+        // Find the missing required templates
+        return getMissingRequiredTemplates(capturedPhotos, requiredTemplates);
+    }
+
+    /**
+     * Gets the list of required photo templates that are missing photos for this order,
+     * using the provided list of required templates.
+     *
+     * @param capturedPhotos the list of photos captured for this order
+     * @param requiredTemplates the list of templates that are required for this order
+     * @return a list of required templates that are missing photos
+     */
+    public List<PhotoTemplate> getMissingRequiredTemplates(List<PhotoDocument> capturedPhotos, List<PhotoTemplate> requiredTemplates) {
+        // Get the templates of the captured photos
+        List<PhotoTemplate> capturedTemplates = capturedPhotos.stream()
+                .map(PhotoDocument::getTemplate)
+                .collect(Collectors.toList());
 
         // Find the missing required templates
         return requiredTemplates.stream()

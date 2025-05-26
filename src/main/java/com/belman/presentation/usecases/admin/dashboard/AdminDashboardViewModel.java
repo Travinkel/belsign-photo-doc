@@ -4,6 +4,11 @@ import com.belman.application.usecase.report.ReportService;
 import com.belman.bootstrap.di.ServiceLocator;
 import com.belman.common.di.Inject;
 import com.belman.common.session.SessionContext;
+import com.belman.domain.order.OrderRepository;
+import com.belman.domain.order.OrderStatus;
+import com.belman.domain.photo.PhotoDocument;
+import com.belman.domain.photo.PhotoDocument.ApprovalStatus;
+import com.belman.domain.photo.PhotoRepository;
 import com.belman.domain.report.ReportFormat;
 import com.belman.domain.report.ReportType;
 import com.belman.domain.security.AuthenticationService;
@@ -14,8 +19,10 @@ import com.belman.presentation.base.LogoutCapable;
 import com.belman.presentation.navigation.Router;
 import com.belman.presentation.usecases.admin.usermanagement.UserManagementView;
 import com.belman.presentation.usecases.login.LoginView;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -34,8 +41,20 @@ public class AdminDashboardViewModel extends BaseViewModel<AdminDashboardViewMod
     private final StringProperty welcomeMessage = new SimpleStringProperty("Welcome to Admin Dashboard");
     private final StringProperty errorMessage = new SimpleStringProperty("");
 
+    // Statistics properties
+    private final IntegerProperty totalUsers = new SimpleIntegerProperty(0);
+    private final IntegerProperty activeOrders = new SimpleIntegerProperty(0);
+    private final IntegerProperty completedOrders = new SimpleIntegerProperty(0);
+    private final IntegerProperty pendingReviews = new SimpleIntegerProperty(0);
+
     @Inject
     private UserRepository userRepository;
+
+    @Inject
+    private OrderRepository orderRepository;
+
+    @Inject
+    private PhotoRepository photoRepository;
 
     @Inject
     private SessionContext sessionContext;
@@ -56,6 +75,106 @@ public class AdminDashboardViewModel extends BaseViewModel<AdminDashboardViewMod
         sessionContext.getUser().ifPresent(user -> {
             welcomeMessage.set("Welcome, " + user.getUsername().value() + "!");
         });
+
+        // Update statistics
+        updateStatistics();
+    }
+
+    /**
+     * Updates all statistics from the repositories.
+     */
+    public void updateStatistics() {
+        try {
+            // Calculate and update statistics
+            totalUsers.set(calculateTotalUsers());
+            activeOrders.set(calculateActiveOrders());
+            completedOrders.set(calculateCompletedOrders());
+            pendingReviews.set(calculatePendingReviews());
+        } catch (Exception e) {
+            errorMessage.set("Error updating statistics: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Calculates the total number of users in the system.
+     * 
+     * @return the total number of users
+     */
+    private int calculateTotalUsers() {
+        return userRepository.findAll().size();
+    }
+
+    /**
+     * Calculates the number of active orders in the system.
+     * Active orders are those with status PENDING or IN_PROGRESS.
+     * 
+     * @return the number of active orders
+     */
+    private int calculateActiveOrders() {
+        return (int) orderRepository.findAll().stream()
+                .filter(order -> order.getStatus() == OrderStatus.PENDING || 
+                                order.getStatus() == OrderStatus.IN_PROGRESS)
+                .count();
+    }
+
+    /**
+     * Calculates the number of completed orders in the system.
+     * Completed orders are those with status COMPLETED.
+     * 
+     * @return the number of completed orders
+     */
+    private int calculateCompletedOrders() {
+        return (int) orderRepository.findAll().stream()
+                .filter(order -> order.getStatus() == OrderStatus.COMPLETED)
+                .count();
+    }
+
+    /**
+     * Calculates the number of photos pending review in the system.
+     * 
+     * @return the number of photos pending review
+     */
+    private int calculatePendingReviews() {
+        return (int) photoRepository.findAll().stream()
+                .filter(photo -> photo.getStatus() == ApprovalStatus.PENDING)
+                .count();
+    }
+
+    /**
+     * Gets the total users property.
+     * 
+     * @return the total users property
+     */
+    public IntegerProperty totalUsersProperty() {
+        return totalUsers;
+    }
+
+    /**
+     * Gets the active orders property.
+     * 
+     * @return the active orders property
+     */
+    public IntegerProperty activeOrdersProperty() {
+        return activeOrders;
+    }
+
+    /**
+     * Gets the completed orders property.
+     * 
+     * @return the completed orders property
+     */
+    public IntegerProperty completedOrdersProperty() {
+        return completedOrders;
+    }
+
+    /**
+     * Gets the pending reviews property.
+     * 
+     * @return the pending reviews property
+     */
+    public IntegerProperty pendingReviewsProperty() {
+        return pendingReviews;
     }
 
     /**

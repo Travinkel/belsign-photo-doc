@@ -1,5 +1,8 @@
 package com.belman.presentation.usecases.worker.photocube.managers;
 
+import com.belman.application.usecase.photo.CameraImageProvider;
+import com.belman.application.usecase.photo.CameraImageProviderFactory;
+import com.belman.application.usecase.photo.PhotoCaptureService;
 import com.belman.common.di.Inject;
 import com.belman.common.session.SessionContext;
 import com.belman.domain.order.OrderBusiness;
@@ -7,16 +10,8 @@ import com.belman.domain.order.OrderId;
 import com.belman.domain.photo.Photo;
 import com.belman.domain.photo.PhotoDocument;
 import com.belman.domain.photo.PhotoTemplate;
-import com.belman.domain.user.UserBusiness;
-import com.belman.application.usecase.photo.CameraImageProvider;
-import com.belman.application.usecase.photo.CameraImageProviderFactory;
-import com.belman.application.usecase.photo.PhotoCaptureService;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.application.Platform;
+import javafx.beans.property.*;
 import javafx.scene.image.Image;
 
 import java.io.File;
@@ -42,61 +37,82 @@ public class PhotoCaptureManager {
 
     /**
      * Starts the camera preview for the selected template.
-     * 
+     *
      * @param template the selected template
      * @return true if the camera preview was started successfully, false otherwise
      */
     public boolean startCameraPreview(PhotoTemplate template) {
-        statusMessage.set("Starting camera preview...");
+        Platform.runLater(() -> {
+            statusMessage.set("Starting camera preview...");
+        });
 
         try {
             if (!cameraImageProvider.isCameraAvailable()) {
-                errorMessage.set("Camera is not available on this device. Please check camera permissions or try another device.");
+                Platform.runLater(() -> {
+                    errorMessage.set(
+                            "Camera is not available on this device. Please check camera permissions or try another device.");
+                });
                 return false;
             }
 
             // Check if a template is selected
             if (template == null) {
-                errorMessage.set("Please select a template before starting the camera.");
+                Platform.runLater(() -> {
+                    errorMessage.set("Please select a template before starting the camera.");
+                });
                 return false;
             }
 
             // Start the camera preview
-            cameraActive.set(true);
-            statusMessage.set("Camera preview started. Position the camera and tap 'Capture' when ready.");
+            Platform.runLater(() -> {
+                cameraActive.set(true);
+                statusMessage.set("Camera preview started. Position the camera and tap 'Capture' when ready.");
+            });
             return true;
         } catch (Exception e) {
-            errorMessage.set("Error starting camera preview: " + e.getMessage() + ". Please try again or use another device.");
-            cameraActive.set(false);
+            final String errorMsg = e.getMessage(); // Create a final copy for the lambda
+            Platform.runLater(() -> {
+                errorMessage.set(
+                        "Error starting camera preview: " + errorMsg + ". Please try again or use another device.");
+                cameraActive.set(false);
+            });
             return false;
         }
     }
 
     /**
      * Captures a photo for the selected template.
-     * 
-     * @param order the current order
+     *
+     * @param order    the current order
      * @param template the selected template
      * @return the captured photo document, or null if the capture failed
      */
     public PhotoDocument capturePhoto(OrderBusiness order, PhotoTemplate template) {
         if (!cameraActive.get()) {
-            errorMessage.set("Camera is not active. Please start the camera preview first.");
+            Platform.runLater(() -> {
+                errorMessage.set("Camera is not active. Please start the camera preview first.");
+            });
             return null;
         }
 
         if (template == null) {
-            errorMessage.set("No template selected. Please select a template before capturing a photo.");
+            Platform.runLater(() -> {
+                errorMessage.set("No template selected. Please select a template before capturing a photo.");
+            });
             return null;
         }
 
         if (captureInProgress.get()) {
-            errorMessage.set("Capture already in progress. Please wait.");
+            Platform.runLater(() -> {
+                errorMessage.set("Capture already in progress. Please wait.");
+            });
             return null;
         }
 
-        captureInProgress.set(true);
-        statusMessage.set("Capturing photo...");
+        Platform.runLater(() -> {
+            captureInProgress.set(true);
+            statusMessage.set("Capturing photo...");
+        });
 
         try {
             // Capture the photo using the camera image provider
@@ -104,8 +120,10 @@ public class PhotoCaptureManager {
             Optional<File> capturedPhotoFile = cameraImageProvider.takePhoto(template, orderId);
 
             if (capturedPhotoFile.isEmpty()) {
-                errorMessage.set("Unable to save photo. Please check camera permissions and try again.");
-                captureInProgress.set(false);
+                Platform.runLater(() -> {
+                    errorMessage.set("Unable to save photo. Please check camera permissions and try again.");
+                    captureInProgress.set(false);
+                });
                 return null;
             }
 
@@ -116,27 +134,34 @@ public class PhotoCaptureManager {
             // Save the photo
             return savePhoto(order.getId(), template, capturedPhoto);
         } catch (Exception e) {
-            errorMessage.set("Error capturing photo: " + e.getMessage() + ". Please try again.");
-            captureInProgress.set(false);
+            final String errorMsg = e.getMessage(); // Create a final copy for the lambda
+            Platform.runLater(() -> {
+                errorMessage.set("Error capturing photo: " + errorMsg + ". Please try again.");
+                captureInProgress.set(false);
+            });
             return null;
         }
     }
 
     /**
      * Saves a captured photo for the selected template.
-     * 
-     * @param orderId the order ID
+     *
+     * @param orderId  the order ID
      * @param template the template
-     * @param photo the photo to save
+     * @param photo    the photo to save
      * @return the saved photo document, or null if the save failed
      */
     private PhotoDocument savePhoto(OrderId orderId, PhotoTemplate template, Photo photo) {
-        statusMessage.set("Saving photo...");
+        Platform.runLater(() -> {
+            statusMessage.set("Saving photo...");
+        });
 
         try {
             if (orderId == null || template == null) {
-                errorMessage.set("Missing order or template information. Please try again.");
-                captureInProgress.set(false);
+                Platform.runLater(() -> {
+                    errorMessage.set("Missing order or template information. Please try again.");
+                    captureInProgress.set(false);
+                });
                 return null;
             }
 
@@ -145,10 +170,12 @@ public class PhotoCaptureManager {
                 try {
                     // Save the photo using the photo capture service
                     PhotoDocument savedPhoto = photoCaptureService.capturePhoto(
-                        orderId, template, photo, user);
+                            orderId, template, photo, user);
 
                     if (savedPhoto == null) {
-                        errorMessage.set("Failed to save photo. Please try again.");
+                        Platform.runLater(() -> {
+                            errorMessage.set("Failed to save photo. Please try again.");
+                        });
                         return null;
                     }
 
@@ -156,53 +183,74 @@ public class PhotoCaptureManager {
                     updateAfterPhotoCapture(savedPhoto);
                     return savedPhoto;
                 } catch (Exception e) {
-                    errorMessage.set("Error saving photo: " + e.getMessage() + ". Please try again.");
+                    final String errorMsg = e.getMessage(); // Create a final copy for the lambda
+                    Platform.runLater(() -> {
+                        errorMessage.set("Error saving photo: " + errorMsg + ". Please try again.");
+                    });
                     return null;
                 } finally {
-                    captureInProgress.set(false);
+                    Platform.runLater(() -> {
+                        captureInProgress.set(false);
+                    });
                 }
             }).orElseGet(() -> {
-                errorMessage.set("No user is logged in. Please log in to continue.");
-                captureInProgress.set(false);
+                Platform.runLater(() -> {
+                    errorMessage.set("No user is logged in. Please log in to continue.");
+                    captureInProgress.set(false);
+                });
                 return null;
             });
         } catch (Exception e) {
-            errorMessage.set("Error saving photo: " + e.getMessage() + ". Please try again.");
-            captureInProgress.set(false);
+            final String errorMsg = e.getMessage(); // Create a final copy for the lambda
+            Platform.runLater(() -> {
+                errorMessage.set("Error saving photo: " + errorMsg + ". Please try again.");
+                captureInProgress.set(false);
+            });
             return null;
         }
     }
 
     /**
      * Updates the UI after a photo is captured and saved.
-     * 
+     *
      * @param savedPhoto the saved photo document
      */
     private void updateAfterPhotoCapture(PhotoDocument savedPhoto) {
         try {
             // Load the photo as an image for preview
             Image image = loadPhotoAsImage(savedPhoto);
-            if (image != null) {
-                currentPhotoPreview.set(image);
-            }
 
-            // Stop the camera preview
-            cameraActive.set(false);
+            // Update all UI elements on the JavaFX application thread
+            Platform.runLater(() -> {
+                try {
+                    if (image != null) {
+                        currentPhotoPreview.set(image);
+                    }
 
-            // Reset the capture in progress flag
-            captureInProgress.set(false);
+                    // Stop the camera preview
+                    cameraActive.set(false);
 
-            // Update the status message
-            statusMessage.set("Photo captured successfully.");
+                    // Reset the capture in progress flag
+                    captureInProgress.set(false);
+
+                    // Update the status message
+                    statusMessage.set("Photo captured successfully.");
+                } catch (Exception ex) {
+                    System.err.println("Error in Platform.runLater: " + ex.getMessage());
+                }
+            });
         } catch (Exception e) {
-            errorMessage.set("Error updating UI after photo capture: " + e.getMessage() + ". Please try again.");
-            captureInProgress.set(false);
+            final String errorMsg = e.getMessage(); // Create a final copy for the lambda
+            Platform.runLater(() -> {
+                errorMessage.set("Error updating UI after photo capture: " + errorMsg + ". Please try again.");
+                captureInProgress.set(false);
+            });
         }
     }
 
     /**
      * Loads a photo as a JavaFX Image.
-     * 
+     *
      * @param photoDocument the photo document to load
      * @return the photo as a JavaFX Image, or null if the photo could not be loaded
      */
@@ -230,7 +278,7 @@ public class PhotoCaptureManager {
                 if (photoFile.exists()) {
                     // Load the image from the file
                     return new Image(photoFile.toURI().toString(), true); // Use background loading
-                } 
+                }
 
                 // Try to load from photos directory
                 File mockCameraFile = new File("src/main/resources/photos/" + photoFile.getName());
@@ -265,7 +313,7 @@ public class PhotoCaptureManager {
 
     /**
      * Loads a fallback image when the requested image cannot be found.
-     * 
+     *
      * @return a fallback image
      */
     private Image loadFallbackImage() {
@@ -279,10 +327,10 @@ public class PhotoCaptureManager {
             // Try to load any image from photos directory
             File mockCameraDir = new File("src/main/resources/photos");
             if (mockCameraDir.exists() && mockCameraDir.isDirectory()) {
-                File[] imageFiles = mockCameraDir.listFiles((dir, name) -> 
-                    name.toLowerCase().endsWith(".jpg") || 
-                    name.toLowerCase().endsWith(".png") || 
-                    name.toLowerCase().endsWith(".gif"));
+                File[] imageFiles = mockCameraDir.listFiles((dir, name) ->
+                        name.toLowerCase().endsWith(".jpg") ||
+                        name.toLowerCase().endsWith(".png") ||
+                        name.toLowerCase().endsWith(".gif"));
 
                 if (imageFiles != null && imageFiles.length > 0) {
                     return new Image(imageFiles[0].toURI().toString(), true);

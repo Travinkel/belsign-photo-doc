@@ -234,8 +234,30 @@ public class DefaultPhotoTemplateService implements PhotoTemplateService {
         List<PhotoDocument> capturedPhotos = photoRepository.findByOrderId(orderId);
         logger.debug("Found {} captured photos for order", capturedPhotos.size());
 
-        // Delegate to the domain object to get missing required templates
-        List<PhotoTemplate> missingTemplates = order.getMissingRequiredTemplates(capturedPhotos);
+        // Get the templates associated with this order from the repository
+        List<PhotoTemplate> requiredTemplates = photoTemplateRepository.findByOrderId(orderId);
+        logger.debug("Found {} required templates for order", requiredTemplates.size());
+
+        // If no templates are found, use the default templates from the domain object
+        if (requiredTemplates.isEmpty()) {
+            logger.warn("No templates found for order ID: {}, using default templates", orderId.id());
+            // Delegate to the domain object to get missing required templates using default templates
+            List<PhotoTemplate> missingTemplates = order.getMissingRequiredTemplates(capturedPhotos);
+
+            if (missingTemplates.isEmpty()) {
+                logger.debug("No missing templates (all required templates are captured)");
+            } else {
+                logger.debug("Missing {} templates (using default templates):", missingTemplates.size());
+                for (PhotoTemplate template : missingTemplates) {
+                    logger.debug("- {}", template.name());
+                }
+            }
+
+            return missingTemplates;
+        }
+
+        // Delegate to the domain object to get missing required templates using the templates from the repository
+        List<PhotoTemplate> missingTemplates = order.getMissingRequiredTemplates(capturedPhotos, requiredTemplates);
 
         if (missingTemplates.isEmpty()) {
             logger.debug("No missing templates (all required templates are captured)");

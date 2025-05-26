@@ -702,6 +702,7 @@
 .progressive-capture-dashboard .center-container {
     -fx-spacing: -spacing-medium;
     -fx-padding: -spacing-medium;
+    -fx-fill-width: true;
 }
 
 /* 4.1. Layout and Panels
@@ -714,6 +715,8 @@
     -fx-border-radius: 8px;
     -fx-padding: -spacing-medium;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);
+    -fx-max-width: 60%;
+    -fx-pref-width: 60%;
 }
 
 .progressive-capture-dashboard .progress-panel {
@@ -735,6 +738,8 @@
     -fx-border-radius: 8px;
     -fx-padding: -spacing-medium;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 2);
+    -fx-max-width: 40%;
+    -fx-pref-width: 40%;
 }
 
 .progressive-capture-dashboard .template-info {
@@ -1568,13 +1573,13 @@
 }
 
 .tablet-landscape .progressive-capture-dashboard .photo-preview-panel {
-    -fx-max-width: 55%;
-    -fx-pref-width: 55%;
+    -fx-max-width: 60%;
+    -fx-pref-width: 60%;
 }
 
 .tablet-landscape .progressive-capture-dashboard .template-list-panel {
-    -fx-max-width: 45%;
-    -fx-pref-width: 45%;
+    -fx-max-width: 40%;
+    -fx-pref-width: 40%;
 }
 
 /* Tablet optimizations for camera controls */

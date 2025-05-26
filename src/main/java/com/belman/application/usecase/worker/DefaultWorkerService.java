@@ -90,7 +90,7 @@ public class DefaultWorkerService implements WorkerService {
 
     @Override
     public List<PhotoTemplate> getMissingRequiredTemplates(OrderId orderId) {
-        logger.debug("Delegating getMissingRequiredTemplates to PhotoTemplateService");
-        return photoTemplateService.getMissingRequiredTemplates(orderId);
+        logger.debug("Getting templates for order using getAvailableTemplates");
+        return photoTemplateService.getAvailableTemplates(orderId);
     }
 }

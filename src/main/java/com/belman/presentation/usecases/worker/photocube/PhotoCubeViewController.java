@@ -24,6 +24,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.application.Platform;
 
 /**
  * Controller for the PhotoCubeView.
@@ -236,7 +237,9 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
      */
     private void setupTemplateListView() {
         // Bind the list view to the template status list in the view model
-        templateListView.itemsProperty().bind(getViewModel().templateStatusListProperty());
+        // First clear the selection to prevent IndexOutOfBoundsException
+        safelyClearSelection();
+        templateListView.itemsProperty().bind(getViewModel().filteredTemplateStatusListProperty());
 
         // Set cell factory to display template status
         templateListView.setCellFactory(lv -> new ListCell<PhotoTemplateStatusViewModel>() {
@@ -437,46 +440,15 @@ public class PhotoCubeViewController extends BaseController<PhotoCubeViewModel> 
      * This method adds additional checks to prevent IndexOutOfBoundsException.
      */
     private void safelyClearSelection() {
-        try {
-            // First check if the ListView is not null
-            if (templateListView != null) {
-                // Check if the selection model is not null
+        Platform.runLater(() -> {
+            try {
                 if (templateListView.getSelectionModel() != null) {
-                    // Check if the ListView has items
-                    if (templateListView.getItems() != null) {
-                        // Check if the ListView is empty
-                        if (templateListView.getItems().isEmpty()) {
-                            // If the list is empty, there's nothing to clear
-                            System.out.println("ListView is empty, nothing to clear");
-                            return;
-                        }
-
-                        // Get the current selection index
-                        int selectedIndex = templateListView.getSelectionModel().getSelectedIndex();
-
-                        // Only clear if there's a valid selection
-                        if (selectedIndex >= 0 && selectedIndex < templateListView.getItems().size()) {
-                            try {
-                                // Use a try-catch block to catch any IndexOutOfBoundsException
-                                templateListView.getSelectionModel().clearSelection();
-                            } catch (IndexOutOfBoundsException e) {
-                                System.err.println("Prevented IndexOutOfBoundsException when clearing selection: " + e.getMessage());
-                            }
-                        } else {
-                            System.out.println("No valid selection to clear (index: " + selectedIndex + ", size: " + templateListView.getItems().size() + ")");
-                        }
-                    } else {
-                        System.out.println("ListView items are null, nothing to clear");
-                    }
-                } else {
-                    System.out.println("Selection model is null, cannot clear selection");
+                    templateListView.getSelectionModel().clearSelection();
                 }
-            } else {
-                System.err.println("Warning: templateListView is null when trying to clear selection");
+            } catch (Exception e) {
+                System.err.println("Failed to clear ListView selection: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("Error clearing selection: " + e.getMessage());
-        }
+        });
     }
 
     /**
