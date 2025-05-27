@@ -8,18 +8,20 @@ import com.belman.domain.common.valueobjects.Timestamp;
 import com.belman.domain.user.UserId;
 import com.belman.domain.user.Username;
 import com.belman.domain.user.UserReference;
+import com.belman.domain.user.UserBusiness;
+import com.belman.domain.security.HashedPassword;
+import com.belman.domain.common.valueobjects.EmailAddress;
 
 import java.time.Instant;
 import com.belman.domain.photo.PhotoDocument;
 import com.belman.domain.photo.PhotoId;
 import com.belman.domain.photo.PhotoRepository;
+import com.belman.domain.photo.PhotoTemplate;
+import com.belman.domain.photo.Photo;
 import com.belman.domain.report.ReportBusiness;
 import com.belman.domain.report.ReportStatus;
 import com.belman.domain.report.service.PhotoReportGenerationService;
 import com.belman.domain.services.LoggerFactory;
-import com.belman.domain.user.UserReference;
-import com.belman.domain.user.UserId;
-import com.belman.domain.user.Username;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -173,23 +175,49 @@ public class PhotoReportGenerationServiceTest {
     }
 
     /**
-     * Helper method to create a list of mock approved photos.
+     * Helper method to create a list of real approved photos.
      * 
      * @param orderId the order ID
-     * @return a list of mock approved photos
+     * @return a list of approved photos
      */
     private List<PhotoDocument> createMockApprovedPhotos(OrderId orderId) {
         List<PhotoDocument> photos = new ArrayList<>();
 
-        // Create 3 mock photos
+        // Create 3 real photos
         for (int i = 0; i < 3; i++) {
-            PhotoDocument photo = mock(PhotoDocument.class);
             PhotoId photoId = new PhotoId(UUID.randomUUID().toString());
-            when(photo.getId()).thenReturn(photoId);
-            when(photo.getOrderId()).thenReturn(orderId);
-            when(photo.getStatus()).thenReturn(PhotoDocument.ApprovalStatus.APPROVED);
+            PhotoTemplate template = PhotoTemplate.of("Test Template " + i, "Description " + i);
+            Photo photo = new Photo("test/path/image" + i + ".jpg");
 
-            photos.add(photo);
+            // Create a user reference for the uploader
+            UserId userId = new UserId(UUID.randomUUID().toString());
+            Username username = new Username("test_user_" + i);
+            UserReference userRef = new UserReference(userId, username);
+
+            // Create a user business object
+            UserBusiness uploadedBy = new UserBusiness.Builder()
+                    .id(userId)
+                    .username(username)
+                    .password(new HashedPassword("hashedpassword123"))
+                    .email(new EmailAddress("test_user_" + i + "@example.com"))
+                    .build();
+
+            Timestamp uploadedAt = new Timestamp(Instant.now());
+
+            // Build the photo document
+            PhotoDocument photoDoc = PhotoDocument.builder()
+                    .photoId(photoId)
+                    .template(template)
+                    .imagePath(photo)
+                    .uploadedBy(uploadedBy)
+                    .uploadedAt(uploadedAt)
+                    .orderId(orderId)
+                    .build();
+
+            // Approve the photo
+            photoDoc.approve(userRef, new Timestamp(Instant.now()));
+
+            photos.add(photoDoc);
         }
 
         return photos;
