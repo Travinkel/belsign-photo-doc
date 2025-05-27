@@ -1,13 +1,51 @@
 # PowerShell script to analyze quality reports and generate a summary
 # This script should be run after collect-quality-reports.ps1
+#
+# Parameters:
+#   -ReportsDir: Optional. The directory containing the quality reports. Default is "target\quality-reports"
+#   -OutputFile: Optional. The file where the quality report summary will be written. Default is ".junie\quality-assessment.md"
+#   -ProjectRoot: Optional. The root directory of the project. Default is determined from script location.
+param (
+    [string]$ReportsDir = "",
+    [string]$OutputFile = "",
+    [string]$ProjectRoot = ""
+)
 
-# Define the quality reports directory
-$reportsDir = "target/quality-reports"
+# Get the script directory and project root if not provided
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+if (-not $ProjectRoot) {
+    $ProjectRoot = Split-Path -Parent (Split-Path -Parent $scriptDir)
+}
+
+Write-Host "Starting quality report analysis..."
+Write-Host "Project root: $ProjectRoot"
+
+# Set the reports directory if not provided
+if (-not $ReportsDir) {
+    $ReportsDir = Join-Path -Path $ProjectRoot -ChildPath "target\quality-reports"
+}
+
+# Set the output file if not provided
+if (-not $OutputFile) {
+    $OutputFile = Join-Path -Path $ProjectRoot -ChildPath ".junie\quality-assessment.md"
+}
 
 # Check if the reports directory exists
-if (-not (Test-Path $reportsDir)) {
-    Write-Host "Error: Quality reports directory not found at $reportsDir"
+if (-not (Test-Path $ReportsDir)) {
+    Write-Host "Error: Quality reports directory not found at $ReportsDir"
     Write-Host "Please run 'mvn verify' and then 'collect-quality-reports.ps1' first."
+    exit 1
+}
+
+# Create the output directory if it doesn't exist
+try {
+    $outputDir = Split-Path -Parent $OutputFile
+    if (-not (Test-Path $outputDir)) {
+        New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
+        Write-Host "Created output directory: $outputDir"
+    }
+} catch {
+    Write-Host "Error creating output directory: $_"
     exit 1
 }
 
@@ -40,157 +78,286 @@ function Get-XmlContent {
     return $null
 }
 
-# Analyze Surefire reports (unit tests)
-Write-Host "Analyzing Surefire reports (unit tests)..."
-$surefireDir = "$reportsDir/surefire"
-if (Test-Path $surefireDir) {
-    $testSummaryFiles = Get-ChildItem -Path $surefireDir -Filter "TEST-*.xml"
-    foreach ($testFile in $testSummaryFiles) {
-        $xml = Get-XmlContent $testFile.FullName
-        if ($xml -and $xml.testsuite) {
-            $totalUnitTests += [int]$xml.testsuite.tests
-            $failedUnitTests += [int]$xml.testsuite.failures + [int]$xml.testsuite.errors
+# Function to analyze test reports
+function Analyze-TestReports {
+    param (
+        [string]$ReportDir,
+        [string]$TestType
+    )
+
+    $total = 0
+    $failed = 0
+
+    try {
+        if (Test-Path $ReportDir) {
+            $testSummaryFiles = Get-ChildItem -Path $ReportDir -Filter "TEST-*.xml"
+            foreach ($testFile in $testSummaryFiles) {
+                $xml = Get-XmlContent $testFile.FullName
+                if ($xml -and $xml.testsuite) {
+                    $total += [int]$xml.testsuite.tests
+                    $failed += [int]$xml.testsuite.failures + [int]$xml.testsuite.errors
+                }
+            }
+            $passed = $total - $failed
+            Write-Host "$TestType tests: $passed passed, $failed failed (total: $total)"
+
+            return @{
+                Total = $total
+                Passed = $passed
+                Failed = $failed
+            }
+        } else {
+            Write-Host "No $TestType test reports found at $ReportDir"
+            return @{
+                Total = 0
+                Passed = 0
+                Failed = 0
+            }
+        }
+    } catch {
+        Write-Host "Error analyzing $TestType test reports: $_"
+        return @{
+            Total = 0
+            Passed = 0
+            Failed = 0
         }
     }
-    $passedUnitTests = $totalUnitTests - $failedUnitTests
-    Write-Host "Unit tests: $passedUnitTests passed, $failedUnitTests failed (total: $totalUnitTests)"
 }
+
+# Analyze Surefire reports (unit tests)
+Write-Host "Analyzing Surefire reports (unit tests)..."
+$surefireDir = Join-Path -Path $ReportsDir -ChildPath "surefire"
+$unitTestResults = Analyze-TestReports -ReportDir $surefireDir -TestType "Unit"
+$totalUnitTests = $unitTestResults.Total
+$passedUnitTests = $unitTestResults.Passed
+$failedUnitTests = $unitTestResults.Failed
 
 # Analyze Failsafe reports (integration tests)
 Write-Host "Analyzing Failsafe reports (integration tests)..."
-$failsafeDir = "$reportsDir/failsafe"
-if (Test-Path $failsafeDir) {
-    $testSummaryFiles = Get-ChildItem -Path $failsafeDir -Filter "TEST-*.xml"
-    foreach ($testFile in $testSummaryFiles) {
-        $xml = Get-XmlContent $testFile.FullName
-        if ($xml -and $xml.testsuite) {
-            $totalIntegrationTests += [int]$xml.testsuite.tests
-            $failedIntegrationTests += [int]$xml.testsuite.failures + [int]$xml.testsuite.errors
+$failsafeDir = Join-Path -Path $ReportsDir -ChildPath "failsafe"
+$integrationTestResults = Analyze-TestReports -ReportDir $failsafeDir -TestType "Integration"
+$totalIntegrationTests = $integrationTestResults.Total
+$passedIntegrationTests = $integrationTestResults.Passed
+$failedIntegrationTests = $integrationTestResults.Failed
+
+# Function to analyze SpotBugs reports
+function Analyze-SpotBugsReports {
+    param (
+        [string]$ReportFile
+    )
+
+    $warnings = 0
+    $criticalWarnings = 0
+    $issues = @()
+
+    try {
+        if (Test-Path $ReportFile) {
+            $xml = Get-XmlContent $ReportFile
+            if ($xml -and $xml.BugCollection -and $xml.BugCollection.BugInstance) {
+                $warnings = $xml.BugCollection.BugInstance.Count
+                Write-Host "SpotBugs: $warnings warnings"
+
+                # Count critical warnings and collect top issues
+                foreach ($bug in $xml.BugCollection.BugInstance) {
+                    if ($bug.priority -eq "1") {
+                        $criticalWarnings++
+                    }
+
+                    # Collect top 5 issues
+                    if ($issues.Count -lt 5) {
+                        $className = $bug.Class.classname
+                        $sourceLine = $bug.SourceLine.start
+                        $bugType = $bug.type
+                        $bugCategory = $bug.category
+                        $issues += @{
+                            ClassName = $className
+                            SourceLine = $sourceLine
+                            BugType = $bugType
+                            Category = $bugCategory
+                        }
+                    }
+                }
+            } else {
+                Write-Host "SpotBugs report has no bug instances or invalid format"
+            }
+        } else {
+            Write-Host "SpotBugs report not found at $ReportFile"
         }
+    } catch {
+        Write-Host "Error analyzing SpotBugs report: $_"
     }
-    $passedIntegrationTests = $totalIntegrationTests - $failedIntegrationTests
-    Write-Host "Integration tests: $passedIntegrationTests passed, $failedIntegrationTests failed (total: $totalIntegrationTests)"
+
+    return @{
+        Warnings = $warnings
+        CriticalWarnings = $criticalWarnings
+        Issues = $issues
+    }
 }
 
 # Analyze SpotBugs reports
 Write-Host "Analyzing SpotBugs reports..."
-$spotbugsFile = "$reportsDir/spotbugs/spotbugsXml.xml"
-if (Test-Path $spotbugsFile) {
-    $xml = Get-XmlContent $spotbugsFile
-    if ($xml -and $xml.BugCollection -and $xml.BugCollection.BugInstance) {
-        $spotbugsWarnings = $xml.BugCollection.BugInstance.Count
-        Write-Host "SpotBugs: $spotbugsWarnings warnings"
+$spotbugsFile = Join-Path -Path $ReportsDir -ChildPath "spotbugs\spotbugsXml.xml"
+$spotbugsResults = Analyze-SpotBugsReports -ReportFile $spotbugsFile
+$spotbugsWarnings = $spotbugsResults.Warnings
+$criticalSpotbugsWarnings = $spotbugsResults.CriticalWarnings
+$spotbugsIssues = $spotbugsResults.Issues
 
-        # Count critical warnings and collect top issues
-        foreach ($bug in $xml.BugCollection.BugInstance) {
-            if ($bug.priority -eq "1") {
-                $criticalSpotbugsWarnings++
-            }
+# Function to analyze PMD reports
+function Analyze-PMDReports {
+    param (
+        [string]$ReportFile
+    )
 
-            # Collect top 5 issues
-            if ($spotbugsIssues.Count -lt 5) {
-                $className = $bug.Class.classname
-                $sourceLine = $bug.SourceLine.start
-                $bugType = $bug.type
-                $bugCategory = $bug.category
-                $spotbugsIssues += @{
-                    ClassName = $className
-                    SourceLine = $sourceLine
-                    BugType = $bugType
-                    Category = $bugCategory
+    $violations = 0
+    $issues = @()
+
+    try {
+        if (Test-Path $ReportFile) {
+            $xml = Get-XmlContent $ReportFile
+            if ($xml -and $xml.pmd -and $xml.pmd.file) {
+                foreach ($file in $xml.pmd.file) {
+                    $violations += $file.violation.Count
                 }
+                Write-Host "PMD: $violations rule violations"
+
+                # Collect top 5 PMD issues
+                $issueCount = 0
+                foreach ($file in $xml.pmd.file) {
+                    foreach ($violation in $file.violation) {
+                        if ($issueCount -lt 5) {
+                            $fileName = $file.name.Split('\')[-1]
+                            $ruleName = $violation.rule
+                            $priority = $violation.priority
+                            $beginLine = $violation.beginline
+                            $issues += @{
+                                FileName = $fileName
+                                RuleName = $ruleName
+                                Priority = $priority
+                                Line = $beginLine
+                            }
+                            $issueCount++
+                        }
+                    }
+                }
+            } else {
+                Write-Host "PMD report has no violations or invalid format"
             }
+        } else {
+            Write-Host "PMD report not found at $ReportFile"
         }
+    } catch {
+        Write-Host "Error analyzing PMD report: $_"
+    }
+
+    return @{
+        Violations = $violations
+        Issues = $issues
     }
 }
 
 # Analyze PMD reports
 Write-Host "Analyzing PMD reports..."
-$pmdFile = "$reportsDir/pmd/pmd.xml"
-if (Test-Path $pmdFile) {
-    $xml = Get-XmlContent $pmdFile
-    if ($xml -and $xml.pmd -and $xml.pmd.file) {
-        $pmdViolations = 0
-        foreach ($file in $xml.pmd.file) {
-            $pmdViolations += $file.violation.Count
-        }
-        Write-Host "PMD: $pmdViolations rule violations"
+$pmdFile = Join-Path -Path $ReportsDir -ChildPath "pmd\pmd.xml"
+$pmdResults = Analyze-PMDReports -ReportFile $pmdFile
+$pmdViolations = $pmdResults.Violations
+$pmdIssues = $pmdResults.Issues
 
-        # Collect top 5 PMD issues
-        $issueCount = 0
-        foreach ($file in $xml.pmd.file) {
-            foreach ($violation in $file.violation) {
-                if ($issueCount -lt 5) {
-                    $fileName = $file.name.Split('\')[-1]
-                    $ruleName = $violation.rule
-                    $priority = $violation.priority
-                    $beginLine = $violation.beginline
-                    $pmdIssues += @{
-                        FileName = $fileName
-                        RuleName = $ruleName
-                        Priority = $priority
-                        Line = $beginLine
+# Function to analyze JaCoCo reports
+function Analyze-JaCoCoReports {
+    param (
+        [string]$ReportFile
+    )
+
+    $instructionCoverage = 0
+    $branchCoverage = 0
+    $lowCoverageFiles = @()
+
+    try {
+        if (Test-Path $ReportFile) {
+            $xml = Get-XmlContent $ReportFile
+            if ($xml -and $xml.report -and $xml.report.counter) {
+                # Calculate instruction coverage
+                $instructionCounter = $xml.report.counter | Where-Object { $_.type -eq "INSTRUCTION" }
+                if ($instructionCounter) {
+                    $covered = [int]$instructionCounter.covered
+                    $missed = [int]$instructionCounter.missed
+                    $total = $covered + $missed
+                    if ($total -gt 0) {
+                        $instructionCoverage = [math]::Round(($covered / $total) * 100, 2)
+                        Write-Host "JaCoCo: $instructionCoverage% overall instruction coverage"
                     }
-                    $issueCount++
                 }
+
+                # Calculate branch coverage
+                $branchCounter = $xml.report.counter | Where-Object { $_.type -eq "BRANCH" }
+                if ($branchCounter) {
+                    $covered = [int]$branchCounter.covered
+                    $missed = [int]$branchCounter.missed
+                    $total = $covered + $missed
+                    if ($total -gt 0) {
+                        $branchCoverage = [math]::Round(($covered / $total) * 100, 2)
+                        Write-Host "JaCoCo: $branchCoverage% overall branch coverage"
+                    }
+                }
+
+                # Find classes with low coverage
+                foreach ($package in $xml.report.package) {
+                    foreach ($class in $package.class) {
+                        $classCounter = $class.counter | Where-Object { $_.type -eq "INSTRUCTION" }
+                        if ($classCounter) {
+                            $covered = [int]$classCounter.covered
+                            $missed = [int]$classCounter.missed
+                            $total = $covered + $missed
+                            if ($total -gt 0) {
+                                $coverage = [math]::Round(($covered / $total) * 100, 2)
+                                if ($coverage -lt 70) {
+                                    $className = $class.name.Split('/')[-1]
+                                    $lowCoverageFiles += @{
+                                        ClassName = "$className.java"
+                                        Coverage = $coverage
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                Write-Host "JaCoCo report has invalid format or missing data"
             }
+        } else {
+            Write-Host "JaCoCo report not found at $ReportFile"
         }
+    } catch {
+        Write-Host "Error analyzing JaCoCo report: $_"
+    }
+
+    return @{
+        InstructionCoverage = $instructionCoverage
+        BranchCoverage = $branchCoverage
+        LowCoverageFiles = $lowCoverageFiles
     }
 }
 
 # Analyze JaCoCo reports
 Write-Host "Analyzing JaCoCo reports..."
-$jacocoFile = "$reportsDir/jacoco/jacoco.xml"
-if (Test-Path $jacocoFile) {
-    $xml = Get-XmlContent $jacocoFile
-    if ($xml -and $xml.report -and $xml.report.counter) {
-        # Calculate line coverage
-        $instructionCounter = $xml.report.counter | Where-Object { $_.type -eq "INSTRUCTION" }
-        if ($instructionCounter) {
-            $covered = [int]$instructionCounter.covered
-            $missed = [int]$instructionCounter.missed
-            $total = $covered + $missed
-            $jacocoCoverage = [math]::Round(($covered / $total) * 100, 2)
-            Write-Host "JaCoCo: $jacocoCoverage% overall instruction coverage"
-        }
-
-        # Calculate branch coverage
-        $branchCounter = $xml.report.counter | Where-Object { $_.type -eq "BRANCH" }
-        if ($branchCounter) {
-            $covered = [int]$branchCounter.covered
-            $missed = [int]$branchCounter.missed
-            $total = $covered + $missed
-            $branchCoverage = [math]::Round(($covered / $total) * 100, 2)
-            Write-Host "JaCoCo: $branchCoverage% overall branch coverage"
-        }
-
-        # Find classes with low coverage
-        foreach ($package in $xml.report.package) {
-            foreach ($class in $package.class) {
-                $classCounter = $class.counter | Where-Object { $_.type -eq "INSTRUCTION" }
-                if ($classCounter) {
-                    $covered = [int]$classCounter.covered
-                    $missed = [int]$classCounter.missed
-                    $total = $covered + $missed
-                    if ($total -gt 0) {
-                        $coverage = [math]::Round(($covered / $total) * 100, 2)
-                        if ($coverage -lt 70) {
-                            $className = $class.name.Split('/')[-1]
-                            $lowCoverageFiles += @{
-                                ClassName = "$className.java"
-                                Coverage = $coverage
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+$jacocoFile = Join-Path -Path $ReportsDir -ChildPath "jacoco\jacoco.xml"
+$jacocoResults = Analyze-JaCoCoReports -ReportFile $jacocoFile
+$jacocoCoverage = $jacocoResults.InstructionCoverage
+$branchCoverage = $jacocoResults.BranchCoverage
+$lowCoverageFiles = $jacocoResults.LowCoverageFiles
 
 # Generate the quality report summary
-$summaryFile = ".junie/quality-assessment.md"
-New-Item -ItemType Directory -Force -Path ".junie" | Out-Null
+try {
+    # Ensure the output directory exists
+    $outputDir = Split-Path -Parent $OutputFile
+    if (-not (Test-Path $outputDir)) {
+        New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
+        Write-Host "Created output directory: $outputDir"
+    }
+} catch {
+    Write-Host "Error creating output directory: $_"
+    exit 1
+}
 
 # Determine status icons
 $unitTestsIcon = if ($failedUnitTests -eq 0) { "✅" } else { "🔴" }
@@ -315,7 +482,23 @@ $($recommendations -join "`n")
 "@
 
 # Write the summary to the file
-Set-Content -Path $summaryFile -Value $summaryContent
+try {
+    Set-Content -Path $OutputFile -Value $summaryContent
+    Write-Host "Quality assessment report generated at $OutputFile"
+} catch {
+    Write-Host "Error writing quality assessment report: $_"
+    exit 1
+}
 
-Write-Host "Quality assessment report generated at $summaryFile"
-Write-Host "Done!"
+# Generate a timestamp for the report
+$timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+
+# Add a footer to the report
+try {
+    Add-Content -Path $OutputFile -Value "`n`n---`nReport generated on $timestamp"
+    Write-Host "Report timestamp added"
+} catch {
+    Write-Host "Error adding timestamp to report: $_"
+}
+
+Write-Host "Quality assessment analysis completed successfully!"

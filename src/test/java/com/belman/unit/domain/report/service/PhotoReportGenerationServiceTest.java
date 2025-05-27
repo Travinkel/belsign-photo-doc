@@ -147,7 +147,7 @@ public class PhotoReportGenerationServiceTest {
         OrderId orderId = new OrderId(UUID.randomUUID().toString());
 
         // Create a real OrderNumber
-        OrderNumber orderNumber = new OrderNumber("ORD-XX-230101-ABC-0001");
+        OrderNumber orderNumber = new OrderNumber("ORD-78-230101-ABC-0001");
 
         // Create a user reference for the creator
         UserId userId = new UserId(UUID.randomUUID().toString());

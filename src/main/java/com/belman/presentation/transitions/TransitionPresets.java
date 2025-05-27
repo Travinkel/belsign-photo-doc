@@ -11,9 +11,36 @@ import javafx.util.Duration;
  */
 public class TransitionPresets {
     // Default durations
-    private static final Duration DEFAULT_DURATION = Duration.millis(300);
-    private static final Duration FAST_DURATION = Duration.millis(150);
-    private static final Duration SLOW_DURATION = Duration.millis(500);
+    private static final Duration DEFAULT_DURATION = getDefaultDuration();
+    private static final Duration FAST_DURATION = getFastDuration();
+    private static final Duration SLOW_DURATION = getSlowDuration();
+
+    /**
+     * Gets the default duration for transitions.
+     * 
+     * @return the default duration (300 milliseconds)
+     */
+    private static Duration getDefaultDuration() {
+        return Duration.millis(300);
+    }
+
+    /**
+     * Gets the fast duration for transitions.
+     * 
+     * @return the fast duration (150 milliseconds)
+     */
+    private static Duration getFastDuration() {
+        return Duration.millis(150);
+    }
+
+    /**
+     * Gets the slow duration for transitions.
+     * 
+     * @return the slow duration (500 milliseconds)
+     */
+    private static Duration getSlowDuration() {
+        return Duration.millis(500);
+    }
 
     // Prevent instantiation
     private TransitionPresets() {

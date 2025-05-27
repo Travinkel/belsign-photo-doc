@@ -32,7 +32,7 @@
 }
 
 /* Primary Button */
-.button-primary {
+.button-primary, .btn-primary {
     -fx-background-color: -belman-blue;
     -fx-text-fill: white;
     -fx-font-size: -font-size-large;
@@ -42,16 +42,16 @@
     -fx-cursor: hand;
 }
 
-.button-primary:hover {
+.button-primary:hover, .btn-primary:hover {
     -fx-background-color: derive(-belman-blue, 10%);
 }
 
-.button-primary:pressed {
+.button-primary:pressed, .btn-primary:pressed {
     -fx-background-color: derive(-belman-blue, -10%);
 }
 
 /* Secondary Button */
-.button-secondary {
+.button-secondary, .btn-secondary {
     -fx-background-color: white;
     -fx-border-color: -belman-light-blue;
     -fx-border-width: 2px;
@@ -64,7 +64,7 @@
     -fx-cursor: hand;
 }
 
-.button-secondary:hover {
+.button-secondary:hover, .btn-secondary:hover {
     -fx-background-color: derive(white, -5%);
     -fx-border-color: derive(-belman-light-blue, 10%);
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 4, 0, 0, 1);
@@ -72,7 +72,7 @@
     -fx-scale-y: 1.02;
 }
 
-.button-secondary:pressed {
+.button-secondary:pressed, .btn-secondary:pressed {
     -fx-background-color: derive(white, -10%);
     -fx-border-color: derive(-belman-light-blue, -10%);
     -fx-scale-x: 0.98;
@@ -81,7 +81,7 @@
 }
 
 /* Success Button */
-.button-success {
+.button-success, .btn-success {
     -fx-background-color: -belman-green;
     -fx-text-fill: white;
     -fx-font-size: -font-size-large;
@@ -91,14 +91,14 @@
     -fx-cursor: hand;
 }
 
-.button-success:hover {
+.button-success:hover, .btn-success:hover {
     -fx-background-color: derive(-belman-green, 10%);
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 6, 0, 0, 2);
     -fx-scale-x: 1.02;
     -fx-scale-y: 1.02;
 }
 
-.button-success:pressed {
+.button-success:pressed, .btn-success:pressed {
     -fx-background-color: derive(-belman-green, -10%);
     -fx-scale-x: 0.98;
     -fx-scale-y: 0.98;
@@ -409,6 +409,15 @@
 .confirmation-buttons {
     -fx-spacing: 15px;
     -fx-alignment: center;
+}
+
+/* Button Size Variants */
+.btn-sm, .button-sm {
+    -fx-min-height: 36px;
+    -fx-pref-height: 36px;
+    -fx-font-size: 14px;
+    -fx-padding: 6px 12px;
+    -fx-min-width: 120px;
 }
 
 /* Scroll bars - Wider for touch */

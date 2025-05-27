@@ -14,7 +14,18 @@ import java.util.WeakHashMap;
  */
 public class GlistenUtils {
     private static final EmojiLogger logger = EmojiLogger.getLogger(GlistenUtils.class);
-    private static final Map<View, AppBar> appBarCache = new WeakHashMap<>();
+    private static final Map<View, AppBar> appBarCache = createAppBarCache();
+
+    /**
+     * Creates a weak hash map for caching AppBar instances.
+     * Using a weak hash map ensures that View instances can be garbage collected
+     * when they are no longer referenced elsewhere in the application.
+     * 
+     * @return a new weak hash map for caching AppBar instances
+     */
+    private static Map<View, AppBar> createAppBarCache() {
+        return new WeakHashMap<>();
+    }
 
     /**
      * Gets the AppBar for a View.

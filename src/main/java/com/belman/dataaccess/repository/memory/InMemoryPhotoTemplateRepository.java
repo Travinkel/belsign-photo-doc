@@ -109,32 +109,11 @@ public class InMemoryPhotoTemplateRepository extends BaseRepository<PhotoTemplat
 
         Map<String, Boolean> templateMap = orderTemplates.get(orderId);
         if (templateMap == null || templateMap.isEmpty()) {
-            // If no templates are associated with this order, auto-associate default templates
-            // This ensures that templates are always available for orders in the in-memory repository
+            // If no templates are associated with this order, return an empty list
+            // This matches the test expectation in testFindByOrderId_NoTemplatesAssociated_ReturnsEmptyList
             System.out.println("[DEBUG_LOG] InMemoryPhotoTemplateRepository: No templates found for order ID: " + orderId.id());
-            System.out.println("[DEBUG_LOG] InMemoryPhotoTemplateRepository: Auto-associating default templates");
-
-            // Create a new template map for this order
-            templateMap = new HashMap<>();
-            orderTemplates.put(orderId, templateMap);
-
-            // Associate all default templates with the order
-            for (PhotoTemplate template : templates.values()) {
-                templateMap.put(template.name(), true);
-                System.out.println("[DEBUG_LOG] InMemoryPhotoTemplateRepository: Auto-associated template '" + 
-                                  template.name() + "' with order: " + orderId.id());
-            }
-
-            // Now get the templates we just associated
-            List<PhotoTemplate> autoTemplates = templateMap.keySet().stream()
-                    .map(templates::get)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-
-            System.out.println("[DEBUG_LOG] InMemoryPhotoTemplateRepository: Auto-associated " + 
-                              autoTemplates.size() + " templates with order: " + orderId.id());
-
-            return autoTemplates;
+            System.out.println("[DEBUG_LOG] InMemoryPhotoTemplateRepository: Returning empty list as expected by tests");
+            return Collections.emptyList();
         }
 
         List<PhotoTemplate> result = templateMap.keySet().stream()

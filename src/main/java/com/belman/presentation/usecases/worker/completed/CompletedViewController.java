@@ -25,9 +25,9 @@ public class CompletedViewController extends BaseController<CompletedViewModel> 
 
     @Override
     protected void setupBindings() {
-        // Bind view model properties to UI elements
-        orderNumberLabel.textProperty().bind(getViewModel().orderNumberProperty());
-        completionMessageLabel.textProperty().bind(getViewModel().completionMessageProperty());
+        // Bind view model properties to UI elements using safelyBind
+        safelyBind(orderNumberLabel, getViewModel().orderNumberProperty());
+        safelyBind(completionMessageLabel, getViewModel().completionMessageProperty());
     }
 
     /**

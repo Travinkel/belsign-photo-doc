@@ -79,6 +79,12 @@
     -fx-wrap-text: true;
 }
 
+/* Standard text styles for consistent typography */
+.body-text-grey, .worker-label, .detail-value {
+    -fx-font-size: -font-size-body;
+    -fx-text-fill: -belman-grey-80;
+}
+
 .title-label {
     -fx-font-size: 22px;
     -fx-font-weight: bold;

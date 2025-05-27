@@ -32,26 +32,89 @@ public class WorkerFlowContext {
 
     private static OrderBusiness currentOrder;
     private static PhotoTemplate selectedTemplate;
-    private static final List<PhotoDocument> takenPhotos = new CopyOnWriteArrayList<>();
-    private static final Map<String, Object> attributes = new ConcurrentHashMap<>();
-    private static final List<WorkerFlowError> errors = new CopyOnWriteArrayList<>();
+    private static final List<PhotoDocument> takenPhotos = createTakenPhotosList();
+    private static final Map<String, Object> attributes = createAttributesMap();
+    private static final List<WorkerFlowError> errors = createErrorsList();
 
     // Enhanced error handling
-    private static final Map<ErrorSeverity, List<BiConsumer<WorkerFlowError, WorkerFlowContext>>> errorHandlersBySeverity = new HashMap<>();
+    private static final Map<ErrorSeverity, List<BiConsumer<WorkerFlowError, WorkerFlowContext>>> errorHandlersBySeverity = createErrorHandlersMap();
     private static Consumer<WorkerFlowError> legacyErrorHandler; // For backward compatibility
     private static boolean recoveryMode = false;
 
     // State validation
-    private static final Map<String, List<String>> validStateTransitions = new HashMap<>();
+    private static final Map<String, List<String>> validStateTransitions = createStateTransitionsMap();
     private static String currentState;
 
     // Enhanced state management using WorkerFlowState enum
     private static WorkerFlowState currentFlowState = WorkerFlowState.INITIAL;
-    private static final List<Consumer<WorkerFlowState>> stateChangeListeners = new CopyOnWriteArrayList<>();
+    private static final List<Consumer<WorkerFlowState>> stateChangeListeners = createStateChangeListenersList();
 
     // Data validation
-    private static final Map<String, List<String>> requiredAttributes = new HashMap<>();
+    private static final Map<String, List<String>> requiredAttributes = createRequiredAttributesMap();
     private static boolean validationEnabled = false;
+
+    /**
+     * Creates a thread-safe list for storing taken photos.
+     * 
+     * @return a new thread-safe list for taken photos
+     */
+    private static List<PhotoDocument> createTakenPhotosList() {
+        return new CopyOnWriteArrayList<>();
+    }
+
+    /**
+     * Creates a thread-safe map for storing attributes.
+     * 
+     * @return a new thread-safe map for attributes
+     */
+    private static Map<String, Object> createAttributesMap() {
+        return new ConcurrentHashMap<>();
+    }
+
+    /**
+     * Creates a thread-safe list for storing errors.
+     * 
+     * @return a new thread-safe list for errors
+     */
+    private static List<WorkerFlowError> createErrorsList() {
+        return new CopyOnWriteArrayList<>();
+    }
+
+    /**
+     * Creates a map for storing error handlers by severity.
+     * 
+     * @return a new map for error handlers
+     */
+    private static Map<ErrorSeverity, List<BiConsumer<WorkerFlowError, WorkerFlowContext>>> createErrorHandlersMap() {
+        return new HashMap<>();
+    }
+
+    /**
+     * Creates a map for storing valid state transitions.
+     * 
+     * @return a new map for state transitions
+     */
+    private static Map<String, List<String>> createStateTransitionsMap() {
+        return new HashMap<>();
+    }
+
+    /**
+     * Creates a thread-safe list for storing state change listeners.
+     * 
+     * @return a new thread-safe list for state change listeners
+     */
+    private static List<Consumer<WorkerFlowState>> createStateChangeListenersList() {
+        return new CopyOnWriteArrayList<>();
+    }
+
+    /**
+     * Creates a map for storing required attributes.
+     * 
+     * @return a new map for required attributes
+     */
+    private static Map<String, List<String>> createRequiredAttributesMap() {
+        return new HashMap<>();
+    }
 
     /**
      * Represents an error that occurred during the worker flow.

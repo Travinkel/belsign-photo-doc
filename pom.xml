@@ -329,6 +329,37 @@
                         <arg>-Dcom.gluonhq.license.disable=true</arg>
                     </runtimeArgs>
                     <skipTests>true</skipTests>
+                    <resourcesList>
+                        <list>.*\.fxml$</list>
+                        <list>.*\.css$</list>
+                        <list>.*\.png$</list>
+                        <list>.*\.properties$</list>
+                        <list>META-INF/services/.*</list>
+                        <list>org/apache/pdfbox/resources/.*</list>
+                    </resourcesList>
+                    <reflectionList>
+                        <!-- View Controllers -->
+                        <list>com.belman.presentation.views.splash.SplashViewController</list>
+                        <list>com.belman.presentation.views.login.LoginViewController</list>
+                        <list>com.belman.presentation.views.worker.WorkerViewController</list>
+
+                        <!-- Classes using Class.forName() -->
+                        <list>com.belman.bootstrap.hacks.GluonInternalClassesFix</list>
+                        <list>com.belman.bootstrap.config.RepositoryInitializer</list>
+                        <list>com.belman.presentation.base.BaseView</list>
+                        <list>com.belman.presentation.core.ViewLoader</list>
+
+                        <!-- Classes using reflection for field access -->
+                        <list>com.belman.bootstrap.di.ServiceLocator</list>
+                        <list>com.belman.bootstrap.platform.StorageServiceOverride</list>
+
+                        <!-- Classes using reflection for method access -->
+                        <list>com.belman.dataaccess.persistence.sql.SqlUserRepository</list>
+                        <list>com.belman.application.usecase.photo.GluonCameraService</list>
+
+                        <!-- External classes using reflection -->
+                        <list>org.apache.pdfbox.pdmodel.font.PDType1Font</list>
+                    </reflectionList>
                 </configuration>
             </plugin>
 

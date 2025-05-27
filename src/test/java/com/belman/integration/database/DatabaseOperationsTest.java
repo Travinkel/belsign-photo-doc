@@ -1,5 +1,6 @@
 package com.belman.integration.database;
 
+import com.belman.bootstrap.persistence.SqliteDatabaseConfig;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,9 +12,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,25 +24,75 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class DatabaseOperationsTest {
 
+    private static final Logger LOGGER = Logger.getLogger(DatabaseOperationsTest.class.getName());
     private static DataSource dataSource;
 
     @BeforeAll
     public static void setupDatabase() {
-        // Initialize the test database
-        dataSource = TestDatabaseUtil.initializeTestDatabase();
+        // Initialize the SQLite database using SqliteDatabaseConfig
+        System.out.println("[DEBUG_LOG] Initializing database for DatabaseOperationsTest using SqliteDatabaseConfig");
+        SqliteDatabaseConfig.initialize();
+        dataSource = SqliteDatabaseConfig.getDataSource();
         assertNotNull(dataSource, "DataSource should not be null");
+        System.out.println("[DEBUG_LOG] Database initialized successfully for DatabaseOperationsTest");
+
+        // Verify connection works
+        try (Connection conn = dataSource.getConnection()) {
+            System.out.println("[DEBUG_LOG] Successfully obtained database connection");
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("SELECT 1")) {
+                    if (rs.next()) {
+                        System.out.println("[DEBUG_LOG] Database connection test query executed successfully");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("[DEBUG_LOG] Error testing database connection: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        // Create minimal schema for testing
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement()) {
+
+            // Create users table with lowercase names to match SqliteDatabaseConfig schema
+            stmt.execute("CREATE TABLE IF NOT EXISTS users (" +
+                         "id TEXT PRIMARY KEY, " +
+                         "username TEXT NOT NULL, " +
+                         "password TEXT, " +
+                         "email TEXT, " +
+                         "first_name TEXT, " +
+                         "last_name TEXT, " +
+                         "role TEXT NOT NULL, " +
+                         "created_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
+                         "updated_at TEXT DEFAULT CURRENT_TIMESTAMP)");
+
+            System.out.println("[DEBUG_LOG] Created users table");
+
+            // Insert test user
+            stmt.execute("INSERT OR IGNORE INTO users (id, username, password, email, first_name, last_name, role) " +
+                         "VALUES ('test-user-id', 'testuser', 'password', 'test@example.com', 'Test', 'User', 'ADMIN')");
+
+            System.out.println("[DEBUG_LOG] Inserted test user");
+        } catch (SQLException e) {
+            System.out.println("[DEBUG_LOG] Error creating schema: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @BeforeEach
     public void resetDatabase() {
-        // Reset the database before each test
-        TestDatabaseUtil.resetTestDatabase();
+        // For simplicity, we won't reset the database between tests
+        // This is acceptable for these tests since they use unique IDs
+        System.out.println("[DEBUG_LOG] Skipping database reset for DatabaseOperationsTest");
     }
 
     @AfterAll
     public static void tearDown() {
-        // Shutdown the test database
-        TestDatabaseUtil.shutdownTestDatabase();
+        // Shutdown the database
+        System.out.println("[DEBUG_LOG] Shutting down database for DatabaseOperationsTest");
+        SqliteDatabaseConfig.shutdown();
+        System.out.println("[DEBUG_LOG] Database shutdown completed");
     }
 
     /**

@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class OrderBusinessPhotoManagementTest extends BaseAcceptanceTest {
 
-    private static final String TEST_ORDER_NUMBER = "01/23-123456-12345678";
+    private static final String TEST_ORDER_NUMBER = "ORD-78-230625-ABC-0001";
     private OrderRepository orderRepository;
     private PhotoRepository photoRepository;
     private UserBusiness productionUser;

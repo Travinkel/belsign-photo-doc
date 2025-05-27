@@ -325,7 +325,8 @@ public class PhotoReviewViewModelTest {
         OrderId orderId = new OrderId(UUID.randomUUID().toString());
 
         // Create a real OrderNumber with the correct format (ORD-XX-YYMMDD-ZZZ-NNNN)
-        OrderNumber orderNum = new OrderNumber("ORD-XX-230101-ABC-0001");
+        // XX = 2 digits, YYMMDD = 6 digits (date), ZZZ = 3 uppercase letters, NNNN = 4 digits
+        OrderNumber orderNum = new OrderNumber("ORD-78-230101-ABC-0001");
 
         // Create a user reference for the creator
         UserId userId = new UserId(UUID.randomUUID().toString());
