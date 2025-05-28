@@ -125,68 +125,84 @@ public final class SqliteDatabaseConfig {
                 LOGGER.warning("Migration directory does not exist: " + migrationDir.getAbsolutePath());
             }
 
-            // For test purposes, we'll create a minimal schema directly using SQL
-            // This bypasses Flyway migration issues with duplicate version numbers
-            try (java.sql.Connection conn = java.sql.DriverManager.getConnection(jdbcUrl);
-                 java.sql.Statement stmt = conn.createStatement()) {
+            // Configure and run Flyway migrations
+            LOGGER.info("Configuring Flyway for SQLite migrations...");
+            Flyway flyway = Flyway.configure()
+                    .dataSource(jdbcUrl, null, null)
+                    .locations("classpath:sqlitedb/migration")
+                    .cleanDisabled(false) // Enable clean operation
+                    .load();
 
-                LOGGER.info("Creating minimal schema for testing...");
+            // Clean the database first to ensure we start with a fresh schema
+            LOGGER.info("Cleaning database before migrations...");
+            flyway.clean();
+            LOGGER.info("Database cleaned successfully");
 
-                // Create users table
-                stmt.execute("CREATE TABLE IF NOT EXISTS users (" +
-                             "id TEXT PRIMARY KEY, " +
-                             "username TEXT NOT NULL, " +
-                             "password TEXT, " +
-                             "email TEXT, " +
-                             "first_name TEXT, " +
-                             "last_name TEXT, " +
-                             "role TEXT NOT NULL, " +
-                             "created_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
-                             "updated_at TEXT DEFAULT CURRENT_TIMESTAMP)");
+            LOGGER.info("Running Flyway migrations...");
+            int migrationsApplied = flyway.migrate().migrationsExecuted;
+            LOGGER.info("Flyway migrations completed successfully. Applied " + migrationsApplied + " migrations.");
 
-                // Insert a test user
-                stmt.execute("INSERT OR IGNORE INTO users (id, username, password, email, first_name, last_name, role) " +
-                             "VALUES ('1', 'testuser', 'password', 'test@example.com', 'Test', 'User', 'ADMIN')");
+            // If no migrations were applied, create a minimal schema as fallback
+            if (migrationsApplied == 0) {
+                LOGGER.info("No migrations were applied. Creating minimal schema as fallback...");
+                try (java.sql.Connection conn = java.sql.DriverManager.getConnection(jdbcUrl);
+                     java.sql.Statement stmt = conn.createStatement()) {
 
-                // Create orders table
-                stmt.execute("CREATE TABLE IF NOT EXISTS orders (" +
-                             "id TEXT PRIMARY KEY, " +
-                             "order_number TEXT NOT NULL, " +
-                             "customer_id TEXT, " +
-                             "description TEXT, " +
-                             "status TEXT, " +
-                             "created_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
-                             "updated_at TEXT DEFAULT CURRENT_TIMESTAMP)");
+                    LOGGER.info("Creating minimal schema for testing...");
 
-                // Insert a test order
-                stmt.execute("INSERT OR IGNORE INTO orders (id, order_number, description, status) " +
-                             "VALUES ('1', 'ORD-XX-230101-ABC-0001', 'Test Order', 'PENDING')");
+                    // Create users table
+                    stmt.execute("CREATE TABLE IF NOT EXISTS users (" +
+                                 "id TEXT PRIMARY KEY, " +
+                                 "username TEXT NOT NULL, " +
+                                 "password TEXT, " +
+                                 "email TEXT, " +
+                                 "first_name TEXT, " +
+                                 "last_name TEXT, " +
+                                 "role TEXT NOT NULL, " +
+                                 "created_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
+                                 "updated_at TEXT DEFAULT CURRENT_TIMESTAMP)");
 
-                // Create photos table
-                stmt.execute("CREATE TABLE IF NOT EXISTS photos (" +
-                             "id TEXT PRIMARY KEY, " +
-                             "order_id TEXT NOT NULL, " +
-                             "file_path TEXT NOT NULL, " +
-                             "template_type TEXT, " +
-                             "status TEXT, " +
-                             "created_by TEXT, " +
-                             "created_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
-                             "updated_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
-                             "FOREIGN KEY (order_id) REFERENCES orders(id))");
+                    // Insert a test user
+                    stmt.execute("INSERT OR IGNORE INTO users (id, username, password, email, first_name, last_name, role) " +
+                                 "VALUES ('1', 'testuser', 'password', 'test@example.com', 'Test', 'User', 'ADMIN')");
 
-                // Insert a test photo
-                stmt.execute("INSERT OR IGNORE INTO photos (id, order_id, file_path, template_type, status, created_by) " +
-                             "VALUES ('1', '1', 'test/photo.jpg', 'TOP_VIEW', 'PENDING', '1')");
+                    // Create orders table
+                    stmt.execute("CREATE TABLE IF NOT EXISTS orders (" +
+                                 "id TEXT PRIMARY KEY, " +
+                                 "order_number TEXT NOT NULL, " +
+                                 "customer_id TEXT, " +
+                                 "description TEXT, " +
+                                 "status TEXT, " +
+                                 "created_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
+                                 "updated_at TEXT DEFAULT CURRENT_TIMESTAMP)");
 
-                LOGGER.info("Minimal schema created successfully for testing");
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Failed to create minimal schema", e);
-                // Don't throw the exception, just log it and continue
-                LOGGER.warning("Continuing with database initialization despite schema creation failure");
+                    // Insert a test order
+                    stmt.execute("INSERT OR IGNORE INTO orders (id, order_number, description, status) " +
+                                 "VALUES ('1', 'ORD-XX-230101-ABC-0001', 'Test Order', 'PENDING')");
+
+                    // Create photos table
+                    stmt.execute("CREATE TABLE IF NOT EXISTS photos (" +
+                                 "id TEXT PRIMARY KEY, " +
+                                 "order_id TEXT NOT NULL, " +
+                                 "file_path TEXT NOT NULL, " +
+                                 "template_type TEXT, " +
+                                 "status TEXT, " +
+                                 "created_by TEXT, " +
+                                 "created_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
+                                 "updated_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
+                                 "FOREIGN KEY (order_id) REFERENCES orders(id))");
+
+                    // Insert a test photo
+                    stmt.execute("INSERT OR IGNORE INTO photos (id, order_id, file_path, template_type, status, created_by) " +
+                                 "VALUES ('1', '1', 'test/photo.jpg', 'TOP_VIEW', 'PENDING', '1')");
+
+                    LOGGER.info("Minimal schema created successfully for testing");
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Failed to create minimal schema", e);
+                    // Don't throw the exception, just log it and continue
+                    LOGGER.warning("Continuing with database initialization despite schema creation failure");
+                }
             }
-
-            // Skip Flyway migrations for tests to avoid issues with duplicate version numbers
-            LOGGER.info("Skipping Flyway migrations for tests to avoid issues with duplicate version numbers");
         } catch (Exception e) {
             // Log the error with full details
             LOGGER.log(Level.SEVERE, "Failed to run database setup on SQLite database", e);

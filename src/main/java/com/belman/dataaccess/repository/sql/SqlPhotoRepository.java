@@ -56,7 +56,7 @@ public class SqlPhotoRepository extends BaseRepository<PhotoDocument, PhotoId> i
     @Override
     protected Optional<PhotoDocument> doFindById(PhotoId id) {
         try {
-            String sql = "SELECT * FROM photos WHERE id = ?";
+            String sql = "SELECT * FROM PHOTOS WHERE photo_id = ?";
             return queryExecutor.executeQueryForObject(sql, rs -> {
                 try {
                     return photoMapper.fromResultSet(rs);
@@ -76,23 +76,21 @@ public class SqlPhotoRepository extends BaseRepository<PhotoDocument, PhotoId> i
         try {
             if (doExistsById(photoDocument.getId())) {
                 // Update existing photo
-                String sql = "UPDATE photos SET order_id = ?, image_path = ?, template = ?, uploaded_by = ?, " +
-                        "uploaded_at = ?, reviewed_by = ?, reviewed_at = ?, review_comment = ?, status = ? " +
-                        "WHERE id = ?";
+                // Note: The PHOTOS table doesn't have reviewed_by, reviewed_at, or review_comment columns
+                // We'll just update the fields that exist in the table
+                String sql = "UPDATE PHOTOS SET order_id = ?, file_path = ?, template_type = ?, created_by = ?, " +
+                        "status = ? " +
+                        "WHERE photo_id = ?";
                 queryExecutor.executeUpdate(sql,
                         photoDocument.getOrderId().id(),
                         photoDocument.getImagePath().value(),
                         photoDocument.getTemplate().name(),
                         photoDocument.getUploadedBy().getId().id(),
-                        photoDocument.getUploadedAt().value(),
-                        photoDocument.getReviewedBy() != null ? photoDocument.getReviewedBy().id().id() : null,
-                        photoDocument.getReviewedAt() != null ? photoDocument.getReviewedAt().value() : null,
-                        photoDocument.getReviewComment(),
                         photoDocument.getStatus().name(),
                         photoDocument.getId().id());
             } else {
                 // Insert new photo
-                String sql = "INSERT INTO photos (id, order_id, image_path, template, uploaded_by, uploaded_at, " +
+                String sql = "INSERT INTO PHOTOS (photo_id, order_id, file_path, template_type, created_by, created_at, " +
                         "reviewed_by, reviewed_at, review_comment, status) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 queryExecutor.executeUpdate(sql,
@@ -117,7 +115,7 @@ public class SqlPhotoRepository extends BaseRepository<PhotoDocument, PhotoId> i
     @Override
     protected void doDelete(PhotoDocument photoDocument) {
         try {
-            String sql = "DELETE FROM photos WHERE id = ?";
+            String sql = "DELETE FROM PHOTOS WHERE photo_id = ?";
             queryExecutor.executeUpdate(sql, photoDocument.getId().id());
         } catch (SQLException e) {
             logError("Error deleting photo: " + photoDocument.getId(), e);
@@ -128,7 +126,7 @@ public class SqlPhotoRepository extends BaseRepository<PhotoDocument, PhotoId> i
     @Override
     protected List<PhotoDocument> doFindAll() {
         try {
-            String sql = "SELECT * FROM photos";
+            String sql = "SELECT * FROM PHOTOS";
             return queryExecutor.executeQuery(sql, rs -> {
                 try {
                     return photoMapper.fromResultSet(rs);
@@ -146,7 +144,7 @@ public class SqlPhotoRepository extends BaseRepository<PhotoDocument, PhotoId> i
     @Override
     protected boolean doExistsById(PhotoId id) {
         try {
-            String sql = "SELECT COUNT(*) FROM photos WHERE id = ?";
+            String sql = "SELECT COUNT(*) FROM PHOTOS WHERE photo_id = ?";
             return queryExecutor.executeQueryForObject(sql, rs -> {
                 try {
                     return rs.getInt(1) > 0;
@@ -165,7 +163,7 @@ public class SqlPhotoRepository extends BaseRepository<PhotoDocument, PhotoId> i
     @Override
     protected long doCount() {
         try {
-            String sql = "SELECT COUNT(*) FROM photos";
+            String sql = "SELECT COUNT(*) FROM PHOTOS";
             return queryExecutor.executeQueryForObject(sql, rs -> {
                 try {
                     return rs.getLong(1);
@@ -184,7 +182,7 @@ public class SqlPhotoRepository extends BaseRepository<PhotoDocument, PhotoId> i
     @Override
     public List<PhotoDocument> findByOrderId(OrderId orderId) {
         try {
-            String sql = "SELECT * FROM photos WHERE order_id = ?";
+            String sql = "SELECT * FROM PHOTOS WHERE order_id = ?";
             return queryExecutor.executeQuery(sql, rs -> {
                 try {
                     return photoMapper.fromResultSet(rs);
@@ -202,7 +200,7 @@ public class SqlPhotoRepository extends BaseRepository<PhotoDocument, PhotoId> i
     @Override
     public List<PhotoDocument> findByStatus(ApprovalStatus status) {
         try {
-            String sql = "SELECT * FROM photos WHERE status = ?";
+            String sql = "SELECT * FROM PHOTOS WHERE status = ?";
             return queryExecutor.executeQuery(sql, rs -> {
                 try {
                     return photoMapper.fromResultSet(rs);
@@ -220,7 +218,7 @@ public class SqlPhotoRepository extends BaseRepository<PhotoDocument, PhotoId> i
     @Override
     public List<PhotoDocument> findByOrderIdAndStatus(OrderId orderId, ApprovalStatus status) {
         try {
-            String sql = "SELECT * FROM photos WHERE order_id = ? AND status = ?";
+            String sql = "SELECT * FROM PHOTOS WHERE order_id = ? AND status = ?";
             return queryExecutor.executeQuery(sql, rs -> {
                 try {
                     return photoMapper.fromResultSet(rs);

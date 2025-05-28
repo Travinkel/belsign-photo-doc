@@ -123,14 +123,15 @@ public class RatPhaseDataInitializer {
                                String email, String firstName, String lastName, String role) throws SQLException {
         // Insert into USERS table
         try (PreparedStatement stmt = connection.prepareStatement(
-                "INSERT INTO USERS (user_id, username, password, email, first_name, last_name, created_at, updated_at, approved) " +
-                "VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 1)")) {
+                "INSERT INTO USERS (user_id, username, password, email, first_name, last_name, role, created_at, updated_at, approved) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 1)")) {
             stmt.setString(1, userId);
             stmt.setString(2, username);
             stmt.setString(3, password);
             stmt.setString(4, email);
             stmt.setString(5, firstName);
             stmt.setString(6, lastName);
+            stmt.setString(7, role);
             stmt.executeUpdate();
         }
 

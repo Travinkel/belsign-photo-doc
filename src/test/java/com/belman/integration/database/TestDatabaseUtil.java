@@ -118,7 +118,7 @@ public class TestDatabaseUtil {
                 stmt.execute("PRAGMA foreign_keys = ON");
 
                 // Create users table
-                stmt.execute("CREATE TABLE IF NOT EXISTS USERS (" +
+                stmt.execute("CREATE TABLE IF NOT EXISTS users (" +
                              "user_id TEXT PRIMARY KEY, " +
                              "username TEXT NOT NULL UNIQUE, " +
                              "password TEXT, " +

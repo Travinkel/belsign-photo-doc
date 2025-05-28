@@ -1,5 +1,5 @@
 -- Create a table for photo templates
-CREATE TABLE IF NOT EXISTS PHOTO_TEMPLATES (
+CREATE TABLE IF NOT EXISTS photo_templates (
     template_id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT NOT NULL,
@@ -7,18 +7,18 @@ CREATE TABLE IF NOT EXISTS PHOTO_TEMPLATES (
 );
 
 -- Create a table to associate orders with photo templates
-CREATE TABLE IF NOT EXISTS ORDER_PHOTO_TEMPLATES (
+CREATE TABLE IF NOT EXISTS order_photo_templates (
     order_id TEXT NOT NULL,
     template_id TEXT NOT NULL,
     required BOOLEAN DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (order_id, template_id),
-    FOREIGN KEY (order_id) REFERENCES ORDERS(order_id),
-    FOREIGN KEY (template_id) REFERENCES PHOTO_TEMPLATES(template_id)
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    FOREIGN KEY (template_id) REFERENCES photo_templates(template_id)
 );
 
 -- Insert predefined photo templates
-INSERT INTO PHOTO_TEMPLATES (template_id, name, description)
+INSERT INTO photo_templates (template_id, name, description)
 VALUES
     (hex(randomblob(16)), 'TOP_VIEW_OF_JOINT', 'Take a photo from above the joint.'),
     (hex(randomblob(16)), 'SIDE_VIEW_OF_WELD', 'Take a photo from the side of the weld.'),
@@ -34,11 +34,11 @@ VALUES
 
 -- Associate all existing orders with all templates
 -- This ensures that all orders have templates associated with them
-INSERT INTO ORDER_PHOTO_TEMPLATES (order_id, template_id)
+INSERT INTO order_photo_templates (order_id, template_id)
 SELECT o.order_id, pt.template_id
-FROM ORDERS o
-CROSS JOIN PHOTO_TEMPLATES pt;
+FROM orders o
+CROSS JOIN photo_templates pt;
 
 -- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_order_photo_templates_order_id ON ORDER_PHOTO_TEMPLATES(order_id);
-CREATE INDEX IF NOT EXISTS idx_order_photo_templates_template_id ON ORDER_PHOTO_TEMPLATES(template_id);
+CREATE INDEX IF NOT EXISTS idx_order_photo_templates_order_id ON order_photo_templates(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_photo_templates_template_id ON order_photo_templates(template_id);

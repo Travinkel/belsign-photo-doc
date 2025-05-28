@@ -1,4 +1,4 @@
-package com.belman.unit.service.usecase.admin;
+package com.belman.unit.application.usecase.admin;
 
 import com.belman.application.usecase.admin.AdminService;
 import com.belman.application.usecase.admin.DefaultAdminService;

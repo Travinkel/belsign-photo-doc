@@ -27,6 +27,11 @@ SELECT
     '33333333-3333-3333-3333-333333333333', 'qa', '$2a$10$hKDVYxLefVHV/vtuPhWD3OigtRyOykRLDdUAp80Z1crSoS1lFqaFS', 'qa@example.com', '3456789012', 'Quality Assurance', 'NFC003', 'ACTIVE', datetime('now')
 WHERE NOT EXISTS (SELECT 1 FROM USERS WHERE username = 'qa');
 
+INSERT INTO USERS (user_id, username, password, email, phone, name, nfc_id, status, created_at)
+SELECT 
+    '20b013bc-3366-4266-9043-48a96b00e8fd', 'production2', '$2a$10$wK0kEk40ULceNdJGSh1nNusm38CsKD1xBDcEyeLR/J4B2IONqRZUe', 'production2@example.com', '4567890123', 'Production User 2', 'NFC-PROD-002', 'ACTIVE', datetime('now')
+WHERE NOT EXISTS (SELECT 1 FROM USERS WHERE username = 'production2');
+
 -- Insert user roles (if they don't already exist)
 INSERT INTO USER_ROLES (user_id, role)
 SELECT '11111111-1111-1111-1111-111111111111', 'ADMIN'
@@ -39,6 +44,10 @@ WHERE NOT EXISTS (SELECT 1 FROM USER_ROLES WHERE user_id = '22222222-2222-2222-2
 INSERT INTO USER_ROLES (user_id, role)
 SELECT '33333333-3333-3333-3333-333333333333', 'QA'
 WHERE NOT EXISTS (SELECT 1 FROM USER_ROLES WHERE user_id = '33333333-3333-3333-3333-333333333333' AND role = 'QA');
+
+INSERT INTO USER_ROLES (user_id, role)
+SELECT '20b013bc-3366-4266-9043-48a96b00e8fd', 'PRODUCTION'
+WHERE NOT EXISTS (SELECT 1 FROM USER_ROLES WHERE user_id = '20b013bc-3366-4266-9043-48a96b00e8fd' AND role = 'PRODUCTION');
 
 -- Insert test customers (if they don't already exist)
 INSERT INTO CUSTOMERS (customer_id, name, email, phone, type, company_name, created_at)
@@ -72,12 +81,20 @@ SELECT
     '99999999-9999-9999-9999-999999999999', 'ORD-003-TEST-PIP-0003', '66666666-6666-6666-6666-666666666666', '11111111-1111-1111-1111-111111111111', datetime('now'), NULL, 'COMPLETED', 'Pipe end-cap inspection', '789 Residential Ave, Hometown, USA', date('now', '+15 days')
 WHERE NOT EXISTS (SELECT 1 FROM ORDERS WHERE order_id = '99999999-9999-9999-9999-999999999999');
 
+INSERT INTO ORDERS (order_id, order_number, customer_id, created_by, created_at, modified_at, status, product_description, delivery_address, delivery_date, assigned_to)
+SELECT
+    'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'ORD-004-TEST-PROD2-0001', '44444444-4444-4444-4444-444444444444', '11111111-1111-1111-1111-111111111111', datetime('now'), datetime('now'), 'PENDING', 'Special order for production2 user', '123 Production Lane, Worktown, USA', date('now', '+20 days'), '20b013bc-3366-4266-9043-48a96b00e8fd'
+WHERE NOT EXISTS (SELECT 1 FROM ORDERS WHERE order_id = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa');
+
 -- Update orders to assign them to production workers (if not already assigned)
 UPDATE ORDERS SET assigned_to = '22222222-2222-2222-2222-222222222222' 
 WHERE order_id = '77777777-7777-7777-7777-777777777777' AND (assigned_to IS NULL OR assigned_to = '');
 
-UPDATE ORDERS SET assigned_to = '22222222-2222-2222-2222-222222222222' 
+UPDATE ORDERS SET assigned_to = '20b013bc-3366-4266-9043-48a96b00e8fd' 
 WHERE order_id = '88888888-8888-8888-8888-888888888888' AND (assigned_to IS NULL OR assigned_to = '');
+
+UPDATE ORDERS SET assigned_to = '20b013bc-3366-4266-9043-48a96b00e8fd' 
+WHERE order_id = '99999999-9999-9999-9999-999999999999' AND (assigned_to IS NULL OR assigned_to = '');
 
 -- Insert photo templates (if not already inserted by migrations)
 INSERT OR IGNORE INTO PHOTO_TEMPLATES (template_id, name, description, created_at)
