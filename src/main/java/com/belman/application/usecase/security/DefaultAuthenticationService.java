@@ -1,6 +1,6 @@
 package com.belman.application.usecase.security;
 
-import com.belman.bootstrap.di.ServiceLocator;
+import com.belman.common.di.ServiceProviderFactory;
 import com.belman.common.logging.AuthLoggingService;
 import com.belman.common.logging.EmojiLoggerFactory;
 import com.belman.domain.security.ExtendedAuthenticationService;
@@ -63,7 +63,7 @@ public class DefaultAuthenticationService extends BaseService implements Extende
 
     @Override
     protected LoggerFactory getLoggerFactory() {
-        return ServiceLocator.getService(LoggerFactory.class);
+        return ServiceProviderFactory.getInstance().getService(LoggerFactory.class);
     }
 
     @Override

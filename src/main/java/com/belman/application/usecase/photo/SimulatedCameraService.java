@@ -31,7 +31,7 @@ public class SimulatedCameraService extends BaseService implements CameraService
      * Creates a new SimulatedCameraService.
      */
     public SimulatedCameraService() {
-        super(ServiceLocator.getService(LoggerFactory.class));
+        super(ServiceProviderFactory.getInstance().getService(LoggerFactory.class));
         loadMockImages();
     }
 
@@ -126,6 +126,6 @@ public class SimulatedCameraService extends BaseService implements CameraService
 
     @Override
     protected LoggerFactory getLoggerFactory() {
-        return ServiceLocator.getService(LoggerFactory.class);
+        return ServiceProviderFactory.getInstance().getService(LoggerFactory.class);
     }
 }

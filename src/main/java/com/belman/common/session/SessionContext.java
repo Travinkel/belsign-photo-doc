@@ -1,6 +1,6 @@
 package com.belman.common.session;
 
-import com.belman.bootstrap.di.ServiceLocator;
+import com.belman.common.di.ServiceProviderFactory;
 import com.belman.domain.user.UserBusiness;
 
 import java.util.Optional;

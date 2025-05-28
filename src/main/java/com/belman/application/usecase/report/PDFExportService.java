@@ -1,6 +1,6 @@
 package com.belman.application.usecase.report;
 
-import com.belman.bootstrap.di.ServiceLocator;
+import com.belman.common.di.ServiceProviderFactory;
 import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.order.OrderRepository;
 import com.belman.domain.photo.PhotoDocument;
@@ -31,13 +31,13 @@ public class PDFExportService extends BaseService {
      * @param orderRepository the repository for retrieving order information
      */
     public PDFExportService(OrderRepository orderRepository) {
-        super(ServiceLocator.getService(LoggerFactory.class));
+        super(ServiceProviderFactory.getInstance().getService(LoggerFactory.class));
         this.orderRepository = orderRepository;
     }
 
     @Override
     protected LoggerFactory getLoggerFactory() {
-        return ServiceLocator.getService(LoggerFactory.class);
+        return ServiceProviderFactory.getInstance().getService(LoggerFactory.class);
     }
 
     /**

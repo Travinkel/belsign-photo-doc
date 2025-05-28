@@ -1,7 +1,7 @@
 package com.belman.application.usecase.admin;
 
 import com.belman.application.base.BaseService;
-import com.belman.bootstrap.di.ServiceLocator;
+import com.belman.common.di.ServiceProviderFactory;
 import com.belman.domain.common.valueobjects.EmailAddress;
 import com.belman.domain.common.valueobjects.PersonName;
 import com.belman.domain.security.HashedPassword;
@@ -41,7 +41,7 @@ public class DefaultAdminService extends BaseService implements AdminService {
      * @param passwordHasher the password hasher
      */
     public DefaultAdminService(UserRepository userRepository, PasswordHasher passwordHasher) {
-        this(userRepository, passwordHasher, ServiceLocator.getService(LoggerFactory.class));
+        this(userRepository, passwordHasher, ServiceProviderFactory.getInstance().getService(LoggerFactory.class));
     }
 
     /**
