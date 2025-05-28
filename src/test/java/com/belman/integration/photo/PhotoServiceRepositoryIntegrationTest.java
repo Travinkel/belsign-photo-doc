@@ -45,13 +45,13 @@ public class PhotoServiceRepositoryIntegrationTest {
 
     private PhotoService photoService;
     private PhotoRepository photoRepository;
-    
+
     @Mock
     private LoggerFactory loggerFactory;
-    
+
     @Mock
     private Logger logger;
-    
+
     @Mock
     private UserBusiness mockUser;
 
@@ -63,17 +63,17 @@ public class PhotoServiceRepositoryIntegrationTest {
     void setUp() {
         // Set up logger
         when(loggerFactory.getLogger(any())).thenReturn(logger);
-        
+
         // Set up mock user
         when(mockUser.getId()).thenReturn(new UserId("test-user-id"));
         when(mockUser.getUsername()).thenReturn(new Username("test-user"));
-        
+
         // Create a real repository with mocked logger
         photoRepository = new InMemoryPhotoRepository(loggerFactory);
-        
-        // Create the service with the real repository
-        photoService = new DefaultPhotoService(photoRepository);
-        
+
+        // Create the service with the real repository and a test photo storage directory
+        photoService = new DefaultPhotoService(photoRepository, "test-photos");
+
         // Set up test data
         testOrderId = new OrderId("test-order-id");
         testTemplate = PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY;
@@ -87,27 +87,24 @@ public class PhotoServiceRepositoryIntegrationTest {
     @DisplayName("Photo can be uploaded and retrieved")
     void testUploadAndRetrievePhoto() {
         // Arrange
-        Timestamp uploadTime = new Timestamp(Instant.now());
-        
+
         // Act - Upload the photo
         PhotoDocument uploadedPhoto = photoService.uploadPhoto(
+                testOrderId,
                 testPhoto, 
-                testOrderId, 
-                testTemplate, 
-                mockUser, 
-                uploadTime);
-        
+                mockUser);
+
         // Assert - Verify the uploaded photo
         assertNotNull(uploadedPhoto, "Uploaded photo should not be null");
         assertEquals(testOrderId, uploadedPhoto.getOrderId(), "Order ID should match");
-        assertEquals(testTemplate, uploadedPhoto.getTemplate(), "Template should match");
+        assertEquals(PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY, uploadedPhoto.getTemplate(), "Template should be the default");
         assertEquals(testPhoto, uploadedPhoto.getImagePath(), "Image path should match");
         assertEquals(mockUser, uploadedPhoto.getUploadedBy(), "Uploader should match");
-        assertEquals(uploadTime, uploadedPhoto.getUploadedAt(), "Upload time should match");
-        
+        assertNotNull(uploadedPhoto.getUploadedAt(), "Upload time should not be null");
+
         // Act - Retrieve the photo by ID
         Optional<PhotoDocument> retrievedPhotoOpt = photoService.getPhotoById(uploadedPhoto.getId());
-        
+
         // Assert - Verify the retrieved photo
         assertTrue(retrievedPhotoOpt.isPresent(), "Photo should be retrievable by ID");
         PhotoDocument retrievedPhoto = retrievedPhotoOpt.get();
@@ -121,40 +118,31 @@ public class PhotoServiceRepositoryIntegrationTest {
     @DisplayName("Photos can be retrieved by order ID")
     void testGetPhotosByOrderId() {
         // Arrange - Upload multiple photos for the same order
-        Timestamp uploadTime = new Timestamp(Instant.now());
-        
+
         PhotoDocument photo1 = photoService.uploadPhoto(
+                testOrderId,
                 testPhoto, 
-                testOrderId, 
-                PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY, 
-                mockUser, 
-                uploadTime);
-        
+                mockUser);
+
         PhotoDocument photo2 = photoService.uploadPhoto(
+                testOrderId,
                 new Photo("/path/to/test/image2.jpg"), 
-                testOrderId, 
-                PhotoTemplate.RIGHT_VIEW_OF_ASSEMBLY, 
-                mockUser, 
-                uploadTime);
-        
+                mockUser);
+
         PhotoDocument photo3 = photoService.uploadPhoto(
+                testOrderId,
                 new Photo("/path/to/test/image3.jpg"), 
-                testOrderId, 
-                PhotoTemplate.LEFT_VIEW_OF_ASSEMBLY, 
-                mockUser, 
-                uploadTime);
-        
+                mockUser);
+
         // Upload a photo for a different order
         PhotoDocument differentOrderPhoto = photoService.uploadPhoto(
+                new OrderId("different-order-id"),
                 new Photo("/path/to/test/image4.jpg"), 
-                new OrderId("different-order-id"), 
-                PhotoTemplate.FRONT_VIEW_OF_ASSEMBLY, 
-                mockUser, 
-                uploadTime);
-        
+                mockUser);
+
         // Act - Retrieve photos by order ID
         List<PhotoDocument> orderPhotos = photoService.getPhotosByOrderId(testOrderId);
-        
+
         // Assert - Verify the retrieved photos
         assertEquals(3, orderPhotos.size(), "Should retrieve 3 photos for the test order");
         assertTrue(orderPhotos.contains(photo1), "Should contain the first photo");
@@ -170,23 +158,20 @@ public class PhotoServiceRepositoryIntegrationTest {
     @DisplayName("Photo can be deleted")
     void testDeletePhoto() {
         // Arrange - Upload a photo
-        Timestamp uploadTime = new Timestamp(Instant.now());
-        
+
         PhotoDocument uploadedPhoto = photoService.uploadPhoto(
+                testOrderId,
                 testPhoto, 
-                testOrderId, 
-                testTemplate, 
-                mockUser, 
-                uploadTime);
-        
+                mockUser);
+
         PhotoId photoId = uploadedPhoto.getId();
-        
+
         // Verify the photo exists
         assertTrue(photoService.getPhotoById(photoId).isPresent(), "Photo should exist before deletion");
-        
+
         // Act - Delete the photo
-        boolean deleted = photoService.deletePhoto(photoId);
-        
+        boolean deleted = photoService.deletePhoto(photoId, mockUser);
+
         // Assert - Verify the photo was deleted
         assertTrue(deleted, "deletePhoto should return true for successful deletion");
         assertFalse(photoService.getPhotoById(photoId).isPresent(), "Photo should not exist after deletion");
@@ -199,32 +184,28 @@ public class PhotoServiceRepositoryIntegrationTest {
     @DisplayName("Photo approval status can be updated")
     void testUpdatePhotoApprovalStatus() {
         // Arrange - Upload a photo
-        Timestamp uploadTime = new Timestamp(Instant.now());
-        
+
         PhotoDocument uploadedPhoto = photoService.uploadPhoto(
+                testOrderId,
                 testPhoto, 
-                testOrderId, 
-                testTemplate, 
-                mockUser, 
-                uploadTime);
-        
+                mockUser);
+
         // Initial status should be PENDING
         assertEquals(PhotoDocument.ApprovalStatus.PENDING, uploadedPhoto.getStatus(), 
                 "Initial status should be PENDING");
-        
+
         // Act - Approve the photo
         boolean approved = photoService.approvePhoto(
                 uploadedPhoto.getId(), 
-                mockUser, 
-                new Timestamp(Instant.now()));
-        
+                mockUser);
+
         // Assert - Verify the photo was approved
         assertTrue(approved, "approvePhoto should return true for successful approval");
-        
+
         // Retrieve the updated photo
         Optional<PhotoDocument> updatedPhotoOpt = photoService.getPhotoById(uploadedPhoto.getId());
         assertTrue(updatedPhotoOpt.isPresent(), "Photo should still exist after approval");
-        
+
         PhotoDocument updatedPhoto = updatedPhotoOpt.get();
         assertEquals(PhotoDocument.ApprovalStatus.APPROVED, updatedPhoto.getStatus(), 
                 "Status should be APPROVED after approval");

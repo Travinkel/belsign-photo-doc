@@ -305,5 +305,10 @@ public class OrderLoadingWithUserRolesIT {
         public boolean isLoggedIn() {
             return currentUser != null;
         }
+
+        @Override
+        public com.belman.domain.services.Logger getLogger() {
+            return mock(com.belman.domain.services.Logger.class);
+        }
     }
 }
