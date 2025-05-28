@@ -95,10 +95,10 @@ public class PhotoQualitySpecificationTest {
 
         boolean result = specification.isSatisfiedBy(photoWithoutMetadata);
         assertFalse(result, "Photo document without metadata should not satisfy the specification");
-        
+
         List<String> messages = specification.getValidationMessages();
         assertEquals(1, messages.size(), "Should have one validation message");
-        assertTrue(messages.get(0).contains("metadata must be provided"),
+        assertTrue(messages.get(0).contains("Photo must include metadata as required by template"),
                 "Validation message should mention missing metadata");
     }
 
@@ -114,7 +114,7 @@ public class PhotoQualitySpecificationTest {
 
         boolean result = specification.isSatisfiedBy(validPhotoDocument);
         assertFalse(result, "Photo document with low resolution should not satisfy the specification");
-        
+
         List<String> messages = specification.getValidationMessages();
         assertTrue(messages.stream().anyMatch(m -> m.contains("resolution must be at least")),
                 "Validation message should mention resolution requirement");
@@ -132,7 +132,7 @@ public class PhotoQualitySpecificationTest {
 
         boolean result = specification.isSatisfiedBy(validPhotoDocument);
         assertFalse(result, "Photo document with small file size should not satisfy the specification");
-        
+
         List<String> messages = specification.getValidationMessages();
         assertTrue(messages.stream().anyMatch(m -> m.contains("file size must be at least")),
                 "Validation message should mention minimum file size");
@@ -150,7 +150,7 @@ public class PhotoQualitySpecificationTest {
 
         boolean result = specification.isSatisfiedBy(validPhotoDocument);
         assertFalse(result, "Photo document with large file size should not satisfy the specification");
-        
+
         List<String> messages = specification.getValidationMessages();
         assertTrue(messages.stream().anyMatch(m -> m.contains("file size must not exceed")),
                 "Validation message should mention maximum file size");
@@ -168,7 +168,7 @@ public class PhotoQualitySpecificationTest {
 
         boolean result = specification.isSatisfiedBy(validPhotoDocument);
         assertFalse(result, "Photo document with invalid format should not satisfy the specification");
-        
+
         List<String> messages = specification.getValidationMessages();
         assertTrue(messages.stream().anyMatch(m -> m.contains("format must be JPEG or PNG")),
                 "Validation message should mention format requirements");
@@ -186,7 +186,7 @@ public class PhotoQualitySpecificationTest {
 
         boolean result = specification.isSatisfiedBy(validPhotoDocument);
         assertFalse(result, "Photo document with invalid color space should not satisfy the specification");
-        
+
         List<String> messages = specification.getValidationMessages();
         assertTrue(messages.stream().anyMatch(m -> m.contains("color space must be RGB")),
                 "Validation message should mention color space requirements");
@@ -204,7 +204,7 @@ public class PhotoQualitySpecificationTest {
 
         boolean result = specification.isSatisfiedBy(validPhotoDocument);
         assertFalse(result, "Photo document with low DPI should not satisfy the specification");
-        
+
         List<String> messages = specification.getValidationMessages();
         assertTrue(messages.stream().anyMatch(m -> m.contains("DPI must be at least")),
                 "Validation message should mention DPI requirements");
@@ -236,7 +236,7 @@ public class PhotoQualitySpecificationTest {
 
         boolean result = specification.isSatisfiedBy(validPhotoDocument);
         assertFalse(result, "Photo document with multiple issues should not satisfy the specification");
-        
+
         List<String> messages = specification.getValidationMessages();
         assertTrue(messages.size() >= 4, "Should have at least 4 validation messages");
     }

@@ -1,6 +1,8 @@
 package com.belman.bootstrap.config;
 
+import com.belman.bootstrap.di.DefaultServiceProvider;
 import com.belman.bootstrap.di.ServiceRegistry;
+import com.belman.common.di.ServiceProviderFactory;
 import com.belman.common.logging.EmojiLogger;
 import com.belman.common.logging.EmojiLoggerFactory;
 
@@ -23,6 +25,11 @@ public class ApplicationBootstrapper {
         EmojiLoggerFactory loggerFactory = EmojiLoggerFactory.getInstance();
         ServiceRegistry.setLogger(loggerFactory);
         ServiceRegistry.registerService(loggerFactory);
+
+        // Initialize ServiceProviderFactory with DefaultServiceProvider
+        logger.debug("Initializing ServiceProviderFactory");
+        ServiceProviderFactory.setInstance(DefaultServiceProvider.getInstance());
+        logger.debug("ServiceProviderFactory initialized with DefaultServiceProvider");
 
         // Initialize application services and repositories
         logger.startup("Initializing application services and repositories");
