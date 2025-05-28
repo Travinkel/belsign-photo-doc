@@ -1,6 +1,6 @@
 package com.belman.application.usecase.photo;
 
-import com.belman.bootstrap.di.ServiceLocator;
+import com.belman.common.di.ServiceProviderFactory;
 import com.belman.domain.services.LoggerFactory;
 import com.belman.application.base.BaseService;
 import com.belman.application.error.ErrorHandler;
@@ -42,8 +42,8 @@ public class GluonCameraService extends BaseService implements CameraService {
      * @param tempDirectory the directory to store temporary files
      */
     public GluonCameraService(String tempDirectory) {
-        super(ServiceLocator.getService(LoggerFactory.class));
-        this.errorHandler = ServiceLocator.getService(ErrorHandler.class);
+        super(ServiceProviderFactory.getInstance().getService(LoggerFactory.class));
+        this.errorHandler = ServiceProviderFactory.getInstance().getService(ErrorHandler.class);
         this.tempDirectory = tempDirectory;
 
         // Create the temporary directory if it doesn't exist
@@ -448,6 +448,6 @@ public class GluonCameraService extends BaseService implements CameraService {
 
     @Override
     protected LoggerFactory getLoggerFactory() {
-        return ServiceLocator.getService(LoggerFactory.class);
+        return ServiceProviderFactory.getInstance().getService(LoggerFactory.class);
     }
 }

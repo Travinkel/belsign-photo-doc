@@ -1,6 +1,6 @@
 package com.belman.application.usecase.photo;
 
-import com.belman.bootstrap.di.ServiceLocator;
+import com.belman.common.di.ServiceProviderFactory;
 import com.belman.dataaccess.file.MockCameraImageProvider;
 import com.belman.dataaccess.file.RealCameraImageProvider;
 import com.belman.domain.services.LoggerFactory;
@@ -24,11 +24,11 @@ public class CameraImageProviderFactory {
         if (instance == null) {
             // Check if we're in mock mode
             boolean mockMode = Boolean.parseBoolean(System.getProperty(MOCK_CAMERA_PROPERTY, "false"));
-            
+
             // Get dependencies
-            CameraService cameraService = ServiceLocator.getService(CameraService.class);
-            LoggerFactory loggerFactory = ServiceLocator.getService(LoggerFactory.class);
-            
+            CameraService cameraService = ServiceProviderFactory.getInstance().getService(CameraService.class);
+            LoggerFactory loggerFactory = ServiceProviderFactory.getInstance().getService(LoggerFactory.class);
+
             if (mockMode) {
                 // Create a mock provider
                 instance = new MockCameraImageProvider(loggerFactory);
@@ -37,7 +37,7 @@ public class CameraImageProviderFactory {
                 instance = new RealCameraImageProvider(cameraService, loggerFactory);
             }
         }
-        
+
         return instance;
     }
 

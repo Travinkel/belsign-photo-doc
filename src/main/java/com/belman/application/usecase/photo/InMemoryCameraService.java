@@ -1,6 +1,6 @@
 package com.belman.application.usecase.photo;
 
-import com.belman.bootstrap.di.ServiceLocator;
+import com.belman.common.di.ServiceProviderFactory;
 import com.belman.domain.services.LoggerFactory;
 import com.belman.application.base.BaseService;
 
@@ -31,7 +31,7 @@ public class InMemoryCameraService extends BaseService implements CameraService 
      * Creates a new InMemoryCameraService.
      */
     public InMemoryCameraService() {
-        super(ServiceLocator.getService(LoggerFactory.class));
+        super(ServiceProviderFactory.getInstance().getService(LoggerFactory.class));
         loadImages();
         logInfo("InMemoryCameraService initialized with " + availableImages.size() + " images");
     }
@@ -78,7 +78,7 @@ public class InMemoryCameraService extends BaseService implements CameraService 
 
     @Override
     protected LoggerFactory getLoggerFactory() {
-        return ServiceLocator.getService(LoggerFactory.class);
+        return ServiceProviderFactory.getInstance().getService(LoggerFactory.class);
     }
 
     /**
