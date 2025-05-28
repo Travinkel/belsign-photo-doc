@@ -30,7 +30,7 @@ public final class PhotoAnnotation {
         validateCoordinate(y, "y");
         this.x = x;
         this.y = y;
-        this.text = Objects.requireNonNull(text, "text must not be null");
+        this.text = validateText(text);
         this.type = Objects.requireNonNull(type, "type must not be null");
     }
 
@@ -39,6 +39,14 @@ public final class PhotoAnnotation {
             throw new IllegalArgumentException(
                     name + " coordinate must be between 0.0 and 1.0, but was " + value);
         }
+    }
+
+    private String validateText(String text) {
+        Objects.requireNonNull(text, "text must not be null");
+        if (text.trim().isEmpty()) {
+            throw new IllegalArgumentException("text must not be empty or whitespace-only");
+        }
+        return text;
     }
 
     /**
