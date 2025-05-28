@@ -37,7 +37,7 @@ public class MockCameraService extends BaseService implements CameraService {
      * @param stage the JavaFX stage to use for file chooser dialogs
      */
     public MockCameraService(Stage stage) {
-        super(ServiceLocator.getService(LoggerFactory.class));
+        super(ServiceProviderFactory.getInstance().getService(LoggerFactory.class));
         this.stage = stage;
         this.fileChooser = new FileChooser();
         this.fileChooser.getExtensionFilters().addAll(
@@ -71,7 +71,7 @@ public class MockCameraService extends BaseService implements CameraService {
 
     @Override
     protected LoggerFactory getLoggerFactory() {
-        return ServiceLocator.getService(LoggerFactory.class);
+        return ServiceProviderFactory.getInstance().getService(LoggerFactory.class);
     }
 
     /**

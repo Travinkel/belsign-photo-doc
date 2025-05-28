@@ -1,6 +1,6 @@
 package com.belman.application.usecase.photo;
 
-import com.belman.bootstrap.di.ServiceLocator;
+import com.belman.common.di.ServiceProviderFactory;
 import com.belman.domain.services.LoggerFactory;
 import com.belman.application.base.BaseService;
 
