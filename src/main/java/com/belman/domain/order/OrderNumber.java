@@ -4,7 +4,7 @@ import com.belman.domain.common.base.ValueObject;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Random;
+import java.security.SecureRandom;
 
 /**
  * Value object representing an order number in the BelSign system.
@@ -59,7 +59,7 @@ public record OrderNumber(String value) implements ValueObject {
 
         // Generate a random 4-digit sequence number
         // In a real system, this would be managed by a sequence generator
-        Random random = new Random();
+        SecureRandom random = new SecureRandom();
         String sequence = String.format("%04d", random.nextInt(10000));
 
         return new OrderNumber("ORD-" + projectId + "-" + dateStr + "-" + formattedProjectCode + "-" + sequence);
