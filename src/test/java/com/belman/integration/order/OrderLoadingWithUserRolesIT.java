@@ -76,7 +76,7 @@ public class OrderLoadingWithUserRolesIT {
         // Set up logger factory mock
         when(loggerFactory.getLogger(any())).thenReturn(mock(com.belman.domain.services.Logger.class));
 
-        // Register mock services with ServiceLocator
+        // Register mock services with DependencyContainer
         registerMockServices();
 
         // Create test users with different roles
@@ -101,8 +101,8 @@ public class OrderLoadingWithUserRolesIT {
         injectDependency(qaDashboardViewModel, "orderRepository", orderRepository);
         injectDependency(qaDashboardViewModel, "sessionContext", sessionContext);
 
-        // Use ServiceLocator to inject dependencies into AssignedOrderViewModel
-        com.belman.bootstrap.di.ServiceLocator.injectServices(assignedOrderViewModel);
+        // Use DependencyContainer to inject dependencies into AssignedOrderViewModel
+        com.belman.bootstrap.di.DependencyContainerImpl.getInstance().injectServices(assignedOrderViewModel);
 
         // Also inject orderService directly for backward compatibility
         injectDependency(assignedOrderViewModel, "orderService", orderService);
@@ -249,32 +249,32 @@ public class OrderLoadingWithUserRolesIT {
     }
 
     /**
-     * Registers mock services with the ServiceLocator.
+     * Registers mock services with the DependencyContainer.
      */
     private void registerMockServices() {
         // Clear any existing services
-        com.belman.bootstrap.di.ServiceLocator.clear();
+        com.belman.bootstrap.di.DependencyContainerImpl.getInstance().clear();
 
         // Register mock AuthenticationService
-        com.belman.bootstrap.di.ServiceLocator.registerService(
+        com.belman.bootstrap.di.DependencyContainerImpl.getInstance().registerService(
             com.belman.domain.security.AuthenticationService.class,
             new MockAuthenticationService()
         );
 
         // Register OrderService mock
-        com.belman.bootstrap.di.ServiceLocator.registerService(
+        com.belman.bootstrap.di.DependencyContainerImpl.getInstance().registerService(
             com.belman.application.usecase.order.OrderService.class,
             orderService
         );
 
         // Register WorkerService mock
-        com.belman.bootstrap.di.ServiceLocator.registerService(
+        com.belman.bootstrap.di.DependencyContainerImpl.getInstance().registerService(
             com.belman.application.usecase.worker.WorkerService.class,
             mock(com.belman.application.usecase.worker.WorkerService.class)
         );
 
         // Register SessionContext mock
-        com.belman.bootstrap.di.ServiceLocator.registerService(
+        com.belman.bootstrap.di.DependencyContainerImpl.getInstance().registerService(
             com.belman.common.session.SessionContext.class,
             sessionContext
         );

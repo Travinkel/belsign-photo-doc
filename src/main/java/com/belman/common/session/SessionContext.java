@@ -76,7 +76,7 @@ public interface SessionContext {
      * @param user the user to set
      */
     static void setCurrentUser(UserBusiness user) {
-        SessionContext context = ServiceLocator.getService(SessionContext.class);
+        SessionContext context = ServiceProviderFactory.getInstance().getService(SessionContext.class);
         if (context != null) {
             context.setUser(user);
         }
@@ -89,7 +89,7 @@ public interface SessionContext {
      * @return an Optional containing the current user if one is set, or empty if no user is set
      */
     static Optional<UserBusiness> getCurrentUser() {
-        SessionContext context = ServiceLocator.getService(SessionContext.class);
+        SessionContext context = ServiceProviderFactory.getInstance().getService(SessionContext.class);
         if (context != null) {
             return context.getUser();
         }
@@ -101,7 +101,7 @@ public interface SessionContext {
      * This is a simplified way to log out the current user.
      */
     static void clear() {
-        SessionContext context = ServiceLocator.getService(SessionContext.class);
+        SessionContext context = ServiceProviderFactory.getInstance().getService(SessionContext.class);
         if (context != null) {
             context.setUser(null);
         }

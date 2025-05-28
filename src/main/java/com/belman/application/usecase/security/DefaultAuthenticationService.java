@@ -67,6 +67,11 @@ public class DefaultAuthenticationService extends BaseService implements Extende
     }
 
     @Override
+    public com.belman.domain.services.Logger getLogger() {
+        return com.belman.common.logging.EmojiLoggerAdapter.getLogger(DefaultAuthenticationService.class);
+    }
+
+    @Override
     public Optional<UserBusiness> authenticate(String username, String password) {
         AuthLoggingService.logAuth("DefaultAuthenticationService", "Attempting to authenticate user: " + username);
 
@@ -353,26 +358,37 @@ public class DefaultAuthenticationService extends BaseService implements Extende
      * Class to track failed login attempts
      */
     private static class FailedLoginTracker {
+        private static final com.belman.domain.services.Logger logger = 
+            com.belman.common.logging.EmojiLoggerAdapter.getLogger(FailedLoginTracker.class);
+
         private int attempts;
         private Instant lockoutTime;
 
         public FailedLoginTracker() {
             this.attempts = INITIAL_ATTEMPTS;
             this.lockoutTime = null;
+            logger.debug("Created new FailedLoginTracker with initial attempts: {}", INITIAL_ATTEMPTS);
         }
 
         public void incrementAttempts() {
             this.attempts++;
+            logger.debug("Incremented failed attempts to: {}", this.attempts);
             if (this.attempts >= MAX_FAILED_ATTEMPTS) {
                 this.lockoutTime = Instant.now().plus(LOCKOUT_DURATION);
+                logger.warn("Account locked out due to too many failed attempts. Lockout until: {}", this.lockoutTime);
             }
         }
 
         public boolean isLockedOut() {
-            return lockoutTime != null && Instant.now().isBefore(lockoutTime);
+            boolean locked = lockoutTime != null && Instant.now().isBefore(lockoutTime);
+            if (locked) {
+                logger.debug("Account is currently locked out until: {}", lockoutTime);
+            }
+            return locked;
         }
 
         public void resetAttempts() {
+            logger.info("Resetting failed login attempts from: {}", this.attempts);
             this.attempts = 0;
             this.lockoutTime = null;
         }

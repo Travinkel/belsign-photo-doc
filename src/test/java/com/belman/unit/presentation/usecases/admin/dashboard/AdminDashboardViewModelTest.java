@@ -1,10 +1,12 @@
 package com.belman.unit.presentation.usecases.admin.dashboard;
 
 import com.belman.common.session.SessionContext;
+import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.user.UserRepository;
 import com.belman.presentation.navigation.Router;
 import com.belman.presentation.usecases.admin.dashboard.AdminDashboardViewModel;
 import com.belman.presentation.usecases.admin.usermanagement.UserManagementView;
+import com.belman.presentation.usecases.login.LoginView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +34,9 @@ public class AdminDashboardViewModelTest {
 
     @Mock
     private SessionContext sessionContext;
+
+    @Mock
+    private AuthenticationService authenticationService;
 
     @InjectMocks
     private AdminDashboardViewModel viewModel;
@@ -85,46 +90,66 @@ public class AdminDashboardViewModelTest {
 
     @Test
     public void testLogout_NavigatesToLogin() {
-        // Act
-        viewModel.logout();
+        // Arrange
+        try (MockedStatic<Router> mockedRouter = mockStatic(Router.class);
+             MockedStatic<SessionContext> mockedSessionContext = mockStatic(SessionContext.class)) {
 
-        // Assert
-        verify(sessionContext).navigateToLogin();
-        assertEquals("", viewModel.errorMessageProperty().get());
+            // Act
+            viewModel.logout();
+
+            // Assert
+            verify(authenticationService).logout();
+            mockedSessionContext.verify(() -> SessionContext.clear());
+            mockedRouter.verify(() -> Router.navigateTo(LoginView.class));
+            assertEquals("", viewModel.errorMessageProperty().get());
+        }
     }
 
     @Test
     public void testLogout_SetsErrorMessage_WhenLogoutFails() {
         // Arrange
-        doThrow(new RuntimeException("Logout error")).when(sessionContext).navigateToLogin();
+        doThrow(new RuntimeException("Logout error")).when(authenticationService).logout();
 
-        // Act
-        viewModel.logout();
+        try (MockedStatic<Router> mockedRouter = mockStatic(Router.class)) {
+            // Act
+            viewModel.logout();
 
-        // Assert
-        assertEquals("Error logging out: Logout error", viewModel.errorMessageProperty().get());
+            // Assert
+            assertEquals("Unable to log out properly. Please close the application and restart it to ensure you are fully logged out.", 
+                    viewModel.errorMessageProperty().get());
+        }
     }
 
     @Test
-    public void testLogout_DoesNothing_WhenSessionContextIsNull() {
+    public void testLogout_HandlesNullAuthenticationService() {
         // Arrange
-        // Create a new ViewModel with null SessionContext
-        AdminDashboardViewModel viewModelWithNullSession = new AdminDashboardViewModel();
+        // Create a new ViewModel with null AuthenticationService
+        AdminDashboardViewModel viewModelWithNullAuth = new AdminDashboardViewModel();
 
         // Use reflection to set the userRepository field
         try {
             Field field = AdminDashboardViewModel.class.getDeclaredField("userRepository");
             field.setAccessible(true);
-            field.set(viewModelWithNullSession, userRepository);
+            field.set(viewModelWithNullAuth, userRepository);
+
+            // Set sessionContext
+            Field sessionField = AdminDashboardViewModel.class.getDeclaredField("sessionContext");
+            sessionField.setAccessible(true);
+            sessionField.set(viewModelWithNullAuth, sessionContext);
+
+            // Leave authenticationService as null
         } catch (Exception e) {
             // Ignore
         }
 
-        // Act
-        viewModelWithNullSession.logout();
+        try (MockedStatic<Router> mockedRouter = mockStatic(Router.class)) {
+            // Act
+            viewModelWithNullAuth.logout();
 
-        // Assert
-        // No exception should be thrown
-        assertEquals("", viewModelWithNullSession.errorMessageProperty().get());
+            // Assert
+            // Should handle the null authenticationService gracefully
+            assertEquals("Unable to log out properly. Please close the application and restart it to ensure you are fully logged out.", 
+                    viewModelWithNullAuth.errorMessageProperty().get());
+        }
     }
 }

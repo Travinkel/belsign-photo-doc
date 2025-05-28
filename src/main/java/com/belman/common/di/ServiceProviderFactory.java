@@ -1,5 +1,6 @@
 package com.belman.common.di;
 
+import com.belman.bootstrap.di.DefaultServiceProvider;
 import java.lang.reflect.Method;
 
 /**
@@ -28,6 +29,16 @@ public class ServiceProviderFactory {
             throw new IllegalArgumentException("ServiceProvider instance cannot be null");
         }
         instance = serviceProvider;
+    }
+
+    /**
+     * Creates a new ServiceProvider instance.
+     * This method follows the Factory pattern by creating and returning a new object.
+     *
+     * @return a new ServiceProvider instance
+     */
+    public static ServiceProvider createServiceProvider() {
+        return DefaultServiceProvider.getInstance();
     }
 
     /**

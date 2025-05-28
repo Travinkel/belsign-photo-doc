@@ -37,7 +37,8 @@ import java.time.format.DateTimeFormatter;
  * Provides data and operations for admin-specific functionality.
  */
 public class AdminDashboardViewModel extends BaseViewModel<AdminDashboardViewModel> implements LogoutCapable {
-    private final AuthenticationService authenticationService = ServiceLocator.getService(AuthenticationService.class);
+    @Inject
+    private AuthenticationService authenticationService;
     private final StringProperty welcomeMessage = new SimpleStringProperty("Welcome to Admin Dashboard");
     private final StringProperty errorMessage = new SimpleStringProperty("");
 

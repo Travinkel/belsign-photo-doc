@@ -1,5 +1,7 @@
 package com.belman.presentation.usecases.admin.settings;
 
+import com.belman.common.di.Inject;
+import com.belman.common.session.SessionContext;
 import com.belman.presentation.base.BaseController;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -13,6 +15,9 @@ import javafx.scene.control.ComboBox;
  * Handles UI interactions for the system settings screen.
  */
 public final class SystemSettingsViewController extends BaseController<SystemSettingsViewModel> {
+
+    @Inject
+    private SessionContext sessionContext;
 
     @FXML
     private Label welcomeLabel;

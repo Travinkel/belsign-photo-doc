@@ -4,11 +4,13 @@ package com.belman.bootstrap.di;
 import com.belman.domain.common.valueobjects.EmailAddress;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.security.HashedPassword;
+import com.belman.domain.services.Logger;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRepository;
 import com.belman.domain.user.UserRole;
 import com.belman.domain.user.Username;
 import com.belman.application.usecase.security.DefaultAuthenticationService;
+import com.belman.common.logging.EmojiLoggerAdapter;
 
 import java.util.Optional;
 
@@ -42,6 +44,7 @@ public final class ServiceInjector {
      * In production, this would be replaced with a real implementation.
      */
     private static class MockAuthenticationService implements AuthenticationService {
+        private static final Logger logger = EmojiLoggerAdapter.getLogger(MockAuthenticationService.class);
         private UserBusiness currentUser = null;
 
         @Override
@@ -97,6 +100,11 @@ public final class ServiceInjector {
             return Optional.ofNullable(currentUser)
                     .map(user -> true)
                     .orElse(false);
+        }
+
+        @Override
+        public Logger getLogger() {
+            return logger;
         }
     }
 }

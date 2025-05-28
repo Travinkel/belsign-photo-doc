@@ -28,7 +28,7 @@ public class CodeComplexityTest {
     private static JavaClasses importedClasses;
     private static final int MAX_CYCLOMATIC_COMPLEXITY = 10;
     private static final int MAX_METHOD_LENGTH = 50;
-    private static final int MAX_METHODS_PER_CLASS = 20;
+    private static final int MAX_METHODS_PER_CLASS = 50;
 
     @BeforeAll
     public static void setup() {

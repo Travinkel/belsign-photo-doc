@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Utility class to generate password hashes for testing.
  */
-public class GeneratePasswordHash {
+class GeneratePasswordHash {
 
     @Test
     public void generatePasswordHash() {

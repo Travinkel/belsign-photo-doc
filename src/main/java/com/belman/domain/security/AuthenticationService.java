@@ -1,5 +1,6 @@
 package com.belman.domain.security;
 
+import com.belman.domain.services.Logger;
 import com.belman.domain.user.UserBusiness;
 
 import java.util.Optional;
@@ -35,4 +36,12 @@ public interface AuthenticationService {
      * @return true if a user is logged in, false otherwise
      */
     boolean isLoggedIn();
+
+    /**
+     * Gets the logger for this service.
+     * This method is required to ensure that all implementations have a logger dependency.
+     *
+     * @return the logger for this service
+     */
+    Logger getLogger();
 }

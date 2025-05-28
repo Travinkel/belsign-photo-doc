@@ -1,5 +1,6 @@
 package com.belman.application.usecase.auth;
 
+import com.belman.domain.services.Logger;
 import com.belman.domain.user.UserBusiness;
 
 import java.util.Optional;
@@ -36,4 +37,12 @@ public interface AuthenticationService {
      * Logs out the current user.
      */
     void logout();
+
+    /**
+     * Gets the logger for this service.
+     * This method is required to ensure that all implementations have a logger dependency.
+     *
+     * @return the logger for this service
+     */
+    Logger getLogger();
 }
