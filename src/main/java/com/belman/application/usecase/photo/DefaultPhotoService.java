@@ -12,7 +12,8 @@ import com.belman.domain.photo.PhotoRepository;
 import com.belman.domain.photo.PhotoTemplate;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserReference;
-import com.belman.presentation.error.ErrorHandler;
+import com.belman.domain.services.ErrorHandler;
+import com.belman.presentation.error.DomainErrorHandlerAdapter;
 import com.gluonhq.attach.storage.StorageService;
 import com.gluonhq.attach.util.Services;
 
@@ -49,7 +50,7 @@ public class DefaultPhotoService implements PhotoService {
 
     private final PhotoRepository photoRepository;
     private final String photoStorageDirectory;
-    private final ErrorHandler errorHandler = ErrorHandler.getInstance();
+    private final ErrorHandler errorHandler = DomainErrorHandlerAdapter.createWithDefaultErrorHandler();
     private final SessionPhotoStore sessionPhotoStore = SessionPhotoStore.getInstance();
 
     /**

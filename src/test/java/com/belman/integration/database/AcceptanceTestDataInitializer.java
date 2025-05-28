@@ -11,11 +11,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Utility class for initializing the database with data useful for the Requirements Acceptance Testing (RAT) phase.
+ * Utility class for initializing the database with data useful for the Requirements Acceptance Testing phase.
  * This class provides methods for adding test data that covers various test scenarios for the photo documentation system.
  */
-public class RatPhaseDataInitializer {
-    private static final Logger LOGGER = Logger.getLogger(RatPhaseDataInitializer.class.getName());
+public class AcceptanceTestDataInitializer {
+    private static final Logger LOGGER = Logger.getLogger(AcceptanceTestDataInitializer.class.getName());
     private static DataSource dataSource;
 
     /**
@@ -24,15 +24,15 @@ public class RatPhaseDataInitializer {
      * @param dataSource the data source to use
      */
     public static void initialize(DataSource dataSource) {
-        RatPhaseDataInitializer.dataSource = dataSource;
-        LOGGER.info("RatPhaseDataInitializer initialized with data source");
+        AcceptanceTestDataInitializer.dataSource = dataSource;
+        LOGGER.info("AcceptanceTestDataInitializer initialized with data source");
     }
 
     /**
-     * Populates the database with data useful for the RAT phase.
+     * Populates the database with data useful for the acceptance testing phase.
      * This method adds test data that covers various test scenarios for the photo documentation system.
      */
-    public static void populateRatPhaseData() {
+    public static void populateAcceptanceTestData() {
         if (dataSource == null) {
             LOGGER.severe("Data source not initialized. Call initialize() first.");
             return;
@@ -63,11 +63,11 @@ public class RatPhaseDataInitializer {
 
                 // Commit the transaction
                 connection.commit();
-                LOGGER.info("RAT phase data populated successfully");
+                LOGGER.info("Acceptance test data populated successfully");
             } catch (SQLException e) {
                 // Rollback the transaction if an error occurs
                 connection.rollback();
-                LOGGER.log(Level.SEVERE, "Error populating RAT phase data", e);
+                LOGGER.log(Level.SEVERE, "Error populating acceptance test data", e);
                 throw e;
             } finally {
                 // Restore auto-commit mode
@@ -75,7 +75,7 @@ public class RatPhaseDataInitializer {
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error getting connection from data source", e);
-            throw new RuntimeException("Failed to populate RAT phase data", e);
+            throw new RuntimeException("Failed to populate acceptance test data", e);
         }
     }
 
@@ -86,7 +86,7 @@ public class RatPhaseDataInitializer {
      * @throws SQLException if an error occurs
      */
     private static void addTestUsers(Connection connection) throws SQLException {
-        LOGGER.info("Adding test users for RAT phase...");
+        LOGGER.info("Adding test users for acceptance testing...");
 
         // Add a production worker user
         String productionUserId = UUID.randomUUID().toString();
@@ -150,7 +150,7 @@ public class RatPhaseDataInitializer {
      * @throws SQLException if an error occurs
      */
     private static void addTestOrders(Connection connection) throws SQLException {
-        LOGGER.info("Adding test orders for RAT phase...");
+        LOGGER.info("Adding test orders for acceptance testing...");
 
         // Add a pending order
         String pendingOrderId = UUID.randomUUID().toString();
@@ -207,15 +207,15 @@ public class RatPhaseDataInitializer {
      * @throws SQLException if an error occurs
      */
     private static void addTestPhotoTemplates(Connection connection) throws SQLException {
-        LOGGER.info("Adding test photo templates for RAT phase...");
+        LOGGER.info("Adding test photo templates for acceptance testing...");
 
         // Add a required photo template
         String requiredTemplateId = UUID.randomUUID().toString();
-        addPhotoTemplate(connection, requiredTemplateId, "RAT_REQUIRED_VIEW", "Required view for RAT phase", true);
+        addPhotoTemplate(connection, requiredTemplateId, "RAT_REQUIRED_VIEW", "Required view for acceptance testing", true);
 
         // Add an optional photo template
         String optionalTemplateId = UUID.randomUUID().toString();
-        addPhotoTemplate(connection, optionalTemplateId, "RAT_OPTIONAL_VIEW", "Optional view for RAT phase", false);
+        addPhotoTemplate(connection, optionalTemplateId, "RAT_OPTIONAL_VIEW", "Optional view for acceptance testing", false);
 
         LOGGER.info("Test photo templates added successfully");
     }
@@ -250,7 +250,7 @@ public class RatPhaseDataInitializer {
      * @throws SQLException if an error occurs
      */
     private static void addTestPhotos(Connection connection) throws SQLException {
-        LOGGER.info("Adding test photos for RAT phase...");
+        LOGGER.info("Adding test photos for acceptance testing...");
 
         // Get a random order ID
         String orderId = getRandomOrderId(connection);
@@ -330,7 +330,7 @@ public class RatPhaseDataInitializer {
      * @throws SQLException if an error occurs
      */
     private static void addTestAnnotations(Connection connection) throws SQLException {
-        LOGGER.info("Adding test annotations for RAT phase...");
+        LOGGER.info("Adding test annotations for acceptance testing...");
 
         // Get a random photo ID
         String photoId = getRandomPhotoId(connection);
@@ -341,7 +341,7 @@ public class RatPhaseDataInitializer {
 
         // Add an annotation
         String annotationId = UUID.randomUUID().toString();
-        addAnnotation(connection, annotationId, photoId, 100.0, 100.0, 50.0, 50.0, "RAT phase annotation", null);
+        addAnnotation(connection, annotationId, photoId, 100.0, 100.0, 50.0, 50.0, "Acceptance test annotation", null);
 
         LOGGER.info("Test annotations added successfully");
     }
@@ -406,7 +406,7 @@ public class RatPhaseDataInitializer {
      * @throws SQLException if an error occurs
      */
     private static void addTestReports(Connection connection) throws SQLException {
-        LOGGER.info("Adding test reports for RAT phase...");
+        LOGGER.info("Adding test reports for acceptance testing...");
 
         // Get a random order ID
         String orderId = getRandomOrderId(connection);
@@ -417,15 +417,15 @@ public class RatPhaseDataInitializer {
 
         // Add a pending report
         String pendingReportId = UUID.randomUUID().toString();
-        addReport(connection, pendingReportId, orderId, "RAT Pending Report", "Report for RAT phase (pending)", "PENDING", null);
+        addReport(connection, pendingReportId, orderId, "RAT Pending Report", "Report for acceptance testing (pending)", "PENDING", null);
 
         // Add an approved report
         String approvedReportId = UUID.randomUUID().toString();
-        addReport(connection, approvedReportId, orderId, "RAT Approved Report", "Report for RAT phase (approved)", "APPROVED", null);
+        addReport(connection, approvedReportId, orderId, "RAT Approved Report", "Report for acceptance testing (approved)", "APPROVED", null);
 
         // Add a rejected report
         String rejectedReportId = UUID.randomUUID().toString();
-        addReport(connection, rejectedReportId, orderId, "RAT Rejected Report", "Report for RAT phase (rejected)", "REJECTED", null);
+        addReport(connection, rejectedReportId, orderId, "RAT Rejected Report", "Report for acceptance testing (rejected)", "REJECTED", null);
 
         LOGGER.info("Test reports added successfully");
     }

@@ -15,13 +15,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Integration tests for the RAT phase data initializer.
+ * Integration tests for the acceptance test data initializer.
  * These tests verify that the data initializer correctly populates the database with data useful for the Requirements Acceptance Testing phase.
  * 
  * This class uses the IT suffix (Integration Test) to be run by Maven Failsafe
  * instead of Surefire, demonstrating the separation between unit tests and integration tests.
  */
-public class RatPhaseDataInitializerIT {
+public class AcceptanceTestDataInitializerIT {
 
     private static DataSource dataSource;
 
@@ -30,30 +30,30 @@ public class RatPhaseDataInitializerIT {
         // Initialize the test database
         dataSource = TestDatabaseUtil.initializeTestDatabase();
         assertNotNull(dataSource, "DataSource should not be null");
-        System.out.println("[DEBUG_LOG] Test database initialized successfully for RAT phase data initializer tests");
+        System.out.println("[DEBUG_LOG] Test database initialized successfully for acceptance test data initializer tests");
 
-        // Initialize the RAT phase data initializer
-        RatPhaseDataInitializer.initialize(dataSource);
-        System.out.println("[DEBUG_LOG] RAT phase data initializer initialized");
+        // Initialize the acceptance test data initializer
+        AcceptanceTestDataInitializer.initialize(dataSource);
+        System.out.println("[DEBUG_LOG] Acceptance test data initializer initialized");
     }
 
     @AfterAll
     public static void tearDown() {
         // Shutdown the test database
         TestDatabaseUtil.shutdownTestDatabase();
-        System.out.println("[DEBUG_LOG] Test database shut down after RAT phase data initializer tests");
+        System.out.println("[DEBUG_LOG] Test database shut down after acceptance test data initializer tests");
     }
 
     /**
-     * Test that the RAT phase data initializer correctly populates the database with test data.
+     * Test that the acceptance test data initializer correctly populates the database with test data.
      */
     @Test
-    public void testPopulateRatPhaseData() {
-        System.out.println("[DEBUG_LOG] Starting test for populating RAT phase data");
+    public void testPopulateAcceptanceTestData() {
+        System.out.println("[DEBUG_LOG] Starting test for populating acceptance test data");
 
-        // Populate the database with RAT phase data
-        RatPhaseDataInitializer.populateRatPhaseData();
-        System.out.println("[DEBUG_LOG] RAT phase data populated");
+        // Populate the database with acceptance test data
+        AcceptanceTestDataInitializer.populateAcceptanceTestData();
+        System.out.println("[DEBUG_LOG] Acceptance test data populated");
 
         // Verify that the database contains the expected data
         verifyTestUsers();
@@ -63,7 +63,7 @@ public class RatPhaseDataInitializerIT {
         verifyTestAnnotations();
         verifyTestReports();
 
-        System.out.println("[DEBUG_LOG] RAT phase data verification completed successfully");
+        System.out.println("[DEBUG_LOG] Acceptance test data verification completed successfully");
     }
 
     /**
@@ -222,7 +222,7 @@ public class RatPhaseDataInitializerIT {
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement stmt = connection.prepareStatement(
-                     "SELECT * FROM PHOTO_ANNOTATIONS WHERE text LIKE 'RAT phase%'")) {
+                     "SELECT * FROM PHOTO_ANNOTATIONS WHERE text LIKE 'Acceptance%'")) {
             try (ResultSet rs = stmt.executeQuery()) {
                 List<String> texts = new ArrayList<>();
 
@@ -232,7 +232,7 @@ public class RatPhaseDataInitializerIT {
                 }
 
                 // Verify that we found the expected annotations
-                assertTrue(texts.contains("RAT phase annotation"), "Test annotation should exist");
+                assertTrue(texts.contains("Acceptance test annotation"), "Test annotation should exist");
 
                 System.out.println("[DEBUG_LOG] Found " + texts.size() + " test annotations");
             }
