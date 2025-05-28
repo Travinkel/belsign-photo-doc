@@ -10,12 +10,12 @@ import com.belman.common.logging.EmojiLogger;
  * - sqlite: SQLite database for development
  * - sqlserver: SQL Server database for production
  */
-public class StorageTypeConfig {
+public final class StorageTypeConfig {
     private static final EmojiLogger logger = EmojiLogger.getLogger(StorageTypeConfig.class);
     public static final String ENV_STORAGE_TYPE = "BELSIGN_STORAGE_TYPE";
     // Changed default from "memory" to "sqlite" to ensure database migrations run and tables are created
     // This fixes the "no such table: USERS" error when trying to authenticate
-    private static final String DEFAULT_STORAGE_TYPE = "memory"; // Changed default to "memory" to ensure in-memory repositories are used by default
+    private static final String DEFAULT_STORAGE_TYPE = "sql"; // Changed default to "sql" to ensure MSSQL are used by default
 
     public enum StorageType {
         MEMORY,
@@ -104,12 +104,13 @@ public class StorageTypeConfig {
                 logger.debug("Parsed as SQLITE storage type");
                 return StorageType.SQLITE;
             case "sqlserver":
+            case "sql":
                 logger.debug("Parsed as SQLSERVER storage type");
                 return StorageType.SQLSERVER;
             default:
                 logger.warn("Unknown storage type: " + storageTypeStr + ", using default: " + DEFAULT_STORAGE_TYPE);
-                // Return SQLITE to match DEFAULT_STORAGE_TYPE
-                return StorageType.SQLITE;
+                // Return SQLSERVER to match DEFAULT_STORAGE_TYPE
+                return StorageType.SQLSERVER;
         }
     }
 

@@ -6,7 +6,7 @@ import com.belman.presentation.base.BaseView;
  * View class for the system settings screen.
  * This view allows administrators to configure system-wide settings.
  */
-public class SystemSettingsView extends BaseView<SystemSettingsViewModel> {
+public final class SystemSettingsView extends BaseView<SystemSettingsViewModel> {
     /**
      * Creates a new SystemSettingsView.
      */

@@ -1,7 +1,6 @@
-package com.belman.application.usecase.qa;
+package com.belman.unit.application.usecase.qa;
 
-import com.belman.domain.common.valueobjects.Timestamp;
-import com.belman.domain.order.OrderId;
+import com.belman.application.usecase.qa.DefaultQAService;
 import com.belman.domain.photo.PhotoAnnotation;
 import com.belman.domain.photo.PhotoDocument;
 import com.belman.domain.photo.PhotoId;
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;

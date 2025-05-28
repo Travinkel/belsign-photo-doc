@@ -23,7 +23,7 @@ import java.util.Properties;
  * Provides secure storage for sensitive configuration data such as database credentials.
  * Uses AES-GCM encryption to protect data at rest.
  */
-public class SecureConfigStorage {
+public final class SecureConfigStorage {
     private final EmojiLogger logger = EmojiLogger.getLogger(SecureConfigStorage.class);
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final int GCM_TAG_LENGTH = 128;

@@ -15,7 +15,7 @@ import javafx.beans.property.StringProperty;
  * ViewModel for the system settings screen.
  * Provides data and operations for system-wide settings configuration.
  */
-public class SystemSettingsViewModel extends BaseViewModel<SystemSettingsViewModel> implements LogoutCapable {
+public final class SystemSettingsViewModel extends BaseViewModel<SystemSettingsViewModel> implements LogoutCapable {
     private final AuthenticationService authenticationService = ServiceLocator.getService(AuthenticationService.class);
     private final StringProperty welcomeMessage = new SimpleStringProperty("System Settings");
     private final StringProperty errorMessage = new SimpleStringProperty("");

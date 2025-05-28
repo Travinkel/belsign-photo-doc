@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * Configuration class for database connectivity.
  * Sets up a connection pool using HikariCP and provides a DataSource.
  */
-public class DatabaseConfig {
+public final class DatabaseConfig {
     private static final Logger LOGGER = Logger.getLogger(DatabaseConfig.class.getName());
     private static final String DB_PROPERTIES_FILE = "database.properties";
     private static HikariDataSource dataSource;
@@ -45,6 +45,13 @@ public class DatabaseConfig {
 
                 dataSource = new HikariDataSource(config);
                 LOGGER.info("Database connection pool initialized successfully");
+
+                // Run database migrations
+                if (DatabaseMigrationManager.runMigrations(dataSource)) {
+                    LOGGER.info("Database migrations completed successfully");
+                } else {
+                    LOGGER.warning("Database migrations failed or were not applied");
+                }
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Failed to initialize database connection pool", e);
                 // Don't throw an exception, just log it and return

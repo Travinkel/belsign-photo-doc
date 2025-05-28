@@ -12,7 +12,7 @@ import javafx.scene.control.ComboBox;
  * Controller for the system settings view.
  * Handles UI interactions for the system settings screen.
  */
-public class SystemSettingsViewController extends BaseController<SystemSettingsViewModel> {
+public final class SystemSettingsViewController extends BaseController<SystemSettingsViewModel> {
 
     @FXML
     private Label welcomeLabel;

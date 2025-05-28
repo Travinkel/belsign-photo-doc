@@ -55,25 +55,49 @@ public class DatabaseOperationsTest {
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement()) {
 
-            // Create users table with lowercase names to match SqliteDatabaseConfig schema
-            stmt.execute("CREATE TABLE IF NOT EXISTS users (" +
-                         "id TEXT PRIMARY KEY, " +
+            // Drop existing tables if they exist
+            try {
+                stmt.execute("DROP TABLE IF EXISTS USER_ROLES");
+                stmt.execute("DROP TABLE IF EXISTS USERS");
+                System.out.println("[DEBUG_LOG] Dropped existing tables");
+            } catch (SQLException e) {
+                System.out.println("[DEBUG_LOG] Error dropping tables: " + e.getMessage());
+                // Continue with table creation even if drop fails
+            }
+
+            // Create USERS table with uppercase name and user_id column to match the schema used in tests
+            stmt.execute("CREATE TABLE USERS (" +
+                         "user_id TEXT PRIMARY KEY, " +
                          "username TEXT NOT NULL, " +
                          "password TEXT, " +
                          "email TEXT, " +
                          "first_name TEXT, " +
                          "last_name TEXT, " +
-                         "role TEXT NOT NULL, " +
+                         "status TEXT, " +
                          "created_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
-                         "updated_at TEXT DEFAULT CURRENT_TIMESTAMP)");
+                         "updated_at TEXT DEFAULT CURRENT_TIMESTAMP, " +
+                         "approved INTEGER DEFAULT 0)");
 
-            System.out.println("[DEBUG_LOG] Created users table");
+            System.out.println("[DEBUG_LOG] Created USERS table");
+
+            // Create USER_ROLES table with constraint on role column
+            stmt.execute("CREATE TABLE USER_ROLES (" +
+                         "user_id TEXT NOT NULL, " +
+                         "role TEXT NOT NULL CHECK (role IN ('ADMIN', 'QA', 'PRODUCTION')), " +
+                         "PRIMARY KEY (user_id, role), " +
+                         "FOREIGN KEY (user_id) REFERENCES USERS(user_id))");
+
+            System.out.println("[DEBUG_LOG] Created USER_ROLES table with role constraint");
 
             // Insert test user
-            stmt.execute("INSERT OR IGNORE INTO users (id, username, password, email, first_name, last_name, role) " +
-                         "VALUES ('test-user-id', 'testuser', 'password', 'test@example.com', 'Test', 'User', 'ADMIN')");
+            stmt.execute("INSERT INTO USERS (user_id, username, password, email, first_name, last_name, status, approved) " +
+                         "VALUES ('test-user-id', 'testuser', 'password', 'test@example.com', 'Test', 'User', 'ACTIVE', 1)");
 
-            System.out.println("[DEBUG_LOG] Inserted test user");
+            // Insert test user role
+            stmt.execute("INSERT INTO USER_ROLES (user_id, role) " +
+                         "VALUES ('test-user-id', 'ADMIN')");
+
+            System.out.println("[DEBUG_LOG] Inserted test user and role");
         } catch (SQLException e) {
             System.out.println("[DEBUG_LOG] Error creating schema: " + e.getMessage());
             e.printStackTrace();

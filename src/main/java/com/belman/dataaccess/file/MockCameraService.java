@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
+import java.security.SecureRandom;
 import java.util.stream.Collectors;
 
 /**
@@ -24,7 +24,7 @@ public class MockCameraService implements CameraService {
 
     private static final String MOCK_CAMERA_PATH = "src/main/resources/photos";
     private final LoggerFactory loggerFactory;
-    private final Random random = new Random();
+    private final SecureRandom random = new SecureRandom();
 
     /**
      * Creates a new MockCameraService.

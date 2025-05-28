@@ -14,7 +14,7 @@ import javax.sql.DataSource;
  * Sets up a connection pool using HikariCP and provides a DataSource.
  * This is a utility class with static methods and should not be instantiated.
  */
-public class SecureDatabaseConfig {
+public final class SecureDatabaseConfig {
     private static final Logger LOGGER = EmojiLoggerFactory.getInstance().getLogger(SecureDatabaseConfig.class);
     private static final String DB_PROPERTIES_FILE = "database.properties";
     // Configuration keys

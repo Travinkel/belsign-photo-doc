@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  * Configuration class for SQLite database connectivity.
  * Sets up a connection pool using HikariCP and provides a DataSource for the SQLite database.
  */
-public class SqliteDatabaseConfig {
+public final class SqliteDatabaseConfig {
     private static final Logger LOGGER = Logger.getLogger(SqliteDatabaseConfig.class.getName());
     private static final String SQLITE_DB_PATH = "src/main/resources/sqlitedb/mydb.db";
     private static HikariDataSource dataSource;

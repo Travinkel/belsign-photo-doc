@@ -8,7 +8,7 @@ import com.gluonhq.charm.glisten.mvc.View;
  * Factory for creating SystemSettingsView instances.
  * This factory is used by the ViewStackManager to create views on demand.
  */
-public class SystemSettingsViewFactory implements ViewFactory {
+public final class SystemSettingsViewFactory implements ViewFactory {
     private final ViewDependencies viewDependencies;
 
     /**

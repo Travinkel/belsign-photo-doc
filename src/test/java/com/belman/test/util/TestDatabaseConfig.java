@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * Configuration class for SQLite database connectivity in tests.
  * Sets up an in-memory SQLite database with Flyway migrations.
  */
-public class TestDatabaseConfig {
+public final class TestDatabaseConfig {
     private static final Logger LOGGER = Logger.getLogger(TestDatabaseConfig.class.getName());
     private static final String DB_PROPERTIES_FILE = "database.properties";
     private static HikariDataSource dataSource;

@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
+import java.security.SecureRandom;
 import java.util.stream.Collectors;
 
 /**
@@ -25,7 +25,7 @@ public class InMemoryCameraService extends BaseService implements CameraService 
 
     private static final String PHOTOS_PATH = "src/main/resources/photos";
     private List<File> availableImages = new ArrayList<>();
-    private final Random random = new Random();
+    private final SecureRandom random = new SecureRandom();
 
     /**
      * Creates a new InMemoryCameraService.
