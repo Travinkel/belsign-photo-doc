@@ -13,7 +13,7 @@ import com.belman.domain.order.OrderStatus;
 import com.belman.domain.photo.Photo;
 import com.belman.domain.photo.PhotoDocument;
 import com.belman.domain.photo.PhotoId;
-import com.belman.domain.photo.PhotoStatus;
+import com.belman.domain.PhotoStatus;
 import com.belman.domain.photo.PhotoTemplate;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.security.HashedPassword;
