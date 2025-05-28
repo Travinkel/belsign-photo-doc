@@ -98,7 +98,7 @@ This document outlines the tasks needed to complete the implementation of the Be
 - [ ] Implement tests for view models
 
 ### 5.2 Integration Testing
-- [ ] Add integration tests for database operations
+- [x] Add integration tests for database operations
 - [ ] Implement tests for service interactions
 - [ ] Add tests for external service integrations
 - [ ] Implement end-to-end tests for key workflows

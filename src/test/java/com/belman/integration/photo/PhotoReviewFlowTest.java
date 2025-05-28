@@ -11,9 +11,9 @@ import com.belman.domain.order.OrderId;
 import com.belman.domain.order.OrderNumber;
 import com.belman.domain.order.OrderStatus;
 import com.belman.domain.photo.Photo;
+import com.belman.domain.photo.PhotoAnnotation;
 import com.belman.domain.photo.PhotoDocument;
 import com.belman.domain.photo.PhotoId;
-import com.belman.domain.PhotoStatus;
 import com.belman.domain.photo.PhotoTemplate;
 import com.belman.domain.security.AuthenticationService;
 import com.belman.domain.security.HashedPassword;
@@ -23,7 +23,6 @@ import com.belman.domain.user.UserId;
 import com.belman.domain.user.UserReference;
 import com.belman.domain.user.Username;
 import com.belman.domain.user.UserRole;
-import com.belman.presentation.usecases.qa.QAFlowContext;
 import com.belman.presentation.usecases.qa.review.PhotoReviewViewModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,12 +31,13 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**
@@ -65,6 +65,12 @@ public class PhotoReviewFlowTest {
     @Mock
     private com.belman.domain.services.LoggerFactory loggerFactory;
 
+    @Mock
+    private com.belman.domain.order.OrderRepository orderRepository;
+
+    @Mock
+    private com.belman.domain.photo.PhotoRepository photoRepository;
+
     private UserBusiness testQAEngineer;
     private OrderBusiness testOrder;
     private List<PhotoDocument> testPhotos;
@@ -73,9 +79,6 @@ public class PhotoReviewFlowTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         System.out.println("[DEBUG_LOG] Setting up PhotoReviewFlowTest");
-
-        // Clear any previous state
-        QAFlowContext.clear();
 
         // Clear ServiceLocator and register necessary services
         com.belman.bootstrap.di.ServiceLocator.clear();
@@ -119,6 +122,18 @@ public class PhotoReviewFlowTest {
             qaService
         );
 
+        // Register OrderRepository
+        com.belman.bootstrap.di.ServiceLocator.registerService(
+            com.belman.domain.order.OrderRepository.class,
+            orderRepository
+        );
+
+        // Register PhotoRepository
+        com.belman.bootstrap.di.ServiceLocator.registerService(
+            com.belman.domain.photo.PhotoRepository.class,
+            photoRepository
+        );
+
         // Create test QA engineer
         testQAEngineer = createTestQAEngineer();
 
@@ -147,66 +162,79 @@ public class PhotoReviewFlowTest {
         // Configure sessionContext mock to return the test QA engineer
         when(sessionContext.getUser()).thenReturn(Optional.of(testQAEngineer));
 
-        // 1. Set up the order context
-        QAFlowContext.setCurrentOrder(testOrder);
-        
-        // Verify that the order is set in the context
-        assertNotNull(QAFlowContext.getCurrentOrder(), "Order should be set in QAFlowContext");
-        assertEquals(testOrder.getId().id(), QAFlowContext.getCurrentOrder().getId().id(), 
-                    "Order in context should match test order");
-
-        // 2. Test PhotoReviewViewModel
+        // 1. Create the PhotoReviewViewModel
         PhotoReviewViewModel photoReviewViewModel = new PhotoReviewViewModel();
         injectMocks(photoReviewViewModel);
 
-        // Trigger onShow to load the photos
-        photoReviewViewModel.onShow();
-
-        // Verify that photos are loaded
-        assertNotNull(photoReviewViewModel.getPhotos(), "Photos should be loaded");
-        assertFalse(photoReviewViewModel.getPhotos().isEmpty(), "Photo list should not be empty");
+        // 2. Load the order
+        String orderNumberStr = testOrder.getOrderNumber().toString();
+        photoReviewViewModel.loadOrder(orderNumberStr);
+        
+        // Verify that the order is loaded
+        assertEquals(orderNumberStr, photoReviewViewModel.orderNumberProperty().get(), 
+                    "Order number should be set in the view model");
+        assertFalse(photoReviewViewModel.getPhotos().isEmpty(), 
+                    "Photos should be loaded for the order");
         assertEquals(testPhotos.size(), photoReviewViewModel.getPhotos().size(), 
                     "Number of loaded photos should match test photos");
 
-        // 3. Test approving a photo
-        PhotoDocument photoToApprove = testPhotos.get(0);
-        
-        // Mock the QA service to return true for approvePhoto
-        when(qaService.approvePhoto(eq(photoToApprove.getId()), any(UserBusiness.class), anyString()))
-            .thenReturn(true);
-            
-        // Approve the photo
-        boolean approveResult = photoReviewViewModel.approvePhoto(photoToApprove, "Looks good");
+        // 3. Select a photo for review
+        PhotoDocument photoToReview = testPhotos.get(0);
+        photoReviewViewModel.selectPhoto(photoToReview);
+
+        // 4. Test approving a photo
+        boolean approveResult = photoReviewViewModel.approveSelectedPhoto();
         
         // Verify that the photo was approved
         assertTrue(approveResult, "Photo should be approved successfully");
-        verify(qaService).approvePhoto(eq(photoToApprove.getId()), any(UserBusiness.class), eq("Looks good"));
+        verify(photoRepository).save(any(PhotoDocument.class));
 
-        // 4. Test rejecting a photo
+        // 5. Select another photo for review
         PhotoDocument photoToReject = testPhotos.get(1);
-        
-        // Mock the QA service to return true for rejectPhoto
-        when(qaService.rejectPhoto(eq(photoToReject.getId()), any(UserBusiness.class), anyString()))
-            .thenReturn(true);
-            
-        // Reject the photo
-        boolean rejectResult = photoReviewViewModel.rejectPhoto(photoToReject, "Blurry image");
+        photoReviewViewModel.selectPhoto(photoToReject);
+
+        // Set a comment for rejection
+        photoReviewViewModel.commentProperty().set("Blurry image");
+
+        // 6. Test rejecting a photo
+        boolean rejectResult = photoReviewViewModel.rejectSelectedPhoto();
         
         // Verify that the photo was rejected
         assertTrue(rejectResult, "Photo should be rejected successfully");
-        verify(qaService).rejectPhoto(eq(photoToReject.getId()), any(UserBusiness.class), eq("Blurry image"));
+        verify(photoRepository, times(2)).save(any(PhotoDocument.class));
 
-        // 5. Test completing the order review
-        // Mock the QA service to return true for completeOrderReview
-        when(qaService.completeOrderReview(eq(testOrder.getId()), any(UserBusiness.class)))
-            .thenReturn(true);
-            
-        // Complete the order review
-        boolean completeResult = photoReviewViewModel.completeOrderReview();
+        // 7. Test adding an annotation to a photo
+        PhotoDocument photoToAnnotate = testPhotos.get(2);
+        photoReviewViewModel.selectPhoto(photoToAnnotate);
+
+        // Mock the QA service to return a new annotation
+        PhotoAnnotation testAnnotation = new PhotoAnnotation(
+            "annotation-1", 0.5, 0.5, "Test annotation", PhotoAnnotation.AnnotationType.NOTE
+        );
+        when(qaService.createAnnotation(
+            eq(photoToAnnotate.getId()), 
+            eq(0.5), 
+            eq(0.5), 
+            eq("Test annotation"), 
+            eq(PhotoAnnotation.AnnotationType.NOTE)
+        )).thenReturn(testAnnotation);
+
+        // Create the annotation
+        PhotoAnnotation createdAnnotation = photoReviewViewModel.createAnnotation(
+            0.5, 0.5, "Test annotation"
+        );
         
-        // Verify that the order review was completed
-        assertTrue(completeResult, "Order review should be completed successfully");
-        verify(qaService).completeOrderReview(eq(testOrder.getId()), any(UserBusiness.class));
+        // Verify that the annotation was created
+        assertNotNull(createdAnnotation, "Annotation should be created successfully");
+        assertEquals("Test annotation", createdAnnotation.getText(), 
+                    "Annotation text should match");
+
+        // 8. Test approving the order
+        // This will approve any remaining pending photos and update the order status
+        photoReviewViewModel.approveOrder();
+        
+        // Verify that the order status was updated
+        verify(orderRepository).save(any(OrderBusiness.class));
 
         System.out.println("[DEBUG_LOG] Complete photo review flow test completed successfully");
     }
@@ -225,57 +253,63 @@ public class PhotoReviewFlowTest {
         // Configure sessionContext mock to return the test QA engineer
         when(sessionContext.getUser()).thenReturn(Optional.of(testQAEngineer));
 
-        // 1. Set up the order context
-        QAFlowContext.setCurrentOrder(testOrder);
-
-        // 2. Test PhotoReviewViewModel with error during photo loading
-        // Mock the PhotoService to throw an exception when loading photos
-        when(photoService.getPhotosByOrderId(any(OrderId.class)))
-            .thenThrow(new RuntimeException("Failed to load photos"));
-
+        // 1. Create the PhotoReviewViewModel
         PhotoReviewViewModel photoReviewViewModel = new PhotoReviewViewModel();
         injectMocks(photoReviewViewModel);
 
-        // Trigger onShow to attempt loading photos
-        photoReviewViewModel.onShow();
+        // 2. Test error handling when order is not found
+        when(orderRepository.findByOrderNumber(any(OrderNumber.class)))
+            .thenReturn(Optional.empty());
 
-        // Verify that the error is handled (the view model should not crash)
-        // In a real application, this would typically set an error message property
-        assertTrue(photoReviewViewModel.getPhotos().isEmpty(), "Photos should not be loaded due to error");
+        photoReviewViewModel.loadOrder("NON-EXISTENT-ORDER");
+        
+        // Verify that an error message is set
+        assertFalse(photoReviewViewModel.errorMessageProperty().get().isEmpty(), 
+                    "Error message should be set when order is not found");
+        assertTrue(photoReviewViewModel.getPhotos().isEmpty(), 
+                    "No photos should be loaded when order is not found");
 
         // Reset the mock for subsequent tests
-        reset(photoService);
-        when(photoService.getPhotosByOrderId(any(OrderId.class))).thenReturn(testPhotos);
+        reset(orderRepository);
+        when(orderRepository.findByOrderNumber(any(OrderNumber.class)))
+            .thenReturn(Optional.of(testOrder));
 
-        // 3. Test error handling during photo approval
-        PhotoDocument photoToApprove = testPhotos.get(0);
+        // 3. Test error handling when trying to approve without selecting a photo
+        boolean approveResult = photoReviewViewModel.approveSelectedPhoto();
         
-        // Mock the QA service to throw an exception during photo approval
-        when(qaService.approvePhoto(any(PhotoId.class), any(UserBusiness.class), anyString()))
-            .thenThrow(new RuntimeException("Failed to approve photo"));
+        // Verify that the operation fails
+        assertFalse(approveResult, "Approval should fail when no photo is selected");
+        assertFalse(photoReviewViewModel.errorMessageProperty().get().isEmpty(), 
+                    "Error message should be set when no photo is selected");
 
-        // In a real application, this would be handled by the PhotoReviewViewModel
-        // Here we're just verifying that the exception is thrown
-        Exception approveException = assertThrows(RuntimeException.class, () -> {
-            qaService.approvePhoto(photoToApprove.getId(), testQAEngineer, "Looks good");
-        });
+        // 4. Test error handling when trying to reject without a comment
+        // Load the order and select a photo
+        photoReviewViewModel.loadOrder(testOrder.getOrderNumber().toString());
+        photoReviewViewModel.selectPhoto(testPhotos.get(0));
         
-        assertEquals("Failed to approve photo", approveException.getMessage(), "Exception message should match");
+        // Clear the error message
+        photoReviewViewModel.errorMessageProperty().set("");
+        
+        // Try to reject without setting a comment
+        photoReviewViewModel.commentProperty().set("");
+        boolean rejectResult = photoReviewViewModel.rejectSelectedPhoto();
+        
+        // Verify that the operation fails
+        assertFalse(rejectResult, "Rejection should fail when no comment is provided");
+        assertFalse(photoReviewViewModel.errorMessageProperty().get().isEmpty(), 
+                    "Error message should be set when no comment is provided");
 
-        // 4. Test error handling during photo rejection
-        PhotoDocument photoToReject = testPhotos.get(1);
+        // 5. Test error handling when trying to reject an order without a comment
+        // Clear the error message
+        photoReviewViewModel.errorMessageProperty().set("");
         
-        // Mock the QA service to throw an exception during photo rejection
-        when(qaService.rejectPhoto(any(PhotoId.class), any(UserBusiness.class), anyString()))
-            .thenThrow(new RuntimeException("Failed to reject photo"));
-
-        // In a real application, this would be handled by the PhotoReviewViewModel
-        // Here we're just verifying that the exception is thrown
-        Exception rejectException = assertThrows(RuntimeException.class, () -> {
-            qaService.rejectPhoto(photoToReject.getId(), testQAEngineer, "Blurry image");
-        });
+        // Try to reject the order without setting a comment
+        photoReviewViewModel.commentProperty().set("");
+        photoReviewViewModel.rejectOrder();
         
-        assertEquals("Failed to reject photo", rejectException.getMessage(), "Exception message should match");
+        // Verify that an error message is set
+        assertFalse(photoReviewViewModel.errorMessageProperty().get().isEmpty(), 
+                    "Error message should be set when trying to reject an order without a comment");
 
         System.out.println("[DEBUG_LOG] Error handling during photo review test completed successfully");
     }
@@ -318,7 +352,6 @@ public class PhotoReviewFlowTest {
                 .username(new Username("testworker"))
                 .build())
             .uploadedAt(new Timestamp(Instant.now().minusSeconds(3600)))
-            .status(PhotoStatus.PENDING)
             .build());
             
         photos.add(PhotoDocument.builder()
@@ -331,7 +364,6 @@ public class PhotoReviewFlowTest {
                 .username(new Username("testworker"))
                 .build())
             .uploadedAt(new Timestamp(Instant.now().minusSeconds(3000)))
-            .status(PhotoStatus.PENDING)
             .build());
             
         photos.add(PhotoDocument.builder()
@@ -344,41 +376,43 @@ public class PhotoReviewFlowTest {
                 .username(new Username("testworker"))
                 .build())
             .uploadedAt(new Timestamp(Instant.now().minusSeconds(2400)))
-            .status(PhotoStatus.PENDING)
             .build());
             
         return photos;
     }
 
     private void setupMocks() {
-        // Set up OrderService mock
-        when(orderService.getOrderById(any(OrderId.class))).thenReturn(Optional.of(testOrder));
+        // Set up OrderRepository mock
+        when(orderRepository.findByOrderNumber(any(OrderNumber.class))).thenReturn(Optional.of(testOrder));
         
-        // Set up PhotoService mock
-        when(photoService.getPhotosByOrderId(any(OrderId.class))).thenReturn(testPhotos);
+        // Set up PhotoRepository mock
+        when(photoRepository.findByOrderId(any(OrderId.class))).thenReturn(testPhotos);
         
         // Set up AuthenticationService mock
         when(authenticationService.getCurrentUser()).thenReturn(Optional.of(testQAEngineer));
+        
+        // Set up QAService mock
+        when(qaService.getAnnotations(any(PhotoId.class))).thenReturn(new ArrayList<>());
     }
 
     private void injectMocks(PhotoReviewViewModel viewModel) {
         try {
             // Use reflection to inject mocks into the view model
-            java.lang.reflect.Field orderServiceField = viewModel.getClass().getDeclaredField("orderService");
-            orderServiceField.setAccessible(true);
-            orderServiceField.set(viewModel, orderService);
+            java.lang.reflect.Field orderRepositoryField = viewModel.getClass().getDeclaredField("orderRepository");
+            orderRepositoryField.setAccessible(true);
+            orderRepositoryField.set(viewModel, orderRepository);
 
-            java.lang.reflect.Field photoServiceField = viewModel.getClass().getDeclaredField("photoService");
-            photoServiceField.setAccessible(true);
-            photoServiceField.set(viewModel, photoService);
+            java.lang.reflect.Field photoRepositoryField = viewModel.getClass().getDeclaredField("photoRepository");
+            photoRepositoryField.setAccessible(true);
+            photoRepositoryField.set(viewModel, photoRepository);
 
             java.lang.reflect.Field qaServiceField = viewModel.getClass().getDeclaredField("qaService");
             qaServiceField.setAccessible(true);
             qaServiceField.set(viewModel, qaService);
 
-            java.lang.reflect.Field authServiceField = viewModel.getClass().getDeclaredField("authenticationService");
-            authServiceField.setAccessible(true);
-            authServiceField.set(viewModel, authenticationService);
+            java.lang.reflect.Field sessionContextField = viewModel.getClass().getDeclaredField("sessionContext");
+            sessionContextField.setAccessible(true);
+            sessionContextField.set(viewModel, sessionContext);
         } catch (Exception e) {
             System.err.println("[DEBUG_LOG] Error injecting mocks: " + e.getMessage());
             e.printStackTrace();

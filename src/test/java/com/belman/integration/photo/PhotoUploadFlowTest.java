@@ -214,7 +214,7 @@ public class PhotoUploadFlowTest {
 
         // 1. Set up the order context
         WorkerFlowContext.setCurrentOrder(testOrder);
-        
+
         // Verify that the order is set in the context
         assertNotNull(WorkerFlowContext.getCurrentOrder(), "Order should be set in WorkerFlowContext");
         assertEquals(testOrder.getId().id(), WorkerFlowContext.getCurrentOrder().getId().id(), 
@@ -247,17 +247,17 @@ public class PhotoUploadFlowTest {
 
         // 3. Simulate photo capture
         File mockImageFile = new File("test-photo.jpg");
-        
+
         // Create a test photo document
         PhotoDocument photoDocument = createTestPhoto(selectedTemplate);
-        
+
         // Mock the photo service to return our test photo document
         when(photoService.uploadPhoto(any(OrderId.class), any(Photo.class), any(UserBusiness.class)))
             .thenReturn(photoDocument);
-            
+
         // Add the photo to the context (simulating a successful capture)
         WorkerFlowContext.addTakenPhoto(photoDocument);
-        
+
         // Verify that the photo was added to the context
         assertEquals(1, WorkerFlowContext.getTakenPhotos().size(), "Photo should be added to WorkerFlowContext");
         assertEquals(photoDocument.getId().id(), WorkerFlowContext.getTakenPhotos().get(0).getId().id(),
@@ -323,7 +323,7 @@ public class PhotoUploadFlowTest {
         Exception exception = assertThrows(RuntimeException.class, () -> {
             photoService.uploadPhoto(testOrder.getId(), new Photo("test-photo.jpg"), testWorker);
         });
-        
+
         assertEquals("Failed to upload photo", exception.getMessage(), "Exception message should match");
 
         System.out.println("[DEBUG_LOG] Error handling during photo upload test completed successfully");
@@ -376,10 +376,10 @@ public class PhotoUploadFlowTest {
     private void setupMocks() {
         // Set up OrderService mock
         when(orderService.getOrderById(any(OrderId.class))).thenReturn(Optional.of(testOrder));
-        
+
         // Set up PhotoTemplateService mock
-        when(photoTemplateService.getRequiredTemplates()).thenReturn(testTemplates);
-        
+        when(photoTemplateService.getAvailableTemplates(any(OrderId.class))).thenReturn(testTemplates);
+
         // Set up AuthenticationService mock
         when(authenticationService.getCurrentUser()).thenReturn(Optional.of(testWorker));
     }
