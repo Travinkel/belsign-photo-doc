@@ -1,6 +1,6 @@
 package com.belman.domain.order.policy;
 
-import com.belman.domain.common.Money;
+import com.belman.common.value.Money;
 import com.belman.domain.order.OrderBusiness;
 import com.belman.domain.order.ProductDescription;
 
