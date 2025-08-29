@@ -148,7 +148,7 @@ public class StateManager {
      */
     @SuppressWarnings("unchecked")
     public <T> Property<T> getStateProperty(StateKey<T> key) {
-        return StateStore.getInstance().getPropertyTyped(key);
+        return (Property<T>) StateStore.getInstance().getPropertyTyped(key);
     }
 
     /**
@@ -218,7 +218,7 @@ public class StateManager {
      */
     @SuppressWarnings("unchecked")
     public <T> NestedProperty<T> getNestedProperty(StateKey<T> key) {
-        return StateStore.getInstance().getNestedPropertyTyped(key);
+        return (NestedProperty<T>) StateStore.getInstance().getNestedPropertyTyped(key);
     }
 
     /**
