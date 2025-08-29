@@ -35,30 +35,30 @@ public class ArchitecturalAntipatternTest {
     }
 
     /**
-     * Detects service classes that directly use repository implementations instead of interfaces.
-     * This is an antipattern because it creates tight coupling between services and repository implementations.
+     * Detects business classes that directly use data implementations instead of interfaces.
+     * This is an antipattern because it creates tight coupling between business and data implementations.
      */
     @Test
-    public void servicesShouldNotDependOnRepositoryImplementations() {
+    public void businessShouldNotDependOnDataImplementations() {
         ArchRule rule = noClasses()
-                .that().resideInAPackage("com.belman.service..")
-                .should().dependOnClassesThat().resideInAPackage("com.belman.repository.persistence..")
-                .because("Services should depend on repository interfaces, not implementations");
+                .that().resideInAPackage("com.belman.business..")
+                .should().dependOnClassesThat().resideInAPackage("com.belman.data.persistence..")
+                .because("Business should depend on data interfaces, not implementations");
 
         rule.check(importedClasses);
     }
 
     /**
-     * Detects UI classes that directly access repositories, bypassing the service layer.
+     * Detects UI classes that directly access data layer, bypassing the business layer.
      * This is an antipattern because it violates the layered architecture.
      */
     @Test
-    public void uiShouldNotDependOnRepositories() {
+    public void uiShouldNotDependOnDataLayer() {
         ArchRule rule = noClasses()
-                .that().resideInAPackage("com.belman.ui..")
-                .should().dependOnClassesThat().resideInAPackage("com.belman.repository..")
+                .that().resideInAPackage("com.belman.presentation..")
+                .should().dependOnClassesThat().resideInAPackage("com.belman.data..")
                 .because(
-                        "UI classes should not directly access repositories, they should go through the service layer");
+                        "UI classes should not directly access data layer, they should go through the business layer");
 
         rule.check(importedClasses);
     }
@@ -262,18 +262,18 @@ public class ArchitecturalAntipatternTest {
     }
 
     /**
-     * Detects service classes that depend on concrete implementations instead of interfaces.
+     * Detects business classes that depend on concrete implementations instead of interfaces.
      * This is an antipattern because it creates tight coupling and makes testing harder.
      */
     @Test
-    public void servicesShouldDependOnInterfaces() {
-        // Define a predicate to identify service classes
-        DescribedPredicate<JavaClass> isServiceClass = new DescribedPredicate<JavaClass>("is a service class") {
+    public void businessShouldDependOnInterfaces() {
+        // Define a predicate to identify business classes
+        DescribedPredicate<JavaClass> isBusinessClass = new DescribedPredicate<JavaClass>("is a business class") {
             @Override
             public boolean test(JavaClass javaClass) {
-                return javaClass.getSimpleName().endsWith("Service") &&
+                return javaClass.getSimpleName().endsWith("Business") &&
                        !javaClass.isInterface() &&
-                       javaClass.getPackageName().contains("service");
+                       javaClass.getPackageName().contains("business");
             }
         };
 
@@ -292,10 +292,10 @@ public class ArchitecturalAntipatternTest {
 
                     // Check if the field is of a concrete type that should be an interface
                     if (!field.getRawType().isInterface() &&
-                        (field.getRawType().getSimpleName().endsWith("Repository") ||
-                         field.getRawType().getSimpleName().endsWith("Service"))) {
+                        (field.getRawType().getSimpleName().endsWith("Data") ||
+                         field.getRawType().getSimpleName().endsWith("Business"))) {
                         String message = String.format(
-                                "Service class %s depends on concrete implementation %s instead of an interface",
+                                "Business class %s depends on concrete implementation %s instead of an interface",
                                 javaClass.getName(), field.getRawType().getName());
                         events.add(SimpleConditionEvent.violated(javaClass, message));
                     }
@@ -304,9 +304,9 @@ public class ArchitecturalAntipatternTest {
         };
 
         ArchRule rule = classes()
-                .that(isServiceClass)
+                .that(isBusinessClass)
                 .should(dependOnInterfaces)
-                .because("Services should depend on interfaces, not concrete implementations");
+                .because("Business should depend on interfaces, not concrete implementations");
 
         rule.check(importedClasses);
     }

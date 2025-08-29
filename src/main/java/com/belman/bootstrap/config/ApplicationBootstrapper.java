@@ -19,8 +19,8 @@ public class ApplicationBootstrapper {
 
         // Initialize the ServiceRegistry with a logger first
         logger.debug("Initializing LoggerFactory");
-        com.belman.repository.logging.EmojiLoggerFactory loggerFactory =
-                com.belman.repository.logging.EmojiLoggerFactory.getInstance();
+        com.belman.data.logging.EmojiLoggerFactory loggerFactory =
+                com.belman.data.logging.EmojiLoggerFactory.getInstance();
         ServiceRegistry.setLogger(loggerFactory);
         ServiceRegistry.registerService(loggerFactory);
 

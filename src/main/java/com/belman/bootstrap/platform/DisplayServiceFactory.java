@@ -1,7 +1,7 @@
 package com.belman.bootstrap.platform;
 
 import com.belman.common.platform.PlatformUtils;
-import com.belman.repository.service.DesktopDisplayServiceFallback;
+import com.belman.data.service.DesktopDisplayServiceFallback;
 import com.gluonhq.attach.display.DisplayService;
 
 import java.util.Optional;

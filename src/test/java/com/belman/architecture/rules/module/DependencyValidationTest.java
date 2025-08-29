@@ -12,7 +12,7 @@ import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
  * Tests to enforce the dependency validation rules between different scopes.
  * These rules match the configuration in .idea/scopes/scope_settings.xml.
  * 
- * Note: Only UI, Service, and Repository are considered layers.
+ * Note: Only Presentation, Business, and Data are considered layers.
  * Domain, Common, and Bootstrap are shared packages that can be used by all layers.
  */
 public class DependencyValidationTest {
@@ -30,9 +30,9 @@ public class DependencyValidationTest {
                 .consideringAllDependencies()
 
                 // Layers
-                .layer("UI").definedBy("com.belman.ui..")
-                .layer("Service").definedBy("com.belman.service..")
-                .layer("Repository").definedBy("com.belman.repository..")
+                .layer("Presentation").definedBy("com.belman.presentation..")
+                .layer("Business").definedBy("com.belman.business..")
+                .layer("Data").definedBy("com.belman.data..")
 
                 // Shared packages (not layers, just used by all)
                 .optionalLayer("Domain").definedBy("com.belman.domain..")
@@ -40,9 +40,9 @@ public class DependencyValidationTest {
                 .optionalLayer("Bootstrap").definedBy("com.belman.bootstrap..")
 
                 // Rules
-                .whereLayer("UI").mayOnlyAccessLayers("Service", "Domain", "Common", "Bootstrap")
-                .whereLayer("Service").mayOnlyAccessLayers("UI", "Repository", "Domain", "Common", "Bootstrap")
-                .whereLayer("Repository").mayOnlyAccessLayers("Service", "Domain", "Common", "Bootstrap");
+                .whereLayer("Presentation").mayOnlyAccessLayers("Business", "Domain", "Common", "Bootstrap")
+                .whereLayer("Business").mayOnlyAccessLayers("Presentation", "Data", "Domain", "Common", "Bootstrap")
+                .whereLayer("Data").mayOnlyAccessLayers("Business", "Domain", "Common", "Bootstrap");
 
         rule.check(importedClasses);
     }

@@ -9,7 +9,7 @@ import com.belman.domain.security.HashedPassword;
 import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserId;
 import com.belman.domain.user.Username;
-import com.belman.repository.email.SmtpEmailService;
+import com.belman.data.email.SmtpEmailService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

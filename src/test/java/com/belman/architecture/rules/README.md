@@ -15,7 +15,7 @@ Located in `com.belman.architecture.rules.module`:
 - **DependencyValidationTest**: Verifies that dependencies between layers follow the defined rules.
 - **BootstrapLayerTest**: Verifies that bootstrap code follows the correct patterns.
 - **CommonPackageTest**: Verifies that common code follows the correct patterns.
-- **ServiceLayerUseCaseTest**: Verifies that service layer usecases follow the correct patterns.
+- **BusinessLayerUseCaseTest**: Verifies that business layer usecases follow the correct patterns.
 
 ### 2. Three-Layer Architecture Tests
 
@@ -99,11 +99,11 @@ Example:
 ```java
 
 @Test
-public void servicesShouldNotDependOnRepositoryImplementations() {
+public void businessesShouldNotDependOnDataImplementations() {
     ArchRule rule = noClasses()
-            .that().resideInAPackage("com.belman.service..")
-            .should().dependOnClassesThat().resideInAPackage("com.belman.repository.persistence..")
-            .because("Services should depend on repository interfaces, not implementations");
+            .that().resideInAPackage("com.belman.business..")
+            .should().dependOnClassesThat().resideInAPackage("com.belman.data.persistence..")
+            .because("business should depend on data interfaces, not implementations");
 
     rule.check(importedClasses);
 }

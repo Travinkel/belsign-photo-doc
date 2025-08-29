@@ -1,7 +1,7 @@
 package com.belman.bootstrap.camera;
 
 import com.belman.domain.services.CameraService;
-import com.belman.repository.camera.GluonCameraService;
+import com.belman.data.camera.GluonCameraService;
 
 import java.io.File;
 import java.util.Optional;
