@@ -27,9 +27,9 @@ public class MVVMCArchitectureTest {
         // Controllers should be in the same package as their corresponding views
         ArchRule rule = classes()
                 .that().haveSimpleNameEndingWith("Controller")
-                .and().resideInAPackage("com.belman.ui..")
+                .and().resideInAPackage("com.belman.presentation..")
                 .and().haveSimpleNameNotStartingWith("Base")
-                .should().resideInAPackage("com.belman.ui..views..")
+                .should().resideInAPackage("com.belman.presentation..views..")
                 .because(
                         "Controllers should be in the same package as their corresponding views in MVVMC architecture");
 
@@ -41,7 +41,7 @@ public class MVVMCArchitectureTest {
         // Controllers should have corresponding views
         ArchRule rule = classes()
                 .that().haveSimpleNameEndingWith("Controller")
-                .and().resideInAPackage("com.belman.ui..")
+                .and().resideInAPackage("com.belman.presentation..")
                 .should().haveSimpleNameStartingWith("")
                 .because("Controllers should have corresponding views in MVVMC architecture");
 
@@ -67,7 +67,7 @@ public class MVVMCArchitectureTest {
         // Controllers should depend on view models
         ArchRule rule = classes()
                 .that().haveSimpleNameEndingWith("Controller")
-                .and().resideInAPackage("com.belman.ui..")
+                .and().resideInAPackage("com.belman.presentation..")
                 .should().dependOnClassesThat().haveSimpleNameEndingWith("ViewModel")
                 .because("Controllers should depend on view models in MVVMC architecture");
 
@@ -79,7 +79,7 @@ public class MVVMCArchitectureTest {
         // Views should have corresponding view models
         ArchRule rule = classes()
                 .that().haveSimpleNameEndingWith("View")
-                .and().resideInAPackage("com.belman.ui..")
+                .and().resideInAPackage("com.belman.presentation..")
                 .and().areNotInterfaces()
                 .should().dependOnClassesThat().haveSimpleNameEndingWith("ViewModel")
                 .because("Views should have corresponding view models in MVVMC architecture");
@@ -93,7 +93,7 @@ public class MVVMCArchitectureTest {
     //     // Views should have corresponding controllers
     //     ArchRule rule = classes()
     //             .that().haveSimpleNameEndingWith("View")
-    //             .and().resideInAPackage("com.belman.ui..")
+    //             .and().resideInAPackage("com.belman.presentation..")
     //             .and().areNotInterfaces()
     //             .should().dependOnClassesThat().haveSimpleNameEndingWith("Controller")
     //             .because("Views should have corresponding controllers in MVVMC architecture");

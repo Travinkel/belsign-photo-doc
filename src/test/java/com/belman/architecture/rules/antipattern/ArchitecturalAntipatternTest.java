@@ -55,7 +55,7 @@ public class ArchitecturalAntipatternTest {
     @Test
     public void uiShouldNotDependOnRepositories() {
         ArchRule rule = noClasses()
-                .that().resideInAPackage("com.belman.ui..")
+                .that().resideInAPackage("com.belman.presentation..")
                 .should().dependOnClassesThat().resideInAPackage("com.belman.repository..")
                 .because(
                         "UI classes should not directly access repositories, they should go through the service layer");

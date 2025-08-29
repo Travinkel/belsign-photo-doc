@@ -3,7 +3,7 @@ package com.belman.service.session;
 import com.belman.domain.user.UserBusiness;
 import com.belman.repository.logging.EmojiLoggerFactory;
 import com.belman.service.base.BaseService;
-import com.belman.ui.navigation.Router;
+import com.belman.presentation.navigation.Router;
 
 import java.util.Optional;
 import java.util.logging.Logger;
