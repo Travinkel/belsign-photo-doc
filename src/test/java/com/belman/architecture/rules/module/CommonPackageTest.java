@@ -88,7 +88,7 @@ public class CommonPackageTest {
                 .and().areNotInterfaces()
                 .and().areNotEnums()
                 .and().haveSimpleNameNotContaining("ValidationResult")
-                .should().implement("com.belman.common.value.base.DataObject")
+                .should().implement("com.belman.domain.common.base.DataObject")
                 .because("Common value objects should implement DataObject");
 
         rule.check(importedClasses);
