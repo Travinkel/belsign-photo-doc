@@ -8,8 +8,8 @@ import com.belman.domain.user.UserBusiness;
 import com.belman.domain.user.UserRepository;
 import com.belman.domain.user.UserRole;
 import com.belman.domain.user.Username;
-import com.belman.service.session.SessionManager;
-import com.belman.service.usecase.security.DefaultAuthenticationService;
+import com.belman.business.session.SessionManager;
+import com.belman.business.usecase.security.DefaultAuthenticationService;
 
 import java.util.Optional;
 

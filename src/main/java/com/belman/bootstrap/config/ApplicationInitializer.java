@@ -17,11 +17,11 @@ import com.belman.domain.user.UserDataAccess;
 import com.belman.domain.user.UserRepository;
 import com.belman.domain.user.rbac.AccessPolicyFactory;
 import com.belman.domain.user.rbac.RoleBasedAccessControlFactory;
-import com.belman.repository.persistence.adapter.*;
-import com.belman.repository.persistence.memory.*;
-import com.belman.service.session.SessionManager;
-import com.belman.service.usecase.photo.DefaultPhotoService;
-import com.belman.service.usecase.security.DefaultAuthenticationService;
+import com.belman.data.persistence.adapter.*;
+import com.belman.data.persistence.memory.*;
+import com.belman.business.session.SessionManager;
+import com.belman.business.usecase.photo.DefaultPhotoService;
+import com.belman.business.usecase.security.DefaultAuthenticationService;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Constructor;

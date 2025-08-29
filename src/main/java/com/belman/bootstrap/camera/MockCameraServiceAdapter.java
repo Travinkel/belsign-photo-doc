@@ -1,7 +1,7 @@
 package com.belman.bootstrap.camera;
 
 import com.belman.domain.services.CameraService;
-import com.belman.repository.service.MockCameraService;
+import com.belman.data.service.MockCameraService;
 import javafx.stage.Stage;
 
 import java.io.File;

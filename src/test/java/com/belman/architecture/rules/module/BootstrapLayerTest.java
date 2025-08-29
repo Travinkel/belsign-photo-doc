@@ -30,7 +30,7 @@ public class BootstrapLayerTest {
                 .or().haveSimpleNameEndingWith("Bootstrapper")
                 .or().haveSimpleNameEndingWith("Main")
                 .and().haveSimpleNameNotEndingWith("Test")
-                .and().resideInAnyPackage("com.belman.repository..", "com.belman.bootstrap..")
+                .and().resideInAnyPackage("com.belman.data..", "com.belman.bootstrap..")
                 .should().resideInAPackage("com.belman.bootstrap..")
                 .because("Bootstrap code should only be in the bootstrap package");
 

@@ -6,8 +6,8 @@ import com.belman.domain.common.PersonName;
 import com.belman.domain.security.HashedPassword;
 import com.belman.domain.security.PasswordHasher;
 import com.belman.domain.user.*;
-import com.belman.repository.persistence.sql.SqlUserRepository;
-import com.belman.service.usecase.security.BCryptPasswordHasher;
+import com.belman.data.persistence.sql.SqlUserRepository;
+import com.belman.business.usecase.security.BCryptPasswordHasher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

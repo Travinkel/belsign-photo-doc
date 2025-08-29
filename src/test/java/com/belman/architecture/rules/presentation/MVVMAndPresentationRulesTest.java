@@ -26,7 +26,7 @@ public class MVVMAndPresentationRulesTest {
     public void viewModelsShouldResideInUiLayer() {
         ArchRule rule = classes()
                 .that().haveNameMatching(".*ViewModel")
-                .should().resideInAPackage("com.belman.ui..")
+                .should().resideInAPackage("com.belman.presentation..")
                 .because("ViewModels should be in the UI layer following MVVM pattern");
 
         rule.check(importedClasses);
@@ -35,12 +35,12 @@ public class MVVMAndPresentationRulesTest {
     @Test
     public void viewsShouldOnlyDependOnViewModels() {
         ArchRule rule = classes()
-                .that().resideInAPackage("com.belman.ui..views..")
+                .that().resideInAPackage("com.belman.presentation..views..")
                 .should().onlyDependOnClassesThat()
                 .resideInAnyPackage(
-                        "com.belman.ui..views..",
-                        "com.belman.ui..common..",
-                        "com.belman.ui..navigation..",
+                        "com.belman.presentation..views..",
+                        "com.belman.presentation..common..",
+                        "com.belman.presentation..navigation..",
                         "java..", "javafx..", "com.gluonhq..",
                         // Common utilities and language features
                         "org.slf4j..", "ch.qos.logback.."
@@ -54,7 +54,7 @@ public class MVVMAndPresentationRulesTest {
     public void viewModelsShouldNotDependOnViews() {
         ArchRule rule = noClasses()
                 .that().haveNameMatching(".*ViewModel")
-                .should().dependOnClassesThat().resideInAPackage("com.belman.ui..views..")
+                .should().dependOnClassesThat().resideInAPackage("com.belman.presentation..views..")
                 .because("ViewModels should not depend on Views in MVVM architecture");
 
         rule.check(importedClasses);
@@ -64,7 +64,7 @@ public class MVVMAndPresentationRulesTest {
     public void coordinatorsShouldManageNavigation() {
         ArchRule rule = classes()
                 .that().haveNameMatching(".*Coordinator")
-                .should().resideInAPackage("com.belman.ui..navigation..")
+                .should().resideInAPackage("com.belman.presentation..navigation..")
                 .because("Coordinators should handle navigation in MVVM+C architecture");
 
         rule.check(importedClasses);
@@ -74,7 +74,7 @@ public class MVVMAndPresentationRulesTest {
     public void viewModelsShouldHaveCorrectNaming() {
         ArchRule rule = classes()
                 .that().haveSimpleNameEndingWith("ViewModel")
-                .should().resideInAPackage("com.belman.ui..");
+                .should().resideInAPackage("com.belman.presentation..");
 
         rule.check(importedClasses);
     }
@@ -83,8 +83,8 @@ public class MVVMAndPresentationRulesTest {
     public void controllersShouldResideInUiLayer() {
         ArchRule rule = classes()
                 .that().haveSimpleNameEndingWith("Controller")
-                .and().resideInAPackage("com.belman.ui..")
-                .should().resideInAPackage("com.belman.ui..");
+                .and().resideInAPackage("com.belman.presentation..")
+                .should().resideInAPackage("com.belman.presentation..");
 
         rule.check(importedClasses);
     }
@@ -93,8 +93,8 @@ public class MVVMAndPresentationRulesTest {
     public void viewsShouldResideInUiLayer() {
         ArchRule rule = classes()
                 .that().haveSimpleNameEndingWith("View")
-                .and().resideInAPackage("com.belman.ui..")
-                .should().resideInAPackage("com.belman.ui..");
+                .and().resideInAPackage("com.belman.presentation..")
+                .should().resideInAPackage("com.belman.presentation..");
 
         rule.check(importedClasses);
     }
@@ -102,10 +102,10 @@ public class MVVMAndPresentationRulesTest {
     @Test
     public void uiLayerShouldNotDependOnRepositoryImplementations() {
         ArchRule rule = noClasses()
-                .that().resideInAPackage("com.belman.ui..")
-                .should().dependOnClassesThat().resideInAPackage("com.belman.repository.persistence..")
-                .orShould().dependOnClassesThat().resideInAPackage("com.belman.repository.email..")
-                .orShould().dependOnClassesThat().resideInAPackage("com.belman.repository.camera..");
+                .that().resideInAPackage("com.belman.presentation..")
+                .should().dependOnClassesThat().resideInAPackage("com.belman.data.persistence..")
+                .orShould().dependOnClassesThat().resideInAPackage("com.belman.data.email..")
+                .orShould().dependOnClassesThat().resideInAPackage("com.belman.data.camera..");
 
         rule.check(importedClasses);
     }
@@ -113,12 +113,12 @@ public class MVVMAndPresentationRulesTest {
     @Test
     public void uiLayerShouldOnlyDependOnDomainAndService() {
         ArchRule rule = classes()
-                .that().resideInAPackage("com.belman.ui..")
+                .that().resideInAPackage("com.belman.presentation..")
                 .should().onlyDependOnClassesThat()
                 .resideInAnyPackage(
-                        "com.belman.ui..",
+                        "com.belman.presentation..",
                         "com.belman.domain..",
-                        "com.belman.service..",
+                        "com.belman.business..",
                         "com.belman.common..",
                         "java..",
                         "javafx..",
@@ -145,7 +145,7 @@ public class MVVMAndPresentationRulesTest {
         // This rule checks that View classes don't have too many methods
         ArchRule rule = classes()
                 .that().haveSimpleNameEndingWith("View")
-                .and().resideInAPackage("com.belman.ui..")
+                .and().resideInAPackage("com.belman.presentation..")
                 .should().haveOnlyFinalFields();
 
         rule.check(importedClasses);
