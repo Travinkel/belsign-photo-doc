@@ -1,6 +1,6 @@
 package com.belman.common.value;
 
-import com.belman.common.value.base.DataObject;
+import com.belman.domain.common.base.DataObject;
 
 import java.util.regex.Pattern;
 
