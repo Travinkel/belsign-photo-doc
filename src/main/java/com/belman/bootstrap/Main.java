@@ -15,10 +15,10 @@ import com.belman.domain.services.Logger;
 import com.belman.domain.services.LoggerFactory;
 import com.belman.repository.logging.EmojiLoggerAdapter;
 import com.belman.service.error.ErrorHandler;
-import com.belman.ui.core.UIErrorHandlerAdapter;
-import com.belman.ui.navigation.RouteGuardImpl;
-import com.belman.ui.navigation.Router;
-import com.belman.ui.views.splash.SplashView;
+import com.belman.presentation.core.UIErrorHandlerAdapter;
+import com.belman.presentation.navigation.RouteGuardImpl;
+import com.belman.presentation.navigation.Router;
+import com.belman.presentation.views.splash.SplashView;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.mvc.View;
 import javafx.scene.Scene;
@@ -125,43 +125,43 @@ public class Main extends MobileApplication {
 
         // Register the login view
         logger.debug("Registering login view");
-        this.addViewFactory(com.belman.ui.views.login.LoginView.class.getSimpleName(),
-                com.belman.ui.views.login.LoginView::new);
+        this.addViewFactory(com.belman.presentation.views.login.LoginView.class.getSimpleName(),
+                com.belman.presentation.views.login.LoginView::new);
 
         // Register the admin view
         logger.debug("Registering admin view");
-        this.addViewFactory(com.belman.ui.views.admin.AdminView.class.getSimpleName(),
-                com.belman.ui.views.admin.AdminView::new);
+        this.addViewFactory(com.belman.presentation.views.admin.AdminView.class.getSimpleName(),
+                com.belman.presentation.views.admin.AdminView::new);
 
         // Register the order gallery view
         logger.debug("Registering order gallery view");
-        this.addViewFactory(com.belman.ui.views.ordergallery.OrderGalleryView.class.getSimpleName(),
-                com.belman.ui.views.ordergallery.OrderGalleryView::new);
+        this.addViewFactory(com.belman.presentation.views.ordergallery.OrderGalleryView.class.getSimpleName(),
+                com.belman.presentation.views.ordergallery.OrderGalleryView::new);
 
         // Register the photo review view
         logger.debug("Registering photo review view");
-        this.addViewFactory(com.belman.ui.views.photoreview.PhotoReviewView.class.getSimpleName(),
-                com.belman.ui.views.photoreview.PhotoReviewView::new);
+        this.addViewFactory(com.belman.presentation.views.photoreview.PhotoReviewView.class.getSimpleName(),
+                com.belman.presentation.views.photoreview.PhotoReviewView::new);
 
         // Register the photo upload view
         logger.debug("Registering photo upload view");
-        this.addViewFactory(com.belman.ui.views.photoupload.PhotoUploadView.class.getSimpleName(),
-                com.belman.ui.views.photoupload.PhotoUploadView::new);
+        this.addViewFactory(com.belman.presentation.views.photoupload.PhotoUploadView.class.getSimpleName(),
+                com.belman.presentation.views.photoupload.PhotoUploadView::new);
 
         // Register the QA dashboard view
         logger.debug("Registering QA dashboard view");
-        this.addViewFactory(com.belman.ui.views.qadashboard.QADashboardView.class.getSimpleName(),
-                com.belman.ui.views.qadashboard.QADashboardView::new);
+        this.addViewFactory(com.belman.presentation.views.qadashboard.QADashboardView.class.getSimpleName(),
+                com.belman.presentation.views.qadashboard.QADashboardView::new);
 
         // Register the report preview view
         logger.debug("Registering report preview view");
-        this.addViewFactory(com.belman.ui.views.reportpreview.ReportPreviewView.class.getSimpleName(),
-                com.belman.ui.views.reportpreview.ReportPreviewView::new);
+        this.addViewFactory(com.belman.presentation.views.reportpreview.ReportPreviewView.class.getSimpleName(),
+                com.belman.presentation.views.reportpreview.ReportPreviewView::new);
 
         // Register the user management view
         logger.debug("Registering user management view");
-        this.addViewFactory(com.belman.ui.views.usermanagement.UserManagementView.class.getSimpleName(),
-                com.belman.ui.views.usermanagement.UserManagementView::new);
+        this.addViewFactory(com.belman.presentation.views.usermanagement.UserManagementView.class.getSimpleName(),
+                com.belman.presentation.views.usermanagement.UserManagementView::new);
     }
 
     /**

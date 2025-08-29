@@ -30,7 +30,7 @@ public class DependencyValidationTest {
                 .consideringAllDependencies()
 
                 // Layers
-                .layer("UI").definedBy("com.belman.ui..")
+                .layer("UI").definedBy("com.belman.presentation..")
                 .layer("Service").definedBy("com.belman.service..")
                 .layer("Repository").definedBy("com.belman.repository..")
 

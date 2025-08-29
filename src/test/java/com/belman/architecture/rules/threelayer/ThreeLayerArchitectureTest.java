@@ -31,7 +31,7 @@ public class ThreeLayerArchitectureTest {
         // This test checks that the production code follows the layered architecture
         ArchRule rule = layeredArchitecture()
                 .consideringAllDependencies()
-                .layer("UI").definedBy("com.belman.ui..")
+                .layer("UI").definedBy("com.belman.presentation..")
                 .layer("Service").definedBy("com.belman.service..")
                 .layer("Repository").definedBy("com.belman.repository..")
                 .layer("Domain").definedBy("com.belman.domain..")
@@ -58,7 +58,7 @@ public class ThreeLayerArchitectureTest {
     public void uiLayerShouldNotDependOnInternalRepositoryImplementations() {
         // Allow UI layer to depend on repository layer services and utilities,
         // but not on internal repository implementations
-        ArchRule rule = noClasses().that().resideInAPackage("com.belman.ui..")
+        ArchRule rule = noClasses().that().resideInAPackage("com.belman.presentation..")
                 .should().dependOnClassesThat().resideInAnyPackage(
                         "com.belman.repository.persistence..",
                         "com.belman.repository.implementation..");
@@ -71,7 +71,7 @@ public class ThreeLayerArchitectureTest {
         // Service layer should not depend on UI layer except through interfaces
         ArchRule rule = noClasses().that().resideInAPackage("com.belman.service..")
                 .and().areNotInterfaces()
-                .should().dependOnClassesThat().resideInAPackage("com.belman.ui..");
+                .should().dependOnClassesThat().resideInAPackage("com.belman.presentation..");
 
         rule.check(importedClasses);
     }
@@ -89,7 +89,7 @@ public class ThreeLayerArchitectureTest {
                                !javaClass.getPackageName().contains("bootstrap");
                     }
                 })
-                .should().dependOnClassesThat().resideInAnyPackage("com.belman.ui..");
+                .should().dependOnClassesThat().resideInAnyPackage("com.belman.presentation..");
 
         rule.check(importedClasses);
     }
@@ -105,7 +105,7 @@ public class ThreeLayerArchitectureTest {
                         return !javaClass.getSimpleName().equals("BaseViewModel");
                     }
                 })
-                .should().resideInAPackage("com.belman.ui.views..");
+                .should().resideInAPackage("com.belman.presentation.views..");
 
         rule.check(importedClasses);
     }
@@ -115,8 +115,8 @@ public class ThreeLayerArchitectureTest {
         // Allow base controllers in the ui.core package,
         // but require view controllers to be in the ui.views package
         ArchRule rule = classes().that().haveNameMatching(".*Controller")
-                .and().resideInAPackage("com.belman.ui.views..")
-                .should().resideInAPackage("com.belman.ui.views..");
+                .and().resideInAPackage("com.belman.presentation.views..")
+                .should().resideInAPackage("com.belman.presentation.views..");
 
         rule.check(importedClasses);
     }
@@ -171,7 +171,7 @@ public class ThreeLayerArchitectureTest {
                         return !javaClass.getSimpleName().equals("BaseView");
                     }
                 })
-                .should().resideInAPackage("com.belman.ui.views..");
+                .should().resideInAPackage("com.belman.presentation.views..");
 
         rule.check(importedClasses);
     }

@@ -91,7 +91,7 @@ public class ServiceLayerUseCaseTest {
                 .or().haveSimpleNameEndingWith("Service")
                 .and().areNotInterfaces()
                 .and().haveSimpleNameNotEndingWith("Test")
-                .should().dependOnClassesThat().resideInAPackage("com.belman.ui..")
+                .should().dependOnClassesThat().resideInAPackage("com.belman.presentation..")
                 .because("Usecases should not depend on the UI layer");
 
         rule.check(importedClasses);
