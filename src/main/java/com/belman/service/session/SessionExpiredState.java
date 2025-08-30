@@ -13,9 +13,6 @@ public class SessionExpiredState implements SessionState {
         // Clear the current user
         context.setUser(null);
         
-        // Navigate to login view
-        context.navigateToLogin();
-        
         // Transition to logged out state
         context.setState(new LoggedOutState());
     }

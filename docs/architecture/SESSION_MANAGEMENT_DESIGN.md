@@ -59,7 +59,7 @@ public class DefaultSessionService implements SessionService {
 
 ### SessionContext
 
-The `SessionContext` interface defines the methods for managing the session state and providing session-related operations:
+The `SessionContext` interface defines the methods for managing the session state and providing session-related operations. Navigation responsibilities are handled separately in the presentation layer:
 
 ```java
 public interface SessionContext {
@@ -68,8 +68,6 @@ public interface SessionContext {
     void setState(SessionState state);
     SessionState getState();
     void logEvent(String message);
-    void navigateToUserHome();
-    void navigateToLogin();
     void refreshSession();
     boolean isSessionValid();
 }
@@ -81,54 +79,42 @@ The `DefaultSessionContext` implementation uses the `SessionService` and provide
 public class DefaultSessionContext implements SessionContext {
     private final SessionService sessionService;
     private SessionState currentState;
-    private final Logger logger;
-    
+
     public DefaultSessionContext(SessionService sessionService) {
         this.sessionService = sessionService;
-        this.logger = LoggerFactory.getLogger(DefaultSessionContext.class);
         this.currentState = new LoggedOutState();
     }
-    
+
     @Override
     public void setUser(UserBusiness user) {
         // Implementation
     }
-    
+
     @Override
     public Optional<UserBusiness> getUser() {
         return sessionService.getCurrentUser();
     }
-    
+
     @Override
     public void setState(SessionState state) {
         this.currentState = state;
     }
-    
+
     @Override
     public SessionState getState() {
         return currentState;
     }
-    
+
     @Override
     public void logEvent(String message) {
-        logger.info(message);
+        // Implementation depends on logging requirements
     }
-    
-    @Override
-    public void navigateToUserHome() {
-        // Implementation depends on navigation requirements
-    }
-    
-    @Override
-    public void navigateToLogin() {
-        // Implementation depends on navigation requirements
-    }
-    
+
     @Override
     public void refreshSession() {
         sessionService.refreshSession();
     }
-    
+
     @Override
     public boolean isSessionValid() {
         return sessionService.isLoggedIn();
@@ -157,63 +143,61 @@ Concrete implementations of `SessionState` include:
 
 ### Role-Based Navigation
 
-Role-based navigation is implemented in the UI layer using the `SessionContext`:
+Role-based navigation is implemented in the UI layer using a `RoleBasedNavigationService` that relies on the `SessionContext` for user information:
 
 ```java
 public class RoleBasedNavigationService {
     private final SessionContext sessionContext;
-    private final Router router;
-    
-    public RoleBasedNavigationService(SessionContext sessionContext, Router router) {
+
+    public RoleBasedNavigationService(SessionContext sessionContext) {
         this.sessionContext = sessionContext;
-        this.router = router;
     }
-    
+
     public void navigateToUserHome() {
         Optional<UserBusiness> userOpt = sessionContext.getUser();
         if (userOpt.isPresent()) {
             UserBusiness user = userOpt.get();
             if (user.getRoles().contains(UserRole.ADMIN)) {
-                router.navigateTo(UserManagementView.class);
+                Router.navigateTo(UserManagementView.class);
             } else if (user.getRoles().contains(UserRole.QA)) {
-                router.navigateTo(QADashboardView.class);
+                Router.navigateTo(QADashboardView.class);
             } else if (user.getRoles().contains(UserRole.PRODUCTION)) {
-                router.navigateTo(PhotoUploadView.class);
+                Router.navigateTo(PhotoUploadView.class);
             } else {
-                // Default to photo upload view
-                router.navigateTo(PhotoUploadView.class);
+                Router.navigateTo(PhotoUploadView.class);
             }
         } else {
-            // If no user is logged in, navigate to login view
             navigateToLogin();
         }
     }
-    
+
     public void navigateToLogin() {
-        router.navigateTo(LoginView.class);
+        Router.navigateTo(LoginView.class);
     }
 }
 ```
 
 ## Integration with UI Layer
 
-The UI layer uses the `SessionContext` to manage user sessions and navigation:
+The UI layer uses the `SessionContext` to manage user sessions and a `RoleBasedNavigationService` for navigation:
 
 ```java
 public class LoginViewModel extends BaseViewModel<LoginViewModel> {
     private final SessionContext sessionContext;
-    
+    private final RoleBasedNavigationService navigationService;
+
     public LoginViewModel(SessionContext sessionContext) {
         this.sessionContext = sessionContext;
+        this.navigationService = new RoleBasedNavigationService(sessionContext);
     }
-    
+
     public void login() {
         // Implementation
     }
-    
+
     public void logout() {
-        sessionContext.logout();
-        sessionContext.navigateToLogin();
+        sessionContext.setUser(null);
+        navigationService.navigateToLogin();
     }
 }
 ```

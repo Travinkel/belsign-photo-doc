@@ -3,10 +3,8 @@ package com.belman.service.session;
 import com.belman.domain.user.UserBusiness;
 import com.belman.repository.logging.EmojiLoggerFactory;
 import com.belman.service.base.BaseService;
-import com.belman.presentation.navigation.Router;
 
 import java.util.Optional;
-import java.util.logging.Logger;
 
 /**
  * Default implementation of the SessionContext interface.
@@ -17,7 +15,6 @@ public class DefaultSessionContext extends BaseService implements SessionContext
     private final SessionService sessionService;
     private SessionState currentState;
     private UserBusiness currentUser;
-    private final Logger logger;
 
     /**
      * Creates a new DefaultSessionContext with the specified session service.
@@ -27,7 +24,6 @@ public class DefaultSessionContext extends BaseService implements SessionContext
     public DefaultSessionContext(SessionService sessionService) {
         super(EmojiLoggerFactory.getInstance());
         this.sessionService = sessionService;
-        this.logger = Logger.getLogger(DefaultSessionContext.class.getName());
         this.currentState = new LoggedOutState();
     }
 
@@ -58,28 +54,6 @@ public class DefaultSessionContext extends BaseService implements SessionContext
     @Override
     public void logEvent(String message) {
         logInfo(message);
-    }
-
-    @Override
-    public void navigateToUserHome() {
-        Optional<UserBusiness> userOpt = getUser();
-        if (userOpt.isPresent()) {
-            UserBusiness user = userOpt.get();
-            // Navigate based on user role
-            // This would typically be handled by a RoleBasedNavigationService
-            // For now, we'll just log the action
-            logInfo("Navigating to home view for user: {}", user.getUsername().value());
-        } else {
-            // If no user is logged in, navigate to login view
-            navigateToLogin();
-        }
-    }
-
-    @Override
-    public void navigateToLogin() {
-        logInfo("Navigating to login view");
-        // This would typically use the Router to navigate to the login view
-        // For now, we'll just log the action
     }
 
     @Override

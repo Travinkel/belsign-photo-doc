@@ -47,16 +47,6 @@ public interface SessionContext {
     void logEvent(String message);
 
     /**
-     * Navigates to the appropriate home view based on the user's role.
-     */
-    void navigateToUserHome();
-
-    /**
-     * Navigates to the login view.
-     */
-    void navigateToLogin();
-
-    /**
      * Refreshes the current session.
      */
     void refreshSession();
